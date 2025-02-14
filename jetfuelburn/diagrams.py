@@ -25,6 +25,12 @@ def calculate_fuel_consumption_based_on_payload_range(
     Note that in this figure, the y-axis shows _total_ aircraft weight, not _payload weight_.
     Total aircraft weight can be computed by adding the operating empty weight (OEW) to the payload weight and fuel weight.
 
+    See Also
+    --------
+    - [Burzlaff (2017), Fig. 3.10](https://www.fzt.haw-hamburg.de/pers/Scholz/arbeiten/TextBurzlaff.pdf)
+    - ["Aircraft Payload-Range Analysis for Financiers", Fig. 5 ff.](http://www.aircraftmonitor.com/uploads/1/5/9/9/15993320/aircraft_payload_range_analysis_for_financiers___v2.pdf)
+
+
     Notes
     -----
     Key assumptions of this fuel calculation function:
@@ -37,11 +43,6 @@ def calculate_fuel_consumption_based_on_payload_range(
     | fuel reserves     | depends on (sometimes unknown) manufacturer assumptions             |
     | alternate airport | depends on (sometimes unknown) manufacturer assumptions             |
     
-    See Also
-    --------
-    - [Burzlaff (2017), Fig. 3.10](https://www.fzt.haw-hamburg.de/pers/Scholz/arbeiten/TextBurzlaff.pdf)
-    - ["Aircraft Payload-Range Analysis for Financiers", Fig. 5 ff.](http://www.aircraftmonitor.com/uploads/1/5/9/9/15993320/aircraft_payload_range_analysis_for_financiers___v2.pdf)
-
     Warnings
     --------
     There is no manufacturer-independent convention for including
