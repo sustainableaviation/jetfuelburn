@@ -1,3 +1,1 @@
-# Diagrams
-
 ::: jetfuelburn.diagrams

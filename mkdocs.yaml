@@ -4,11 +4,25 @@ repo_url: https://github.com/sustainableaviation/jetfuelburn
 copyright: © Paul Scherrer Institute (PSI)
 nav:
   - Home: 'index.md'
-  - Allocation: 'allocation.md'
-  - Diagrams: 'diagrams.md'
+  - About: 'about.md'
+  - Getting Started:
+    - Installation: 'installation.md'
+    - Tutorial: 'tutorial.md'
+  - API Reference:
+    - Fuel from Diagrams: 'api/diagrams.md'
+    - Fuel from Reduced Order Models: 'api/reducedorder.md'
+    - Fuel from Range Equation: 'api/breguet.md'
+    - Fuel from Closed Form Equations: 'api/closedform.md'
+    - Footprint Cabin Class Allocation: 'api/allocation.md'
 theme:
   name: readthedocs
   highlightjs: true
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.path
+    - navigation.indexes
+    - navigation.top
 plugins:
   - search:
       min_search_length: 2
