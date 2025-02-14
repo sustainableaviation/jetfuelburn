@@ -36,7 +36,19 @@ def calculate_fuel_consumption_based_on_breguet_range_equation(
     | $v$        | [speed]           | Average cruise speed of the aircraft (TAS)                             |
     | $m_2$      | [mass]            | Mass of the aircraft after cruise segment                              |
 
-    Note that thrust-specific fuel consumption (TSFC) is expressed in [time/distance], as the commonly used unit [g/kNs] simplifies accordingly.
+    Note that thrust-specific fuel consumption (TSFC) is of dimension [time/distance], as the commonly used unit [g/kNs] simplifies accordingly.
+
+    Notes
+    -----
+    Key assumptions of this fuel calculation function:
+
+    | Parameter         | Assumption                                                                 |
+    |-------------------|----------------------------------------------------------------------------|
+    | data availability | adequate for both current aircraft (reports) and future aircraft (studies) |
+    | aircraft payload  | variable                                                                   |
+    | climb/descent     | not considered, only cruise-phase                                          |
+    | fuel reserves     | can be considered through $m_2$                                            |
+    | alternate airport | can be considered through $m_2$                                            |
 
     Warnings
     --------
