@@ -4,7 +4,8 @@ repo_url: https://github.com/sustainableaviation/jetfuelburn
 copyright: © Paul Scherrer Institute (PSI)
 nav:
   - Home: 'index.md'
-  - API: 'api.md'
+  - Allocation: 'allocation.md'
+  - Diagrams: 'diagrams.md'
 theme:
   name: readthedocs
   highlightjs: true
@@ -26,5 +27,4 @@ markdown_extensions:
       generic: true
 
 extra_javascript:
-  - javascripts/mathjax.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js

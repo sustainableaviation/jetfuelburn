@@ -18,6 +18,8 @@ def calculate_fuel_consumption_based_on_payload_range(
     Given aircraft performance parameters from a payload/range diagram and a flight distance,
     calculates the fuel burned and payload mass for a given mission.
 
+    ![Screenshot](docs/_static/payload_range_generic_DOCSTRINGS.svg)
+
     Parameters
     ----------
     d : float
