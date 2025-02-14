@@ -9,9 +9,9 @@ nav:
     - Installation: 'installation.md'
     - Tutorial: 'tutorial.md'
   - API Reference:
-    - Fuel from Diagrams: 'api/diagrams.md'
-    - Fuel from Reduced Order Models: 'api/reducedorder.md'
+    - Fuel from PL/R-Diagrams: 'api/diagrams.md'
     - Fuel from Range Equation: 'api/breguet.md'
+    - Fuel from Reduced Order Models: 'api/reducedorder.md'
     - Fuel from Closed Form Equations: 'api/closedform.md'
     - Footprint Cabin Class Allocation: 'api/allocation.md'
 theme:
