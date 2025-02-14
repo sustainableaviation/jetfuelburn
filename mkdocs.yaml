@@ -1,0 +1,30 @@
+# https://www.mkdocs.org/user-guide/configuration/
+site_name: JetFuelBurn Documentation
+repo_url: https://github.com/sustainableaviation/jetfuelburn
+copyright: © Paul Scherrer Institute (PSI)
+nav:
+  - Home: 'index.md'
+  - API: 'api.md'
+theme:
+  name: readthedocs
+  highlightjs: true
+plugins:
+  - search:
+      min_search_length: 2
+      indexing: 'full'
+  - mkdocstrings:
+      handlers:
+        # See: https://mkdocstrings.github.io/python/usage/
+        python:
+          options:
+            docstring_style: numpy
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
