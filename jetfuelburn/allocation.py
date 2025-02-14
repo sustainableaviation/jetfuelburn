@@ -15,14 +15,10 @@ def footprint_allocation_by_area(
     load_factor_business: float,
     load_factor_first: float,
 ) -> tuple[float, float, float, float]:
-    """
-    Given the fuel burn per flight, the number of seats in each cabin class
-    and the load factor in each cabin class, returns the fuel burn per passenger,
-    specific to each cabin class.
-
-    This function implements the "allocation by area" method recommended by
-    both IATA and ICAO. If a certain seating class is not present, all related parameters
-    (`seats`, `size_factor`, `load_factor`) should be set to 0.
+    r"""
+    Given the fuel burn per flight $F$, the number of seats in each cabin class $S_i$,
+    the load factor in each cabin class $L_i$ and the size factor of each cabin class $s_i$,
+    returns the fuel burn per passenger specific to each cabin class $f_i$.
 
     $$
         f_i = \frac{1}{L_i} \frac{s_i F}{\sum_i s_i S_i}
@@ -41,11 +37,22 @@ def footprint_allocation_by_area(
     Summing over the fuel burn of all seating classes, we again get the total fuel burn per flight $F$:
 
     $$
-        F = \sum_i f_i S_i L_i = \sum_i \frac{1}{L_i} \frac{s_i F}{\sum_i s_i S_i} S_i L_i = F \frac{\sum_i s_i}{\sum_i s_i}
+    F = \sum_i f_i S_i L_i = \sum_i \frac{1}{L_i} \frac{s_i F}{\sum_i s_i S_i} S_i L_i = F \frac{\sum_i s_i}{\sum_i s_i}
     $$
+
+    The _size factor_ of a class is defined as:
+    
+    $$
+        s_i = \frac{A_i}{A_{economy}}
+    $$
+
+    where $A_i$ is the area occupied by a passenger in class $i$ and
+    $A_{economy}$ is the area occupied by a passenger in economy class.
 
     See Also
     --------
+    This function implements the "allocation by area" method recommended by both IATA and ICAO:
+
     - [IATA Recommended Practice RP 1726: Passenger CO2 Calculation Methodology](https://web.archive.org/web/20230526103741/https://www.iata.org/contentassets/139d686fa8f34c4ba7a41f7ba3e026e7/iata-rp-1726_passenger-co2.pdf)
     - [ICAO Carbon Emissions Calculator Methodology (Version 13.1)](https://web.archive.org/web/20240826103513/https://applications.icao.int/icec/Methodology%20ICAO%20Carbon%20Emissions%20Calculator_v13_Final.pdf)
 
@@ -58,15 +65,17 @@ def footprint_allocation_by_area(
     | Narrow-Body | 1.0     | 1.00            | 1.5      | 1.5   |
     | Wide-Body   | 1.0     | 1.5             | 4.0      | 5.0   |
 
+    Warnings
+    --------
+
+    If a certain seating class is not present, all related parameters
+    (`seats`, `size_factor`, `load_factor`) should be set to 0.
+
     Raises
     ------
     ValueError
-        If any of the following conditions are NOT met:
-        - `fuel_per_flight` > 0
-        - `load_factor_eco` between 0 and 1
-        - `load_factor_premiumeco` between 0 and 1
-        - `load_factor_business` between 0 and 1
-        - `load_factor_first` between 0 and 1
+        If `fuel_per_flight` < 0 or
+        (`load_factor_eco`, `load_factor_premiumeco`, `load_factor_business`, `load_factor_first`) not between 0 and 1.
 
     Parameters
     ----------
