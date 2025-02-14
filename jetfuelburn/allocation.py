@@ -49,12 +49,7 @@ def footprint_allocation_by_area(
     where $A_i$ is the area occupied by a passenger in class $i$ and
     $A_{economy}$ is the area occupied by a passenger in economy class.
 
-    See Also
-    --------
-    This function implements the "allocation by area" method recommended by both IATA and ICAO:
-
-    - [IATA Recommended Practice RP 1726: Passenger CO2 Calculation Methodology](https://web.archive.org/web/20230526103741/https://www.iata.org/contentassets/139d686fa8f34c4ba7a41f7ba3e026e7/iata-rp-1726_passenger-co2.pdf)
-    - [ICAO Carbon Emissions Calculator Methodology (Version 13.1)](https://web.archive.org/web/20240826103513/https://applications.icao.int/icec/Methodology%20ICAO%20Carbon%20Emissions%20Calculator_v13_Final.pdf)
+    This approach is suggested by both ICAO and IATA as the "allocation by area" method.
 
     Notes
     -----
@@ -67,9 +62,14 @@ def footprint_allocation_by_area(
 
     Warnings
     --------
-
     If a certain seating class is not present, all related parameters
     (`seats`, `size_factor`, `load_factor`) should be set to 0.
+
+    References
+    --------
+    - [IATA Recommended Practice RP 1726: Passenger CO2 Calculation Methodology](https://web.archive.org/web/20230526103741/https://www.iata.org/contentassets/139d686fa8f34c4ba7a41f7ba3e026e7/iata-rp-1726_passenger-co2.pdf)
+    - [ICAO Carbon Emissions Calculator Methodology (Version 13.1)](https://web.archive.org/web/20240826103513/https://applications.icao.int/icec/Methodology%20ICAO%20Carbon%20Emissions%20Calculator_v13_Final.pdf)
+
 
     Raises
     ------
