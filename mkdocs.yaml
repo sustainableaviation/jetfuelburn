@@ -23,16 +23,17 @@ theme:
     - navigation.path
     - navigation.indexes
     - navigation.top
+    - content.footnote.tooltips
 plugins:
   - search:
       min_search_length: 2
       indexing: 'full'
-  - mkdocstrings:
+  - mkdocstrings: # https://mkdocstrings.github.io/python/usage/
       handlers:
-        # See: https://mkdocstrings.github.io/python/usage/
         python:
           options:
             docstring_style: numpy
+            show_source: true
 markdown_extensions:
   - admonition
   - toc:
