@@ -11,7 +11,7 @@ class fuel_burn_model_yanto_etal:
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
     from the Eurocontrol BADA flight trajectory simulation model and climb/descent fuel burn data.
 
-    ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/reduced_order_yanto.svg)
+    ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/reduced_order_yanto_etal.svg)
     Diagrammatic illustration of the reduced-order fuel burn model by Yanto and Liem (2017).
     Climb and descent segment fuel burn is calculated using the [EUROCONTROL BADA](https://www.eurocontrol.int/model/bada) model.
     Cruise segment fuel burn is calculated using the Breguet range equation.
