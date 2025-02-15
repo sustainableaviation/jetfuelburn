@@ -57,8 +57,8 @@ def footprint_allocation_by_area(
 
     |             | Economy | Premium Economy | Business | First |
     | ----------- | ------- | --------------- | -------- | ----- |
-    | Narrow-Body | 1.0     | 1.00            | 1.5      | 1.5   |
-    | Wide-Body   | 1.0     | 1.5             | 4.0      | 5.0   |
+    | __Narrow-Body__ | 1.0     | 1.00            | 1.5      | 1.5   |
+    | __Wide-Body__   | 1.0     | 1.5             | 4.0      | 5.0   |
 
     Warnings
     --------
