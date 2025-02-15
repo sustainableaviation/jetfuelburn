@@ -22,7 +22,10 @@ class fuel_burn_model_yanto_etal:
 
     References
     ----------
-    - [Yanto and Liem (2017)](https://doi.org/10.2514/6.2017-3338)
+    Yanto, J., & Liem, R. P. (2017).
+    Efficient fast approximation for aircraft fuel consumption for decision-making and policy analysis.
+    In _AIAA Modeling and Simulation Technologies Conference_ (p. 3338).
+    doi:[10.2514/6.2017-3338](https://doi.org/10.2514/6.2017-3338)
 
     """
     def __init__(self):
@@ -121,6 +124,8 @@ class fuel_burn_model_yanto_etal:
 class fuel_burn_model_lee_etal:
     """
     Reduced-order fuel burn model based on Lee et al. (2010).
+
+    ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/reduced_order_lee_etal.svg)
     
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
@@ -128,7 +133,10 @@ class fuel_burn_model_lee_etal:
 
     References
     ----------
-    - [Lee and Chatterji (2010)](https://doi.org/10.2514/6.2010-9156)
+    Lee, H. T., & Chatterji, G. (2010, September).
+    Closed-form takeoff weight estimation model for air transportation simulation.
+    In _10th AIAA Aviation Technology, Integration, and Operations (ATIO) Conference_ (p. 9156).
+    doi:[10.2514/6.2010-9156](https://doi.org/10.2514/6.2010-9156)
 
     """
     def __init__(self):
