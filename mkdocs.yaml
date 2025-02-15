@@ -14,8 +14,9 @@ nav:
     - Fuel from Reduced Order Models: 'api/reducedorder.md'
     - Fuel from Closed Form Equations: 'api/closedform.md'
     - Footprint Cabin Class Allocation: 'api/allocation.md'
-theme:
+theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
   name: readthedocs
+  logo: _static/jetfuelburn_logo_wide.svg
   highlightjs: true
   features:
     - navigation.instant

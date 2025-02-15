@@ -58,7 +58,10 @@ def calculate_fuel_consumption_based_on_breguet_range_equation(
 
     References
     --------
-    - [Young (2018), Sec. 13.7 and Eqn. (13.43a)](https://doi.org/10.1002/9781118534786)
+    - Young, T. M. (2017).
+    _Performance of the Jet Transport Airplane: Analysis Methods, Flight Operations, and Regulations._
+    John Wiley & Sons.
+    doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
     - [Range (Aeronautics), Wikipedia](https://en.wikipedia.org/wiki/Range_(aeronautics))
 
     Raises
