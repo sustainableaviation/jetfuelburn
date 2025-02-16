@@ -496,3 +496,26 @@ class fuel_burn_model_seymour_etal():
 
         weight_fuel = self.dict_regression_coefficients[acft]['reduced_fuel_a1'] ** 2 * R + self.dict_regression_coefficients[acft]['reduced_fuel_a2'] * R + self.dict_regression_coefficients[acft]['reduced_fuel_intercept']
         return weight_fuel * ureg('kg')
+    
+
+class fuel_burn_model_aim2015():
+    """
+    Reduced-order fuel burn model based on the AIM2015 air transport model (part "Aircraft Performance Model").
+
+    ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/reduced_order_aim2015.svg)
+    
+    In this model, fuel burn calculations are based on a regression model.
+    The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
+    from the Eurocontrol BADA flight trajectory simulation model and climb/descent fuel burn data.
+
+    References
+    ----------
+    - Dray, L. M., Krammer, P., Doyme, K., Wang, B., Al Zayat, K., O'Sullivan, A., & Schäfer, A. W. (2019).
+    AIM2015: Validation and initial results from an open-source aviation systems model.
+    _Transport Policy_, 79, 93-102.
+    doi:[10.1016/j.tranpol.2019.04.013](https://doi.org/10.1016/j.tranpol.2019.04.013)
+    - [AIM2015 documentation (v9)](https://web.archive.org/web/20241206191807/https://www.atslab.org/wp-content/uploads/2019/12/AIM-2015-Documentation-v9-122019.pdf)
+    - [AIM2015 information in the EU MIDAS system](https://web.jrc.ec.europa.eu/policy-model-inventory/explore/models/model-aim/)
+
+
+    """
