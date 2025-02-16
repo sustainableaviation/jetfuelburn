@@ -1,4 +1,5 @@
 import math
+import csv
 import pint
 ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/latest/user/common.html#using-a-shared-unit-registry
 
@@ -498,15 +499,54 @@ class fuel_burn_model_seymour_etal():
         return weight_fuel * ureg('kg')
     
 
-class fuel_burn_model_aim2015():
-    """
-    Reduced-order fuel burn model based on the AIM2015 air transport model (part "Aircraft Performance Model").
+@ureg.check(
+    None, # int
+    '[length]',
+    '[length]',
+    '[length]',
+    '[mass]',
+)
+def fuel_burn_model_aim2015(
+    acft_size_class: int,
+    D_climb: ureg.Quantity,
+    D_cruise: ureg.Quantity,
+    D_descent: ureg.Quantity,
+    PL: ureg.Quantity,
+) -> tuple[ureg.Quantity, ureg.Quantity, ureg.Quantity]:
+    r"""
+    Given an aircraft size class integer, payload and range calculates the fuel burned during flight (climb, cruise, takeoff).
+
+    The function implements the reduced-order fuel burn model of the [AIM2015 air transport model](https://www.atslab.org/data-tools/) (part "Aircraft Performance Model").
 
     ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/reduced_order_aim2015.svg)
     
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
-    from the Eurocontrol BADA flight trajectory simulation model and climb/descent fuel burn data.
+    by simulating flights using the PianoX software.
+
+    $$
+        \text{Fuel}_{tsp} = I_{ts} \cdot ( \eta_{tsp,0} + \eta_{tsp,1}D + \eta_{tsp,2}D \cdot PL + \eta_{tsp,3}D^2 + \eta_{tsp,4}PL + \eta_{tsp,5}D^2 \cdot PL )
+    $$
+    
+    Notes
+    -----
+    Data is available for 8 aircraft size classes, as defined in the AIM2015 documentation, Section 2.3, Table 1:
+
+    | Index | Size Category         | Approx. Range | Reference Aircraft | Reference Engine     | Comment |
+    |-------|-----------------------|---------------|--------------------|----------------------|---------|
+    | 1     | Small Regional Jet    | 30-69         | CRJ 700            | GE CF34 8C5B1        |         |
+    | 2     | Large Regional Jet    | 70-109        | Embraer 190        | GE CF34 10E6         |         |
+    | 3     | Small Narrowbody      | 110-129       | Airbus A319        | V.2522               |         |
+    | 4     | Medium Narrowbody     | 130-159       | Airbus A320        | CFM56-5B4            |         |
+    | 5     | Large Narrowbody      | 160-199       | Boeing 737-800     | CFM56-7B27           |         |
+    | 6     | Small Twin Aisle      | 200-249       | Boeing 787-800     | GEnx-1B67            |         |
+    | 7     | Medium Twin Aisle     | 259-299       | Airbus A330-300    | Trent 772B           |         |
+    | 8     | Large Twin Aisle      | 300-399       | Boeing 777-300ER   | PW4090               |         |
+    | 9     | Very Large Aircraft   | 400+          | Airbus A380-800    | EA GP7270            | no data |
+
+    See Also
+    --------
+    Class `AircraftPerformanceParams` in `aim/v11/datastructures/AircraftPerformanceParams`
 
     References
     ----------
@@ -517,5 +557,70 @@ class fuel_burn_model_aim2015():
     - [AIM2015 documentation (v9)](https://web.archive.org/web/20241206191807/https://www.atslab.org/wp-content/uploads/2019/12/AIM-2015-Documentation-v9-122019.pdf)
     - [AIM2015 information in the EU MIDAS system](https://web.jrc.ec.europa.eu/policy-model-inventory/explore/models/model-aim/)
 
+    Parameters
+    ----------
+    acft_size_class : int
+        Aircraft size class (1-8)
+    D_climb : ureg.Quantity
+        Climb distance [length]
+    D_cruise : ureg.Quantity
+        Cruise distance [length]
+    D_descent : ureg.Quantity
+        Descent distance [length]
+    PL : ureg.Quantity
+        Payload [mass]
 
+    Raises
+    ------
+    ValueError
+        If range or payload is negative, or if the aircraft size class is not between 1 and 8.
+
+    Returns
+    -------
+    tuple[ureg.Quantity, ureg.Quantity, ureg.Quantity]
+        Fuel burned during climb, cruise and descent [mass]
     """
+
+    if R.magnitude < 0:
+        raise ValueError("Range must be non-negative.")
+    if PL.magnitude < 0:
+        raise ValueError("Payload must be non-negative.")
+    if acft_size_class not in range(1, 9):
+        raise ValueError("Aircraft size class must be between 1 and 8. Compare the table in the function documentation.")
+
+    D = D.to('km').magnitude
+    PL = PL.to('kg').magnitude
+
+    dict_coefficients = {}
+    with open("data/AIM2015_v11_AircraftPerformanceParams.csv", mode='r') as file:
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            variable = row.pop('Variable')
+            dict_coefficients[variable] = {key: float(value) for key, value in row.items()}
+    
+    weight_fuel_climb = (
+        dict_coefficients['ClimboutFuel_kg_Intercept'][f'Param_size{acft_size_class}'] +
+        dict_coefficients['ClimboutFuel_kg_Dist_km'][f'Param_size{acft_size_class}'] * D_climb +
+        dict_coefficients['ClimboutFuel_kg_Dist_km_x_Payload_kg'][f'Param_size{acft_size_class}'] * PL + 
+        dict_coefficients['ClimboutFuel_kg_Dist_km_squared'][f'Param_size{acft_size_class}'] * D_climb ** 2 +
+        dict_coefficients['ClimboutFuel_kg_Payload_kg'][f'Param_size{acft_size_class}'] * PL +
+        dict_coefficients['ClimboutFuel_kg_Dist_km_squared_x_Payload_kg'][f'Param_size{acft_size_class}'] * D_climb ** 2 * PL
+    )
+    weight_fuel_cruise = (
+        dict_coefficients['CruiseFuel_kg_Intercept'][f'Param_size{acft_size_class}'] +
+        dict_coefficients['CruiseFuel_kg_Dist_km'][f'Param_size{acft_size_class}'] * D_cruise +
+        dict_coefficients['CruiseFuel_kg_Dist_km_x_Payload_kg'][f'Param_size{acft_size_class}'] * PL + 
+        dict_coefficients['CruiseFuel_kg_Dist_km_squared'][f'Param_size{acft_size_class}'] * D_cruise ** 2 +
+        dict_coefficients['CruiseFuel_kg_Payload_kg'][f'Param_size{acft_size_class}'] * PL +
+        dict_coefficients['CruiseFuel_kg_Dist_km_squared_x_Payload_kg'][f'Param_size{acft_size_class}'] * D_cruise ** 2 * PL
+    )
+    weight_fuel_descent = (
+        dict_coefficients['DescentFuel_kg_Intercept'][f'Param_size{acft_size_class}'] +
+        dict_coefficients['DescentFuel_kg_Dist_km'][f'Param_size{acft_size_class}'] * D_descent +
+        dict_coefficients['DescentFuel_kg_Dist_km_x_Payload_kg'][f'Param_size{acft_size_class}'] * PL + 
+        dict_coefficients['DescentFuel_kg_Dist_km_squared'][f'Param_size{acft_size_class}'] * D_descent ** 2 +
+        dict_coefficients['DescentFuel_kg_Payload_kg'][f'Param_size{acft_size_class}'] * PL +
+        dict_coefficients['DescentFuel_kg_Dist_km_squared_x_Payload_kg'][f'Param_size{acft_size_class}'] * D_descent ** 2 * PL
+    )
+    weight_fuel_total = weight_fuel_climb + weight_fuel_cruise + weight_fuel_descent
+    return weight_fuel_total * ureg('kg')
