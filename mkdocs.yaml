@@ -16,7 +16,7 @@ nav:
     - Footprint Cabin Class Allocation: 'api/allocation.md'
 theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
   name: readthedocs
-  logo: _static/jetfuelburn_logo_wide.svg
+  logo: _static/logo/jetfuelburn_logo_wide.svg
   highlightjs: true
   features:
     - navigation.instant
@@ -42,8 +42,8 @@ markdown_extensions:
   - pymdownx.arithmatex:
       generic: true
 
-extra:
-  generator: false
-
 extra_javascript:
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+watch:
+  - jetfuelburn

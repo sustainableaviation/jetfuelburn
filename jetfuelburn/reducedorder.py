@@ -6,21 +6,49 @@ ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/l
 
 class fuel_burn_model_yanto_etal:
     """
-    Reduced-order fuel burn model using the parameters __payload__ and __range__ proposed by Yanto and Liem (2017).
+    Given an ICAO aircraft designator, mission range and payload mass, calculates the fuel burned.
+
+    This function implements the the reduced-order fuel burn model of Yanto and Liem (2017):
+
+    ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/reduced_order_yanto_etal.svg)
     
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
-    from the Eurocontrol BADA flight trajectory simulation model and climb/descent fuel burn data.
-
-    ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/reduced_order_yanto_etal.svg)
-    Diagrammatic illustration of the reduced-order fuel burn model by Yanto and Liem (2017).
+    from a combination of Eurocontrol BADA flight trajectory simulation model and the Breguet range equation.
     Climb and descent segment fuel burn is calculated using the [EUROCONTROL BADA](https://www.eurocontrol.int/model/bada) model.
     Cruise segment fuel burn is calculated using the Breguet range equation.
-    The multi-variate 
 
+    Fuel is calculated according to Table 5 in Yanto and Liem (2017):
+
+    $$
+        W_f = c_R \cdot R + c_P \cdot PL + c_C
+    $$
+
+    where:
+
+    | Symbol     | Dimension         | Description                                                            |
+    |------------|-------------------|------------------------------------------------------------------------|
+    | $W_f$      | [mass]            | Fuel required for the mission of the aircraft                          |
+    | $R$        | [distance]        | Range of the aircraft (=mission distance)                              |
+    | $PL$       | [mass]            | Payload mass of the aircraft                                           |
+    | $c_R$      | [mass/distance]   | Regression coefficient for range                                       |
+    | $c_P$      | [mass/mass]       | Regression coefficient for payload                                     |
+    | $c_C$      | [mass]            | Constant term                                                          |
+
+    Notes
+    -----
+
+    Key assumptions of this fuel calculation function:
+
+    | Parameter             | Assumption                                                                  |
+    |-----------------------|-----------------------------------------------------------------------------|
+    | data availability     | 37 selected aircraft                                                        |
+    | aircraft payload      | variable                                                                    |
+    | climb/descent         | considered implicitly                                                       |
+    | reserve fuel uplift   | assumed constant at _"0.08 zero-fuel weight"_ (cf. P.577)                   |
+    | diversion fuel uplift | unknown                                                                     |
 
     
-
     References
     ----------
     Yanto, J., & Liem, R. P. (2017).
@@ -95,6 +123,8 @@ class fuel_burn_model_yanto_etal:
 
         Parameters
         ----------
+        acft : str
+            ICAO Aircraft Designator
         R : float
             Mission range [length]
         PL : float
@@ -104,6 +134,8 @@ class fuel_burn_model_yanto_etal:
         ------
         ValueError
             If the ICAO aircraft designator is not found in the model data.
+        ValueError
+            If range or payload are less than zero.
 
         Returns
         -------
@@ -111,11 +143,16 @@ class fuel_burn_model_yanto_etal:
             Fuel burned during flight [kg]
         """
 
-        R = R.to('km').magnitude
-        PL = PL.to('kg').magnitude
-
+        if R < 0:
+            raise ValueError("Range must be greater than zero.")
+        if PL < 0:
+            raise ValueError("Payload mass must be greater than zero.")
         if acft not in self.dict_regression_coefficients.keys():
             raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data. Please select one of the following: {self.dict_regression_coefficients.keys()}")
+
+
+        R = R.to('km').magnitude
+        PL = PL.to('kg').magnitude
 
         weight_fuel =  self.dict_regression_coefficients[acft]['c_R'] * R + self.dict_regression_coefficients[acft]['c_P'] * PL + self.dict_regression_coefficients[acft]['c_C']
         return weight_fuel * ureg('kg')
@@ -516,33 +553,55 @@ def fuel_burn_model_aim2015(
     r"""
     Given an aircraft size class integer, payload and range calculates the fuel burned during flight (climb, cruise, takeoff).
 
-    The function implements the reduced-order fuel burn model of the [AIM2015 air transport model](https://www.atslab.org/data-tools/) (part "Aircraft Performance Model").
+    The function implements the reduced-order fuel burn model of the [AIM2015 air transport model](https://www.atslab.org/data-tools/) (part "Aircraft Performance Model"):
 
     ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/reduced_order_aim2015.svg)
     
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
-    by simulating flights using the PianoX software.
+    by simulating flights using the [PianoX software](https://www.lissys.uk/PianoX.html).
+
+    Fuel burn is calculated according to Section 3.4.1 of the AIM2015 documentation:
 
     $$
         \text{Fuel}_{tsp} = I_{ts} \cdot ( \eta_{tsp,0} + \eta_{tsp,1}D + \eta_{tsp,2}D \cdot PL + \eta_{tsp,3}D^2 + \eta_{tsp,4}PL + \eta_{tsp,5}D^2 \cdot PL )
     $$
-    
+
+    where subscripts $t,s,p$ denote aircraft $t$ype, $s$ize class and flight $p$hase and where:
+
+    | Symbol     | Dimension         | Description                                                            |
+    |------------|-------------------|------------------------------------------------------------------------|
+    | $I$        | [dimensionless]   | non-linear inefficiency parameter                                      |
+    | $D$        | [length]          | distance flown in flight phase                                         |
+    | $PL$       | [mass]            | payload mass                                                           |
+    | $\eta$     | varies            | regression coefficients                                                |
+
+    For information on the inefficiency parameter $I$, see the conference publication of Reynolds (2009).
+
     Notes
     -----
     Data is available for 8 aircraft size classes, as defined in the AIM2015 documentation, Section 2.3, Table 1:
 
-    | Index | Size Category         | Approx. Range | Reference Aircraft | Reference Engine     | Comment |
-    |-------|-----------------------|---------------|--------------------|----------------------|---------|
-    | 1     | Small Regional Jet    | 30-69         | CRJ 700            | GE CF34 8C5B1        |         |
-    | 2     | Large Regional Jet    | 70-109        | Embraer 190        | GE CF34 10E6         |         |
-    | 3     | Small Narrowbody      | 110-129       | Airbus A319        | V.2522               |         |
-    | 4     | Medium Narrowbody     | 130-159       | Airbus A320        | CFM56-5B4            |         |
-    | 5     | Large Narrowbody      | 160-199       | Boeing 737-800     | CFM56-7B27           |         |
-    | 6     | Small Twin Aisle      | 200-249       | Boeing 787-800     | GEnx-1B67            |         |
-    | 7     | Medium Twin Aisle     | 259-299       | Airbus A330-300    | Trent 772B           |         |
-    | 8     | Large Twin Aisle      | 300-399       | Boeing 777-300ER   | PW4090               |         |
-    | 9     | Very Large Aircraft   | 400+          | Airbus A380-800    | EA GP7270            | no data |
+    | Index | Size Category         | Approx. Range | Reference Aircraft | Reference Engine     |
+    |-------|-----------------------|---------------|--------------------|----------------------|
+    | 1     | Small Regional Jet    | 30-69         | CRJ 700            | GE CF34 8C5B1        |
+    | 2     | Large Regional Jet    | 70-109        | Embraer 190        | GE CF34 10E6         |
+    | 3     | Small Narrowbody      | 110-129       | Airbus A319        | V.2522               |
+    | 4     | Medium Narrowbody     | 130-159       | Airbus A320        | CFM56-5B4            |
+    | 5     | Large Narrowbody      | 160-199       | Boeing 737-800     | CFM56-7B27           |
+    | 6     | Small Twin Aisle      | 200-249       | Boeing 787-800     | GEnx-1B67            |
+    | 7     | Medium Twin Aisle     | 259-299       | Airbus A330-300    | Trent 772B           |
+    | 8     | Large Twin Aisle      | 300-399       | Boeing 777-300ER   | PW4090               |
+
+    Key assumptions of this fuel calculation function:
+
+    | Parameter             | Assumption                                                                  |
+    |-----------------------|-----------------------------------------------------------------------------|
+    | data availability     | 8 selected aircraft, which can be used as proxies within their weight class |
+    | aircraft payload      | variable                                                                    |
+    | climb/descent         | considered separately                                                       |
+    | reserve fuel uplift   | considered implicitly (?)                                                   |
+    | diversion fuel uplift | considered implicitly (?)                                                   |
 
     See Also
     --------
@@ -554,6 +613,10 @@ def fuel_burn_model_aim2015(
     AIM2015: Validation and initial results from an open-source aviation systems model.
     _Transport Policy_, 79, 93-102.
     doi:[10.1016/j.tranpol.2019.04.013](https://doi.org/10.1016/j.tranpol.2019.04.013)
+    - Reynolds, T. G. (2009).
+    Development of flight inefficiency metrics for environmental performance assessment of ATM.
+    In _8th USA/Europe Seminar on Air Traffic Management Research and Development (ATM2009)_.
+    Full Text:[Archived Copy from atslab.org](https://web.archive.org/web/20220721111106/http://www.atslab.org/wp-content/uploads/2017/01/ATM2009_Reynoldsv2.pdf)
     - [AIM2015 documentation (v9)](https://web.archive.org/web/20241206191807/https://www.atslab.org/wp-content/uploads/2019/12/AIM-2015-Documentation-v9-122019.pdf)
     - [AIM2015 information in the EU MIDAS system](https://web.jrc.ec.europa.eu/policy-model-inventory/explore/models/model-aim/)
 
