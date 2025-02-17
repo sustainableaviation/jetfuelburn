@@ -17,7 +17,7 @@ class yanto_etal:
     Climb and descent segment fuel burn is calculated using the [EUROCONTROL BADA](https://www.eurocontrol.int/model/bada) model.
     Cruise segment fuel burn is calculated using the Breguet range equation.
 
-    Fuel is calculated according to Table 5 in Yanto and Liem (2017):
+    Fuel burn is calculated according to Table 5 in Yanto and Liem (2017):
 
     $$
         W_f = c_R \cdot R + c_P \cdot PL + c_C
@@ -369,7 +369,36 @@ class seymour_etal():
     
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
-    from the Eurocontrol BADA flight trajectory simulation model and climb/descent fuel burn data.
+    from the Eurocontrol BADA flight trajectory simulation model and climb/descent fuel burn data based on engine data.
+
+    Fuel burn is calculated according to Table M.7 in the supplement to Seymour et al. (2020):
+
+    $$
+        F=a_1 \cdot R + a_2 \cdot PL + c
+    $$
+
+    where:
+
+    | Symbol     | Dimension         | Description                                                            |
+    |------------|-------------------|------------------------------------------------------------------------|
+    | $F$        | [mass]            | Fuel required for the mission of the aircraft                          |
+    | $R$        | [distance]        | Range of the aircraft (=mission distance)                              |
+    | $PL$       | [mass]            | Payload mass of the aircraft                                           |
+    | $a_1$      | [mass/distance]   | Regression coefficient for range                                       |
+    | $a_2$      | [mass/mass]       | Regression coefficient for payload                                     |
+    | $c$        | [mass]            | Constant term                                                          |
+
+    Notes
+    -----
+    Key assumptions of this fuel calculation function:
+
+    | Parameter             | Assumption                                                                  |
+    |-----------------------|-----------------------------------------------------------------------------|
+    | data availability     | 133 selected aircraft                                                       |
+    | aircraft payload      | assumed to be average for each aircraft type                                |
+    | climb/descent         | considered implicitly                                                       |
+    | reserve fuel uplift   | considered implicitly, according to ICAO requirements                       |
+    | diversion fuel uplift | considered implicitly, according to ICAO requirements                       |
 
     References
     ----------
@@ -522,21 +551,16 @@ class seymour_etal():
         None, # string
         '[length]',
     )
-    def calculate_fuel_consumption_based_on_seymour_etal(
+    def calculate_fuel(
         acft: str,
         R: float,
     ) -> ureg.Quantity:
         """
-        Given an ICAO aircraft designator and mission range, calculates the fuel burned. An "average" payload is assumed for every aircraft.
-
-        _extended_summary_
-
-        INCLUDES RESERVE ETC.?
-
-        See Also
+        Given an ICAO aircraft designator and mission range, calculates the fuel burned.
+        
+        Warnings
         --------
-        -[Seymour et al. (2020), supplementary document "Appendices A-M", Table M.7](https://doi.org/10.1016/j.trd.2020.102528)
-        -[CSV of regression coefficients from Table M.7 at the FEAT GitHub repository](https://github.com/kwdseymour/FEAT/blob/master/ac_model_coefficients.csv)
+        An "average" payload is assumed for every aircraft. Range is the only variable.
 
         Parameters
         ----------
@@ -545,17 +569,25 @@ class seymour_etal():
         R : float
             Mission range [length]
 
+        Raises
+        ------
+        ValueError
+            If the ICAO Aircraft Designator is not found in the model data.
+        ValueError
+            If the mission range is negative.
+
         Returns
         -------
         ureg.Quantity
             Fuel burned during flight [mass]
-
         """
-
-        R = R.to('km').magnitude
 
         if acft not in self.dict_regression_coefficients.keys():
             raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data.")
+        if R < 0:
+            raise ValueError("Mission range must be non-negative.")
+
+        R = R.to('km').magnitude
 
         weight_fuel = self.dict_regression_coefficients[acft]['reduced_fuel_a1'] ** 2 * R + self.dict_regression_coefficients[acft]['reduced_fuel_a2'] * R + self.dict_regression_coefficients[acft]['reduced_fuel_intercept']
         return weight_fuel * ureg('kg')
