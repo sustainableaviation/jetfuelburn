@@ -3,12 +3,11 @@ import csv
 import pint
 ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/latest/user/common.html#using-a-shared-unit-registry
 
+from aux.physics import _calculate_dynamic_pressure
 
-class fuel_burn_model_yanto_etal:
+class yanto_etal:
     """
-    Given an ICAO aircraft designator, mission range and payload mass, calculates the fuel burned.
-
-    This function implements the the reduced-order fuel burn model of Yanto and Liem (2017):
+    This class implements the the reduced-order fuel burn model of Yanto and Liem (2017):
 
     ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/reduced_order_yanto_etal.svg)
     
@@ -37,7 +36,6 @@ class fuel_burn_model_yanto_etal:
 
     Notes
     -----
-
     Key assumptions of this fuel calculation function:
 
     | Parameter             | Assumption                                                                  |
@@ -48,7 +46,6 @@ class fuel_burn_model_yanto_etal:
     | reserve fuel uplift   | assumed constant at _"0.08 zero-fuel weight"_ (cf. P.577)                   |
     | diversion fuel uplift | unknown                                                                     |
 
-    
     References
     ----------
     Yanto, J., & Liem, R. P. (2017).
@@ -159,15 +156,32 @@ class fuel_burn_model_yanto_etal:
     
 
 
-class fuel_burn_model_lee_etal:
+class lee_etal:
     """
-    Reduced-order fuel burn model based on Lee et al. (2010).
+    This class implements the the reduced-order fuel burn model of Lee et al. (2010).
 
     ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/reduced_order_lee_etal.svg)
     
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
-    from the Eurocontrol BADA flight trajectory simulation model and climb/descent fuel burn data.
+    from a combination of Eurocontrol BADA flight trajectory simulation model and the Breguet range equation.
+    Climb segment fuel burn is calculated using the [EUROCONTROL BADA](https://www.eurocontrol.int/model/bada) model.
+    Descent segment fuel burn is assumed equal to cruise segment fuel burn.
+    Cruise segment fuel burn is calculated using the Breguet range equation.
+
+    For the equations implemented in this class, see Lee et al. (2010), Eqns.(13)ff. and Figure 5.
+
+    Notes
+    -----
+    Key assumptions of this fuel calculation function:
+
+    | Parameter             | Assumption                                                                  |
+    |-----------------------|-----------------------------------------------------------------------------|
+    | data availability     | 21 selected aircraft                                                        |
+    | aircraft payload      | variable                                                                    |
+    | climb/descent         | considered implicitly                                                       |
+    | reserve fuel uplift   | assumed constant at 0.08 zero-fuel weight (cf. P.4)                     |
+    | diversion fuel uplift | unclear (cf. P.4)                                                           |
 
     References
     ----------
@@ -223,7 +237,7 @@ class fuel_burn_model_lee_etal:
         '[speed]',
         '[length]'
     )
-    def calculate_fuel_consumption_based_on_lee_etal(
+    def calculate_fuel(
         acft: str,
         W_E: float,
         W_MPLD: float,
@@ -237,26 +251,35 @@ class fuel_burn_model_lee_etal:
         V: float,
         d: float,
     ) -> tuple[ureg.Quantity, ureg.Quantity]:
-        """_summary_
-
-        _extended_summary_
+        """
+        Given an ICAO aircraft designator, mission range and payload mass, calculates the fuel burned.
 
         Parameters
         ----------
         acft : str
-            _description_
-        R : float
-            _description_
-        PL : float
-            _description_
-        alt_cruise : float
-            _description_
-        speed_cruise : float
-            _description_
-
-        See Also
-        --------
-        - [Lee and Chatterji (2010)](https://doi.org/10.2514/6.2010-9156)
+            ICAO Aircraft Designator
+        W_E : float
+            Aircraft empty weight [weight]
+        W_MPLD : float
+            Aircraft maximum payload [weight]
+        W_MTO : float
+            Aircraft maximum takeoff weight [weight]
+        W_MF : float
+            Aircraft maximum fuel weight [weight]
+        S : float
+            Aircraft wing area [area]
+        C_D0 : float
+            Parasitic drag coefficient [dimensionless]
+        C_D2 : float
+            Induced drag coefficient [dimensionless]
+        c : float
+            Thrust specific fuel consumption [time/distance]
+        h : float
+            Cruise altitude [length]
+        V : float
+            Cruise speed [speed]
+        d : float
+            wind-compensated distance [length]
 
         Returns
         -------
@@ -267,11 +290,16 @@ class fuel_burn_model_lee_etal:
         ------
         ValueError
             If the ICAO aircraft designator is not found in the model data.
+        ValueError
+            If any parameter is less than zero.
         """
 
-        """
-        -[Lee and Chatterji (2010)](https://doi.org/10.2514/6.2010-9156)
-        """
+        parameters = [W_E, W_MPLD, W_MTO, W_MF, S, C_D0, C_D2, c, h, V, d]
+        if any(param <= 0 for param in parameters):
+            raise ValueError("All parameters must be greater than zero.")
+        if acft not in self.dict_regression_coefficients.keys():
+            raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data. Please select one of the following: {self.dict_regression_coefficients.keys()}")
+
         q = _calculate_dynamic_pressure(speed=V, altitude=h)
         q = q.to('N/m^2').magnitude
         c = c.magnitude
@@ -283,9 +311,6 @@ class fuel_burn_model_lee_etal:
         d = d.to('m').magnitude
         h = h.to('m').magnitude
         V = V.to('m/s').magnitude
-
-        if acft not in self.dict_regression_coefficients.keys():
-            raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data. Please select one of the following: {self.dict_regression_coefficients.keys()}")
 
         f_res = 0.08 # cf. Section II D of Lee et al.
         f_man = 0.007 # cf. Section II D of Lee et al.
@@ -336,7 +361,7 @@ class fuel_burn_model_lee_etal:
         return m_f.to('kg'), m_pld.to('kg')
     
 
-class fuel_burn_model_seymour_etal():
+class seymour_etal():
     """
     Reduced-order fuel burn model based on Seymour et al. (2020).
 
@@ -543,7 +568,7 @@ class fuel_burn_model_seymour_etal():
     '[length]',
     '[mass]',
 )
-def fuel_burn_model_aim2015(
+def aim2015(
     acft_size_class: int,
     D_climb: ureg.Quantity,
     D_cruise: ureg.Quantity,
