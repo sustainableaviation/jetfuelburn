@@ -6,7 +6,7 @@ ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/l
 from aux.physics import _calculate_dynamic_pressure
 
 class yanto_etal:
-    """
+    r"""
     This class implements the the reduced-order fuel burn model of Yanto and Liem (2017):
 
     ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/reduced_order_yanto_etal.svg)
@@ -362,7 +362,7 @@ class lee_etal:
     
 
 class seymour_etal():
-    """
+    r"""
     Reduced-order fuel burn model based on Seymour et al. (2020).
 
     ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/reduced_order_seymour_etal.svg)
