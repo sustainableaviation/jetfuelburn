@@ -16,6 +16,7 @@ nav:
     - Footprint Cabin Class Allocation: 'api/allocation.md'
   - API Reference (Internal):
     - Physics Functions: 'api/physics.md'
+    - Flight Profile Functions: 'api/flightprofile.md'
 theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
   name: readthedocs
   logo: _static/logo/jetfuelburn_logo_wide.svg
