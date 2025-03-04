@@ -1,7 +1,7 @@
 # https://www.mkdocs.org/user-guide/configuration/
 site_name: JetFuelBurn Documentation
 repo_url: https://github.com/sustainableaviation/jetfuelburn
-copyright: © Paul Scherrer Institute (PSI) | Code under MIT License | Documentation under CC BY 4.0 License
+copyright: © Paul Scherrer Institute (PSI) | Code under MIT License
 nav:
   - Home: 'index.md'
   - About: 'about.md'
