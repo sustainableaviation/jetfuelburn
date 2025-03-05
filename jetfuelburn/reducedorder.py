@@ -1,116 +1,74 @@
+# %%
+
 import math
 import csv
 import pint
 ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/latest/user/common.html#using-a-shared-unit-registry
 
-from aux.physics import _calculate_dynamic_pressure
+import sys
+import os
+module_path = os.path.abspath("/Users/michaelweinold/github/jetfuelburn")
+if module_path not in sys.path:
+    sys.path.append(module_path)
+
+from jetfuelburn.aux.physics import _calculate_dynamic_pressure
 
 class yanto_etal:
-    r"""
-    This class implements the the reduced-order fuel burn model of Yanto and Liem (2017):
+    # Class-level regression coefficients
+    _regression_coefficients = {
+        'A319': {'c_R': 1.809, 'c_P': 0.145, 'c_C': 580.83},
+        'A320': {'c_R': 1.984, 'c_P': 0.138, 'c_C': 390.97},
+        'A332': {'c_R': 8.305, 'c_P': 0.341, 'c_C': -2314.39},
+        'A333': {'c_R': 8.278, 'c_P': 0.329, 'c_C': 706.80},
+        'B731': {'c_R': 2.085, 'c_P': 0.148, 'c_C': 125.44},
+        'B733': {'c_R': 2.099, 'c_P': 0.146, 'c_C': 470.24},
+        'B734': {'c_R': 2.412, 'c_P': 0.16, 'c_C': 431.29},
+        'B735': {'c_R': 1.825, 'c_P': 0.117, 'c_C': 631.40},
+        'B736': {'c_R': 1.922, 'c_P': 0.185, 'c_C': 517.48},
+        'B737': {'c_R': 2.063, 'c_P': 0.165, 'c_C': 915.72},
+        'B738': {'c_R': 2.539, 'c_P': 0.157, 'c_C': 484.68},
+        'B739': {'c_R': 2.507, 'c_P': 0.172, 'c_C': 503.32},
+        'B739ER': {'c_R': 2.547, 'c_P': 0.18, 'c_C': 328.96},
+        'B752': {'c_R': 2.966, 'c_P': 0.168, 'c_C': 443.28},
+        'B753': {'c_R': 3.242, 'c_P': 0.177, 'c_C': 762.16},
+        'B772': {'c_R': 6.724, 'c_P': 0.396, 'c_C': -7634.59},
+        'B773': {'c_R': 8.163, 'c_P': 0.371, 'c_C': -8576.72},
+        'CRJ2': {'c_R': 1.045, 'c_P': 0.116, 'c_C': 140.42},
+        'CRJ9': {'c_R': 1.271, 'c_P': 0.141, 'c_C': 778.27},
+        'E145': {'c_R': 0.705, 'c_P': 0.134, 'c_C': 601.88},
+        'MD80': {'c_R': 2.463, 'c_P': 0.152, 'c_C': -67.81},
+        'A318': {'c_R': 1.407, 'c_P': 0.172, 'c_C': 17.29},
+        'A321': {'c_R': 2.61, 'c_P': 0.176, 'c_C': 880.53},
+        'A343': {'c_R': 8.81, 'c_P': 0.424, 'c_C': -5057.09},
+        'A345': {'c_R': 10.86, 'c_P': 0.453, 'c_C': -9708.52},
+        'A342': {'c_R': 8.36, 'c_P': 0.348, 'c_C': -290.49},
+        'A346': {'c_R': 12.428, 'c_P': 0.385, 'c_C': -8552.62},
+        'B742': {'c_R': 10.06, 'c_P': 0.403, 'c_C': -8964.48},
+        'B744': {'c_R': 8.779, 'c_P': 0.247, 'c_C': -9191.53},
+        'B762': {'c_R': 4.102, 'c_P': 0.228, 'c_C': 716.20},
+        'B763': {'c_R': 5.159, 'c_P': 0.279, 'c_C': -2282.61},
+        'CRJ7': {'c_R': 1.194, 'c_P': 0.143, 'c_C': 725.06},
+        'CRJ1': {'c_R': 0.781, 'c_P': 0.169, 'c_C': 351.56},
+        'E140': {'c_R': 0.673, 'c_P': 0.133, 'c_C': 633.03},
+        'E170': {'c_R': 1.19, 'c_P': 0.144, 'c_C': 949.164},
+        'E190': {'c_R': 1.626, 'c_P': 0.145, 'c_C': 1219.34},
+        'MD90': {'c_R': 2.157, 'c_P': 0.117, 'c_C': 643.18}
+    }
 
-    ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/reduced_order_yanto_etal.svg)
-    
-    In this model, fuel burn calculations are based on a regression model.
-    The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
-    from a combination of Eurocontrol BADA flight trajectory simulation model and the Breguet range equation.
-    Climb and descent segment fuel burn is calculated using the [EUROCONTROL BADA](https://www.eurocontrol.int/model/bada) model.
-    Cruise segment fuel burn is calculated using the Breguet range equation.
-
-    Fuel burn is calculated according to Table 5 in Yanto and Liem (2017):
-
-    $$
-        W_f = c_R \cdot R + c_P \cdot PL + c_C
-    $$
-
-    where:
-
-    | Symbol     | Dimension         | Description                                                            |
-    |------------|-------------------|------------------------------------------------------------------------|
-    | $W_f$      | [mass]            | Fuel required for the mission of the aircraft                          |
-    | $R$        | [distance]        | Range of the aircraft (=mission distance)                              |
-    | $PL$       | [mass]            | Payload mass of the aircraft                                           |
-    | $c_R$      | [mass/distance]   | Regression coefficient for range                                       |
-    | $c_P$      | [mass/mass]       | Regression coefficient for payload                                     |
-    | $c_C$      | [mass]            | Constant term                                                          |
-
-    Notes
-    -----
-    Key assumptions of this fuel calculation function:
-
-    | Parameter             | Assumption                                                                  |
-    |-----------------------|-----------------------------------------------------------------------------|
-    | data availability     | 37 selected aircraft                                                        |
-    | aircraft payload      | variable                                                                    |
-    | climb/descent         | considered implicitly                                                       |
-    | reserve fuel uplift   | assumed constant at _"0.08 zero-fuel weight"_ (cf. P.577)                   |
-    | diversion fuel uplift | unknown                                                                     |
-
-    References
-    ----------
-    Yanto, J., & Liem, R. P. (2017).
-    Efficient fast approximation for aircraft fuel consumption for decision-making and policy analysis.
-    In _AIAA Modeling and Simulation Technologies Conference_ (p. 3338).
-    doi:[10.2514/6.2017-3338](https://doi.org/10.2514/6.2017-3338)
-
-    """
-    def __init__(self):
-        self.dict_regression_coefficients = {
-            'A319': {'c_R': 1.809, 'c_P': 0.145, 'c_C': 580.83},
-            'A320': {'c_R': 1.984, 'c_P': 0.138, 'c_C': 390.97},
-            'A332': {'c_R': 8.305, 'c_P': 0.341, 'c_C': -2314.39},
-            'A333': {'c_R': 8.278, 'c_P': 0.329, 'c_C': 706.80},
-            'B731': {'c_R': 2.085, 'c_P': 0.148, 'c_C': 125.44},
-            'B733': {'c_R': 2.099, 'c_P': 0.146, 'c_C': 470.24},
-            'B734': {'c_R': 2.412, 'c_P': 0.16, 'c_C': 431.29},
-            'B735': {'c_R': 1.825, 'c_P': 0.117, 'c_C': 631.40},
-            'B736': {'c_R': 1.922, 'c_P': 0.185, 'c_C': 517.48},
-            'B737': {'c_R': 2.063, 'c_P': 0.165, 'c_C': 915.72},
-            'B738': {'c_R': 2.539, 'c_P': 0.157, 'c_C': 484.68},
-            'B739': {'c_R': 2.507, 'c_P': 0.172, 'c_C': 503.32},
-            'B739ER': {'c_R': 2.547, 'c_P': 0.18, 'c_C': 328.96},
-            'B752': {'c_R': 2.966, 'c_P': 0.168, 'c_C': 443.28},
-            'B753': {'c_R': 3.242, 'c_P': 0.177, 'c_C': 762.16},
-            'B772': {'c_R': 6.724, 'c_P': 0.396, 'c_C': -7634.59},
-            'B773': {'c_R': 8.163, 'c_P': 0.371, 'c_C': -8576.72},
-            'CRJ2': {'c_R': 1.045, 'c_P': 0.116, 'c_C': 140.42},
-            'CRJ9': {'c_R': 1.271, 'c_P': 0.141, 'c_C': 778.27},
-            'E145': {'c_R': 0.705, 'c_P': 0.134, 'c_C': 601.88},
-            'MD80': {'c_R': 2.463, 'c_P': 0.152, 'c_C': -67.81},
-            'A318': {'c_R': 1.407, 'c_P': 0.172, 'c_C': 17.29},
-            'A321': {'c_R': 2.61, 'c_P': 0.176, 'c_C': 880.53},
-            'A343': {'c_R': 8.81, 'c_P': 0.424, 'c_C': -5057.09},
-            'A345': {'c_R': 10.86, 'c_P': 0.453, 'c_C': -9708.52},
-            'A342': {'c_R': 8.36, 'c_P': 0.348, 'c_C': -290.49},
-            'A346': {'c_R': 12.428, 'c_P': 0.385, 'c_C': -8552.62},
-            'B742': {'c_R': 10.06, 'c_P': 0.403, 'c_C': -8964.48},
-            'B744': {'c_R': 8.779, 'c_P': 0.247, 'c_C': -9191.53},
-            'B762': {'c_R': 4.102, 'c_P': 0.228, 'c_C': 716.20},
-            'B763': {'c_R': 5.159, 'c_P': 0.279, 'c_C': -2282.61},
-            'CRJ7': {'c_R': 1.194, 'c_P': 0.143, 'c_C': 725.06},
-            'CRJ1': {'c_R': 0.781, 'c_P': 0.169, 'c_C': 351.56},
-            'E140': {'c_R': 0.673, 'c_P': 0.133, 'c_C': 633.03},
-            'E170': {'c_R': 1.19, 'c_P': 0.144, 'c_C': 949.164},
-            'E190': {'c_R': 1.626, 'c_P': 0.145, 'c_C': 1219.34},
-            'MD90': {'c_R': 2.157, 'c_P': 0.117, 'c_C': 643.18}
-        }
-
-
-    def available_aircraft(self) -> list[str]:
+    @staticmethod
+    def available_aircraft() -> list[str]:
         """
         Returns a sorted list of available ICAO aircraft designators included in the model.
-        See also Table 5 in Yanto and Liem (2017).
         """
-        return sorted(self.dict_regression_coefficients.keys())
+        return sorted(yanto_etal._regression_coefficients.keys())
 
-
+    @staticmethod
     @ureg.check(
-        None, # string
+        None,  # acft
         '[length]',
         '[mass]',
     )
     def calculate_fuel_consumption(
-        self,
         acft: str,
         R: float,
         PL: float,
@@ -139,22 +97,22 @@ class yanto_etal:
         float
             Fuel burned during flight [kg]
         """
-
         if R < 0:
             raise ValueError("Range must be greater than zero.")
         if PL < 0:
             raise ValueError("Payload mass must be greater than zero.")
-        if acft not in self.dict_regression_coefficients.keys():
-            raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data. Please select one of the following: {self.dict_regression_coefficients.keys()}")
-
+        if acft not in yanto_etal._regression_coefficients.keys():
+            raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data. Please select one of the following: {yanto_etal._regression_coefficients.keys()}")
 
         R = R.to('km').magnitude
         PL = PL.to('kg').magnitude
 
-        weight_fuel =  self.dict_regression_coefficients[acft]['c_R'] * R + self.dict_regression_coefficients[acft]['c_P'] * PL + self.dict_regression_coefficients[acft]['c_C']
+        weight_fuel = (
+            yanto_etal._regression_coefficients[acft]['c_R'] * R + 
+            yanto_etal._regression_coefficients[acft]['c_P'] * PL + 
+            yanto_etal._regression_coefficients[acft]['c_C']
+        )
         return weight_fuel * ureg('kg')
-    
-
 
 class lee_etal:
     """
@@ -182,6 +140,13 @@ class lee_etal:
     | climb/descent         | considered implicitly                                                       |
     | reserve fuel uplift   | assumed constant at 0.08 zero-fuel weight (cf. P.4)                     |
     | diversion fuel uplift | unclear (cf. P.4)                                                           |
+
+    Warnings
+    --------
+    The x-axis of all three panels in Figure 14 in Lee et al. (2010) are incorrectly rendered.
+    According to panel (a), the maximum achievable range of a Boeing 777 would be ~30'000NM. This is ~1.6x the circumference of the Earth.
+    Neither assuming that the axis multiplier `1e4` nor the unit `nm` (sic!) are incorrect explains this issue.
+    Figure 5 was instead used to test the implementation of the method.
 
     References
     ----------
@@ -233,6 +198,7 @@ class lee_etal:
         '[area]',
         '[]', # dimensionless
         '[]', # dimensionless
+        '[time]/[length]',
         '[length]',
         '[speed]',
         '[length]'
