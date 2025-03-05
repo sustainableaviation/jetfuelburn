@@ -21,6 +21,7 @@ theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
   name: readthedocs
   logo: _static/logo/jetfuelburn_logo_wide.svg
   highlightjs: true
+  navigation_depth: 4
   features:
     - navigation.instant
     - navigation.instant.progress
