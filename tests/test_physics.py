@@ -46,7 +46,10 @@ def test_calculate_aircraft_velocity(request, fixture_name):
     fixture = request.getfixturevalue(fixture_name)
     input_data, output_data = fixture
 
-    velocity = _calculate_aircraft_velocity(*input_data)
+    velocity = _calculate_aircraft_velocity(
+        mach_number=input_data['mach_number'],
+        altitude=input_data['altitude']
+    )
 
     assert velocity.magnitude == pytest.approx(output_data.magnitude, rel=1e-2)
     assert velocity.units == output_data.units

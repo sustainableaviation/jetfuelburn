@@ -1,24 +1,28 @@
+# %%
+
 import pint
 ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/latest/user/common.html#using-a-shared-ureg-registry
-import math
 
+import numpy as np
 
 @ureg.check(
     '[length]' # altitude
 )
 def _calculate_atmospheric_conditions(altitude: float) -> tuple[float, float]:
-    r"""
-    Computes the air density $\rho$ and temperature $T$ as a function of altitute $h$, for altitudes up to 20'000 meters.
+    """
+    Computes the air density and temperature as a function of altitute, for altitudes up to 20,000 meters.
 
     All calculations are based on the ISA (International Standard Atmosphere):
 
-    ![ISA](https://upload.wikimedia.org/wikipedia/commons/6/62/Comparison_International_Standard_Atmosphere_space_diving.svg)
+    .. image:: https://upload.wikimedia.org/wikipedia/commons/6/62/Comparison_International_Standard_Atmosphere_space_diving.svg
 
-    Temperature in the lower Stratosphere, it is simply -56.5°C. In the Troposphere, it is:
+    Temperature in the Troposphere is calculated using the following formula:
 
     $$
-        T=T_0 - L * h
+    T=T_0 - L * h
     $$
+
+    in the lower Stratosphere, it is simply -56.5°C.
 
     where:
 
@@ -50,25 +54,22 @@ def _calculate_atmospheric_conditions(altitude: float) -> tuple[float, float]:
     altitude : float [distance]
         Altitude above sea level
 
-    See Also
-    --------
+    Notes
+    -----
     Compare also the function
     [`atmos()` in openap/extra/aero.py](https://github.com/TUDelft-CNS-ATM/openap/blob/39619977962fe6b4a86ab7efbefa70890eecfe36/openap/extra/aero.py#L48C5-L48C10)
     by Junzi Sun (https://github.com/junzis).
     Note that the present function has been re-written completely.
 
-    References
-    ----------
-    - Eqn. (1.6) in Sadraey, M. H. (2024).
-    _Aircraft Performance: An Engineering Approach (2nd Edition)._
-    CRC Press.
-    doi:[10.1201/9781003279068](https://doi.org/10.1201/9781003279068)
+    See Also
+    --------
+    - Temperature: [Eqn. (1.6) in Sadraey (2nd Edition, 2024)](https://doi.org/10.1201/9781003279068)
     - [Density Equations on Wikipedia](https://en.wikipedia.org/wiki/Barometric_formula#Density_equations)
 
     Returns
     -------
     tuple[float, float]
-        Tuple of air density [kg/m³], temperature [°C]
+        Tuple of air density (⍴)[kg/m³], temperature [°C]
     """
     if altitude < 0 * ureg.m:
         raise ValueError("Altitude must not be <0.")
@@ -89,7 +90,7 @@ def _calculate_atmospheric_conditions(altitude: float) -> tuple[float, float]:
         rho = rho_0 * ((temperature_0 - lapse_rate * altitude) / temperature_0) ** (((g * M) / (R * lapse_rate)) - 1)
     else:
         temperature = temperature_lower_stratosphere
-        rho = rho_1 * math.exp(-g * M * (altitude - 11000 * ureg.m) / (R * temperature_lower_stratosphere))
+        rho = rho_1 * np.exp(-g * M * (altitude - 11000 * ureg.m) / (R * temperature_lower_stratosphere))
 
     return rho.to(ureg.kg/ureg.m ** 3), temperature.to(ureg.celsius)
 
@@ -102,27 +103,13 @@ def _calculate_dynamic_pressure(
     speed: float,
     altitude: float
 ) -> float:
-    r"""
-    Computes the dynamic pressure $q$ at a given speed $u$ and altitude $h$.
-
-    $$
-    q = \frac{1}{2} \rho(h) u^2
-    $$
-
-    All altitude-dependent calculations are based on the ISA (International Standard Atmosphere).
+    """
+    Computes the dynamic pressure at a given speed and altitude.
 
     See Also
     --------
-    jetfuelburn.aux.physics._calculate_atmospheric_conditions
-
-    References
-    ----------
-    - Eqn. (2.63) in Young, T. M. (2017).
-    _Performance of the Jet Transport Airplane: Analysis Methods, Flight Operations, and Regulations._
-    John Wiley & Sons.
-    doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
     - [Dynamic Pressure on Wikipedia](https://en.wikipedia.org/wiki/Dynamic_pressure)
-
+    - [Eqn.(2.63) in Young (2018)](https://doi.org/10.1002/9781118534786)
 
     Parameters
     ----------
@@ -144,31 +131,15 @@ def _calculate_dynamic_pressure(
 
 @ureg.check(
     '[]', # mach number is dimensionless
-    '[length]'
+    '[length]' # altitude
 )
 def _calculate_aircraft_velocity(
     mach_number: float,
     altitude: float
 ) -> float:
     """
-    Converts aircraft speed from mach number $M$ to kilometers per hour $V$,
-    depending on the flight altitude $h$ and associated air temperature.
-
-    $$
-    V = M \sqrt{\gamma R T}
-    $$
-    
-    where:
-
-    | Symbol   | Dimension              | Description                         | Value        |
-    |----------|------------------------|-------------------------------------|--------------|
-    | $V$      | [speed]                | aircraft velocity                   | N/A          |
-    | $M$      | [dimensionless]        | Mach number                         | N/A          |
-    | $\gamma$ | [dimensionless]        | ratio of specific heat for air      | 1.4          |
-    | $R$      | [specific gas constant | specific gas constant for air       | 287 J/(kg*K) |
-    | $T$      | [temperature]          | temperature at flight altitude      | N/A          |
-
-    All altitude-dependent calculations are based on the ISA (International Standard Atmosphere).
+    Converts aircraft speed from mach number to kilometers per hour,
+    depending on the flight altitude air temperature.
 
     Parameters
     ----------
@@ -177,13 +148,9 @@ def _calculate_aircraft_velocity(
     temperature : float [temperature]
         Temperature at flight altitute (OAT)
 
-    References
-    ----------
-    - Eqn. (2.77) and (6.7) in Young, T. M. (2017).
-    _Performance of the Jet Transport Airplane: Analysis Methods, Flight Operations, and Regulations._
-    John Wiley & Sons.
-    doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
-    - [Mach Number Calculation on Wikipedia](https://en.wikipedia.org/wiki/Mach_number#Calculation)
+    See Also
+    --------
+    - Velocity: [Mach Number Calculation](https://en.wikipedia.org/wiki/Mach_number#Calculation)
 
     Returns
     -------
@@ -195,6 +162,6 @@ def _calculate_aircraft_velocity(
 
     R = 287.052874 * (ureg.J/(ureg.kg*ureg.K)) # specific gas constant for air 
     gamma = 1.4 * ureg.dimensionless # ratio of specific heat for air
-    velocity = mach_number * math.sqrt(gamma * R * temperature.to(ureg.K))
+    velocity = mach_number * np.sqrt(gamma*R*temperature.to(ureg.K))
 
     return velocity.to(ureg.kph)
