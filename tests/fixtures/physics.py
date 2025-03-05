@@ -31,22 +31,31 @@ def atmospheric_conditions_3():
 @pytest.fixture
 def mach_speed_1():
     # Data from the E6B Mach Speed Calculator (https://e6bx.com/mach-speed/)
-    input_data = (0.6224, 7000 * ureg.m)
-    output_data = 700 * ureg.kph
+    input_data = {
+        'mach_number': 0.6224,
+        'altitude': 7000*ureg.m
+    }
+    output_data = 700*ureg.kph
     return input_data, output_data
 
 
 @pytest.fixture
 def mach_speed_2():
     # Data from the E6B Mach Speed Calculator (https://e6bx.com/mach-speed/)
-    input_data = (0.7527, 11000 * ureg.m)
-    output_data = 800 * ureg.kph
+    input_data = {
+        'mach_number': 0.7527,
+        'altitude': 11000*ureg.m
+    }
+    output_data = 800*ureg.kph
     return input_data, output_data
 
 
 @pytest.fixture
 def mach_speed_3():
     # Data from the E6B Mach Speed Calculator (https://e6bx.com/mach-speed/)
-    input_data = (0.8469, 15000 * ureg.m)
-    output_data = 900 * ureg.kph
+    input_data = {
+        'mach_number': 0.8469,
+        'altitude': 15000*ureg.m
+    }
+    output_data = 900*ureg.kph
     return input_data, output_data
