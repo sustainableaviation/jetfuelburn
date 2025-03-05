@@ -32,7 +32,7 @@ from ecopylot.route import (
     _generate_flight_profile_dataframe_from_segments
 )
 
-from ecopylot.tests import approx_with_units, approx_dict_of_dict
+from jetfuelburn.aux.tests import approx_with_units, approx_dict_of_dict
 
 @pytest.mark.parametrize(
     "fixture_climb_segment_name",

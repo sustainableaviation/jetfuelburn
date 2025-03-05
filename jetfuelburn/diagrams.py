@@ -1,13 +1,27 @@
 # %%
 
 import pint
+import numpy as np
+import pandas as pd
 ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/latest/user/common.html#using-a-shared-unit-registry
 
 
+@ureg.check(
+    '[length]',
+    '[mass]',
+    '[mass]',
+    '[length]',
+    '[mass]',
+    '[length]',
+    '[mass]',
+    '[length]',
+    '[length]',
+)
 def calculate_fuel_consumption_based_on_payload_range(
     d: float,
     oew: float,
     mtow: float,
+    range_point_A: float,
     payload_point_B: float,
     range_point_B: float,
     payload_point_C: float,
@@ -92,27 +106,27 @@ def calculate_fuel_consumption_based_on_payload_range(
     range_point_C = range_point_C.to('km')
     range_point_D = range_point_D.to('km')
 
-    acft_weight_point_A = oew + payload_point_B
-    acft_weight_point_B = oew + payload_point_C
-    acft_weight_point_C = oew
+    acft_weight_point_B = oew + payload_point_B
+    acft_weight_point_C = oew + payload_point_C
+    acft_weight_point_D = oew
 
     if d < 0:
         raise ValueError("Distance must be greater than zero.")
     if d < range_point_B:
-        slope = (mtow - acft_weight_point_A)/range_point_B
-        intercept = acft_weight_point_A
-        m_f = (slope * d + intercept) - acft_weight_point_A
+        slope = (mtow - acft_weight_point_B)/(range_point_B - range_point_A)
+        intercept = mtow - slope * range_point_B
+        m_f = (slope * d + intercept) - acft_weight_point_B
         m_pld = payload_point_B
     elif range_point_B <= d < range_point_C:
-        slope = (acft_weight_point_B - acft_weight_point_A) / (range_point_C - range_point_B)
-        intercept = range_point_B * -slope + acft_weight_point_A
-        m_f = mtow - (slope * d + intercept)
-        m_pld = (slope * d + intercept) - oew
+        slope = (acft_weight_point_B - acft_weight_point_C) / (range_point_C - range_point_B)
+        intercept = range_point_B * slope + acft_weight_point_B
+        m_f = mtow - (-1 * slope * d + intercept)
+        m_pld = (mtow - oew) - m_f
     elif range_point_C <= d < range_point_D:
-        m_f = mtow - acft_weight_point_B # max fuel
-        slope = (acft_weight_point_C - acft_weight_point_B) / (range_point_D - range_point_C)
-        intercept = range_point_C * -slope + acft_weight_point_B
-        m_pld = (slope * d + intercept) - oew
+        m_f = mtow - acft_weight_point_C # max fuel
+        slope = (acft_weight_point_C - acft_weight_point_D) / (range_point_D - range_point_C)
+        intercept = range_point_C * slope + acft_weight_point_C
+        m_pld = (-1 * slope * d + intercept) - oew
     else:
         raise ValueError("Distance exceeds maximum range of aircraft as per payload-range diagram.")
 
