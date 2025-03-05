@@ -1,3 +1,5 @@
+# %%
+
 def footprint_allocation_by_area(
     fuel_per_flight: float,
     size_factor_eco: float,
@@ -129,7 +131,7 @@ def footprint_allocation_by_area(
         size_factor_business * seats_business +
         size_factor_first * seats_first
     )
-    if load_factor_premiumeco or seats_premiumeco == 0:
+    if load_factor_premiumeco == 0 or seats_premiumeco == 0:
         fuel_premiumeco = 0
     else:
         fuel_premiumeco = (1/load_factor_premiumeco) * (size_factor_premiumeco * fuel_per_flight) / (
@@ -138,7 +140,7 @@ def footprint_allocation_by_area(
             size_factor_business * seats_business +
             size_factor_first * seats_first
         )
-    if load_factor_business or seats_business == 0:
+    if load_factor_business == 0 or seats_business == 0:
         fuel_business = 0
     else:
         fuel_business = (1/load_factor_business) * (size_factor_business * fuel_per_flight) / (
@@ -147,7 +149,7 @@ def footprint_allocation_by_area(
             size_factor_business * seats_business +
             size_factor_first * seats_first
         )
-    if load_factor_first or seats_first == 0:
+    if load_factor_first == 0 or seats_first == 0:
         fuel_first = 0
     else:
         fuel_first = (1/load_factor_first) * (size_factor_first * fuel_per_flight) / (

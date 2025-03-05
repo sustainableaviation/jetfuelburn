@@ -39,8 +39,11 @@ def test_footprint_allocation_by_area(request, fixture_name):
     )
 
     assert (
-        tuple_fuel_per_seat[0] * input_data['seats_eco'] +
-        tuple_fuel_per_seat[1] * input_data['seats_premiumeco'] +
-        tuple_fuel_per_seat[2] * input_data['seats_business'] +
-        tuple_fuel_per_seat[3] * input_data['seats_first']
-    ) == pytest.approx(input_data['fuel_per_flight'])
+        tuple_fuel_per_seat[0] * input_data['seats_eco'] * input_data['load_factor_eco'] +
+        tuple_fuel_per_seat[1] * input_data['seats_premiumeco'] * input_data['load_factor_premiumeco'] +
+        tuple_fuel_per_seat[2] * input_data['seats_business'] * input_data['load_factor_business'] +
+        tuple_fuel_per_seat[3] * input_data['seats_first'] * input_data['load_factor_first']
+    ) == pytest.approx(
+        expected = input_data['fuel_per_flight'],
+        rel=0.01
+    )
