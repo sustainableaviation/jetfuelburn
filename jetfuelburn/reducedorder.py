@@ -249,7 +249,7 @@ class lee_etal:
         '[speed]', # V
         '[length]' # d
     )
-    def calculate_fuel(
+    def calculate_fuel_consumption(
         acft: str,
         W_E: float,
         W_MPLD: float,
