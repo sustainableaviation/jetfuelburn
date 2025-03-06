@@ -7,13 +7,13 @@ nav:
   - About: 'about.md'
   - Getting Started:
     - Installation: 'installation.md'
-    - Tutorial: 'tutorial.md'
+    - Tutorial: 'tutorial.ipynb'
   - API Reference (Public):
     - Fuel from PL/R-Diagrams: 'api/diagrams.md'
     - Fuel from Range Equation: 'api/breguet.md'
     - Fuel from Reduced Order Models: 'api/reducedorder.md'
-    - Fuel from Closed Form Equations: 'api/closedform.md'
-    - Footprint Cabin Class Allocation: 'api/allocation.md'
+    - Fuel from Closed Form Equations: 'api/closedform.md' 
+    - Cabin Class Footprint Allocation: 'api/allocation.md'
   - API Reference (Internal):
     - Physics Functions: 'api/physics.md'
     - Flight Profile Functions: 'api/flightprofile.md'
@@ -39,6 +39,11 @@ plugins:
           options:
             docstring_style: numpy
             show_source: true
+  - mkdocs-jupyter:
+      execute: False
+      show_input: True
+      ignore_h1_titles: True
+      include_source: True
 markdown_extensions:
   - admonition
   - toc:
