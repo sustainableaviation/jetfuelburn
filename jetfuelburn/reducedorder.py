@@ -188,13 +188,13 @@ class lee_etal:
     -----
     Key assumptions of this fuel calculation function:
 
-    | Parameter             | Assumption                                                                  |
-    |-----------------------|-----------------------------------------------------------------------------|
-    | data availability     | 21 selected aircraft                                                        |
-    | aircraft payload      | variable                                                                    |
-    | climb/descent         | considered implicitly                                                       |
-    | reserve fuel uplift   | assumed constant at 0.08 zero-fuel weight (cf. P.4)                         |
-    | diversion fuel uplift | unclear (cf. P.4)                                                           |
+    | Parameter             | Assumption                                            |
+    |-----------------------|-------------------------------------------------------|
+    | data availability     | 21 selected aircraft                                  |
+    | aircraft payload      | variable                                              |
+    | climb/descent         | considered implicitly                                 |
+    | reserve fuel uplift   | assumed constant at 0.08 zero-fuel weight (cf. P.4)   |
+    | diversion fuel uplift | unclear (cf. P.4)                                     |
 
     References
     ----------
@@ -237,17 +237,17 @@ class lee_etal:
     @staticmethod
     @ureg.check(
         None,  # acft
-        '[mass]',
-        '[mass]',
-        '[mass]',
-        '[mass]',
-        '[area]',
-        '[]',  # dimensionless
-        '[]',  # dimensionless
-        '[time]/[length]',
-        '[length]',
-        '[speed]',
-        '[length]'
+        '[force]', # W_E
+        '[force]', # W_MPLD
+        '[force]', # W_MTO
+        '[force]', # W_MF
+        '[area]', # S
+        '[]', # C_D0
+        '[]', # C_D2
+        '1/[time]', # c
+        '[length]', # h
+        '[speed]', # V
+        '[length]' # d
     )
     def calculate_fuel(
         acft: str,
@@ -271,13 +271,13 @@ class lee_etal:
         acft : str
             ICAO Aircraft Designator
         W_E : float
-            Aircraft empty weight [weight]
+            Aircraft empty weight [weight] (not mass !)
         W_MPLD : float
-            Aircraft maximum payload [weight]
+            Aircraft maximum payload [weight] (not mass !)
         W_MTO : float
-            Aircraft maximum takeoff weight [weight]
+            Aircraft maximum takeoff weight [weight] (not mass !)
         W_MF : float
-            Aircraft maximum fuel weight [weight]
+            Aircraft maximum fuel weight [weight] (not mass !)
         S : float
             Aircraft wing area [area]
         C_D0 : float
@@ -285,7 +285,7 @@ class lee_etal:
         C_D2 : float
             Induced drag coefficient [dimensionless]
         c : float
-            Thrust specific fuel consumption [time/distance]
+            Thrust specific fuel consumption [1/time]
         h : float
             Cruise altitude [length]
         V : float

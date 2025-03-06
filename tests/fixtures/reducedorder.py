@@ -76,3 +76,46 @@ def fixture_seymour_a321_1000km():
     }
     output_data = 4008*ureg.kg
     return input_data, output_data
+
+
+@pytest.fixture
+def fixture_lee_B732_1500nmi():
+    # Table 3 and Figure 6 in Lee et al. (2019) https://doi.org/10.1016/j.trd.2019.102346
+    input_data = {
+        'acft':'B732',
+        'W_E': 265825*ureg.N,
+        'W_MPLD': 156476*ureg.N,
+        'W_MTO': 513422*ureg.N,
+        'W_MF': 142365*ureg.N,
+        'S': 91.09*ureg.m ** 2,
+        'C_D0': 0.0214,
+        'C_D2': 0.0462,
+        'c': (2.131E-4)/ureg.s,
+        'h': 9144*ureg.m,
+        'V': 807.65*ureg.kph,
+        'd': 1500*ureg.nmi
+    }
+    output_data = (26288*ureg.lbs).to('kg')
+    return input_data, output_data
+
+
+@pytest.fixture
+def fixture_lee_B732_2000nmi():
+    # Table 3 and Figure 6 in Lee et al. (2019) https://doi.org/10.1016/j.trd.2019.102346
+    input_data = {
+        'acft':'B732',
+        'W_E': 265825*ureg.N,
+        'W_MPLD': 156476*ureg.N,
+        'W_MTO': 513422*ureg.N,
+        'W_MF': 142365*ureg.N,
+        'S': 91.09*ureg.m ** 2,
+        'C_D0': 0.0214,
+        'C_D2': 0.0462,
+        'c': (2.131E-4)/ureg.s,
+        'h': 9144*ureg.m,
+        'V': 807.65*ureg.kph,
+        'd': 2000*ureg.nmi
+    }
+    output_data = (9500*ureg.lbs).to('kg')
+    return input_data, output_data
+
