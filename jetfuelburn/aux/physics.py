@@ -1,9 +1,5 @@
-# %%
-
-import pint
-ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/latest/user/common.html#using-a-shared-ureg-registry
-
-import numpy as np
+from jetfuelburn import ureg
+import math
 
 @ureg.check(
     '[length]' # altitude
@@ -90,7 +86,7 @@ def _calculate_atmospheric_conditions(altitude: float) -> tuple[float, float]:
         rho = rho_0 * ((temperature_0 - lapse_rate * altitude) / temperature_0) ** (((g * M) / (R * lapse_rate)) - 1)
     else:
         temperature = temperature_lower_stratosphere
-        rho = rho_1 * np.exp(-g * M * (altitude - 11000 * ureg.m) / (R * temperature_lower_stratosphere))
+        rho = rho_1 * math.exp(-g * M * (altitude - 11000 * ureg.m) / (R * temperature_lower_stratosphere))
 
     return rho.to(ureg.kg/ureg.m ** 3), temperature.to(ureg.celsius)
 
@@ -162,6 +158,6 @@ def _calculate_aircraft_velocity(
 
     R = 287.052874 * (ureg.J/(ureg.kg*ureg.K)) # specific gas constant for air 
     gamma = 1.4 * ureg.dimensionless # ratio of specific heat for air
-    velocity = mach_number * np.sqrt(gamma*R*temperature.to(ureg.K))
+    velocity = mach_number * math.sqrt(gamma*R*temperature.to(ureg.K))
 
     return velocity.to(ureg.kph)

@@ -5,10 +5,10 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "jetfuelburn"
 authors = [
-  { name="Michael Weinold", email="XXXXX@gmail.com" }
+  { name="Michael Weinold", email="michaelphilippweinold+jetfuelburn@gmail.com" }
 ]
 maintainers = [
-  { name="Michael Weinold", email="cmutel@gmail.com" }
+  { name="Michael Weinold", email="michaelphilippweinold+jetfuelburn@gmail.com" }
 ]
 description = "XXXXX"
 readme = "README.md"
@@ -34,7 +34,7 @@ dependencies = [
 
 [project.urls]
 source = "https://github.com/sustainableaviation/jetfuelburn"
-homepage = "XXXX"
+homepage = "https://jetfuelburn.readthedocs.io"
 tracker = "https://github.com/sustainableaviation/jetfuelburn/issues"
 
 [project.optional-dependencies]

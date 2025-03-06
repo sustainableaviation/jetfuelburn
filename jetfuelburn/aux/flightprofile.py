@@ -1,7 +1,7 @@
 # %%
 
-import numpy as np
-import pandas as pd
+#import numpy as np
+#import pandas as pd
 import pint
 import pint_pandas
 ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/latest/user/common.html#using-a-shared-unit-registry

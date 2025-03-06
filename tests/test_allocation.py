@@ -1,18 +1,11 @@
 import pytest
 
-import sys
-import os
-module_path = os.path.abspath("/Users/michaelweinold/github/jetfuelburn")
-if module_path not in sys.path:
-    sys.path.append(module_path)
-
 from .fixtures.allocation import (
     allocation_two_classes,
     allocation_all_classes
 )
 
 from jetfuelburn.aux.allocation import footprint_allocation_by_area
-
 
 @pytest.mark.parametrize(
     "fixture_name",

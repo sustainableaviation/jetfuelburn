@@ -4,7 +4,7 @@ import math
 
 @ureg.check(
     '[length]',
-    '[]', # dimensionless
+    '[]',
     '[mass]',
     '[speed]',
     '[time]/[length]' # [mg/Ns] = s/m
@@ -87,7 +87,7 @@ def calculate_fuel_consumption_based_on_breguet_range_equation(
     Returns
     -------
     float
-        Fuel (kg) required for the mission of the aircraft
+        Required fuel mass [kg]
     """
 
     if R < 0:

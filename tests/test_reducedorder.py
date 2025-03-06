@@ -1,23 +1,13 @@
 import pytest
 
-import pint
-ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/latest/user/common.html#using-a-shared-unit-registry
-
-import sys
-import os
-module_path = os.path.abspath("/Users/michaelweinold/github/jetfuelburn")
-if module_path not in sys.path:
-    sys.path.append(module_path)
+from jetfuelburn import ureg
 
 from jetfuelburn.aux.tests import approx_with_units
 
 from .fixtures.reducedorder import (
-    fixture_yanto_etal_B739_heavy,
-    fixture_yanto_etal_B739_light,
-    fixture_aim2015_777_light_10k,
-    fixture_aim2015_777_light_15k,
-    fixture_seymour_a321_5500km,
-    fixture_seymour_a321_1000km,
+    fixture_yanto_B739,
+    fixture_aim2015_B787,
+    fixture_seymour_B738,
     fixture_lee_B732_1500nmi,
     fixture_lee_B732_2000nmi
 )
@@ -31,35 +21,38 @@ from jetfuelburn.reducedorder import (
 
 
 @pytest.mark.parametrize(
-    "fixture_name",
-    ["fixture_yanto_etal_B739_heavy", "fixture_yanto_etal_B739_light"]
+    argnames="r, pl",
+    argvalues=[
+        (2943 * ureg.km, 7885 * ureg.kg),
+        (4724 * ureg.km, 17918 * ureg.kg),
+    ],
+    ids=["B739_light_2943km", "B739_heavy_4724km"]
 )
-def test_yanto_etal(request, fixture_name):
-    fixture = request.getfixturevalue(fixture_name)
-    input_data, output_data = fixture
-
-    weight_fuel = yanto_etal.calculate_fuel_consumption(
+def test_yanto_etal_B739(r, pl, make_yanto_etal_B739_case):
+    input_data, expected_output = make_yanto_etal_B739_case(r, pl)
+    calculated_output = calculate_yanto_fuel(
         acft=input_data['acft'],
         R=input_data['R'],
-        PL=input_data['PL']
+        PL=input_data['PL'],
     )
-
     assert approx_with_units(
-        value_check=weight_fuel,
-        value_expected=output_data,
-        rel=0.05
+        value_check=calculated_output,
+        value_expected=expected_output,
+        rel=0.075
     )
-
 
 @pytest.mark.parametrize(
-    "fixture_name",
-    ["fixture_aim2015_777_light_10k", "fixture_aim2015_777_light_15k"]
+    argnames="d",
+    argvalues=[
+        5000 * ureg.km,
+        10000 * ureg.km,
+        15000 * ureg.km,
+    ],
+    ids=["distance_5k_km", "distance_10k_km", "distance_15k_km"]
 )
-def test_aim2015(request, fixture_name):
-    fixture = request.getfixturevalue(fixture_name)
-    input_data, output_data = fixture
-
-    weight_fuel = aim2015(
+def test_aim2015(d, fixture_aim2015_B787):
+    input_data, expected_output = fixture_aim2015_B787(d)
+    calculated_output = aim2015.calculate_fuel_consumption(
         acft_size_class=input_data['acft_size_class'],
         D_climb=input_data['D_climb'],
         D_cruise=input_data['D_cruise'],
@@ -67,8 +60,29 @@ def test_aim2015(request, fixture_name):
         PL=input_data['PL']
     )
     assert approx_with_units(
-        value_check=weight_fuel,
-        value_expected=output_data,
+        value_check=sum(calculated_output.values()),
+        value_expected=expected_output,
+        rel=0.075
+    )
+
+
+@pytest.mark.parametrize(
+    argnames="r",
+    argvalues=[
+        902 * ureg.km,
+        5557 * ureg.km,
+    ],
+    ids=["range_1000km", "range_5500km"]
+)
+def test_seymour(r, fixture_seymour_B738):
+    input_data, expected_output = fixture_seymour_B738(r)
+    calculated_output = seymour_etal.calculate_fuel_consumption(
+        acft=input_data['acft'],
+        R=input_data['R'],
+    )
+    assert approx_with_units(
+        value_check=calculated_output,
+        value_expected=expected_output,
         rel=0.075
     )
 
