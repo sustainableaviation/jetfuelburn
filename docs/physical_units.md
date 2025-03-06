@@ -44,4 +44,6 @@ You can search this list for specific units using list comprehensions:
 [unit for unit in ureg._units.keys() if "meter" in unit]
 ```
 
-Note that because of American hegemony in the world of science, `'ton'` refers to a short ton (2000 lbs). If you would instead like to use civilized tons (1000 kg), you can use `'metric_ton'` instead.
+!!! note
+
+    Note that because of American hegemony in the world of science, `'ton'` refers to a short ton (2000 lbs). If you would instead like to use civilized tons (1000 kg), you can use `'metric_ton'` instead.

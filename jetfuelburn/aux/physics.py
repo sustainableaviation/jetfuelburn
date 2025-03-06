@@ -5,12 +5,12 @@ import math
     '[length]' # altitude
 )
 def _calculate_atmospheric_conditions(altitude: float) -> tuple[float, float]:
-    """
+    r"""
     Computes the air density and temperature as a function of altitute, for altitudes up to 20,000 meters.
 
     All calculations are based on the ISA (International Standard Atmosphere):
 
-    .. image:: https://upload.wikimedia.org/wikipedia/commons/6/62/Comparison_International_Standard_Atmosphere_space_diving.svg
+    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/International_Standard_Atmosphere.svg" width="250">
 
     Temperature in the Troposphere is calculated using the following formula:
 
@@ -53,9 +53,8 @@ def _calculate_atmospheric_conditions(altitude: float) -> tuple[float, float]:
     Notes
     -----
     Compare also the function
-    [`atmos()` in openap/extra/aero.py](https://github.com/TUDelft-CNS-ATM/openap/blob/39619977962fe6b4a86ab7efbefa70890eecfe36/openap/extra/aero.py#L48C5-L48C10)
-    by Junzi Sun (https://github.com/junzis).
-    Note that the present function has been re-written completely.
+    [`atmos()` in `openap/extra/aero.py`](https://github.com/TUDelft-CNS-ATM/openap/blob/39619977962fe6b4a86ab7efbefa70890eecfe36/openap/extra/aero.py#L48C5-L48C10)
+    by [Junzi Sun](https://github.com/junzis). Note that `jetfuelburn` function has been re-written completely and does not build on the `openap` code.
 
     See Also
     --------
@@ -99,7 +98,7 @@ def _calculate_dynamic_pressure(
     speed: float,
     altitude: float
 ) -> float:
-    """
+    r"""
     Computes the dynamic pressure at a given speed and altitude.
 
     See Also
@@ -133,7 +132,7 @@ def _calculate_aircraft_velocity(
     mach_number: float,
     altitude: float
 ) -> float:
-    """
+    r"""
     Converts aircraft speed from mach number to kilometers per hour,
     depending on the flight altitude air temperature.
 
