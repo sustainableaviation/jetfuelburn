@@ -4,7 +4,7 @@ import pytest
 import sys
 import os
 
-module_path = os.path.abspath("/Users/michaelweinold/github/EcoPyLot")
+module_path = os.path.abspath("/Users/michaelweinold/github/jetfuelburn")
 if module_path not in sys.path:
     sys.path.append(module_path)
 
@@ -22,7 +22,7 @@ from .fixtures.route import (
     segments_for_dataframe
 )
 
-from ecopylot.route import (
+from jetfuelburn.aux.flightprofile import (
     _generate_eurocontrol_climb_segments_complete,
     _generate_eurocontrol_descent_segments_complete,
     _compute_segments_distance_and_time_based_on_alt_cruise,
