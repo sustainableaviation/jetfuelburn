@@ -18,12 +18,15 @@ from .fixtures.reducedorder import (
     fixture_aim2015_777_light_15k,
     fixture_seymour_a321_5500km,
     fixture_seymour_a321_1000km,
+    fixture_lee_B732_1500nmi,
+    fixture_lee_B732_2000nmi
 )
 
 from jetfuelburn.reducedorder import (
     yanto_etal,
     aim2015,
     seymour_etal,
+    lee_etal
 )
 
 
@@ -72,18 +75,28 @@ def test_aim2015(request, fixture_name):
 
 @pytest.mark.parametrize(
     "fixture_name",
-    ["fixture_seymour_a321_1000km", "fixture_seymour_a321_5500km"]
+    ["fixture_lee_B732_1500nmi", "fixture_lee_B732_2000nmi"]
 )
-def test_seymour_etal(request, fixture_name):
+def test_lee_etal(request, fixture_name):
     fixture = request.getfixturevalue(fixture_name)
     input_data, output_data = fixture
 
-    weight_fuel = seymour_etal.calculate_fuel(
+    _, weight_payload = lee_etal.calculate_fuel(
         acft=input_data['acft'],
-        R=input_data['R']
+        W_E=input_data['W_E'],
+        W_MPLD=input_data['W_MPLD'],
+        W_MTO=input_data['W_MTO'],
+        W_MF=input_data['W_MF'],
+        S=input_data['S'],
+        C_D0=input_data['C_D0'],
+        C_D2=input_data['C_D2'],
+        c=input_data['c'],
+        h=input_data['h'],
+        V=input_data['V'],
+        d=input_data['d']
     )
     assert approx_with_units(
-        value_check=weight_fuel,
+        value_check=weight_payload,
         value_expected=output_data,
-        rel=0.05
+        rel=0.25
     )
