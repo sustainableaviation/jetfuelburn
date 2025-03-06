@@ -1,9 +1,4 @@
-# %%
-
-import pint
-import numpy as np
-import pandas as pd
-ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/latest/user/common.html#using-a-shared-unit-registry
+from jetfuelburn import ureg
 
 
 @ureg.check(
@@ -27,7 +22,7 @@ def calculate_fuel_consumption_based_on_payload_range(
     payload_point_C: float,
     range_point_C: float,
     range_point_D: float,
-) -> tuple[ureg.Quantity, ureg.Quantity]:
+) -> dict[ureg.Quantity, ureg.Quantity]:
     r"""
     Given aircraft performance parameters from a payload/range diagram and a flight distance $d$,
     calculates the required fuel mass $m_F$ and payload mass $m_{PL}$ for a given mission.
@@ -84,8 +79,11 @@ def calculate_fuel_consumption_based_on_payload_range(
 
     Returns
     -------
-    tuple[ureg.Quantity, ureg.Quantity]
-        Required fuel [mass], Payload mass [mass]
+    dict
+        'mass_fuel' : ureg.Quantity
+            Fuel mass [kg]
+        'mass_payload' : ureg.Quantity
+            Payload mass [kg]
 
     Raises
     ------
@@ -130,4 +128,7 @@ def calculate_fuel_consumption_based_on_payload_range(
     else:
         raise ValueError("Distance exceeds maximum range of aircraft as per payload-range diagram.")
 
-    return m_f.to('kg'), m_pld.to('kg')
+    return {
+        'mass_fuel': m_f.to('kg'),
+        'mass_payload': m_pld.to('kg')
+    }

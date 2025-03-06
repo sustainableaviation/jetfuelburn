@@ -1,81 +1,106 @@
 import pytest
-
-import pint
-ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/latest/user/common.html#using-a-shared-unit-registry
+from jetfuelburn import ureg
 
 
-@pytest.fixture
-def fixture_yanto_etal_B739_heavy():
-    # Panel (b) of Figure 5 in Yanto et al. (2017)
-    input_data = {
-        'acft':'B739',
-        'R':4724*ureg.km,
-        'PL':17918*ureg.kg,
+@pytest.fixture(scope="module")
+def fixture_aim2015_B787():
+    """
+    Fixture returning a factory function to generate test cases.
+
+    Notes
+    -----
+    - We assume: "(...) 95 kg for a passenger with luggage and an average of 4500 kg hold freight." - P.97, Dray et al. (2019)
+    - We further assume a 200km climb/descent distance. 
+    
+    See Also
+    --------
+    [Pytest Documentation "Factories as Fixtures"](https://docs.pytest.org/en/stable/how-to/fixtures.html#factories-as-fixtures)
+
+    References
+    ----------
+    [Panel 6 in Figure 4 in Dray et al. (2019)](https://doi.org/10.1016/j.tranpol.2019.04.013)
+    """
+    base_data = {
+        'acft_size_class': 6,
+        'D_climb': 200 * ureg.km,
+        'D_descent': 200 * ureg.km,
+        'PL': (359*95+4500) * ureg.kg,
     }
-    output_data = 15807*ureg.kg
-    return input_data, output_data
+
+    def _make_case(d):
+        input_data = base_data | {'D_cruise': d - (200+200) * ureg.km}
+        if d==5000*ureg.km:
+            expected_output = 25606 * ureg.kg
+        elif d == 10000 * ureg.km:
+            expected_output = 53636 * ureg.kg
+        elif d == 15000 * ureg.km:
+            expected_output = 84242 * ureg.kg
+        else:
+            raise ValueError(f"No expected output defined for d={d}")
+        
+        return input_data, expected_output
+    
+    return _make_case
 
 
-@pytest.fixture
-def fixture_yanto_etal_B739_light():
-    # Panel (b) of Figure 5 in Yanto et al. (2017)
-    input_data = {
-        'acft':'B739',
-        'R':2943*ureg.km,
-        'PL':7885*ureg.kg,
+@pytest.fixture(scope="module")
+def fixture_seymour_B738():
+    """
+    Fixture returning a factory function to generate test cases.
+    
+    See Also
+    --------
+    [Pytest Documentation "Factories as Fixtures"](https://docs.pytest.org/en/stable/how-to/fixtures.html#factories-as-fixtures)
+
+    References
+    ----------
+    [Figure 1 in Jupyter Notebook `Reduced_Model_Shape_Exploration.ipynb`](https://github.com/kwdseymour/FEAT/blob/master/Reduced_Model_Shape_Exploration.ipynb)
+    """
+    base_data = {
+        'acft': 'B738',
     }
-    output_data = 8878*ureg.kg
-    return input_data, output_data
+
+    def _make_case(r):
+        input_data = base_data | {'R': r}
+        if r == 5557 * ureg.km:
+            expected_output = 16728 * ureg.kg
+        elif r == 902 * ureg.km:
+            expected_output = 4008 * ureg.kg
+        else:
+            raise ValueError(f"No expected output defined for r={r}")
+        return input_data, expected_output
+    
+    return _make_case
 
 
-@pytest.fixture
-def fixture_aim2015_777_light_10k():
-    # Figure 4 in Dray et al. (2019) https://doi.org/10.1016/j.tranpol.2019.04.013
-    input_data = {
-        'acft_size_class':8,
-        'D_climb':300*ureg.km,
-        'D_cruise':(10000-300-200)*ureg.km,
-        'D_descent':200*ureg.km,
-        'PL':4.5*ureg.metric_ton
+@pytest.fixture(scope="module")
+def fixture_yanto_B739():
+    """
+    Fixture returning a factory function to generate test cases.
+    
+    See Also
+    --------
+    [Pytest Documentation "Factories as Fixtures"](https://docs.pytest.org/en/stable/how-to/fixtures.html#factories-as-fixtures)
+
+    References
+    ----------
+    [Panel (b) of Figure 5 in Yanto et al. (2017)](https://doi.org/10.2514/6.2017-3338)
+    """
+    base_data = {
+        'acft': 'B739',
     }
-    output_data = 72000*ureg.kg
-    return input_data, output_data
 
-
-@pytest.fixture
-def fixture_aim2015_777_light_15k():
-    # Figure 4 in Dray et al. (2019) https://doi.org/10.1016/j.tranpol.2019.04.013
-    input_data = {
-        'acft_size_class':8,
-        'D_climb':300*ureg.km,
-        'D_cruise':(15000-300-200)*ureg.km,
-        'D_descent':200*ureg.km,
-        'PL':4.5*ureg.metric_ton
-    }
-    output_data = 121843*ureg.kg
-    return input_data, output_data
-
-
-@pytest.fixture
-def fixture_seymour_a321_5500km():
-    # Figure 1 in Reduced_Model_Shape_Exploration.ipynb
-    input_data = {
-        'acft':'B738',
-        'R':5557*ureg.km,
-    }
-    output_data = 16728*ureg.kg
-    return input_data, output_data
-
-
-@pytest.fixture
-def fixture_seymour_a321_1000km():
-    # Figure 1 in Reduced_Model_Shape_Exploration.ipynb
-    input_data = {
-        'acft':'B738',
-        'R':902*ureg.km,
-    }
-    output_data = 4008*ureg.kg
-    return input_data, output_data
+    def _make_case(r, pl):
+        input_data = base_data | {'R': r, 'PL': pl}
+        if r == 4724 * ureg.km and pl == 17918 * ureg.kg:
+            expected_output = 15807 * ureg.kg
+        elif r == 2943 * ureg.km and pl == 7885 * ureg.kg:
+            expected_output = 8878 * ureg.kg
+        else:
+            raise ValueError(f"No expected output defined for r={r}, pl={pl}")
+        return input_data, expected_output
+    
+    return _make_case
 
 
 @pytest.fixture

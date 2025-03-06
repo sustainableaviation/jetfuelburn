@@ -7,8 +7,10 @@ ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/l
 @pytest.fixture
 def breguet_range_fuel_calculation_data_1() -> tuple[dict, float]:
     """
-    Generates testing data and correct result for the fuel consumption calculation.
+    Fixture returning test data.
 
+    Notes
+    -----
     Note that in the textbook example from which the data is taken,
     the aircraft mass _includes_ the fuel:
 
@@ -18,14 +20,9 @@ def breguet_range_fuel_calculation_data_1() -> tuple[dict, float]:
     not the mass _after_ cruise. Note also that the variables of the author are 
     in units of weight [N], not mass [kg].
 
-    See Also
+    References
     --------
-    - [Example 5.6 in Sadraey (2023)](https://doi.org/10.1201/9781003279068)
-
-    Returns
-    -------
-    tuple[dict, float]
-        A tuple containing the input data and the correct result for the fuel consumption calculation.
+    [Example 5.6 in Sadraey (2023)](https://doi.org/10.1201/9781003279068)
     """
     g = 9.81 * (ureg.m / ureg.s**2) # acceleration due to gravity
 
@@ -36,5 +33,5 @@ def breguet_range_fuel_calculation_data_1() -> tuple[dict, float]:
         'v_cruise': 603.4 * ureg.kph,
         'R': 4143 * ureg.km,
     }
-    output_data = 30000 * ureg.kg
-    return input_data, output_data
+    expected_data = 30000 * ureg.kg
+    return input_data, expected_data
