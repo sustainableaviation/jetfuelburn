@@ -1,3 +1,4 @@
+# %%
 from jetfuelburn import ureg
 import math
 

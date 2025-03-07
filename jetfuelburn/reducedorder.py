@@ -341,6 +341,7 @@ class lee_etal:
         if W_E + W_MPLD < W_MZF:  # Figure 5(b) in Lee et al.
             W_PLD = W_MPLD  # Figure 5(d) in Lee et al.
             W_ZF = W_E + W_PLD  # Figure 5(d) in Lee et al.
+            # quadratic formula ax^2 + bx + c = 0
             a = A_1 * A_3 * A_d
             b = (A_1 * A_4 * A_d * W_ZF + A_3 - 1)
             c = (A_4 * W_ZF + (A_d/A_1))
@@ -350,7 +351,8 @@ class lee_etal:
             W_F = W_MTO - W_MZF  # Figure 5(c) in Lee et al.
             if W_F < W_MF:  # Figure 5(e) in Lee et al.
                 W_PLD = W_MZF - W_E
-            else:  # Figure 5(e) in Lee et al.
+            else:  # Figure 5(g) in Lee et al.
+                # quadratic formula ax^2 + bx + c = 0
                 a = A_1 * A_d * (A_3 + A_4)  # Eqn.(22) in Lee et al.
                 b = 2 * A_1 * A_d * (A_3 + A_4) * W_E + A_1 * A_d * (2 * A_3 + A_4) * W_MF + A_3 + A_4 - 1  # Eqn.(23) in Lee et al.
                 c = ( 
