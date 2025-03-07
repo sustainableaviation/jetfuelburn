@@ -39,6 +39,9 @@ plugins:
         python:
           options:
             docstring_style: numpy
+            show_root_toc_entry: True
+            show_root_heading: true
+            heading_level: 2
             show_source: true
   - mkdocs-jupyter:
       execute: False
@@ -47,6 +50,7 @@ plugins:
       include_source: True
 markdown_extensions:
   - admonition
+  - pymdownx.superfences
   - toc:
       permalink: true
   - pymdownx.arithmatex:

@@ -21,7 +21,6 @@ from jetfuelburn import ureg
 
 # SETUP #########################################
 
-
 plt.rcParams.update({
     "text.usetex": True,
     "font.family": "Arial",
@@ -38,7 +37,12 @@ df_fres_const = pd.read_csv(
     index_col=None
 )
 df_fres_dist_time = pd.read_csv(
-    filepath_or_buffer='data/100nmi+45min.csv',
+    filepath_or_buffer='data/fres_100nmi+45min.csv',
+    header=0,
+    index_col=None
+)
+df_fres_time = pd.read_csv(
+    filepath_or_buffer='data/fres_45min.csv',
     header=0,
     index_col=None
 )
@@ -57,7 +61,6 @@ input_data = {
     'c': (2.131E-4)/ureg.s,
     'h': 9144*ureg.m,
     'V': 807.65*ureg.kph,
-    'd': 1500*ureg.nmi
 }
 
 results = []
@@ -93,10 +96,8 @@ fig, ax = plt.subplots(
     nrows = 1,
     ncols = 1,
     dpi = 300,
-    figsize=(30*cm, 10*cm), # A4=(210x297)mm,
+    figsize=(15*cm, 10*cm), # A4=(210x297)mm,
 )
-
-# SECONDARY AXES ##############
 
 # AXIS LIMITS ################
 
@@ -119,8 +120,8 @@ ax.grid(which='minor', axis='x', linestyle=':', linewidth = 0.5)
 
 # AXIS LABELS ################
 
-ax.set_ylabel("Payload")
-ax.set_ylabel("Range")
+ax.set_ylabel("Payload [lbs]")
+ax.set_xlabel("Range [nmi]")
 
 
 # PLOTTING ###################
@@ -132,8 +133,9 @@ ax.plot(
     linewidth = 1,
     marker='o',
     linestyle = '-',
-    label = 'fres=0.08'
+    label = 'Fig. 6 in Lee et al. (f$_{res}$=0.08)'
 )
+"""
 ax.plot(
     df_fres_dist_time['range'],
     df_fres_dist_time['payload'],
@@ -143,6 +145,17 @@ ax.plot(
     linestyle = '-',
     label = '100nmi+45min'
 )
+
+ax.plot(
+    df_fres_time['range'],
+    df_fres_time['payload'],
+    color = 'blue',
+    linewidth = 1,
+    marker='s',
+    linestyle = '-',
+    label = '45min'
+)
+"""
 ax.plot(
     df_results['range'],
     df_results['payload'].pint.to('lbs'),
@@ -150,19 +163,24 @@ ax.plot(
     linewidth = 1,
     marker='x',
     linestyle = '-',
-    label = 'my implementation'
+    label = 'My Implementation (f$_{res}$=0.08)'
 )
 
 
 
 # LEGEND ####################
 
+ax.legend(
+    loc = 'lower left',
+    fontsize = 12
+)
+
 
 # EXPORT #########################################
 
 from pathlib import Path
 
-figure_name: str = Path(__file__).stem + '.pdf'
+figure_name: str = Path.cwd().stem + '.pdf'
 plt.savefig(
     fname = figure_name,
     format="pdf",
