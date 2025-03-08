@@ -1,1 +1,0 @@
-::: jetfuelburn.aux.flightprofile

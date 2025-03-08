@@ -8,6 +8,9 @@ Extensive documentation is provided for each function. The package is designed t
 
 The package also includes helper function for basic atmospheric physics and the allocation of fuel burn to different cabin classes (economym, business, etc.).
 
+```pyodide
+print("Hello Markdown!")
+```
 
 <img src="https://upload.wikimedia.org/wikipedia/commons/3/33/Fuel_Quantity_Indicator_B737-300.svg" width="300">
 
