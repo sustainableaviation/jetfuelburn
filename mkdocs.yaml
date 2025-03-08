@@ -13,11 +13,11 @@ nav:
     - Fuel from PL/R-Diagrams: 'api/diagrams.md'
     - Fuel from Range Equation: 'api/breguet.md'
     - Fuel from Reduced Order Models: 'api/reducedorder.md'
+    - Fuel from Combines Models: 'api/combined.md'
     - Fuel from Closed Form Equations: 'api/closedform.md' 
     - Cabin Class Footprint Allocation: 'api/allocation.md'
   - API Reference (Internal):
     - Physics Functions: 'api/physics.md'
-    - Flight Profile Functions: 'api/flightprofile.md'
 theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
   name: readthedocs
   logo: _static/logo/jetfuelburn_logo_wide.svg
@@ -48,6 +48,7 @@ plugins:
       show_input: True
       ignore_h1_titles: True
       include_source: True
+  - markdown-exec
 markdown_extensions:
   - admonition
   - pymdownx.superfences

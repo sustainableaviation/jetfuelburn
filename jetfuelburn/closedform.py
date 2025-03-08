@@ -1,9 +1,7 @@
 import math
 import csv
-import pint
-ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/latest/user/common.html#using-a-shared-unit-registry
-
-from aux.physics import _calculate_dynamic_pressure
+from jetfuelburn import ureg
+from jetfuelburn.aux.physics import _calculate_dynamic_pressure
 
 class poll_et_al:
     r"""

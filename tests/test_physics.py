@@ -1,13 +1,6 @@
 import pytest
 
-import pint
-ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/latest/user/common.html#using-a-shared-unit-registry
-
-import sys
-import os
-module_path = os.path.abspath("/Users/michaelweinold/github/jetfuelburn")
-if module_path not in sys.path:
-    sys.path.append(module_path)
+from jetfuelburn import ureg
 
 from .fixtures.physics import (
     atmospheric_conditions_1,
@@ -34,8 +27,8 @@ def test_calculate_atmospheric_conditions(request, fixture_name):
 
     density, temperature = _calculate_atmospheric_conditions(altitude=input_data)
 
-    assert density.magnitude == pytest.approx(output_data[0].magnitude, rel=1e-2)
-    assert temperature.magnitude == pytest.approx(output_data[1].magnitude, rel=1e-2)
+    assert density.magnitude == pytest.approx(output_data['density'].magnitude, rel=1e-2)
+    assert temperature.magnitude == pytest.approx(output_data['temperature'].magnitude, rel=1e-2)
 
 
 @pytest.mark.parametrize(
