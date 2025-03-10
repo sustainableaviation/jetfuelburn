@@ -10,7 +10,7 @@ class yanto_etal:
     r"""
     This class implements the the reduced-order fuel burn model of Yanto and Liem (2017):
 
-    ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/reduced_order_yanto_etal.svg)
+    ![Payload/Range Diagram](../../_static/reduced_order_yanto_etal.svg)
     
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
@@ -167,7 +167,7 @@ class lee_etal:
     """
     This class implements the the reduced-order fuel burn model of Lee et al. (2010).
 
-    ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/reduced_order_lee_etal.svg)
+    ![Payload/Range Diagram](../../_static/reduced_order_lee_etal.svg)
     
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
@@ -379,7 +379,7 @@ class seymour_etal:
     r"""
     Reduced-order fuel burn model based on Seymour et al. (2020).
 
-    ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/reduced_order_seymour_etal.svg)
+    ![Payload/Range Diagram](../../_static/reduced_order_seymour_etal.svg)
     
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
@@ -636,7 +636,7 @@ class aim2015:
 
     The class implements the reduced-order fuel burn model of the [AIM2015 air transport model](https://www.atslab.org/data-tools/) (part "Aircraft Performance Model"):
 
-    ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/reduced_order_aim2015.svg)
+    ![Payload/Range Diagram](../../_static/reduced_order_aim2015.svg)
     
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained

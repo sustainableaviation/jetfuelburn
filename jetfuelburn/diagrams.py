@@ -29,7 +29,7 @@ def calculate_fuel_consumption_based_on_payload_range(
 
     This function implements the simple _"reading fuel mass off the payload/range diagram directly"_ method:
 
-    ![Payload/Range Diagram](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/docs/_static/payload_range_generic_DOCSTRINGS.svg)
+    ![Payload/Range Diagram](../../_static/payload_range_generic_DOCSTRINGS.svg)
     Payload/Range diagram of the Airbus A350-900 (data derived [from manufacturer information](https://web.archive.org/web/20211129144142/https://www.airbus.com/sites/g/files/jlcbta136/files/2021-11/Airbus-Commercial-Aircraft-AC-A350-900-1000.pdf)).
     Note that in this figure, the y-axis shows _total_ aircraft weight, not _payload weight_.
     Total aircraft weight can be computed by adding the operating empty weight (OEW) to the payload weight and fuel weight.
