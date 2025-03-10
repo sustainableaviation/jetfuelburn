@@ -6,52 +6,67 @@ from jetfuelburn import ureg
     '[dimensionless]',
     '[mass]'/'[time]',
     '[dimensionless]',
+    '[time]',
+    '[]',
     '[]',
     '[]',
     '[length]',
     '[length]',
 )
-def climb_descent_extrapolation_and_range_equation(
+def calculate_fuel_consumption_combined_model(
     payload: float,
     number_of_engines: int,
     fuel_flow_per_engine_idle: float,
     fuel_flow_per_engine_takeoff: float,
     lift_to_drag: float,
-    dict_climb_segment: dict,
-    dict_descent_segment: dict,
+    time_taxi: float,
+    dict_climb_segments: dict,
+    dict_descent_segments: dict,
+    dict_reserve_segment: float,
     R_cruise_origin_to_destination: float,
     R_cruise_destination_to_alternate: float,
 ) -> dict:
     r"""
-    Computes fuel consumption UPDATE DESCRIPTION
+    Given aircraft performance parameters, payload, climb/descent segment information and a flight distances,
+    calculates the required fuel mass $m_F$ for a given mission.
 
     _extended_summary_
 
     ![Diagram](../../_static/combined.svg)
 
-    The `dict_climb_segment` and `dict_descent_segment`
-    contain information about the fuel consumption during each segment of the flight.
+    The `dict_climb_segments` and `dict_descent_segments` are nested dictionaries
+    containing information about the fuel consumption during each segment of the flight.
     The dictionary should be structured as follows:
 
     ```python
-    dict_climb_segment = {
-        'takeoff': {
-            'time': 110*ureg.s,
-            'fuel_flow_per_engine': 0.205*(ureg.kg/ureg.sec),
-        },
-        'climb_to_10000ft': {
-            'time': 5*ureg.min,
-            'fuel_flow_per_engine_relative_to_takeoff': 0.82
-        },
-        'climb_10000ft_to_20000ft': {
-            'time': 5*ureg.min,
-            'fuel_flow_per_engine': 0.181*(ureg.kg/ureg.sec),
-        },
+    dict_climb_segments = {
+        'takeoff': <flight_segment_dict>,
+        'climb_to_10000ft': <flight_segment_dict>,
+        'climb_10000ft_to_20000ft': <flight_segment_dict>,
+        (...)
+    }
+    dict_descent_segments = {
+        'descent_cruise_to_10000ft': <flight_segment_dict>,
+        'descent_10000ft_to_5000ft': <flight_segment_dict>,
         (...)
     }
     ```
 
-    Data dictionaries can contain either 
+    With each `flight_segment_dict` containing a `time` value-pair
+    and _either_ an absolute `fuel_flow_per_engine` value-pair
+    or a relative `fuel_flow_per_engine_relative_to_takeoff` value-pair.
+
+    ```python
+    flight_segment_dict_absolute = {
+        'time': 5*ureg.min,
+        'fuel_flow_per_engine': 0.205*(ureg.kg/ureg.sec),
+    }
+    flight_segment_dict_relative = {
+        'time': 180*ureg.s,
+        'fuel_flow_per_engine_relative_to_takeoff': 0.82
+    }
+    ```
+
 
     References
     ----------
@@ -95,7 +110,41 @@ def climb_descent_extrapolation_and_range_equation(
             Fuel mass for approach [kg]
     """
 
+    if payload < 0:
+        raise ValueError("Payload must be greater than zero.")
+    if number_of_engines < 0:
+        raise ValueError("Number of engines must be greater than zero.")
+    if fuel_flow_per_engine_idle < 0:
+        raise ValueError("Fuel flow during idle must be greater than zero.")
+    if fuel_flow_per_engine_takeoff < 0:
+        raise ValueError("Fuel flow during takeoff must be greater than zero.")
+    if lift_to_drag < 0:
+        raise ValueError("Lift-to-drag ratio must be greater than zero.")
+    if R_cruise_origin_to_destination < 0:
+        raise ValueError("Cruise distance from origin to destination must be greater than zero.")
+    if R_cruise_destination_to_alternate < 0:
+        raise ValueError("Cruise distance from destination to alternate must be greater than zero.")
+    
+    if not dict_climb_segments:
+        raise ValueError("Climb segments dictionary must not be empty.")
+    if not dict_descent_segments:
+        raise ValueError("Descent segments dictionary must not be empty.")
 
+    for segment in dict_climb_segments:
+        if 'time' not in dict_climb_segments[segment]:
+            raise ValueError("Each climb segment must have a 'time' key-value-pair.")
+        if 'fuel_flow_per_engine_relative_to_takeoff' not in dict_climb_segments[segment] and 'fuel_flow_per_engine' not in dict_climb_segments[segment]:
+            raise ValueError("Each climb segment must have either a 'fuel_flow_per_engine_relative_to_takeoff' or 'fuel_flow_per_engine' key-value-pair.")
+        if not all(value > 0 for value in d.values()):
+            raise ValueError("All values in the dictionary must be greater than 0")
+
+    for segment in dict_descent_segments:
+        if 'time' not in dict_descent_segments[segment]:
+            raise ValueError("Each descent segment must have a 'time' key-value-pair.")
+        if 'fuel_flow_per_engine_relative_to_takeoff' not in dict_descent_segments[segment] and 'fuel_flow_per_engine' not in dict_descent_segments[segment]:
+            raise ValueError("Each descent segment must have either a 'fuel_flow_per_engine_relative_to_takeoff' or 'fuel_flow_per_engine' key-value-pair.")
+        if not all(value > 0 for value in d.values()):
+            raise ValueError("All values in the dictionary must be greater than 0")
 
     return {
         'mass_fuel_taxi': m_f_taxi.to('kg'),
