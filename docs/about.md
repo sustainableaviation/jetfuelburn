@@ -4,4 +4,6 @@ The `jetfuelburn` package was written by [Michael Weinold](https://github.com/mi
 
 Funding was provided by the [Swiss Innovation Agency Innosuisse](https://innosuisse.admin.ch) through the ["WISER" Flagship Project](https://wiser-climate.com) (PFFS-21-72).
 
-![PSI ETHZ WISER Logo](../../_static/logo/logo_black_PSI_ETHZ_WISER.svg)
+![PSI ETHZ WISER Logo](_static/logo/logo_black_PSI_ETHZ_WISER.svg)
+
+--8<-- "../LICENSE.txt"

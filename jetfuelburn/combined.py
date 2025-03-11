@@ -32,7 +32,7 @@ def calculate_fuel_consumption_combined_model(
 
     _extended_summary_
 
-    ![Diagram](../../_static/combined.svg)
+    ![Diagram](../_static/combined.svg)
 
     The `dict_climb_segments` and `dict_descent_segments` are nested dictionaries
     containing information about the fuel consumption during each segment of the flight.
