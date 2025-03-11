@@ -57,6 +57,8 @@ markdown_extensions:
   - pymdownx.arithmatex:
       generic: true
   - pymdownx.snippets
+  - pymdownx.highlight:
+      use_pygments: false
 
 extra_javascript:
   - javascripts/katex.js
