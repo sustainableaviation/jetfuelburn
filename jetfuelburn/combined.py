@@ -3,9 +3,23 @@
 from jetfuelburn import ureg
 from jetfuelburn.breguet import calculate_fuel_consumption_based_on_breguet_range_equation
 
+
 @ureg.check(
-    '[mass]', '[mass]', '[]', '[mass]/[time]', '[mass]/[time]', '[speed]', 
-    '[time]/[length]', '[]', None, None, '[length]', '[time]', None, None, '[length]'
+    '[mass]', # payload
+    '[mass]', # oew
+    '[]', # number_of_engines
+    '[mass]/[time]', # fuel_flow_per_engine_idle
+    '[mass]/[time]', # fuel_flow_per_engine_takeoff
+    '[speed]', # speed_cruise
+    '[time]/[length]', # tsfc_cruise, [mg/Ns] = s/m
+    '[]', # lift_to_drag
+    None, # dict_climb_segments_origin_to_destination
+    None, # dict_descent_segments_origin_to_destination
+    '[length]', # R_cruise_origin_to_destination
+    '[time]', # time_taxi
+    None, # dict_climb_segments_destination_to_alternate
+    None, # dict_descent_segments_destination_to_alternate
+    '[length]', # R_cruise_destination_to_alternate
 )
 def calculate_fuel_consumption_combined_model(
     payload: float,
@@ -24,6 +38,104 @@ def calculate_fuel_consumption_combined_model(
     dict_descent_segments_destination_to_alternate: dict=None,
     R_cruise_destination_to_alternate: float=0*ureg.km,
 ) -> dict:
+    r"""
+    Given aircraft performance parameters, payload, climb/descent segment information and a flight distances,
+    calculates the required fuel mass $m_F$ for a given mission.
+
+    _extended_summary_
+
+    ![Diagram](../_static/combined.svg)
+
+    The `dict_climb_segments` and `dict_descent_segments` are nested dictionaries
+    containing information about the fuel consumption during each segment of the flight.
+    The dictionary should be structured as follows:
+
+    ADD: only 'takeoff' is required, the rest is optional
+    ADD: only 'landing' is required, the rest is optional
+
+    ```python
+    dict_climb_segments = {
+        'takeoff': <flight_segment_dict>,
+        'climb_to_10000ft': <flight_segment_dict>,
+        'climb_10000ft_to_20000ft': <flight_segment_dict>,
+        (...)
+    }
+    dict_descent_segments = {
+        'descent_cruise_to_10000ft': <flight_segment_dict>,
+        'descent_10000ft_to_5000ft': <flight_segment_dict>,
+        (...)
+    }
+    ```
+
+    With each `flight_segment_dict` containing a `time` value-pair
+    and _either_ an absolute `fuel_flow_per_engine` value-pair
+    or a relative `fuel_flow_per_engine_relative_to_takeoff` value-pair.
+
+    ```python
+    flight_segment_dict_absolute = {
+        'time': 5*ureg.min,
+        'fuel_flow_per_engine': 0.205*(ureg.kg/ureg.sec),
+    }
+    flight_segment_dict_relative = {
+        'time': 180*ureg.s,
+        'fuel_flow_per_engine_relative_to_takeoff': 0.82
+    }
+    ```
+
+    Notes
+    -----
+
+    - [ICAO Engine Emissions Databank LTO segments](https://web.archive.org/web/20220725161602/https://www.icao.int/environmental-protection/Documents/EnvironmentalReports/2022/ENVReport2022_Art17.pdf):
+
+    | Segment Name | Duration (official LTO cycle) | Thrust  |
+    |--------------|-------------------------------|---------|
+    | `taxi`       | 26 minutes                    | 7%      |
+    | `takeoff`    | 0.7 minutes                   | 100%    |
+    | `climb`      | 2.2 minutes                   | 85%     |
+    | `approach`   | 4 minutes                     | 30%     |
+
+
+    References
+    ----------
+    - Setion 2.1.3.4 "Reference emissions landing and take-off (LTO) cycle"
+    in Annex 16 to the Convention on Civil Aviation, "Environmental Protection", Volume II - Aircraft Engine Emissions, 
+    Fourth Edition, July 2017
+
+
+    Parameters
+    ----------
+    payload : float
+        Aircraft payload [mass]
+    fuel_flow_takeoff : float
+        Fuel flow during takeoff (eg. from ICAO Aircraft Engine Emissions Databank) [mass/time]
+    lift_to_drag : float
+        Aircraft cruise lift-to-Drag ratio [dimensionless]
+    climb_segment_dict : dict
+        Dictionary of climb segment information
+    descent_segment_dict : dict
+        Dictionary of descent segment information
+    R_cruise_origin_to_destination : float
+        Cruise distance from origin to destination (can be zero) [length]
+    R_cruise_destination_to_alternate : float
+        Cruise distance from destination to alternate (can be zero) [length]
+
+    Returns
+    -------
+    dict
+        'mass_fuel_taxi' : ureg.Quantity
+            Fuel mass for taxi [kg],
+        'mass_fuel_takeoff' : ureg.Quantity
+            Fuel mass for takeoff [kg],
+        'mass_fuel_climb' : ureg.Quantity
+            Fuel mass for climb [kg],
+        'mass_fuel_cruise' : ureg.Quantity
+            Fuel mass for cruise [kg],
+        'mass_fuel_descent' : ureg.Quantity
+            Fuel mass for descent [kg],
+        'mass_fuel_approach' : ureg.Quantity
+            Fuel mass for approach [kg]
+    """
+
     if payload < 0:
         raise ValueError("Payload must be greater than zero.")
     if number_of_engines < 0:
@@ -144,8 +256,8 @@ def calculate_fuel_consumption_combined_model(
         if 'landing' not in str_segment.lower()
     )
     m_f_approach_origin_to_destination = (
-        return_correct_fuel_burn_value_from_dict(dict_descent_segments_origin_to_destination['descent_10000ft_to_landing']) *
-        dict_descent_segments_origin_to_destination['descent_10000ft_to_landing']['time'] *
+        return_correct_fuel_burn_value_from_dict(dict_descent_segments_origin_to_destination['approach']) *
+        dict_descent_segments_origin_to_destination['approach']['time'] *
         number_of_engines
     )
 
@@ -170,9 +282,9 @@ def calculate_fuel_consumption_combined_model(
         'mass_fuel_approach': m_f_approach_origin_to_destination.to('kg'),
     }
 
+
 # %%
 
-# Example dictionaries and function call remain unchanged
 dict_climb_segments_origin_to_destination = {
     'takeoff': {
         'time': 0.7*ureg.min,
@@ -201,13 +313,15 @@ dict_descent_segments_origin_to_destination = {
         'time': 5*ureg.min,
         'fuel_flow_per_engine_relative_to_takeoff': 0.3,
     },
-    'descent_10000ft_to_landing': {
+    'approach': {
         'time': 5*ureg.min,
         'fuel_flow_per_engine_relative_to_takeoff': 0.3,
     }
 }
 
-result = calculate_fuel_consumption_combined_model(
+# %%
+
+calculate_fuel_consumption_combined_model(
     payload=10*ureg.metric_ton,
     oew=44300*ureg.kg,
     number_of_engines=2,
