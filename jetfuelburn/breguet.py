@@ -1,5 +1,4 @@
-import pint
-ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/latest/user/common.html#using-a-shared-unit-registry
+from jetfuelburn import ureg
 import math
 
 @ureg.check(
