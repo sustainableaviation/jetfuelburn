@@ -26,27 +26,26 @@ def make_payload_range_case():
         'range_point_D': 9620 * ureg.nmi,
     }
 
+    cases = {
+        2000 * ureg.nmi: {
+            'mass_fuel': (220 - (142.4 + 54)) * ureg.metric_ton,
+            'mass_payload': 54 * ureg.metric_ton,
+        },
+        7500 * ureg.nmi: {
+            'mass_fuel': (280 - 179.14) * ureg.metric_ton,
+            'mass_payload': (179.14 - 142.4) * ureg.metric_ton,
+        },
+        9000 * ureg.nmi: {
+            'mass_fuel': (280 - (142.4 + 25)) * ureg.metric_ton,
+            'mass_payload': (157 - 142.4) * ureg.metric_ton,
+        },
+    }
+
     def _make_case(d):
-        input_data = base_data | {'d': d}
-        
-        if d == 2000 * ureg.nmi:
-            expected_output = {
-                'mass_fuel': (220 - (142.4 + 54)) * ureg.metric_ton,
-                'mass_payload': 54 * ureg.metric_ton,
-            }
-        elif d == 7500 * ureg.nmi:
-            expected_output = {
-                'mass_fuel': (280 - 179.14) * ureg.metric_ton,
-                'mass_payload': (179.14 - 142.4) * ureg.metric_ton,
-            }
-        elif d == 9000 * ureg.nmi:
-            expected_output = {
-                'mass_fuel': (280 - (142.4 + 25)) * ureg.metric_ton,
-                'mass_payload': (157 - 142.4) * ureg.metric_ton,
-            }
-        else:
+        if d not in cases:
             raise ValueError(f"No expected output defined for d={d}")
-        
+        input_data = base_data | {'d': d}
+        expected_output = cases[d]
         return input_data, expected_output
     
-    return _make_case
+    return _make_case, list(cases.keys())
