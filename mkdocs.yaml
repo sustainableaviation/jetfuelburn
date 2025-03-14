@@ -10,8 +10,8 @@ nav:
     - Theory: 'theory.md'
   - Try it in the Browser!:
     - Working with Physical Units: 'interactive/units.md'
-    - Fuel Calculations: 'interactive/fuel.md'
-    - Travel Class Allocation: 'interactive/allocation.md'
+    - Fuel Burn Calculations: 'interactive/fuel.md'
+    - Cabin Class Fuel Allocation: 'interactive/allocation.md'
   - API Reference (Public):
     - PL/R-Diagrams: 'api/diagrams.md'
     - Range Equation: 'api/breguet.md'
@@ -21,6 +21,7 @@ nav:
     - Cabin Class Fuel Allocation: 'api/allocation.md'
   - API Reference (Internal):
     - Physics Functions: 'api/physics.md'
+  - Changelog: 'changelog.md'
 theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
   name: material
   #custom_dir: docs/_overrides
@@ -39,7 +40,6 @@ theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
 plugins:
   - search:
       min_search_length: 2
-      indexing: 'full'
   - mkdocstrings: # https://mkdocstrings.github.io/python/usage/
       handlers:
         python:
@@ -56,6 +56,7 @@ plugins:
       include_source: True
   - markdown-exec
   - autorefs
+  - include-markdown
 markdown_extensions:
   - admonition
   - pymdownx.superfences

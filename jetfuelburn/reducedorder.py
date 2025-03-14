@@ -64,6 +64,7 @@ class yanto_etal:
     --------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
+    from jetfuelburn import ureg
     from jetfuelburn.reducedorder import yanto_etal
     yanto_etal.available_aircraft()[0:10]
     yanto_etal.calculate_fuel_consumption(
@@ -213,6 +214,7 @@ class lee_etal:
     --------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
+    from jetfuelburn import ureg
     from jetfuelburn.reducedorder import lee_etal
     lee_etal.available_aircraft()[0:10]
     lee_etal.calculate_fuel_consumption(
@@ -472,6 +474,7 @@ class seymour_etal:
     --------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
+    from jetfuelburn import ureg
     from jetfuelburn.reducedorder import seymour_etal
     seymour_etal.available_aircraft()[0:10]
     seymour_etal.calculate_fuel_consumption(
@@ -750,6 +753,8 @@ class aim2015:
     Examples
     --------
     ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
     from jetfuelburn.reducedorder import aim2015
     aim2015(
         acft_size_class=8,
