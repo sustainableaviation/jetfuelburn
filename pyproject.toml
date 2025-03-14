@@ -12,6 +12,7 @@ maintainers = [
 ]
 description = "Python package for calculating fuel burn of commercial aircraft."
 readme = "README.md"
+license = {text = "MIT"}
 dynamic = ["version"]
 # Add here all kinds of additional classifiers as defined under
 # https://pypi.org/classifiers/
@@ -47,9 +48,7 @@ testing = [
 ]
 
 [tool.setuptools]
-license-files = ["LICENSE"]
 include-package-data = true
-packages = ["jetfuelburn"]
 
 [tool.setuptools.dynamic]
 version = {attr = "jetfuelburn.__version__"} 
