@@ -1,7 +1,7 @@
 # https://www.mkdocs.org/user-guide/configuration/
 site_name: JetFuelBurn Documentation
 repo_url: https://github.com/sustainableaviation/jetfuelburn
-copyright: © Paul Scherrer Institute (PSI) | Code under MIT License
+copyright: © Paul Scherrer Institute (PSI) and Contributors | Code under MIT License
 nav:
   - Home: 'index.md'
   - About: 'about.md'
@@ -9,26 +9,28 @@ nav:
     - Installation: 'installation.md'
     - Theory: 'theory.md'
   - Try it in the Browser!:
-    - Working with Physical Units: 'physical_units.md'
-    - Fuel Calculations: 'interactive_fuel.md'
-    - Travel Class Allocation: 'interactive_allocation.md'
+    - Working with Physical Units: 'interactive/units.md'
+    - Fuel Calculations: 'interactive/fuel.md'
+    - Travel Class Allocation: 'interactive/allocation.md'
   - API Reference (Public):
-    - Fuel from PL/R-Diagrams: 'api/diagrams.md'
-    - Fuel from Range Equation: 'api/breguet.md'
-    - Fuel from Reduced Order Models: 'api/reducedorder.md'
-    - Fuel from Combined Models: 'api/combined.md'
-    - Fuel from Closed Form Equations: 'api/closedform.md' 
-    - Cabin Class Footprint Allocation: 'api/allocation.md'
+    - PL/R-Diagrams: 'api/diagrams.md'
+    - Range Equation: 'api/breguet.md'
+    - Reduced Order Models: 'api/reducedorder.md'
+    - Combined Models: 'api/combined.md'
+    - Closed Form Models: 'api/closedform.md' 
+    - Cabin Class Fuel Allocation: 'api/allocation.md'
   - API Reference (Internal):
     - Physics Functions: 'api/physics.md'
 theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
   name: material
-  logo: _static/logo/jetfuelburn_logo_wide.svg
+  custom_dir: docs/_overrides
+  logo: _static/logo/jetfuelburn_logo.svg
   highlightjs: true
   navigation_depth: 4
   features:
     - navigation.instant
     - navigation.instant.progress
+    - navigation.expand
     - navigation.path
     - navigation.indexes
     - navigation.top
@@ -52,6 +54,7 @@ plugins:
       ignore_h1_titles: True
       include_source: True
   - markdown-exec
+  - autorefs
 markdown_extensions:
   - admonition
   - pymdownx.superfences
@@ -64,7 +67,7 @@ markdown_extensions:
       use_pygments: false
 
 extra_javascript:
-  - javascripts/katex.js
+  - _javascripts/katex.js
   - https://unpkg.com/katex@0/dist/katex.min.js
   - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
 
@@ -73,3 +76,6 @@ extra_css:
 
 watch:
   - jetfuelburn
+
+extra:
+  generator: false

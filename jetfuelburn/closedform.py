@@ -3,7 +3,7 @@ import csv
 from jetfuelburn import ureg
 from jetfuelburn.aux.physics import _calculate_dynamic_pressure
 
-class poll_et_al() -> None:
+def poll_et_al() -> None:
     r"""
     This function is not yet implemented. It will use the closed-form solution for the fuel burn estimation method developed by Poll et al.:
     References

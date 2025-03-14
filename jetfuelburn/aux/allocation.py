@@ -1,5 +1,3 @@
-# %%
-
 def footprint_allocation_by_area(
     fuel_per_flight: float,
     size_factor_eco: float,

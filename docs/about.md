@@ -12,7 +12,6 @@ Funding was provided by the [Swiss Innovation Agency Innosuisse](https://innosui
 
 ## License
 
-
 ```plaintext
 --8<-- "LICENSE.txt"
 ```
