@@ -49,6 +49,10 @@ testing = [
 
 [tool.setuptools]
 include-package-data = true
+packages = [
+  "jetfuelburn",
+  "jetfuelburn.aux"
+]
 
 [tool.setuptools.dynamic]
 version = {attr = "jetfuelburn.__version__"} 
