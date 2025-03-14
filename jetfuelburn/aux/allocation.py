@@ -115,20 +115,20 @@ def footprint_allocation_by_area(
     from jetfuelburn import ureg
     from jetfuelburn.aux.allocation import footprint_allocation_by_area
     footprint_allocation_by_area(
-            fuel_per_flight=14000*ureg.kg,
-            size_factor_eco=1,
-            size_factor_premiumeco=0,
-            size_factor_business=1.5,
-            size_factor_first=0,
-            seats_eco=154,
-            seats_premiumeco=0,
-            seats_business=24,
-            seats_first=0,
-            load_factor_eco=0.9,
-            load_factor_premiumeco=0,
-            load_factor_business=0.5,
-            load_factor_first=0,
-        )
+        fuel_per_flight=14000*ureg.kg,
+        size_factor_eco=1,
+        size_factor_premiumeco=0,
+        size_factor_business=1.5,
+        size_factor_first=0,
+        seats_eco=154,
+        seats_premiumeco=0,
+        seats_business=24,
+        seats_first=0,
+        load_factor_eco=0.9,
+        load_factor_premiumeco=0,
+        load_factor_business=0.5,
+        load_factor_first=0,
+    )
     ```
     """
 
