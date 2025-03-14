@@ -1,6 +1,27 @@
+# https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-python
 name: Test Python 🐍 package
 
-on: [push]
+on:
+    push:
+      branches: [main, dev]
+      paths-ignore:
+        - "**.md"
+        - "**.bib"
+        - "**.ya?ml"
+        - "LICENSE"
+        - ".gitignore"
+        - "**.ipynb"
+    pull_request:
+        branches: [main, dev]
+        types: [opened, reopened]
+        paths-ignore:
+            - "**.md"
+            - "**.bib"
+            - "**.ya?ml"
+            - "LICENSE"
+            - ".gitignore"
+            - "**.ipynb"
+    workflow_dispatch:
 
 jobs:
     build:
