@@ -6,6 +6,11 @@ on:
     types: [created]
 
 jobs:
+
+  run-tests:
+    name: Run Tests
+    uses: ./.github/workflows/test.yml
+  
   build:
     name: Build distribution 📦
     runs-on: ubuntu-latest
