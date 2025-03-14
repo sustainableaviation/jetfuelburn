@@ -1,6 +1,6 @@
-# %%
-from jetfuelburn import ureg
 import math
+from jetfuelburn import ureg
+
 
 @ureg.check(
     '[length]' # altitude

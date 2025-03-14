@@ -1,14 +1,10 @@
-# %%
-
+from jetfuelburn import ureg
 import pytest
-
-import pint
-ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/latest/user/common.html#using-a-shared-unit-registry
 
 
 def approx_with_units(
-    value_check: pint.Quantity,
-    value_expected: pint.Quantity,
+    value_check: ureg.Quantity,
+    value_expected: ureg.Quantity,
     rel=None,
     abs=None
 ) -> bool:
@@ -21,9 +17,9 @@ def approx_with_units(
 
     Parameters
     ----------
-    value_check : pint.Quantity
+    value_check : ureg.Quantity
         Value to check.
-    value_expected : pint.Quantity
+    value_expected : ureg.Quantity
         Value to compare against.
     rel : _type_, optional
         Relative tolerance, by default None
@@ -51,7 +47,7 @@ def approx_dict(
     """
     Given two dictionaries, check if the values in the first dictionary are approximately equal to the values in the second dictionary.
 
-    Also checks if the [Pint](https://pint.readthedocs.io/en/stable/) units of the values in the first dictionary are equal to the units of the values in the second dictionary.
+    Also checks if the [Pint](https://ureg.readthedocs.io/en/stable/) units of the values in the first dictionary are equal to the units of the values in the second dictionary.
 
     See Also
     --------
@@ -78,12 +74,12 @@ def approx_dict(
             return False
         if type(dict_expected[key]) != type(dict_check[key]):
             return False
-        if isinstance(dict_expected[key], pint.Quantity) == True:
+        if isinstance(dict_expected[key], ureg.Quantity) == True:
             if not pytest.approx(dict_check[key].magnitude, rel=rel, abs=abs) == dict_expected[key].magnitude:
                 return False
             if not dict_check[key].units == dict_expected[key].units:
                 return False
-        elif isinstance(dict_expected[key], pint.Quantity) == False:
+        elif isinstance(dict_expected[key], ureg.Quantity) == False:
             if not pytest.approx(dict_check[key], rel=rel, abs=abs) == dict_expected[key]:
                 return False
         else:

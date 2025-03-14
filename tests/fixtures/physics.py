@@ -1,61 +1,37 @@
 import pytest
-
-import pint
-ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/latest/user/common.html#using-a-shared-unit-registry
+from jetfuelburn import ureg
 
 
-@pytest.fixture
-def atmospheric_conditions_1():
-    # Data from the "U.S. Standard Atmosphere, 1976" (https://ntrs.nasa.gov/api/citations/19770009539/downloads/19770009539.pdf)
-    input_data = 0 * ureg.m
-    output_data = (1.225*ureg.kg/ureg.m**3, ureg.Quantity(15, ureg.degC)) # P.53 (Table 1)
-    return input_data, output_data
-
-
-@pytest.fixture
-def atmospheric_conditions_2():
-    # Data from the "U.S. Standard Atmosphere, 1976" (https://ntrs.nasa.gov/api/citations/19770009539/downloads/19770009539.pdf)
-    input_data = 11000 * ureg.m
-    output_data = (0.36480*ureg.kg/ureg.m**3, ureg.Quantity(-56.5, ureg.degC)) # P.55 (Table 1)
-    return input_data, output_data
-
-
-@pytest.fixture
-def atmospheric_conditions_3():
-    # Data from the "U.S. Standard Atmosphere, 1976" (https://ntrs.nasa.gov/api/citations/19770009539/downloads/19770009539.pdf)
-    input_data = 19000 * ureg.m
-    output_data = (0.10307*ureg.kg/ureg.m**3, ureg.Quantity(-56.5, ureg.degC)) # P.60 (Table 1)
-    return input_data, output_data
-
-
-@pytest.fixture
-def mach_speed_1():
-    # Data from the E6B Mach Speed Calculator (https://e6bx.com/mach-speed/)
-    input_data = {
-        'mach_number': 0.6224,
-        'altitude': 7000*ureg.m
+@pytest.fixture(scope="module")
+def atmospheric_case_fixture():
+    cases = {
+        0 * ureg.m: {'density': 1.225 * ureg.kg / ureg.m**3, 'temperature': ureg.Quantity(15, ureg.degC)},
+        11000 * ureg.m: {'density': 0.36480 * ureg.kg / ureg.m**3, 'temperature': ureg.Quantity(-56.5, ureg.degC)},
+        19000 * ureg.m: {'density': 0.10307 * ureg.kg / ureg.m**3, 'temperature': ureg.Quantity(-56.5, ureg.degC)},
     }
-    output_data = 700*ureg.kph
-    return input_data, output_data
+    
+    def make_atmospheric_case(altitude):
+        if altitude not in cases:
+            raise ValueError(f"No expected output defined for altitude={altitude}")
+        return altitude, cases[altitude]
+    
+    return make_atmospheric_case, list(cases.keys())
 
 
-@pytest.fixture
-def mach_speed_2():
-    # Data from the E6B Mach Speed Calculator (https://e6bx.com/mach-speed/)
-    input_data = {
-        'mach_number': 0.7527,
-        'altitude': 11000*ureg.m
+@pytest.fixture(scope="module")
+def mach_speed_case_fixture():
+    cases = {
+        7000 * ureg.m: {'mach_number': 0.6224, 'speed': 700 * ureg.kph},
+        11000 * ureg.m: {'mach_number': 0.7527, 'speed': 800 * ureg.kph},
+        15000 * ureg.m: {'mach_number': 0.8469, 'speed': 900 * ureg.kph},
     }
-    output_data = 800*ureg.kph
-    return input_data, output_data
-
-
-@pytest.fixture
-def mach_speed_3():
-    # Data from the E6B Mach Speed Calculator (https://e6bx.com/mach-speed/)
-    input_data = {
-        'mach_number': 0.8469,
-        'altitude': 15000*ureg.m
-    }
-    output_data = 900*ureg.kph
-    return input_data, output_data
+    
+    def make_mach_speed_case(altitude):
+        if altitude not in cases:
+            raise ValueError(f"No expected output defined for altitude={altitude}")
+        case = cases[altitude]
+        input_data = {'mach_number': case['mach_number'], 'altitude': altitude}
+        expected_output = case['speed']
+        return input_data, expected_output
+    
+    return make_mach_speed_case, list(cases.keys())

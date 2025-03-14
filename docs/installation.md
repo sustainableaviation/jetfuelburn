@@ -1,6 +1,6 @@
 # Installation
 
-You can install `jetfuelburn` from PyPi using `pip`:
+You can install `jetfuelburn` from [PyPi](https://pypi.org) using `pip`:
 
 ```bash
 pip install jetfuelburn

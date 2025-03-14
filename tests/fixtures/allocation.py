@@ -1,5 +1,6 @@
 import pytest
 
+
 @pytest.fixture
 def allocation_two_classes():
     input_data = {

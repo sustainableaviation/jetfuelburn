@@ -1,48 +1,36 @@
 import pytest
 
-from jetfuelburn import ureg
-
-from .fixtures.physics import (
-    atmospheric_conditions_1,
-    atmospheric_conditions_2,
-    atmospheric_conditions_3,
-    mach_speed_1,
-    mach_speed_2,
-    mach_speed_3
-)
-
-from jetfuelburn.aux.physics import (
-    _calculate_atmospheric_conditions,
-    _calculate_aircraft_velocity
-)
+from jetfuelburn.aux.tests import approx_with_units
+from jetfuelburn.aux.physics import _calculate_atmospheric_conditions, _calculate_aircraft_velocity
+from .fixtures.physics import atmospheric_case_fixture, mach_speed_case_fixture
 
 
-@pytest.mark.parametrize(
-    "fixture_name",
-    ["atmospheric_conditions_1", "atmospheric_conditions_2", "atmospheric_conditions_3"]
-)
-def test_calculate_atmospheric_conditions(request, fixture_name):
-    fixture = request.getfixturevalue(fixture_name)
-    input_data, output_data = fixture
+def test_calculate_atmospheric_conditions(atmospheric_case_fixture):
+    make_atmospheric_case, altitudes = atmospheric_case_fixture
+    
+    for altitude in altitudes:
+        input_data, expected_output = make_atmospheric_case(altitude)
+        calculated_output = _calculate_atmospheric_conditions(altitude=input_data)
 
-    density, temperature = _calculate_atmospheric_conditions(altitude=input_data)
+        assert approx_with_units(
+            value_check=calculated_output['density'],
+            value_expected=expected_output['density'],
+            rel=1e-2
+        )
 
-    assert density.magnitude == pytest.approx(output_data['density'].magnitude, rel=1e-2)
-    assert temperature.magnitude == pytest.approx(output_data['temperature'].magnitude, rel=1e-2)
 
-
-@pytest.mark.parametrize(
-    "fixture_name",
-    ["mach_speed_1", "mach_speed_2", "mach_speed_3"]
-)
-def test_calculate_aircraft_velocity(request, fixture_name):
-    fixture = request.getfixturevalue(fixture_name)
-    input_data, output_data = fixture
-
-    velocity = _calculate_aircraft_velocity(
-        mach_number=input_data['mach_number'],
-        altitude=input_data['altitude']
-    )
-
-    assert velocity.magnitude == pytest.approx(output_data.magnitude, rel=1e-2)
-    assert velocity.units == output_data.units
+def test_calculate_aircraft_velocity(mach_speed_case_fixture):
+    make_mach_speed_case, altitudes = mach_speed_case_fixture
+    
+    for altitude in altitudes:
+        input_data, expected_output = make_mach_speed_case(altitude)
+        output = _calculate_aircraft_velocity(
+            mach_number=input_data['mach_number'],
+            altitude=input_data['altitude']
+        )
+        
+        assert approx_with_units(
+            value_check=output,
+            value_expected=expected_output,
+            rel=1e-2
+        )

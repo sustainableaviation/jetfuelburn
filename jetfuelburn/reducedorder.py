@@ -1,10 +1,9 @@
-# %%
-
+import csv
 import math
 from importlib import resources
-import csv
 from jetfuelburn import ureg
 from jetfuelburn.aux.physics import _calculate_dynamic_pressure
+
 
 class yanto_etal:
     r"""

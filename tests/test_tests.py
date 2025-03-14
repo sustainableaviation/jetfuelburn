@@ -1,17 +1,6 @@
-
 import pytest
 
-import sys
-import os
-
-import pint
-ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/latest/user/common.html#using-a-shared-unit-registry
-
-
-module_path = os.path.abspath("/Users/michaelweinold/github/jetfuelburn")
-if module_path not in sys.path:
-    sys.path.append(module_path)
-
+from jetfuelburn import ureg
 from jetfuelburn.aux.tests import approx_with_units, approx_dict
 
 
