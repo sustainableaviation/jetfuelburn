@@ -10,7 +10,7 @@ Relevant Function: [`jetfuelburn.aux.allocation`][]
 
 ```pyodide session="allocation" install="jetfuelburn"
 from jetfuelburn import ureg
-from jetfuelburn.aux import footprint_allocation_by_area
+from jetfuelburn.aux.allocation import footprint_allocation_by_area
 
 footprint_allocation_by_area(
         fuel_per_flight=14000*ureg.kg,
