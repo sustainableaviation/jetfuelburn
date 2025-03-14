@@ -3,13 +3,13 @@ import jetfuelburn
 
 
 def test_breguet():
-    from jetfuelburn.breguet import calculate_fuel_consumption_based_on_breguet_range_equation
-    assert callable(calculate_fuel_consumption_based_on_breguet_range_equation)
+    from jetfuelburn.breguet import calculate_fuel_consumption_range_equation
+    assert callable(calculate_fuel_consumption_range_equation)
 
 
 def test_diagrams():
-    from jetfuelburn.diagrams import calculate_fuel_consumption_based_on_payload_range
-    assert callable(calculate_fuel_consumption_based_on_payload_range)
+    from jetfuelburn.diagrams import calculate_fuel_consumption_payload_range
+    assert callable(calculate_fuel_consumption_payload_range)
 
 
 def test_reducedorder():

@@ -1,5 +1,5 @@
 from jetfuelburn import ureg
-from jetfuelburn.breguet import calculate_fuel_consumption_based_on_breguet_range_equation
+from jetfuelburn.breguet import calculate_fuel_consumption_range_equation
 
 
 @ureg.check(
@@ -172,7 +172,7 @@ def calculate_fuel_consumption_combined_model(
 
     m_f_taxi = fuel_flow_per_engine_idle * number_of_engines * time_taxi
 
-    m_f_final_reserve = calculate_fuel_consumption_based_on_breguet_range_equation(
+    m_f_final_reserve = calculate_fuel_consumption_range_equation(
         R=(speed_cruise * 30 * ureg.min).to('km'),
         LD=lift_to_drag,
         m_after_cruise=(oew + payload),
@@ -211,7 +211,7 @@ def calculate_fuel_consumption_combined_model(
             number_of_engines
         )
 
-    m_f_cruise_destination_to_alternate = calculate_fuel_consumption_based_on_breguet_range_equation(
+    m_f_cruise_destination_to_alternate = calculate_fuel_consumption_range_equation(
         R=R_cruise_destination_to_alternate,
         LD=lift_to_drag,
         m_after_cruise=(
@@ -254,7 +254,7 @@ def calculate_fuel_consumption_combined_model(
         number_of_engines
     )
 
-    m_f_cruise_origin_to_destination = calculate_fuel_consumption_based_on_breguet_range_equation(
+    m_f_cruise_origin_to_destination = calculate_fuel_consumption_range_equation(
         R=R_cruise_origin_to_destination,
         LD=lift_to_drag,
         m_after_cruise=(

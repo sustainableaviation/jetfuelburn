@@ -1,43 +1,45 @@
 # Fuel Burn Calculations
 
-```python
-import sys
-import os
+## Breguet Range Equation
 
-module_path = os.path.abspath("/Users/michaelweinold/github/jetfuelburn")
-if module_path not in sys.path:
-    sys.path.append(module_path)
+Using the Breguet range equation is perhaps the most well-known approach to computing the range of an aircraft.
+Of course, the equation can also be solved for the fuel required to fly a given distance.
 
-import pint
-ureg = pint.get_application_registry() # https://pint-pandas.readthedocs.io/en/latest/user/common.html#using-a-shared-unit-registry
+While mass-after-cruise and range are straightforward inputs,
+the lift-to-drag ratio (L/D) and specific fuel consumption (TSFC) are often more difficult to obtain.
 
-## Footprint Allocation to Travel Class
+!!! note
+    First, we import the `jetfuelburn` package and the `pint` package unit registry. \
+    All code editors on this page will remember these imports and later variable definitions.
 
-from jetfuelburn.aux.allocation import footprint_allocation_by_area
+```pyodide session='fuel' install='jetfuelburn pint'
+import jetfuelburn
+from jetfuelburn import ureg
+from jetfuelburn.breguet import calculate_fuel_consumption_range_equation
 
-footprint_allocation_by_area(
-        fuel_per_flight=14000*ureg.kg,
-        size_factor_eco=1,
-        size_factor_premiumeco=0,
-        size_factor_business=1.5,
-        size_factor_first=0,
-        seats_eco=154,
-        seats_premiumeco=0,
-        seats_business=24,
-        seats_first=0,
-        load_factor_eco=0.9,
-        load_factor_premiumeco=0,
-        load_factor_business=0.5,
-        load_factor_first=0,
-    )  # Returns: (<Quantity(81.871345, 'kilogram')>, 0, <Quantity(221.052632, 'kilogram')>, 0)
+calculate_fuel_consumption_range_equation(
+    R=2000*ureg.nmi,
+    LD=18,
+    m_after_cruise=100*ureg.metric_ton,
+    v_cruise=800*ureg.kph,
+    TSFC_cruise=17*(ureg.mg/ureg.N/ureg.s),
+)
+```
 
-## Fuel Calculation
+!!! note
+    For additional information, compare the function documentation:
+    [`jetfuelburn.breguet.calculate_fuel_consumption_range_equation`]()
 
-### Payload-Range Diagram
 
-from jetfuelburn.diagrams import calculate_fuel_consumption_based_on_payload_range
+## Payload/Range Diagrams
 
-calculate_fuel_consumption_based_on_payload_range(
+Using payload/range diagrams is another common method for calculating fuel burn of aircraft.
+This method is particularly popular due to the excellent data availability. After all, the payload/range diagram is a standard feature of aircraft performance manuals.
+
+```pyodide session='fuel'
+from jetfuelburn.diagrams import calculate_fuel_consumption_payload_range
+
+calculate_fuel_consumption_payload_range(
     d=2000*ureg.nmi,
     oew=142.4*ureg.metric_ton,
     mtow=280*ureg.metric_ton,
@@ -47,43 +49,50 @@ calculate_fuel_consumption_based_on_payload_range(
     payload_point_C=25*ureg.metric_ton,
     range_point_C=8575*ureg.nmi,
     range_point_D=9620*ureg.nmi,
-)  # Returns: (<Quantity(23527.2045, 'kilogram')>, <Quantity(54000.0, 'kilogram')>)
-
-### Breguet Range Equation
-
-from jetfuelburn.breguet import calculate_fuel_consumption_based_on_breguet_range_equation
-
-calculate_fuel_consumption_based_on_breguet_range_equation(
-    R=2000*ureg.nmi,
-    LD=18,
-    m_after_cruise=100*ureg.metric_ton,
-    v_cruise=800*ureg.kph,
-    TSFC_cruise=17*(ureg.mg/ureg.N/ureg.s),
-)  # Returns: <Quantity(16699.1442, 'kilogram')>
-
-### Reduced-Order Models
-
-from jetfuelburn.reducedorder import (
-    yanto_etal,
-    lee_etal,
-    seymour_etal,
-    aim2015
 )
+```
+
+!!! note
+    For additional information, compare the function documentation:
+    `jetfuelburn.breguet.calculate_fuel_consumption_range_equation`
+
+## Reduced-Order Models
+
+Both the range equation and payload/range diagrams cannot capture the full complexity of fuel burn calculations.
+For example, they do not explicitly consider the impact of climb/descent phases. This is why researchers have developed _reduced order models_.
+
+These models are based on detailed simulations, using eg. the [EUROCONTROL BADA](https://www.eurocontrol.int/model/bada) or [Piano X](https://www.lissys.uk/index2.html) software.
+Both are physics-based models that simulate the fuel-burn of aircraft depending on its flight profile. All reduced-order models used these high-resolution models to compute many data points and then fit a simplified (=reduced order) model to these data points. Some reduced order models have only one variable (eg. range), while others have more (eg. range, payload, altitude, etc.).
+
+!!! note
+    Currently, the `jetfuelburn` package includes reduced-order models from Yanto et al. (2017-2019), Lee et al. (2010), Seymour et al. (2019), and AIM2025 (from 2015).
 
 #### Yanto et al. (2017-2019)
 
-yanto_etal.available_aircraft()[0:10]  # Returns: ['A318', 'A319', 'A320', 'A321', 'A332', 'A333', 'A342', 'A343', 'A345', 'A346']
+Reduced-order models always offer multiple aircraft, for which simulations were run. The `available_aircraft` function always returns a list of these aircraft.
 
+```pyodide session='fuel'
+from jetfuelburn.reducedorder import yanto_etal
+yanto_etal.available_aircraft()[0:10]
+```
+
+Fuel consumption calculations are then performed using the `calculate_fuel_consumption` function.
+
+```pyodide session='fuel'
 yanto_etal.calculate_fuel_consumption(
     acft='A321',
     R=2200*ureg.km,
     PL=18*ureg.metric_ton
-)  # Returns: <Quantity(9790.53, 'kilogram')>
+)
+```
+
+!!! note
+    For additional information, compare the function documentation:
+    `jetfuelburn.breguet.calculate_fuel_consumption_range_equation`
 
 #### Lee et al. (2010)
 
-lee_etal.available_aircraft()[0:10]  # Returns: ['A319', 'A320', 'A332', 'AT45', 'B712', 'B732', 'B733', 'B737', 'B738', 'B744']
-
+```pyodide session='fuel'
 lee_etal.calculate_fuel_consumption(
     acft='B732',
     W_E=265825*ureg.N,
@@ -97,28 +106,45 @@ lee_etal.calculate_fuel_consumption(
     h=9144*ureg.m,
     V=807.65*ureg.kph,
     d=2000*ureg.nmi
-)  # Returns: (<Quantity(15555.2887, 'kilogram')>, <Quantity(5843.11231, 'kilogram')>)
+)
+```
+
+!!! note
+    For additional information, compare the function documentation:
+    `jetfuelburn.breguet.calculate_fuel_consumption_range_equation`
+
 
 #### AIM2025 (from 2015)
 
+```pyodide session='fuel'
 aim2015(
     acft_size_class=8,
     D_climb=300*ureg.km,
     D_cruise=(15000-300-200)*ureg.km,
     D_descent=200*ureg.km,
     PL=55.5*ureg.metric_ton
-)  # Returns: <Quantity(117265.491, 'kilogram')>
+)
+```
+
+!!! note
+    For additional information, compare the function documentation:
+    `jetfuelburn.breguet.calculate_fuel_consumption_range_equation`
+
 
 ## Helper Functions (Aerodynamics/Atmospheric Physics)
 
+The `jetfuelburn` package also includes helper functions for basic atmospheric physics problems.
+Some reduced-order models call these internally - but they can also be used independently.
+
+```pyodide session='fuel'
 from jetfuelburn.aux.physics import (
     _calculate_atmospheric_conditions,
     _calculate_aircraft_velocity,   
 )
 
-_calculate_atmospheric_conditions(altitude=10000*ureg.m)  # Returns: (<Quantity(0.412715861, 'kilogram / meter ** 3')>, <Quantity(-50.0, 'degree_Celsius')>)
-
+_calculate_atmospheric_conditions(altitude=10000*ureg.m)
 _calculate_aircraft_velocity(
     mach_number=0.8,
     altitude=10000*ureg.m
-)  # Returns: <Quantity(862.453921, 'kilometer_per_hour')>
+)
+```

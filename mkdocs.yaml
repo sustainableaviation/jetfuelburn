@@ -5,10 +5,9 @@ copyright: © Paul Scherrer Institute (PSI) and Contributors | Code under MIT Li
 nav:
   - Home: 'index.md'
   - About: 'about.md'
+  - Theory: 'theory.md'
   - Getting Started:
     - Installation: 'installation.md'
-    - Theory: 'theory.md'
-  - Try it in the Browser!:
     - Working with Physical Units: 'interactive/units.md'
     - Fuel Burn Calculations: 'interactive/fuel.md'
     - Cabin Class Fuel Allocation: 'interactive/allocation.md'
@@ -78,7 +77,7 @@ extra_css:
   # https://cdnjs.com/libraries/KaTeX
   # unpkg is incredibly slow (17s to load the css file)
   - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css
-  #- _css/style.css
+  - _css/extra.css
 
 watch:
   - jetfuelburn
