@@ -59,6 +59,19 @@ class yanto_etal:
     According to panel (a), the maximum achievable range of a Boeing 777 would be ~30'000NM. This is ~1.6x the circumference of the Earth.
     Neither assuming that the axis multiplier `1e4` nor the unit `nm` (sic!) are incorrect explains this issue.
     Figure 5 was instead used to test the implementation of the method.
+
+    Examples
+    --------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn.reducedorder import yanto_etal
+    yanto_etal.available_aircraft()[0:10]
+    yanto_etal.calculate_fuel_consumption(
+        acft='A321',
+        R=2200*ureg.km,
+        PL=18*ureg.metric_ton
+    )
+    ```
     """
 
     _regression_coefficients = {
@@ -195,6 +208,28 @@ class lee_etal:
     Closed-form takeoff weight estimation model for air transportation simulation.
     In _10th AIAA Aviation Technology, Integration, and Operations (ATIO) Conference_ (p. 9156).
     doi:[10.2514/6.2010-9156](https://doi.org/10.2514/6.2010-9156)
+
+    Examples
+    --------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn.reducedorder import lee_etal
+    lee_etal.available_aircraft()[0:10]
+    lee_etal.calculate_fuel_consumption(
+        acft='B732',
+        W_E=265825*ureg.N,
+        W_MPLD=156476*ureg.N,
+        W_MTO=513422*ureg.N,
+        W_MF=142365*ureg.N,
+        S=91.09*ureg.m ** 2,
+        C_D0=0.0214,
+        C_D2=0.0462,
+        c=(2.131E-4)/ureg.s,
+        h=9144*ureg.m,
+        V=807.65*ureg.kph,
+        d=2000*ureg.nmi
+    )
+    ```
     """
     _regression_coefficients = {
         "FA50": {'k_1': -18.2e-12, 'k_2': 3.11e-9, 'k_3': -163e-9, 'k_4': 2.46e-6, 'k_5': 47.1e-6, 'k_6': -0.823e-3},
@@ -432,7 +467,18 @@ class seymour_etal:
     _Transportation Research Part D: Transport and Environment_, 88, 102528.
     doi:[10.1016/j.trd.2020.102528](https://doi.org/10.1016/j.trd.2020.102528)
     - [FEAT Model GitHub Repository](https://github.com/kwdseymour/FEAT/tree/master)
-
+    
+    Examples
+    --------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn.reducedorder import seymour_etal
+    seymour_etal.available_aircraft()[0:10]
+    seymour_etal.calculate_fuel_consumption(
+        acft='A321',
+        R=2200*ureg.km,
+    )
+    ```
     """
     _regression_coefficients = {
         'A140': {'reduced_fuel_a1': 0.0001570270040569, 'reduced_fuel_a2': 1.2982777526024196, 'reduced_fuel_intercept': 160.62447178027185},
@@ -700,6 +746,19 @@ class aim2015:
     - [AIM2015 documentation (v9)](https://web.archive.org/web/20241206191807/https://www.atslab.org/wp-content/uploads/2019/12/AIM-2015-Documentation-v9-122019.pdf)
     - [AIM2015 documentation (v11)](https://web.archive.org/web/20231001131622/https://www.atslab.org/wp-content/uploads/2023/02/AIM-2015-Documentation-v11.pdf)
     - [AIM2015 information in the EU MIDAS system](https://web.jrc.ec.europa.eu/policy-model-inventory/explore/models/model-aim/)
+
+    Examples
+    --------
+    ```pyodide install='jetfuelburn'
+    from jetfuelburn.reducedorder import aim2015
+    aim2015(
+        acft_size_class=8,
+        D_climb=300*ureg.km,
+        D_cruise=(15000-300-200)*ureg.km,
+        D_descent=200*ureg.km,
+        PL=55.5*ureg.metric_ton
+    )
+    ```
     """
 
     _regression_coefficients = {}
