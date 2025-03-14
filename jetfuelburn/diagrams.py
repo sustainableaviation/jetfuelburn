@@ -93,6 +93,23 @@ def calculate_fuel_consumption_based_on_payload_range(
         If the distance is less than zero.
     ValueError
         If the distance exceeds the maximum range of the aircraft as per the payload-range diagram.
+
+    Examples
+    --------
+    ```pyodide install='jetfuelburn'
+    from jetfuelburn.diagrams import calculate_fuel_consumption_based_on_payload_range
+    calculate_fuel_consumption_based_on_payload_range(
+        d=2000*ureg.nmi,
+        oew=142.4*ureg.metric_ton,
+        mtow=280*ureg.metric_ton,
+        range_point_A=500*ureg.nmi,
+        payload_point_B=54*ureg.metric_ton,
+        range_point_B=5830*ureg.nmi,
+        payload_point_C=25*ureg.metric_ton,
+        range_point_C=8575*ureg.nmi,
+        range_point_D=9620*ureg.nmi,
+    )
+    ```
     """
 
     #  all variables of the same dimension must use consistent units
