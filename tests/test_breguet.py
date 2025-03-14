@@ -2,13 +2,13 @@ import pytest
 
 from jetfuelburn import ureg
 from jetfuelburn.aux.tests import approx_with_units
-from jetfuelburn.breguet import calculate_fuel_consumption_based_on_breguet_range_equation
+from jetfuelburn.breguet import calculate_fuel_consumption_range_equation
 from .fixtures.breguet import breguet_range_fuel_calculation_data_1
 
 
-def test_scalculate_fuel_consumption_based_on_breguet_range_equation(breguet_range_fuel_calculation_data_1):
+def test_scalculate_fuel_consumption_range_equation(breguet_range_fuel_calculation_data_1):
     input_data, expected_data = breguet_range_fuel_calculation_data_1
-    calculated_data = calculate_fuel_consumption_based_on_breguet_range_equation(
+    calculated_data = calculate_fuel_consumption_range_equation(
         R=input_data['R'],
         LD=input_data['LD'],
         m_after_cruise=input_data['m_after_cruise'],

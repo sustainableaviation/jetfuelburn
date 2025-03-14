@@ -12,7 +12,7 @@ from jetfuelburn import ureg
     '[length]',
     '[length]',
 )
-def calculate_fuel_consumption_based_on_payload_range(
+def calculate_fuel_consumption_payload_range(
     d: float,
     oew: float,
     mtow: float,
@@ -99,8 +99,8 @@ def calculate_fuel_consumption_based_on_payload_range(
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
-    from jetfuelburn.diagrams import calculate_fuel_consumption_based_on_payload_range
-    calculate_fuel_consumption_based_on_payload_range(
+    from jetfuelburn.diagrams import calculate_fuel_consumption_payload_range
+    calculate_fuel_consumption_payload_range(
         d=2000*ureg.nmi,
         oew=142.4*ureg.metric_ton,
         mtow=280*ureg.metric_ton,
