@@ -8,10 +8,9 @@ Passengers in first class are allocated more fuel than passengers in economy cla
 
 Relevant Function: [`jetfuelburn.aux.allocation`][]
 
-```pyodide session="allocation" install="jetfuelburn"
+```pyodide session="allocation" install="jetfuelburn" assets="no"
 from jetfuelburn import ureg
 from jetfuelburn.aux.allocation import footprint_allocation_by_area
-
 footprint_allocation_by_area(
         fuel_per_flight=14000*ureg.kg,
         size_factor_eco=1,

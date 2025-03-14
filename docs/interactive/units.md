@@ -4,11 +4,10 @@ The `jetfuelburn` package utilises the [`pint` package](https://pint.readthedocs
 
 To use physical units, simply load the `ureg` object (**u**nit **reg**istry) from the `jetfuelburn` package. You can now start [defining physical quantities](https://pint.readthedocs.io/en/stable/user/defining-quantities.html): 
 
-```pyodide session="units" install="pint"
+```pyodide session="units" install="jetfuelburn" assets="no"
 from jetfuelburn import ureg
 100 * ureg.kg
 ```
-
 
 !!! warning
 
@@ -23,26 +22,26 @@ from jetfuelburn import ureg
 
 The most frequent use-cases of the `ureg` object are conversion:
 
-```pyodide session="units"
+```pyodide session="units" assets="no"
 my_mass = 100 * ureg.kg
 my_mass.to('lbs')
 ```
 
 and dimensionality checks:
 
-```pyodide session="units"
+```pyodide session="units" assets="no"
 my_mass.check('[mass]')
 ```
 
 In order to get a list of all available units, you can use the following code:
 
-```pyodide session="units"
+```pyodide session="units" assets="no"
 list(ureg._units.keys())
 ```
 
 You can search this list for specific units using list comprehensions:
 
-```pyodide session="units"
+```pyodide session="units" assets="no"
 [unit for unit in ureg._units.keys() if "meter" in unit]
 ```
 
