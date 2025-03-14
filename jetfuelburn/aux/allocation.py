@@ -12,7 +12,7 @@ def footprint_allocation_by_area(
     load_factor_premiumeco: float,
     load_factor_business: float,
     load_factor_first: float,
-) -> tuple[float, float, float, float]:
+) -> dict[float, float, float, float]:
     r"""
     Given the fuel burn per flight $F$, the number of seats in each cabin class $S_i$,
     the load factor in each cabin class $L_i$ and the size factor of each cabin class $s_i$,
@@ -106,8 +106,30 @@ def footprint_allocation_by_area(
         
     Returns
     -------
-    tuple[float, float, float, float]
+    dict[float, float, float, float]
         Fuel burn per passenger per flight in economy, premium economy, business and first class.
+
+    Examples
+    --------
+    ```pyodide install="jetfuelburn"
+    from jetfuelburn import ureg
+    from jetfuelburn.aux.allocation import footprint_allocation_by_area
+    footprint_allocation_by_area(
+            fuel_per_flight=14000*ureg.kg,
+            size_factor_eco=1,
+            size_factor_premiumeco=0,
+            size_factor_business=1.5,
+            size_factor_first=0,
+            seats_eco=154,
+            seats_premiumeco=0,
+            seats_business=24,
+            seats_first=0,
+            load_factor_eco=0.9,
+            load_factor_premiumeco=0,
+            load_factor_business=0.5,
+            load_factor_first=0,
+        )
+    ```
     """
 
     if not fuel_per_flight > 0:
@@ -157,4 +179,9 @@ def footprint_allocation_by_area(
             size_factor_first * seats_first
         )
 
-    return fuel_eco, fuel_premiumeco, fuel_business, fuel_first
+    return {
+        'fuel_eco': fuel_eco,
+        'fuel_premiumeco': fuel_premiumeco,
+        'fuel_business': fuel_business,
+        'fuel_first': fuel_first
+    }
