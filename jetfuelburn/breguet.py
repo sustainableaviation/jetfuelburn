@@ -87,6 +87,19 @@ def calculate_fuel_consumption_based_on_breguet_range_equation(
     -------
     float
         Required fuel mass [kg]
+
+    Examples
+    --------
+    ```pyodide install='jetfuelburn'
+    from jetfuelburn.breguet import calculate_fuel_consumption_based_on_breguet_range_equation
+    calculate_fuel_consumption_based_on_breguet_range_equation(
+        R=2000*ureg.nmi,
+        LD=18,
+        m_after_cruise=100*ureg.metric_ton,
+        v_cruise=800*ureg.kph,
+        TSFC_cruise=17*(ureg.mg/ureg.N/ureg.s),
+    )
+    ```
     """
 
     if R < 0:
