@@ -1,7 +1,6 @@
 import pytest
 from jetfuelburn import ureg
 
-
 @pytest.fixture(scope="module")
 def fixture_aim2015_B787():
     """
@@ -27,21 +26,20 @@ def fixture_aim2015_B787():
         'PL': (359*95+4500) * ureg.kg,
     }
 
+    cases = {
+        5000 * ureg.km: 25606 * ureg.kg,
+        10000 * ureg.km: 53636 * ureg.kg,
+        15000 * ureg.km: 84242 * ureg.kg,
+    }
+
     def _make_case(d):
-        input_data = base_data | {'D_cruise': d - (200+200) * ureg.km}
-        if d==5000*ureg.km:
-            expected_output = 25606 * ureg.kg
-        elif d == 10000 * ureg.km:
-            expected_output = 53636 * ureg.kg
-        elif d == 15000 * ureg.km:
-            expected_output = 84242 * ureg.kg
-        else:
+        if d not in cases:
             raise ValueError(f"No expected output defined for d={d}")
-        
+        input_data = base_data | {'D_cruise': d - (200+200) * ureg.km}
+        expected_output = cases[d]
         return input_data, expected_output
     
-    return _make_case
-
+    return _make_case, list(cases.keys())
 
 @pytest.fixture(scope="module")
 def fixture_seymour_B738():
@@ -60,18 +58,19 @@ def fixture_seymour_B738():
         'acft': 'B738',
     }
 
+    cases = {
+        902 * ureg.km: 4008 * ureg.kg,
+        5557 * ureg.km: 16728 * ureg.kg,
+    }
+
     def _make_case(r):
-        input_data = base_data | {'R': r}
-        if r == 5557 * ureg.km:
-            expected_output = 16728 * ureg.kg
-        elif r == 902 * ureg.km:
-            expected_output = 4008 * ureg.kg
-        else:
+        if r not in cases:
             raise ValueError(f"No expected output defined for r={r}")
+        input_data = base_data | {'R': r}
+        expected_output = cases[r]
         return input_data, expected_output
     
-    return _make_case
-
+    return _make_case, list(cases.keys())
 
 @pytest.fixture(scope="module")
 def fixture_yanto_B739():
@@ -90,57 +89,58 @@ def fixture_yanto_B739():
         'acft': 'B739',
     }
 
+    cases = {
+        (4724 * ureg.km, 17918 * ureg.kg): 15807 * ureg.kg,
+        (2943 * ureg.km, 7885 * ureg.kg): 8878 * ureg.kg,
+    }
+
     def _make_case(r, pl):
-        input_data = base_data | {'R': r, 'PL': pl}
-        if r == 4724 * ureg.km and pl == 17918 * ureg.kg:
-            expected_output = 15807 * ureg.kg
-        elif r == 2943 * ureg.km and pl == 7885 * ureg.kg:
-            expected_output = 8878 * ureg.kg
-        else:
+        key = (r, pl)
+        if key not in cases:
             raise ValueError(f"No expected output defined for r={r}, pl={pl}")
+        input_data = base_data | {'R': r, 'PL': pl}
+        expected_output = cases[key]
         return input_data, expected_output
     
-    return _make_case
+    return _make_case, list(cases.keys())
 
+@pytest.fixture(scope="module")
+def fixture_lee_B732():
+    """
+    Fixture returning a factory function to generate test cases.
+    
+    See Also
+    --------
+    [Pytest Documentation "Factories as Fixtures"](https://docs.pytest.org/en/stable/how-to/fixtures.html#factories-as-fixtures)
 
-@pytest.fixture
-def fixture_lee_B732_1500nmi():
-    # Table 3 and Figure 6 in Lee et al. (2019) https://doi.org/10.1016/j.trd.2019.102346
-    input_data = {
-        'acft':'B732',
-        'W_E': 265825*ureg.N,
-        'W_MPLD': 156476*ureg.N,
-        'W_MTO': 513422*ureg.N,
-        'W_MF': 142365*ureg.N,
-        'S': 91.09*ureg.m ** 2,
+    References
+    ----------
+    [Table 3 and Figure 6 in Lee et al. (2019)](https://doi.org/10.1016/j.trd.2019.102346)
+    """
+    base_data = {
+        'acft': 'B732',
+        'W_E': 265825 * ureg.N,
+        'W_MPLD': 156476 * ureg.N,
+        'W_MTO': 513422 * ureg.N,
+        'W_MF': 142365 * ureg.N,
+        'S': 91.09 * ureg.m ** 2,
         'C_D0': 0.0214,
         'C_D2': 0.0462,
-        'c': (2.131E-4)/ureg.s,
-        'h': 9144*ureg.m,
-        'V': 807.65*ureg.kph,
-        'd': 1500*ureg.nmi
+        'c': (2.131E-4) / ureg.s,
+        'h': 9144 * ureg.m,
+        'V': 807.65 * ureg.kph,
     }
-    output_data = (26288*ureg.lbs).to('kg')
-    return input_data, output_data
 
-
-@pytest.fixture
-def fixture_lee_B732_2000nmi():
-    # Table 3 and Figure 6 in Lee et al. (2019) https://doi.org/10.1016/j.trd.2019.102346
-    input_data = {
-        'acft':'B732',
-        'W_E': 265825*ureg.N,
-        'W_MPLD': 156476*ureg.N,
-        'W_MTO': 513422*ureg.N,
-        'W_MF': 142365*ureg.N,
-        'S': 91.09*ureg.m ** 2,
-        'C_D0': 0.0214,
-        'C_D2': 0.0462,
-        'c': (2.131E-4)/ureg.s,
-        'h': 9144*ureg.m,
-        'V': 807.65*ureg.kph,
-        'd': 2000*ureg.nmi
+    cases = {
+        1500 * ureg.nmi: (26288 * ureg.lbs).to('kg'),
+        2000 * ureg.nmi: (9500 * ureg.lbs).to('kg'),
     }
-    output_data = (9500*ureg.lbs).to('kg')
-    return input_data, output_data
 
+    def _make_case(d):
+        if d not in cases:
+            raise ValueError(f"No expected output defined for d={d}")
+        input_data = base_data | {'d': d}
+        expected_output = cases[d]
+        return input_data, expected_output
+    
+    return _make_case, list(cases.keys())
