@@ -1,4 +1,3 @@
-# fixtures/diagrams.py
 import pytest
 from jetfuelburn import ureg
 
