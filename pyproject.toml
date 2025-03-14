@@ -51,7 +51,7 @@ testing = [
 include-package-data = true
 packages = [
   "jetfuelburn",
-  "jetfuelburn.aux"
+  "jetfuelburn.aux",
   "jetfuelburn.data"
 ]
 

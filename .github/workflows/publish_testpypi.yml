@@ -11,7 +11,7 @@ jobs:
 
   run-tests:
     name: Run Tests
-    uses: ./.github/workflows/test.yml
+    uses: ./.github/workflows/test_package.yml
 
   build:
     name: Build distribution 📦
