@@ -96,7 +96,7 @@ def calculate_fuel_consumption_based_on_payload_range(
 
     Examples
     --------
-    ```pyodide install='jetfuelburn'
+    ```pyodide install='jetfuelburn' assets='no'
     from jetfuelburn.diagrams import calculate_fuel_consumption_based_on_payload_range
     calculate_fuel_consumption_based_on_payload_range(
         d=2000*ureg.nmi,
