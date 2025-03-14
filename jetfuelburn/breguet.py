@@ -90,7 +90,7 @@ def calculate_fuel_consumption_based_on_breguet_range_equation(
 
     Examples
     --------
-    ```pyodide install='jetfuelburn'
+    ```pyodide install='jetfuelburn' assets='no'
     from jetfuelburn.breguet import calculate_fuel_consumption_based_on_breguet_range_equation
     calculate_fuel_consumption_based_on_breguet_range_equation(
         R=2000*ureg.nmi,
