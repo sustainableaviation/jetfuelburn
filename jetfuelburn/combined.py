@@ -1,5 +1,3 @@
-# %%
-
 from jetfuelburn import ureg
 from jetfuelburn.breguet import calculate_fuel_consumption_based_on_breguet_range_equation
 
@@ -46,12 +44,8 @@ def calculate_fuel_consumption_combined_model(
 
     ![Diagram](../_static/combined.svg)
 
-    The `dict_climb_segments` and `dict_descent_segments` are nested dictionaries
-    containing information about the fuel consumption during each segment of the flight.
-    The dictionary should be structured as follows:
-
-    ADD: only 'takeoff' is required, the rest is optional
-    ADD: only 'landing' is required, the rest is optional
+    For `dict_climb_segments`, only 'takeoff' is required; other segments are optional.
+    For `dict_descent_segments`, only 'approach' is required; other segments are optional.
 
     ```python
     dict_climb_segments = {
@@ -63,13 +57,12 @@ def calculate_fuel_consumption_combined_model(
     dict_descent_segments = {
         'descent_cruise_to_10000ft': <flight_segment_dict>,
         'descent_10000ft_to_5000ft': <flight_segment_dict>,
+        'approach': <flight_segment_dict>,
         (...)
     }
-    ```
 
-    With each `flight_segment_dict` containing a `time` value-pair
-    and _either_ an absolute `fuel_flow_per_engine` value-pair
-    or a relative `fuel_flow_per_engine_relative_to_takeoff` value-pair.
+    Each `flight_segment_dict` must contain a time key-value pair and either an absolute
+    `fuel_flow_per_engine` value-pair or a relative `fuel_flow_per_engine_relative_to_takeoff` value-pair.
 
     ```python
     flight_segment_dict_absolute = {
@@ -281,58 +274,3 @@ def calculate_fuel_consumption_combined_model(
         'mass_fuel_descent': m_f_descent_origin_to_destination.to('kg'),
         'mass_fuel_approach': m_f_approach_origin_to_destination.to('kg'),
     }
-
-
-# %%
-
-dict_climb_segments_origin_to_destination = {
-    'takeoff': {
-        'time': 0.7*ureg.min,
-        'fuel_flow_per_engine': 0.205*(ureg.kg/ureg.sec),
-    },
-    'climb_to_10000ft': {
-        'time': 4*ureg.min,
-        'fuel_flow_per_engine_relative_to_takeoff': 0.85,
-    },
-    'climb_10000ft_to_20000ft': {
-        'time': 10*ureg.min,
-        'fuel_flow_per_engine_relative_to_takeoff': 0.75,
-    },
-    'climb_20000ft_to_cruise': {
-        'time': 15*ureg.min,
-        'fuel_flow_per_engine_relative_to_takeoff': 0.7,
-    },
-}
-
-dict_descent_segments_origin_to_destination = {
-    'descent_cruise_to_20000ft': {
-        'time': 10*ureg.min,
-        'fuel_flow_per_engine_relative_to_takeoff': 0.3,
-    },
-    'descent_20000ft_to_10000ft': {
-        'time': 5*ureg.min,
-        'fuel_flow_per_engine_relative_to_takeoff': 0.3,
-    },
-    'approach': {
-        'time': 5*ureg.min,
-        'fuel_flow_per_engine_relative_to_takeoff': 0.3,
-    }
-}
-
-# %%
-
-calculate_fuel_consumption_combined_model(
-    payload=10*ureg.metric_ton,
-    oew=44300*ureg.kg,
-    number_of_engines=2,
-    fuel_flow_per_engine_idle=0.088*(ureg.kg/ureg.sec),
-    fuel_flow_per_engine_takeoff=0.855*(ureg.kg/ureg.sec),
-    speed_cruise=833*ureg.kph,
-    tsfc_cruise=15*(ureg.mg/(ureg.N*ureg.s)),
-    lift_to_drag=17,
-    dict_climb_segments_origin_to_destination=dict_climb_segments_origin_to_destination,
-    dict_descent_segments_origin_to_destination=dict_descent_segments_origin_to_destination,
-    R_cruise_origin_to_destination=2000*ureg.km,
-    time_taxi=26*ureg.min,
-)
-# %%
