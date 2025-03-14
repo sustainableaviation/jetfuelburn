@@ -17,9 +17,10 @@ authors:
     orcid: 0000-0001-6758-482X
     affiliation: "1, 2"
 affiliations:
- - name: “Laboratory for Energy Systems Analysis, PSI Centers for Nuclear Engineering \& Sciences and Energy \& Environmental Sciences, Villigen, Switzerland
+ - name: Laboratory for Energy Systems Analysis, PSI Centers for Nuclear Engineering \& Sciences and Energy \& Environmental Sciences, Villigen, Switzerland
    index: 1
  - name: Chair of Energy Systems Analysis, Institute of Energy and Process Engineering, Department of Mechanical and Process Engineering, ETH Zurich, Zurich, Switzerland
+   index: 2
 date: 14 March 2025
 bibliography: paper.bib
 
@@ -27,19 +28,23 @@ bibliography: paper.bib
 
 # Summary
 
-The forces on stars, galaxies, and dark matter under external gravitational
-fields lead to the dynamical evolution of structures in the universe. The orbits
-of these bodies are therefore key to understanding the formation, history, and
-future state of galaxies. The field of "galactic dynamics," which aims to model
-the gravitating components of galaxies to study their structure and evolution,
-is now well-established, commonly taught, and frequently used in astronomy.
-Aside from toy problems and demonstrations, the majority of problems require
-efficient numerical tools, many of which require the same base code (e.g., for
-performing numerical orbit integration).
+
 
 # Statement of need
 
-`Gala` is an Astropy-affiliated Python package for galactic dynamics. Python
+`jetfuelburn` is a Python package for calculating the fuel burn of commercial aircraft.
+It allows users to choose from four categories of calculation functions.
+
+The package is designed to be extremely light-weight, with only a single dependency on the `pint`
+package for unit conversion. This makes it possible to use with Pyodide.
+
+The API for `jetfuelburn` was designed to be 
+
+All variables passed to functions are checked for correct physical dimensions.
+Functions that are using polynomial approximations in non-SI units are converted to SI units before calculation.
+
+First 
+
 enables wrapping low-level languages (e.g., C) for speed without losing
 flexibility or ease-of-use in the user-interface. The API for `Gala` was
 designed to provide a class-based and user-friendly interface to fast (C or
@@ -59,7 +64,35 @@ design, and support for Astropy functionality in `Gala` will enable exciting
 scientific explorations of forthcoming data releases from the *Gaia* mission
 [@gaia] by students and experts alike.
 
-# Mathematics
+Is going to be a great addition to existing fuel burn calculators, etc.
+
+# Fuel Calculations Methods included in `v1.0.0`
+
+## Payload/Range-Diagrams
+
+
+## Breguet Range Equation
+
+| Category | Implementation | Description |
+|----------|----------------|-------------|
+
+## Reduced Order Models
+
+| Authors    | Pub.Year | Variables      | Polynomial Order |
+|------------|----------|----------------|------------------|
+| Lee et al. | 2016     | $R$            | 2                |
+
+
+## Combined Models
+
+# Auxiliary Functions included in `v1.0.0`
+
+## Atmospheric Physics Functions
+
+## Fuel Consumption Allocation
+
+Fuel consumption is allocated to the different flight phases based on the methodology of the ICAO Carbon Calculator.
+
 
 Single dollars ($) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
 
@@ -92,12 +125,9 @@ For a quick reference, the following citation commands can be used:
 
 # Figures
 
-Figures can be included like this:
-![Caption for example figure.\label{fig:example}](figure.png)
-and referenced from text using \autoref{fig:example}.
 
 Figure sizes can be customized by adding an optional second parameter:
-![Caption for example figure.](figure.png){ width=20% }
+![Caption for example figure.](docs/_static/payload_range_generic.svg){ width=20% }
 
 # Acknowledgements
 
