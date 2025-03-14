@@ -2,4 +2,4 @@
 from pint import UnitRegistry
 ureg = UnitRegistry()
 
-__version__ = "0.0.4"
+__version__ = "0.0.4a0"
