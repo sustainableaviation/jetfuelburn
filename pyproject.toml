@@ -52,7 +52,9 @@ include-package-data = true
 packages = [
   "jetfuelburn",
   "jetfuelburn.aux",
-  "jetfuelburn.data"
+  "jetfuelburn.data",
+  "jetfuelburn.data.AIM2015",
+  "jetfuelburn.data.PS2025",
 ]
 
 [tool.setuptools.dynamic]
