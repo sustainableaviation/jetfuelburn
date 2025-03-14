@@ -23,7 +23,7 @@ nav:
     - Physics Functions: 'api/physics.md'
 theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
   name: material
-  custom_dir: docs/_overrides
+  #custom_dir: docs/_overrides
   logo: _static/logo/jetfuelburn_logo.svg
   favicon: _static/logo/jetfuelburn_logo.svg
   highlightjs: true

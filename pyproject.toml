@@ -10,7 +10,7 @@ authors = [
 maintainers = [
   { name="Michael Weinold", email="michaelphilippweinold+jetfuelburn@gmail.com" }
 ]
-description = "Python package for calculating fuel burn of commercial aircraft."
+description = "A Python package for calculating fuel burn of commercial aircraft."
 readme = "README.md"
 license = {text = "MIT"}
 dynamic = ["version"]
