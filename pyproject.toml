@@ -51,6 +51,9 @@ license-files = ["LICENSE"]
 include-package-data = true
 packages = ["jetfuelburn"]
 
+[tool.setuptools.dynamic]
+version = {attr = "jetfuelburn.__version__"} 
+readme = {file = "README.md"}
 
 [tool.pytest.ini_options]
 testpaths = ["tests/*.py"]
