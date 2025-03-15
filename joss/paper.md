@@ -30,98 +30,46 @@ bibliography: paper.bib
 
 
 
-# Statement of need
+# Statement of Need
 
-`jetfuelburn` is a Python package for calculating the fuel burn of commercial aircraft.
-It allows users to choose from four categories of calculation functions.
+Environmental assessment of air travel is important
+In the life-cycle assessment of aviation, the use-phase of the aircraft has by far the largest impact on the environment.
+The fuel burn of an aircraft is a key parameter in the environmental assessment of air travel. The other key parameter is the environmental burdens associated with fuel burn
+Unforuntaly, environmental researchers are often using overly simplistic models to calculate fuel burn.
+Recently, Su-Un... [@su2023methodological] in Science of the Total Environment...
+Sacchi et al. [@sacchi2023make] based on work by Cox, which was based on ....
 
-The package is designed to be extremely light-weight, with only a single dependency on the `pint`
-package for unit conversion. This makes it possible to use with Pyodide.
 
-The API for `jetfuelburn` was designed to be 
+Tools include:
 
-All variables passed to functions are checked for correct physical dimensions.
-Functions that are using polynomial approximations in non-SI units are converted to SI units before calculation.
+| Tool                                    | Provider  | Availability    | Data Sources                                                   |
+|-----------------------------------------|-----------|-----------------|----------------------------------------------------------------|
+| ICAO Carbon Emissions Calculator (ICEC) | ICAO      | Public (Online) | "ICAO Fuel Formulas"                                           |
+| IATA CO2 Connect                        | IATA      | Proprietary     | airline statistics (real flights)                              |
+| myClimate CO2 Flight Calculator         | myClimate | Public (Online) | EMEP/EEA air pollutant emission inventory guidebook            |
+| Google Flights                          | Google    | Public (Online) | "travel-impact-model" (data partially from EMEP/EEA guidebook) |
 
-First 
 
-enables wrapping low-level languages (e.g., C) for speed without losing
-flexibility or ease-of-use in the user-interface. The API for `Gala` was
-designed to provide a class-based and user-friendly interface to fast (C or
-Cython-optimized) implementations of common operations such as gravitational
-potential and force evaluation, orbit integration, dynamical transformations,
-and chaos indicators for nonlinear dynamics. `Gala` also relies heavily on and
-interfaces well with the implementations of physical units and astronomical
-coordinate systems in the `Astropy` package [@astropy] (`astropy.units` and
-`astropy.coordinates`).
+While researchers from aerospace engineering have proposed different approaches, few have been implemented in a user-friendly package that can be used by non-experts.
+The `jetfuelburn` package is the first Python package that provides a comprehensive set of fuel burn models for commercial aircraft. It is designed to be used in the context of environmental impact assessment of air travel, aircraft performance analysis and optimisation. It uses the `pint` package to allow for calculations in physical units, allowing for quick conversion between imperial and metric units. In addition, all variables passed to functions are checked for correct physical dimensions.
 
-`Gala` was designed to be used by both astronomical researchers and by
-students in courses on gravitational dynamics or astronomy. It has already been
-used in a number of scientific publications [@Pearson:2017] and has also been
-used in graduate courses on Galactic dynamics to, e.g., provide interactive
-visualizations of textbook material [@Binney:2008]. The combination of speed,
-design, and support for Astropy functionality in `Gala` will enable exciting
-scientific explorations of forthcoming data releases from the *Gaia* mission
-[@gaia] by students and experts alike.
 
 Is going to be a great addition to existing fuel burn calculators, etc.
 
-# Fuel Calculations Methods included in `v1.0.0`
+# Fuel Calculation Model Categories
 
-## Payload/Range-Diagrams
+The `jetfuelburn` package implements different types of fuel burn models:
 
-
-## Breguet Range Equation
-
-| Category | Implementation | Description |
-|----------|----------------|-------------|
-
-## Reduced Order Models
-
-| Authors    | Pub.Year | Variables      | Polynomial Order |
-|------------|----------|----------------|------------------|
-| Lee et al. | 2016     | $R$            | 2                |
+1. Breguet Range Equation
+2. Payload/Range Diagrams
+3. Reduced Order Models
+4. Combined Models
 
 
-## Combined Models
 
-# Auxiliary Functions included in `v1.0.0`
+# Auxiliary Functions
 
-## Atmospheric Physics Functions
-
-## Fuel Consumption Allocation
-
-Fuel consumption is allocated to the different flight phases based on the methodology of the ICAO Carbon Calculator.
-
-
-Single dollars ($) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
-
-Double dollars make self-standing equations:
-
-$$\Theta(x) = \left\{\begin{array}{l}
-0\textrm{ if } x < 0\cr
-1\textrm{ else}
-\end{array}\right.$$
-
-You can also use plain \LaTeX for equations
-\begin{equation}\label{eq:fourier}
-\hat f(\omega) = \int_{-\infty}^{\infty} f(x) e^{i\omega x} dx
-\end{equation}
-and refer to \autoref{eq:fourier} from text.
-
-# Citations
-
-Citations to entries in paper.bib should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format.
-
-If you want to cite a software repository URL (e.g. something on GitHub without a preferred
-citation) then you can do it with the example BibTeX entry below for @fidgit.
-
-For a quick reference, the following citation commands can be used:
-- `@author:2001`  ->  "Author et al. (2001)"
-- `[@author:2001]` -> "(Author et al., 2001)"
-- `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)"
+The `jetfuelburn` package also includes helper functions for basic atmospheric physics and the allocation of fuel burn to different cabin classes (economy, business, etc.).
 
 # Figures
 
