@@ -65,6 +65,9 @@ The `jetfuelburn` package implements different types of fuel burn models:
 3. Reduced Order Models
 4. Combined Models
 
+Lee et al. (2010)[@lee2010closed]
+and
+Yanto et al. (2017)[@yanto2017efficient]
 
 
 # Auxiliary Functions
