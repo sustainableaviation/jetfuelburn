@@ -42,12 +42,12 @@ Sacchi et al. [@sacchi2023make] based on work by Cox, which was based on ....
 
 Tools include:
 
-| Tool               | Provider  | Availability    | Data Sources            |
-|--------------------|-----------|-----------------|-------------------------|
-| ICEC               | ICAO      | Open            | "ICAO Fuel Formulas"    |
-| CO~2~ Connect      | IATA      | Proprietary     | airline statistics      |
-| CO~2~ Flight Calc. | myClimate | Open            | EMEP/EEA emissions      |
-| Google Flights     | Google    | Public          | `travel-impact-model`   |
+| Tool               | Provider  | Availability    | Data Sources               |
+|--------------------|-----------|-----------------|----------------------------|
+| ICEC               | ICAO      | Open            | "ICAO Fuel Formulas"       |
+| CO~2~ Connect      | IATA      | Proprietary     | airline statistics         |
+| CO~2~ Flight Calc. | myClimate | Open            | EMEP/EEA emissions guideb. |
+| Google Flights     | Google    | Open            | `travel-impact-model`      |
 
 
 While researchers from aerospace engineering have proposed different approaches, few have been implemented in a user-friendly package that can be used by non-experts.
@@ -58,7 +58,9 @@ Is going to be a great addition to existing fuel burn calculators, etc.
 
 # Fuel Calculation Model Categories
 
-The `jetfuelburn` package implements different types of fuel burn models. 
+The `jetfuelburn` package implements different types of fuel burn models. The simplest models are based on basic aerodynamic equations like the Breguet range equation, while more complex models take into account the specifics of different aircraft types. The package includes the following models:
+
+
 
 1. Breguet Range Equation
 2. Payload/Range Diagrams
@@ -66,6 +68,10 @@ The `jetfuelburn` package implements different types of fuel burn models.
   1. [@lee2010closed]
   2. [@yanto2017efficient]
 4. Combined Models
+
+_1. List item__  
+__1.1 List item
+_2. List item
 
 
 # Auxiliary Functions
