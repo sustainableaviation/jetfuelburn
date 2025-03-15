@@ -119,6 +119,7 @@ yanto_etal.calculate_fuel_consumption(
     Note that Lee et al. use weight [N] instead of mass [kg] as input.
 
 ```pyodide session='fuel'
+from jetfuelburn.reducedorder import lee_etal
 lee_etal.calculate_fuel_consumption(
     acft='B732',
     W_E=265825*ureg.N,
@@ -146,6 +147,7 @@ lee_etal.calculate_fuel_consumption(
     See the function documentation for a list of available size classes.
 
 ```pyodide session='fuel'
+from jetfuelburn.reducedorder import aim2015
 aim2015(
     acft_size_class=8,
     D_climb=300*ureg.km,
@@ -171,9 +173,13 @@ from jetfuelburn.aux.physics import (
     _calculate_aircraft_velocity,   
 )
 
-_calculate_atmospheric_conditions(altitude=10000*ureg.m)
 _calculate_aircraft_velocity(
     mach_number=0.8,
     altitude=10000*ureg.m
 )
+```
+
+
+```pyodide session='fuel'
+_calculate_atmospheric_conditions(altitude=10000*ureg.m)
 ```
