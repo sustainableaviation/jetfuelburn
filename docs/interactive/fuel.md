@@ -12,7 +12,7 @@ the lift-to-drag ratio (L/D) and specific fuel consumption (TSFC) are often more
     First, we import the `jetfuelburn` package and the `pint` package unit registry. \
     All code editors on this page will remember these imports and later variable definitions.
 
-```pyodide session='fuel' install='jetfuelburn pint'
+```pyodide session='fuel' install='jetfuelburn'
 import jetfuelburn
 from jetfuelburn import ureg
 from jetfuelburn.breguet import calculate_fuel_consumption_range_equation
