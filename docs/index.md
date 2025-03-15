@@ -21,7 +21,7 @@ fig = px.line(
     x=data['Range (km)'],
     y=data['Value'],
     color=data['Aircraft'],
-    labels={'x': 'Range [km]', 'y': 'Fuel Burn [kg]', 'color': 'Aircraft Type'},
+    labels={'x': 'Range at average Payload [km]', 'y': 'Fuel Burn [kg]', 'color': 'Aircraft Type'},
 )
 
 fig.add_layout_image(
