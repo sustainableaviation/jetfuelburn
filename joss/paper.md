@@ -54,10 +54,10 @@ The `jetfuelburn` package implements different types of fuel burn models. The si
 
 | Model Category    | Description | Methods |
 |--------------------|-----------|------------|
-| Breguet Range Equation | Simple model based on the Breguet range equation | [@breguet1936memoire] |
-| Payload/Range Diagrams | Model based on payload/range diagrams | [@roskam1985airplane] |
-| Reduced Order Models | Model based on reduced order models | [@lee2010closed] [@yanto2017efficient] |
-| Combined Models | Models that combine different methods | [@sacchi2023make] |
+| Breguet Range Equation | Simple model based on the Breguet range equation | [@young2017performance] |
+| Payload/Range Diagrams | Model based on payload/range diagrams | [@burzlaff2017aircraft] |
+| Reduced Order Models | Model based on reduced order models | [@lee2010closed] [@yanto2017efficient][@dray2019aim2015][@seymour2020fuel] |
+| Combined Models | Models that combine different methods | new |
 
 
 
