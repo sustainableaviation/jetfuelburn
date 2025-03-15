@@ -1,12 +1,45 @@
 # JetFuelBurn
 
-`jetfuelburn` is a Python package for calculating fuel burn in aircraft. It is designed to be used in the context of environmental impact assessment of air travel, aircraft performance analysis and optimisation.
+`jetfuelburn` is a Python package for calculating fuel burn in aircraft. It is designed to be used in the context of environmental impact assessment of air travel, aircraft performance analysis and optimisation. It includes helper function for basic atmospheric physics and the allocation of fuel burn to different cabin classes.
 
-The package implements different fuel burn models. Some are based on basic aerodynamic equations like the [Breguet range equation](), while others are more complex and ultimately based on [EUROCONTROL BADA](https://www.eurocontrol.int/model/bada) or [Piano X](https://www.lissys.uk/index2.html) simulation data.
+The package implements models from textbooks and scientific publications. Some are based on basic aerodynamic equations like the [Breguet range equation](https://en.wikipedia.org/wiki/Range_(aeronautics)), while others are more complex and ultimately based on [EUROCONTROL BADA](https://www.eurocontrol.int/model/bada) or [Piano X](https://www.lissys.uk/index2.html) simulation data.
 
-Extensive documentation and diagrams are provided for relevant functions. The package is designed to be used with physical units enabled by the [`pint` package](https://pint.readthedocs.io/en/stable/). This allows for straightforward conversions of both input and output values.
+```python exec="true" html="true"
+import csv
+import plotly.express as px
 
-The package also includes helper function for basic atmospheric physics problems and the allocation of fuel burn to different cabin classes (economy, business, etc.).
+data = {'Range (km)': [], 'Value': [], 'Aircraft': []}
+with open('docs/_static/figure_data/airbus_fuel_burn.csv', 'r') as file:
+    csv_reader = csv.DictReader(file)
+    for row in csv_reader:
+        for aircraft in ['A320', 'A388', 'A333', 'A343', 'A359']:
+            data['Range (km)'].append(int(row['Range (km)']))
+            data['Value'].append(float(row[aircraft]))
+            data['Aircraft'].append(aircraft)
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/3/33/Fuel_Quantity_Indicator_B737-300.svg" width="300">
+fig = px.line(
+    x=data['Range (km)'],
+    y=data['Value'],
+    color=data['Aircraft'],
+    labels={'x': 'Range [km]', 'y': 'Fuel Burn [kg]', 'color': 'Aircraft Type'},
+)
 
+fig.add_layout_image(
+    dict(
+        source="https://upload.wikimedia.org/wikipedia/commons/a/ae/Airbus_A320_clipart.svg",
+        xref="paper", # reference to the paper (plot area) coordinates
+        yref="paper", # reference to the paper (plot area) coordinates
+        x=0.02,
+        y=0.98,
+        sizex=0.55,
+        sizey=0.55,
+        xanchor="left",
+        yanchor="top",
+        layer="above"
+    )
+)
+
+print(fig.to_html(full_html=False, include_plotlyjs="cdn"))
+# https://pawamoy.github.io/markdown-exec/gallery/#with-plotly
+```
+_Interactive visualization of fuel burn for different Airbus aircraft types, based on the "FEAT" model by Seymour et al. ([`jetfuelburn.reducedorder.seymour_etal`][])._
