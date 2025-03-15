@@ -42,12 +42,12 @@ Sacchi et al. [@sacchi2023make] based on work by Cox, which was based on ....
 
 Tools include:
 
-| Tool                                    | Provider  | Availability    | Data Sources                                                   |
-|-----------------------------------------|-----------|-----------------|----------------------------------------------------------------|
-| ICAO Carbon Emissions Calculator (ICEC) | ICAO      | Public (Online) | "ICAO Fuel Formulas"                                           |
-| IATA CO2 Connect                        | IATA      | Proprietary     | airline statistics (real flights)                              |
-| myClimate CO2 Flight Calculator         | myClimate | Public (Online) | EMEP/EEA air pollutant emission inventory guidebook            |
-| Google Flights                          | Google    | Public (Online) | "travel-impact-model" (data partially from EMEP/EEA guidebook) |
+| Tool               | Provider  | Availability    | Data Sources            |
+|--------------------|-----------|-----------------|-------------------------|
+| ICEC               | ICAO      | Open            | "ICAO Fuel Formulas"    |
+| CO~2~ Connect      | IATA      | Proprietary     | airline statistics      |
+| CO~2~ Flight Calc. | myClimate | Open            | EMEP/EEA emissions      |
+| Google Flights     | Google    | Public          | `travel-impact-model`   |
 
 
 While researchers from aerospace engineering have proposed different approaches, few have been implemented in a user-friendly package that can be used by non-experts.
@@ -63,19 +63,18 @@ The `jetfuelburn` package implements different types of fuel burn models.
 1. Breguet Range Equation
 2. Payload/Range Diagrams
 3. Reduced Order Models
-   3.1. [@lee2010closed], [@yanto2017efficient]
+  1. [@lee2010closed]
+  2. [@yanto2017efficient]
 4. Combined Models
-
-
 
 
 # Auxiliary Functions
 
-The `jetfuelburn` package includes helper functions for basic problems in atmospheric physics, such as computation of airspeed from mach number based on ambient pressure. In addition, the package includes a for the allocation of fuel burn to different cabin classes (economy, business, etc.) according to the current approach of both [IATA]((https://web.archive.org/web/20230526103741/https://www.iata.org/contentassets/139d686fa8f34c4ba7a41f7ba3e026e7/iata-rp-1726_passenger-co2.pdf)) and [ICAO]((https://web.archive.org/web/20240826103513/https://applications.icao.int/icec/Methodology%20ICAO%20Carbon%20Emissions%20Calculator_v13_Final.pdf)).
+The `jetfuelburn` package includes helper functions for basic problems in atmospheric physics, such as computation of airspeed from mach number based on ambient pressure. In addition, the package includes a module for the allocation of fuel burn to different cabin classes (economy, business, etc.) according to the current approach of both [IATA]((https://web.archive.org/web/20230526103741/https://www.iata.org/contentassets/139d686fa8f34c4ba7a41f7ba3e026e7/iata-rp-1726_passenger-co2.pdf)) and [ICAO]((https://web.archive.org/web/20240826103513/https://applications.icao.int/icec/Methodology%20ICAO%20Carbon%20Emissions%20Calculator_v13_Final.pdf)).
 
 # Interactive Documentation
 
-The package documentation allows users to 
+The package documentation allows users to compute fuel burn directly in the browser, without the need to install the package locally. This is achieved through the use of a [Pyodide](https://pyodide.org/en/stable/) Web Assembly Python kernel. The interactive documentation is available at [jetfuelburn.readthedocs.io](https://jetfuelburn.readthedocs.io).
 
 # Acknowledgements
 
