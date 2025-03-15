@@ -40,8 +40,6 @@ def calculate_fuel_consumption_combined_model(
     Given aircraft performance parameters, payload, climb/descent segment information and a flight distances,
     calculates the required fuel mass $m_F$ for a given mission.
 
-    _extended_summary_
-
     ![Diagram](../_static/combined.svg)
 
     For `dict_climb_segments`, only 'takeoff' is required; other segments are optional.
@@ -60,6 +58,7 @@ def calculate_fuel_consumption_combined_model(
         'approach': <flight_segment_dict>,
         (...)
     }
+    ```
 
     Each `flight_segment_dict` must contain a time key-value pair and either an absolute
     `fuel_flow_per_engine` value-pair or a relative `fuel_flow_per_engine_relative_to_takeoff` value-pair.
@@ -93,7 +92,6 @@ def calculate_fuel_consumption_combined_model(
     - Setion 2.1.3.4 "Reference emissions landing and take-off (LTO) cycle"
     in Annex 16 to the Convention on Civil Aviation, "Environmental Protection", Volume II - Aircraft Engine Emissions, 
     Fourth Edition, July 2017
-
 
     Parameters
     ----------
