@@ -5,7 +5,6 @@ copyright: © Paul Scherrer Institute (PSI) and Contributors | Code under MIT Li
 nav: 
   - Home: 'index.md'
   - About: 'about.md'
-  - Theory: 'theory.md'
   - Getting Started:
     - Installation: 'installation.md'
     - Working with Physical Units: 'interactive/units.md'
