@@ -60,18 +60,14 @@ Is going to be a great addition to existing fuel burn calculators, etc.
 
 The `jetfuelburn` package implements different types of fuel burn models. The simplest models are based on basic aerodynamic equations like the Breguet range equation, while more complex models take into account the specifics of different aircraft types. The package includes the following models:
 
+| Model Category    | Description | Methods |
+|--------------------|-----------|------------|
+| Breguet Range Equation | Simple model based on the Breguet range equation | [@breguet1936memoire] |
+| Payload/Range Diagrams | Model based on payload/range diagrams | [@roskam1985airplane] |
+| Reduced Order Models | Model based on reduced order models | [@lee2010closed] [@yanto2017efficient] |
+| Combined Models | Models that combine different methods | [@sacchi2023make] |
 
 
-1. Breguet Range Equation
-2. Payload/Range Diagrams
-3. Reduced Order Models
-  1. [@lee2010closed]
-  2. [@yanto2017efficient]
-4. Combined Models
-
-_1. List item__  
-__1.1 List item
-_2. List item
 
 
 # Auxiliary Functions
