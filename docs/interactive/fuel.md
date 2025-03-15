@@ -54,7 +54,7 @@ calculate_fuel_consumption_payload_range(
 
 !!! note
     For additional information, compare the function documentation:
-    `jetfuelburn.breguet.calculate_fuel_consumption_range_equation`
+    [`jetfuelburn.breguet.calculate_fuel_consumption_range_equation`][]
 
 ## Reduced-Order Models
 
@@ -65,7 +65,12 @@ These models are based on detailed simulations, using eg. the [EUROCONTROL BADA]
 Both are physics-based models that simulate the fuel-burn of aircraft depending on its flight profile. All reduced-order models used these high-resolution models to compute many data points and then fit a simplified (=reduced order) model to these data points. Some reduced order models have only one variable (eg. range), while others have more (eg. range, payload, altitude, etc.).
 
 !!! note
-    Currently, the `jetfuelburn` package includes reduced-order models from Yanto et al. (2017-2019), Lee et al. (2010), Seymour et al. (2019), and AIM2025 (from 2015).
+    Currently, the `jetfuelburn` package includes reduced-order models from:
+
+     - [Yanto et al. (2017/2019)](https://doi.org/10.2514/6.2017-3338)
+     - [Lee et al. (2010)](https://doi.org/10.2514/6.2010-9156)
+     - [Seymour et al. (2019) "FEAT Model"](https://doi.org/10.1016/j.trd.2020.102528)
+     - [Drey et al. (2015) "AIM215 Model"](https://doi.org/10.1016/j.tranpol.2019.04.013)
 
 #### Yanto et al. (2017-2019)
 
@@ -88,9 +93,29 @@ yanto_etal.calculate_fuel_consumption(
 
 !!! note
     For additional information, compare the function documentation:
-    `jetfuelburn.breguet.calculate_fuel_consumption_range_equation`
+    [`jetfuelburn.reducedorder.yanto_etal`][]
+
+#### Seymour et al. (2019)
+
+!!! warning
+    Note that Seymour et al. use "average weights" for every aircraft.
+    The only variable input is therefore the aircraft range.
+
+```pyodide session='fuel'
+seymour_etal.calculate_fuel_consumption(
+        acft='A321',
+        R=2200*ureg.km,
+    )
+```
+
+!!! note
+    For additional information, compare the function documentation:
+    [`jetfuelburn.reducedorder.seymour_etal`][]
 
 #### Lee et al. (2010)
+
+!!! warning
+    Note that Lee et al. use weight [N] instead of mass [kg] as input.
 
 ```pyodide session='fuel'
 lee_etal.calculate_fuel_consumption(
@@ -111,10 +136,13 @@ lee_etal.calculate_fuel_consumption(
 
 !!! note
     For additional information, compare the function documentation:
-    `jetfuelburn.breguet.calculate_fuel_consumption_range_equation`
-
+    [`jetfuelburn.reducedorder.lee_etal`][]
 
 #### AIM2025 (from 2015)
+
+!!! warning
+    Note that the AIM2015 model uses 'representative' aircraft (in different size classes) instead of specific aircraft types.
+    See the function documentation for a list of available size classes.
 
 ```pyodide session='fuel'
 aim2015(
@@ -128,7 +156,7 @@ aim2015(
 
 !!! note
     For additional information, compare the function documentation:
-    `jetfuelburn.breguet.calculate_fuel_consumption_range_equation`
+    [`jetfuelburn.reducedorder.aim2015`][]
 
 
 ## Helper Functions (Aerodynamics/Atmospheric Physics)
