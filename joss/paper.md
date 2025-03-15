@@ -32,15 +32,9 @@ bibliography: paper.bib
 
 # Statement of Need
 
-Environmental assessment of air travel is important
-In the life-cycle assessment of aviation, the use-phase of the aircraft has by far the largest impact on the environment.
-The fuel burn of an aircraft is a key parameter in the environmental assessment of air travel. The other key parameter is the environmental burdens associated with fuel burn
-Unforuntaly, environmental researchers are often using overly simplistic models to calculate fuel burn.
-Recently, Su-Un... [@su2023methodological] in Science of the Total Environment...
-Sacchi et al. [@sacchi2023make] based on work by Cox, which was based on ....
+The environmental assessment of air travel has received increasing attention in the context of efforts to decarbonize transportation. In this context, life-cycle assessment is the primary tool used to evaluate the environmental burdens of travel. In air travel specifically, the use-phase (=fuel burn) of an aircraft has by far the most significant environmental impact. Central to this evaluation are therfore two key parameters: the fuel burn of the aircraft itself and the environmental burdens associated with the fuel used. Both of which are essential for providing reliable estimates of the carbon footprint of air travel.
 
-
-Tools include:
+Unfortunately, environmental researchers often rely on overly simplistic models to estimate fuel burn, leading to flawed conclusions. For instance, a recent study by Su-Un et al. (2023) published in Science of the Total Environment [@su2023methodological] assumed that aircraft could be fully fueled, fully loaded, and still achieve maximum range—an unrealistic scenario that results in a significant underestimation of fuel burn and, consequently, its environmental impact. If tools are available, they are often proprietary or cannot easily be adapted for future aircraft. A selection of current air travel CO~2~ calculators and their availability is shown in the table below:
 
 | Tool               | Provider  | Availability    | Data Sources               |
 |--------------------|-----------|-----------------|----------------------------|
@@ -49,10 +43,8 @@ Tools include:
 | CO~2~ Flight Calc. | myClimate | Open            | EMEP/EEA emissions guideb. |
 | Google Flights     | Google    | Open            | `travel-impact-model`      |
 
-
-While researchers from aerospace engineering have proposed different approaches, few have been implemented in a user-friendly package that can be used by non-experts.
+To remedy this problem, researchers from aerospace engineering have proposed different approaches, few have been implemented in a user-friendly package that can be used by non-experts.
 The `jetfuelburn` package is the first Python package that provides a comprehensive set of fuel burn models for commercial aircraft. It is designed to be used in the context of environmental impact assessment of air travel, aircraft performance analysis and optimisation. It uses the `pint` package to allow for calculations in physical units, allowing for quick conversion between imperial and metric units. In addition, all variables passed to functions are checked for correct physical dimensions.
-
 
 Is going to be a great addition to existing fuel burn calculators, etc.
 
