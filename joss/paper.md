@@ -58,27 +58,24 @@ Is going to be a great addition to existing fuel burn calculators, etc.
 
 # Fuel Calculation Model Categories
 
-The `jetfuelburn` package implements different types of fuel burn models:
+The `jetfuelburn` package implements different types of fuel burn models. 
 
 1. Breguet Range Equation
 2. Payload/Range Diagrams
 3. Reduced Order Models
+   3.1. [@lee2010closed], [@yanto2017efficient]
 4. Combined Models
 
-Lee et al. (2010)[@lee2010closed]
-and
-Yanto et al. (2017)[@yanto2017efficient]
+
 
 
 # Auxiliary Functions
 
-The `jetfuelburn` package also includes helper functions for basic atmospheric physics and the allocation of fuel burn to different cabin classes (economy, business, etc.).
+The `jetfuelburn` package includes helper functions for basic problems in atmospheric physics, such as computation of airspeed from mach number based on ambient pressure. In addition, the package includes a for the allocation of fuel burn to different cabin classes (economy, business, etc.) according to the current approach of both [IATA]((https://web.archive.org/web/20230526103741/https://www.iata.org/contentassets/139d686fa8f34c4ba7a41f7ba3e026e7/iata-rp-1726_passenger-co2.pdf)) and [ICAO]((https://web.archive.org/web/20240826103513/https://applications.icao.int/icec/Methodology%20ICAO%20Carbon%20Emissions%20Calculator_v13_Final.pdf)).
 
-# Figures
+# Interactive Documentation
 
-
-Figure sizes can be customized by adding an optional second parameter:
-![Caption for example figure.](docs/_static/payload_range_generic.svg){ width=20% }
+The package documentation allows users to 
 
 # Acknowledgements
 
