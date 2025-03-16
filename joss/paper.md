@@ -36,6 +36,8 @@ The environmental assessment of air travel has received increasing attention in 
 
 While researchers in aerospace engineering have therefore proposed various methods for estimating the fuel burn of commercial aircraft, few of these have been incorporated into software packages, particularly in a lightweight, user-friendly Python format. To address this gap, the `jetfuelburn` package has been developed as the first comprehensive Python tool offering a robust set of fuel burn models for commercial aircraft. Designed for applications such as environmental impact assessments of air travel, aircraft performance analysis, and optimization, this package promises to be a valuable enhancement to existing fuel burn calculators and related tools.
 
+\clearpage
+
 # Fuel Calculation Model Categories
 
 The `jetfuelburn` package includes different methods for calculating fuel burn of commercial aircraft. These methods can be broadly categorized into four groups:
@@ -54,13 +56,13 @@ If access to propriatary aircraft performance simulation software is available, 
 
 The present verion of the `jetfuelburn` package implements four different reduced order models, proposed by [@lee2010closed;@yanto2017efficient;@dray2019aim2015;@seymour2020fuel].
 
-# Future Development
-
-Recent work has shown that highly accurate (1-2% deviation from real flight data) closed-form solutions to fuel burn equations can be derived from first principles [@poll2025estimation]. Required aircraft-specific input parameters can be extracted from publicly available sources. These novel methods can be implemented in future versions of the `jetfuelburn` package. 
-
 # Auxiliary Functions
 
 The `jetfuelburn` package includes helper functions for basic problems in atmospheric physics, such as computation of airspeed from mach number based on ambient pressure. In addition, the package includes a module for the allocation of fuel burn to different cabin classes (economy, business, etc.) according to the current approach of both [IATA]((https://web.archive.org/web/20230526103741/https://www.iata.org/contentassets/139d686fa8f34c4ba7a41f7ba3e026e7/iata-rp-1726_passenger-co2.pdf)) and [ICAO]((https://web.archive.org/web/20240826103513/https://applications.icao.int/icec/Methodology%20ICAO%20Carbon%20Emissions%20Calculator_v13_Final.pdf)).
+
+# Future Development
+
+Recent work has shown that highly accurate (1-2% deviation from real flight data) closed-form solutions to fuel burn equations can be derived from first principles [@poll2025estimation]. Required aircraft-specific input parameters can be extracted from publicly available sources. These novel methods can be implemented in future versions of the `jetfuelburn` package. 
 
 # Interactive Documentation
 
