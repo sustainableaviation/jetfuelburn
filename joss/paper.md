@@ -28,7 +28,7 @@ bibliography: paper.bib
 
 # Summary
 
-`jetfuelburn` is a Python package that implements different methods for calculating the fuel burn of commercial passenger aircraft. It is designed to be used in the context of environmental impact assessment of air travel, aircraft performance analysis and optimisation. It supports calculations in physical units, allowing for quick conversion between imperial and metric units and dimensionality checks of function inputs. It is lightweight (<40kB packaged) and has only a single dependency (`pint`), therefore allowing for easy integration into WebAssembly kernels for interactive use in the browser. The package is open-source and distributed under a permissive MIT license.
+`jetfuelburn` is a Python package that implements different methods for calculating the fuel burn of commercial passenger aircraft. It is designed to be used in the context of environmental impact assessment of air travel, aircraft performance analysis and optimisation. It supports calculations in physical units, allowing for quick conversion between imperial and metric units and dimensionality checks of function inputs. It is lightweight (<40kB packaged) and has only a single dependency (`pint`), therefore allowing for easy integration into WebAssembly kernels for interactive use in the browser. The package is open-source and distributed under a permissive MIT license. Interactive documentation is available, which allows users to compute fuel burn directly in the browser without the need to install the package locally.
 
 # Statement of Need
 
@@ -52,7 +52,7 @@ The Breguet range equation is a simple model that relates the range of an aircra
 
 If access to propriatary aircraft performance simulation software is available, fuel burn for specific aircraft missions can be simulated with high resolution. However, these simulations can be computationally expensive. Reduced order models instead use regression to extract a simplified model from a large set of high resolution simulation results. While the simulations may include many aircraft and mission parameters, reduced order models only require a few key parameter, such as payload and range. 
 
-The present verion of the `jetfuelburn` package implements four different reduced order models, proposed by [@lee2010closed][@yanto2017efficient][@dray2019aim2015][@seymour2020fuel].
+The present verion of the `jetfuelburn` package implements four different reduced order models, proposed by [@lee2010closed;@yanto2017efficient;@dray2019aim2015;@seymour2020fuel].
 
 # Future Development
 
