@@ -102,11 +102,11 @@ yanto_etal.calculate_fuel_consumption(
     The only variable input is therefore the aircraft range.
 
 ```pyodide session='fuel'
-    from jetfuelburn.reducedorder import seymour_etal
-    seymour_etal.calculate_fuel_consumption(
-        acft='A321',
-        R=2200*ureg.km,
-    )
+from jetfuelburn.reducedorder import seymour_etal
+seymour_etal.calculate_fuel_consumption(
+    acft='A321',
+    R=2200*ureg.km,
+)
 ```
 
 !!! note
