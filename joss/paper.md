@@ -44,11 +44,11 @@ The `jetfuelburn` package includes different methods for calculating fuel burn o
 
 ## Payload/Range Diagrams
 
-As an initial estimate, the fuel burn of aircraft can be "read off" payload/range diagrams directly [@burzlaff2017aircraft]. The `jetfuelburn` package includes a method for this purpose.
+As an initial estimate, the fuel burn of aircraft can be "read off" payload/range diagrams directly [@burzlaff2017aircraft]. The `jetfuelburn` package includes a dedicated method for this purpose.
 
 ## Range Equation
 
-The Breguet range equation is a simple model that relates the range of an aircraft to its fuel burn and efficiency. The `jetfuelburn` package includes a method for calculating fuel burn based on the Breguet range equation [@young2017performance, Sec. 13.7.3].
+The Breguet range equation is a simple model that relates the range of an aircraft to its fuel burn and efficiency. It can also be solved for fuel burn as a function of the range [@young2017performance, Sec. 13.7.3]. The `jetfuelburn` package includes a dedicated method this purpose.
 
 ## Reduced Order Models
 
