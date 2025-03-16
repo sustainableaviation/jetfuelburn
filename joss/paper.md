@@ -34,23 +34,19 @@ bibliography: paper.bib
 
 The environmental assessment of air travel has received increasing attention in the context of efforts to decarbonize transportation. In this context, life-cycle assessment has emerged as the primary method used to evaluate the magnitude of environmental burdens [@keiser2023life]. In air travel specifically, it has been shown that _"The most important life sequence is the use sequence, which makes up over 99\% of emission for every aircraft."_ [@jakovljevic2018carbon, P.865].
 
-Central to any evaluation of the environmental impact of air travel are therfore two key parameters: The fuel burn of the aircraft itself and the environmental burdens associated with the fuel used. Reliable methods for estimating both quantities are essential for providing reliable estimates of the carbon footprint of air travel.
+Robust methods for computing two key parameters are therefore central to any reliable evaluation of the environmental impact of air travel: The fuel burn of the aircraft itself and the environmental burdens associated with fuel production.
 
-Unfortunately, environmental researchers often rely on overly simplistic models to estimate fuel burn, leading to flawed conclusions. For instance, a recent study by Su-Un et al. (2023) published in Science of the Total Environment [@su2023methodological] assumed that aircraft could be fully fueled, fully loaded, and still achieve maximum range—an unrealistic scenario that results in a significant underestimation of fuel burn and, consequently, its environmental impact. If tools are available, they are often proprietary or cannot easily be adapted for future aircraft. A selection of current air travel CO~2~ calculators and their availability is shown in the table below:
+While researchers in aerospace engineering have therefore proposed various methods for estimating the fuel burn of commercial aircraft, few of these have been incorporated into software packages, particularly in a lightweight, user-friendly Python format. To address this gap, the `jetfuelburn` package has been developed as the first comprehensive Python tool offering a robust set of fuel burn models for commercial aircraft. Designed for applications such as environmental impact assessments of air travel, aircraft performance analysis, and optimization, this package promises to be a valuable enhancement to existing fuel burn calculators and related tools.
 
-| Tool               | Provider  | Availability    | Data Sources               |
-|--------------------|-----------|-----------------|----------------------------|
-| ICEC               | ICAO      | Open            | "ICAO Fuel Formulas"       |
-| CO~2~ Connect      | IATA      | Proprietary     | airline statistics         |
-| CO~2~ Flight Calc. | myClimate | Open            | EMEP/EEA emissions guideb. |
-| Google Flights     | Google    | Open            | `travel-impact-model`      |
-
-To remedy this problem, researchers from aerospace engineering have proposed different approaches, few have been implemented in a user-friendly package that can be used by non-experts.
-The `jetfuelburn` package is the first Python package that provides a comprehensive set of fuel burn models for commercial aircraft. It is designed to be used in the context of environmental impact assessment of air travel, aircraft performance analysis and optimisation. It uses the `pint` package to allow for calculations in physical units, allowing for quick conversion between imperial and metric units. In addition, all variables passed to functions are checked for correct physical dimensions.
-
-Is going to be a great addition to existing fuel burn calculators, etc.
+% Unfortunately, environmental researchers frequently rely on overly simplistic models to estimate fuel burn, potentially leading to flawed conclusions. For instance, a recent study [@su2023methodological] assumed that aircraft could be fully fueled, fully loaded, and still achieve maximum range. This unrealistic scenario that results in a significant underestimation of fuel burn per ton-kilometer and, consequently, its environmental impact. If tools are available, they are often proprietary or cannot easily be adapted for future aircraft. A selection of current air travel CO~2~ calculators and their availability is shown in the table below:
 
 # Fuel Calculation Model Categories
+
+## Payload/Range Diagrams
+
+The `jetfuelburn` package includes a model based on payload/range diagrams. This model is based on the work of Burzlaff et al. [@burzlaff2017aircraft], who developed a method to calculate fuel burn based on payload/range diagrams. The model is based on the assumption that the fuel burn of an aircraft is a function of the payload and the range of the aircraft. The model is implemented in the `PayloadRangeDiagram` class, which takes as input the payload and range of the aircraft and returns the fuel burn.
+
+## Reduced Order Models
 
 The `jetfuelburn` package implements different types of fuel burn models. The simplest models are based on basic aerodynamic equations like the Breguet range equation, while more complex models take into account the specifics of different aircraft types. The package includes the following models:
 
