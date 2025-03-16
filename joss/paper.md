@@ -52,7 +52,11 @@ The Breguet range equation is a simple model that relates the range of an aircra
 
 If access to propriatary aircraft performance simulation software is available, fuel burn for specific aircraft missions can be simulated with high resolution. However, these simulations can be computationally expensive. Reduced order models instead use regression to extract a simplified model from a large set of high resolution simulation results. While the simulations may include many aircraft and mission parameters, reduced order models only require a few key parameter, such as payload and range. 
 
-Verion `v1.0.0` of the `jetfuelburn` package implements four different reduced order models, proposed by [@lee2010closed][@yanto2017efficient][@dray2019aim2015][@seymour2020fuel].
+The present verion of the `jetfuelburn` package implements four different reduced order models, proposed by [@lee2010closed][@yanto2017efficient][@dray2019aim2015][@seymour2020fuel].
+
+# Future Development
+
+Recent work has shown that highly accurate (1-2% deviation from real flight data) closed-form solutions to fuel burn equations can be derived from first principles [@poll2025estimation]. Required aircraft-specific input parameters can be extracted from publicly available sources. These novel methods can be implemented in future versions of the `jetfuelburn` package. 
 
 # Auxiliary Functions
 
