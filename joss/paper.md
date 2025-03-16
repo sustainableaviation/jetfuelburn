@@ -28,11 +28,13 @@ bibliography: paper.bib
 
 # Summary
 
-
+`jetfuelburn` is a Python package that implements different methods for calculating the fuel burn of commercial passenger aircraft. It is designed to be used in the context of environmental impact assessment of air travel, aircraft performance analysis and optimisation. It supports calculations in physical units, allowing for quick conversion between imperial and metric units and dimensionality checks of function inputs. It is lightweight (<40kB packaged) and has only a single dependency (`pint`), therefore allowing for easy integration into WebAssembly kernels for interactive use in the browser. The package is open-source and distributed under a permissive MIT license.
 
 # Statement of Need
 
-The environmental assessment of air travel has received increasing attention in the context of efforts to decarbonize transportation. In this context, life-cycle assessment is the primary tool used to evaluate the environmental burdens of travel. In air travel specifically, the use-phase (=fuel burn) of an aircraft has by far the most significant environmental impact. Central to this evaluation are therfore two key parameters: the fuel burn of the aircraft itself and the environmental burdens associated with the fuel used. Both of which are essential for providing reliable estimates of the carbon footprint of air travel.
+The environmental assessment of air travel has received increasing attention in the context of efforts to decarbonize transportation. In this context, life-cycle assessment has emerged as the primary method used to evaluate the magnitude of environmental burdens [@keiser2023life]. In air travel specifically, it has been shown that _"The most important life sequence is the use sequence, which makes up over 99\% of emission for every aircraft."_ [@jakovljevic2018carbon, P.865].
+
+Central to any evaluation of the environmental impact of air travel are therfore two key parameters: The fuel burn of the aircraft itself and the environmental burdens associated with the fuel used. Reliable methods for estimating both quantities are essential for providing reliable estimates of the carbon footprint of air travel.
 
 Unfortunately, environmental researchers often rely on overly simplistic models to estimate fuel burn, leading to flawed conclusions. For instance, a recent study by Su-Un et al. (2023) published in Science of the Total Environment [@su2023methodological] assumed that aircraft could be fully fueled, fully loaded, and still achieve maximum range—an unrealistic scenario that results in a significant underestimation of fuel burn and, consequently, its environmental impact. If tools are available, they are often proprietary or cannot easily be adapted for future aircraft. A selection of current air travel CO~2~ calculators and their availability is shown in the table below:
 
