@@ -32,33 +32,27 @@ bibliography: paper.bib
 
 # Statement of Need
 
-The environmental assessment of air travel has received increasing attention in the context of efforts to decarbonize transportation. In this context, life-cycle assessment has emerged as the primary method used to evaluate the magnitude of environmental burdens [@keiser2023life]. In air travel specifically, it has been shown that _"The most important life sequence is the use sequence, which makes up over 99\% of emission for every aircraft."_ [@jakovljevic2018carbon, P.865].
-
-Robust methods for computing two key parameters are therefore central to any reliable evaluation of the environmental impact of air travel: The fuel burn of the aircraft itself and the environmental burdens associated with fuel production.
+The environmental assessment of air travel has received increasing attention in the context of efforts to decarbonize transportation. In this context, life-cycle assessment has emerged as the primary method used to evaluate the magnitude of environmental burdens [@keiser2023life]. In air travel specifically, it has been shown that _"The most important life sequence is the use sequence, which makes up over 99\% of emission for every aircraft."_ [@jakovljevic2018carbon, P.865]. Robust methods for computing two key parameters are therefore central to any reliable evaluation of the environmental impact of air travel: The fuel burn of the aircraft itself and the environmental burdens associated with fuel production.
 
 While researchers in aerospace engineering have therefore proposed various methods for estimating the fuel burn of commercial aircraft, few of these have been incorporated into software packages, particularly in a lightweight, user-friendly Python format. To address this gap, the `jetfuelburn` package has been developed as the first comprehensive Python tool offering a robust set of fuel burn models for commercial aircraft. Designed for applications such as environmental impact assessments of air travel, aircraft performance analysis, and optimization, this package promises to be a valuable enhancement to existing fuel burn calculators and related tools.
 
-% Unfortunately, environmental researchers frequently rely on overly simplistic models to estimate fuel burn, potentially leading to flawed conclusions. For instance, a recent study [@su2023methodological] assumed that aircraft could be fully fueled, fully loaded, and still achieve maximum range. This unrealistic scenario that results in a significant underestimation of fuel burn per ton-kilometer and, consequently, its environmental impact. If tools are available, they are often proprietary or cannot easily be adapted for future aircraft. A selection of current air travel CO~2~ calculators and their availability is shown in the table below:
-
 # Fuel Calculation Model Categories
+
+The `jetfuelburn` package includes different methods for calculating fuel burn of commercial aircraft. These methods can be broadly categorized into four groups:
 
 ## Payload/Range Diagrams
 
-The `jetfuelburn` package includes a model based on payload/range diagrams. This model is based on the work of Burzlaff et al. [@burzlaff2017aircraft], who developed a method to calculate fuel burn based on payload/range diagrams. The model is based on the assumption that the fuel burn of an aircraft is a function of the payload and the range of the aircraft. The model is implemented in the `PayloadRangeDiagram` class, which takes as input the payload and range of the aircraft and returns the fuel burn.
+As an initial estimate, the fuel burn of aircraft can be "read off" payload/range diagrams directly [@burzlaff2017aircraft]. The `jetfuelburn` package includes a method for this purpose.
+
+## Range Equation
+
+The Breguet range equation is a simple model that relates the range of an aircraft to its fuel burn and efficiency. The `jetfuelburn` package includes a method for calculating fuel burn based on the Breguet range equation [@young2017performance, Sec. 13.7.3].
 
 ## Reduced Order Models
 
-The `jetfuelburn` package implements different types of fuel burn models. The simplest models are based on basic aerodynamic equations like the Breguet range equation, while more complex models take into account the specifics of different aircraft types. The package includes the following models:
+If access to propriatary aircraft performance simulation software is available, fuel burn for specific aircraft missions can be simulated with high resolution. However, these simulations can be computationally expensive. Reduced order models instead use regression to extract a simplified model from a large set of high resolution simulation results. While the simulations may include many aircraft and mission parameters, reduced order models only require a few key parameter, such as payload and range. 
 
-| Model Category    | Description | Methods |
-|--------------------|-----------|------------|
-| Breguet Range Equation | Simple model based on the Breguet range equation | [@young2017performance] |
-| Payload/Range Diagrams | Model based on payload/range diagrams | [@burzlaff2017aircraft] |
-| Reduced Order Models | Model based on reduced order models | [@lee2010closed] [@yanto2017efficient][@dray2019aim2015][@seymour2020fuel] |
-| Combined Models | Models that combine different methods | new |
-
-
-
+Verion `v1.0.0` of the `jetfuelburn` package implements four different reduced order models, proposed by [@lee2010closed][@yanto2017efficient][@dray2019aim2015][@seymour2020fuel].
 
 # Auxiliary Functions
 
