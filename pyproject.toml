@@ -55,6 +55,7 @@ packages = [
   "jetfuelburn.data",
   "jetfuelburn.data.AIM2015",
   "jetfuelburn.data.PS2025",
+  "jetfuelburn.data.EEA2009",
 ]
 
 [tool.setuptools.package-data]

@@ -1,4 +1,7 @@
+# %%
+
 import csv
+import yaml
 import math
 from importlib import resources
 from jetfuelburn import ureg
@@ -680,7 +683,7 @@ class seymour_etal:
 
 class aim2015:
     r"""
-    Given an aircraft size class integer, payload and range calculates the fuel burned during flight (climb, cruise, takeoff).
+    Reduced-order fuel burn model based on Dray et al. (2019).
 
     The class implements the reduced-order fuel burn model of the [AIM2015 air transport model](https://www.atslab.org/data-tools/) (part "Aircraft Performance Model"):
 
@@ -874,3 +877,115 @@ class aim2015:
             'mass_fuel_cruise': m_f_cruise * ureg('kg'),
             'mass_fuel_descent': m_f_descent * ureg('kg'),
         }
+    
+# %%
+
+
+class EEA_emission_inventory_2023:
+    r"""
+    Reduced-order fuel burn model based on Dray et al. (2019).
+
+    The class implements the reduced-order fuel burn model of the [AIM2015 air transport model](https://www.atslab.org/data-tools/) (part "Aircraft Performance Model"):
+
+    ![Payload/Range Diagram](../_static/reduced_order_aim2015.svg)
+    
+    In this model, fuel burn calculations are based on a regression model.
+    The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
+    by simulating flights using the [PianoX software](https://www.lissys.uk/PianoX.html).
+
+
+
+    Key assumptions of this fuel calculation function:
+
+    | Parameter             | Assumption                                                                  |
+    |-----------------------|-----------------------------------------------------------------------------|
+    | data availability     | 8 selected aircraft, which can be used as proxies within their weight class |
+    | aircraft payload      | variable                                                                    |
+    | climb/descent         | considered separately                                                       |
+    | reserve fuel uplift   | considered implicitly (?)                                                   |
+    | diversion fuel uplift | considered implicitly (?)                                                   |
+
+    References
+    ----------
+    - [EMEP/EEA air pollutant emission inventory guidebook - 2009, Part B, Section 1 (Energy), Subsection 1.A.3.a `Aviation_annex.zip`](https://www.eea.europa.eu/en/analysis/publications/emep-eea-emission-inventory-guidebook-2009)
+
+    Examples
+    --------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.reducedorder import aim2015
+import yaml
+    aim2015(
+        acft_size_class=8,
+        D_climb=300*ureg.km,
+        D_cruise=(15000-300-200)*ureg.km,
+        D_descent=200*ureg.km,
+        PL=55.5*ureg.metric_ton
+    )
+    ```
+    """
+
+    _aircraft_data = {}
+    with resources.open_text("jetfuelburn.data.EEA2009", "data.yaml") as file:
+        _aircraft_data = yaml.safe_load(file)
+
+    @staticmethod
+    def available_aircraft() -> list[str]:
+        """
+        Returns a sorted list of available ICAO aircraft designators included in the model.
+        """
+        return sorted(EEA_emission_inventory_2023._aircraft_data.keys())
+    
+
+    @staticmethod
+    @ureg.check(
+        None,
+        '[length]',
+    )
+    def calculate_fuel_consumption(
+        acft: str,
+        range: ureg.Quantity,
+    ) -> dict:
+        
+        range = range.to('nmi').magnitude
+
+        data = EEA_emission_inventory_2023._aircraft_data[acft]
+        range_keys = sorted(data['total'].keys())
+
+        if range < range_keys[0]:
+            raise ValueError(f"Range must be at least {range_keys[0]} nmi.")
+        if range > range_keys[-1]:
+            raise ValueError(f"Range must be at most {range_keys[-1]} nmi.")
+        
+        fuel_categories = [
+            'total',
+            'LTO',
+            'taxi_in',
+            'climbout',
+            'takeoff',
+            'climb+cruise+descent',
+            'approach+landing',
+            'taxi_out',
+        ]
+
+        dict_fuel_burn = {}
+        for category in fuel_categories:
+            fuel_dict = data[category]
+            keys = sorted(fuel_dict.keys())
+            
+            # Find the two closest range values for interpolation
+            for i in range(len(keys) - 1):
+                if keys[i] <= range < keys[i + 1]:
+                    x1, x2 = keys[i], keys[i + 1]
+                    y1, y2 = fuel_dict[x1], fuel_dict[x2]
+                    # Linear interpolation
+                    dict_fuel_burn[category] = y1 + (range - x1) * (y2 - y1) / (x2 - x1)
+                    break
+            # If range equals the last key value
+            if range == keys[-1]:
+                dict_fuel_burn[category] = fuel_dict[keys[-1]]
+            
+        return dict_fuel_burn
+
+# %%
