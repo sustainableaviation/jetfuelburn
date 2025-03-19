@@ -756,7 +756,7 @@ class aim2015:
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import aim2015
-    aim2015(
+    aim2015.calculate_fuel_consumption(
         acft_size_class=8,
         D_climb=300*ureg.km,
         D_cruise=(15000-300-200)*ureg.km,
