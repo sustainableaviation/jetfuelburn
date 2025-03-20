@@ -37,8 +37,7 @@ theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
     - navigation.top
     - content.footnote.tooltips
 plugins:
-  - search:
-      min_search_length: 2
+  - search
   - mkdocstrings: # https://mkdocstrings.github.io/python/usage/
       handlers:
         python:
