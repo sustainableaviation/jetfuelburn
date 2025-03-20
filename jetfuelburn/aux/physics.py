@@ -190,7 +190,7 @@ def _calculate_aircraft_velocity(
 
     Parameters
     ----------
-    mach : float [dimensionless]
+    mach_number : float [dimensionless]
         Mach number
     altitude : float [length]
         Flight altitude above sea level
