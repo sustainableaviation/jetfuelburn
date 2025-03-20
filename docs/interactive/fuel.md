@@ -28,7 +28,7 @@ calculate_fuel_consumption_range_equation(
 
 !!! note
     For additional information, compare the function documentation:
-    [`jetfuelburn.breguet.calculate_fuel_consumption_range_equation`]()
+    [`jetfuelburn.breguet.calculate_fuel_consumption_range_equation`][]
 
 
 ## Payload/Range Diagrams
@@ -54,7 +54,7 @@ calculate_fuel_consumption_payload_range(
 
 !!! note
     For additional information, compare the function documentation:
-    [`jetfuelburn.breguet.calculate_fuel_consumption_range_equation`][]
+    [`jetfuelburn.diagrams.calculate_fuel_consumption_payload_range`][]
 
 ## Reduced-Order Models
 
@@ -148,7 +148,7 @@ lee_etal.calculate_fuel_consumption(
 
 ```pyodide session='fuel'
 from jetfuelburn.reducedorder import aim2015
-aim2015(
+aim2015.calculate_fuel_consumption(
     acft_size_class=8,
     D_climb=300*ureg.km,
     D_cruise=(15000-300-200)*ureg.km,
@@ -172,13 +172,13 @@ from jetfuelburn.aux.physics import (
     _calculate_atmospheric_conditions,
     _calculate_aircraft_velocity,   
 )
-
 _calculate_aircraft_velocity(
     mach_number=0.8,
     altitude=10000*ureg.m
 )
 ```
 
+and
 
 ```pyodide session='fuel'
 _calculate_atmospheric_conditions(altitude=10000*ureg.m)
