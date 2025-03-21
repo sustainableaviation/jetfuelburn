@@ -47,11 +47,7 @@ plugins:
             show_root_heading: true
             heading_level: 2
             show_source: true
-  - mkdocs-jupyter:
-      execute: False
-      show_input: True
-      ignore_h1_titles: True
-      include_source: True
+            filters: []
   - markdown-exec
   - autorefs
   - include-markdown
