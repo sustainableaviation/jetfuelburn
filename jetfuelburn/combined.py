@@ -97,18 +97,34 @@ def calculate_fuel_consumption_combined_model(
     ----------
     payload : float
         Aircraft payload [mass]
-    fuel_flow_takeoff : float
+    oew : float
+        Aircraft operating empty weight [mass]
+    number_of_engines : int
+        Number of engines on the aircraft [unitless]
+    fuel_flow_per_engine_idle : float
+        Fuel flow during taxi (eg. from ICAO Aircraft Engine Emissions Databank) [mass/time]
+    fuel_flow_per_engine_takeoff : float
         Fuel flow during takeoff (eg. from ICAO Aircraft Engine Emissions Databank) [mass/time]
+    speed_cruise : float
+        Cruise speed [speed]
+    tsfc_cruise : float
+        Cruise TSFC [time/mass]
     lift_to_drag : float
         Aircraft cruise lift-to-Drag ratio [dimensionless]
-    climb_segment_dict : dict
-        Dictionary of climb segment information
-    descent_segment_dict : dict
-        Dictionary of descent segment information
+    dict_climb_segments_origin_to_destination : dict
+        Dictionary of climb segment information (origin to destination)
+    dict_descent_segments_origin_to_destination : dict
+        Dictionary of descent segment information (origin to destination)
     R_cruise_origin_to_destination : float
-        Cruise distance from origin to destination (can be zero) [length]
+        Cruise distance (origin to destination, can be zero) [length]
+    time_taxi : float
+        Time spent taxiing [time]
+    dict_climb_segments_destination_to_alternate : dict
+        Dictionary of climb segment information (destination to alternate)
+    dict_descent_segments_destination_to_alternate : dict
+        Dictionary of descent segment information (destination to alternate)
     R_cruise_destination_to_alternate : float
-        Cruise distance from destination to alternate (can be zero) [length]
+        Cruise distance (destination to alternate ,can be zero) [length]
 
     Returns
     -------
