@@ -877,31 +877,25 @@ class aim2015:
             'mass_fuel_cruise': m_f_cruise * ureg('kg'),
             'mass_fuel_descent': m_f_descent * ureg('kg'),
         }
-    
-# %%
 
 
-class EEA_emission_inventory_2023:
+class eea_emission_inventory_2009:
     r"""
-    Reduced-order fuel burn model based on Dray et al. (2019).
+    The class implements the reduced-order fuel burn model of the [EMEP/EEA air pollutant emission inventory guidebook](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023) (2009).
 
-    The class implements the reduced-order fuel burn model of the [AIM2015 air transport model](https://www.atslab.org/data-tools/) (part "Aircraft Performance Model"):
-
-    ![Payload/Range Diagram](../_static/reduced_order_aim2015.svg)
+    ![Payload/Range Diagram](../_static/reduced_order_eea2009.svg)
     
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
     by simulating flights using the [PianoX software](https://www.lissys.uk/PianoX.html).
 
-
-
     Key assumptions of this fuel calculation function:
 
     | Parameter             | Assumption                                                                  |
     |-----------------------|-----------------------------------------------------------------------------|
-    | data availability     | 8 selected aircraft, which can be used as proxies within their weight class |
-    | aircraft payload      | variable                                                                    |
-    | climb/descent         | considered separately                                                       |
+    | data availability     | 19 selected aircraft                                                        |
+    | aircraft payload      | fixed, unclear                                                              |
+    | climb/descent         | not considered separately                                                   |
     | reserve fuel uplift   | considered implicitly (?)                                                   |
     | diversion fuel uplift | considered implicitly (?)                                                   |
 
@@ -914,28 +908,24 @@ class EEA_emission_inventory_2023:
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
-    from jetfuelburn.reducedorder import aim2015
-import yaml
-    aim2015(
-        acft_size_class=8,
-        D_climb=300*ureg.km,
-        D_cruise=(15000-300-200)*ureg.km,
-        D_descent=200*ureg.km,
-        PL=55.5*ureg.metric_ton
+    from jetfuelburn.reducedorder import eea_emission_inventory_2009
+    eea_emission_inventory_2009(
+        acft='A320',
+        range=1500*ureg.km
     )
     ```
     """
 
     _aircraft_data = {}
-    with resources.open_text("jetfuelburn.data.EEA2009", "data.yaml") as file:
-        _aircraft_data = yaml.safe_load(file)
+    with resources.open_text("jetfuelburn.data.EEA2009", "data.json") as file:
+        _aircraft_data = json.load(file)
 
     @staticmethod
     def available_aircraft() -> list[str]:
         """
         Returns a sorted list of available ICAO aircraft designators included in the model.
         """
-        return sorted(EEA_emission_inventory_2023._aircraft_data.keys())
+        return sorted(eea_emission_inventory_2009._aircraft_data.keys())
     
 
     @staticmethod
@@ -945,47 +935,97 @@ import yaml
     )
     def calculate_fuel_consumption(
         acft: str,
-        range: ureg.Quantity,
+        R: ureg.Quantity,
     ) -> dict:
-        
-        range = range.to('nmi').magnitude
+        r"""
+        Given an aircraft name and range, calculates the fuel burned during flight.
 
-        data = EEA_emission_inventory_2023._aircraft_data[acft]
-        range_keys = sorted(data['total'].keys())
+        Data between reported range/fuel-burn points is extrapolated linearly:
 
-        if range < range_keys[0]:
-            raise ValueError(f"Range must be at least {range_keys[0]} nmi.")
-        if range > range_keys[-1]:
-            raise ValueError(f"Range must be at most {range_keys[-1]} nmi.")
+        $$
+            m_F(R=200) = m_F(125) + (200-125) \cdot \frac{m_F(250) - m_F(125)}{250 - 125}
+        $$
+
+        where data is available for $R=[125,250]$ miles and a user-defined range of $R=200$ miles is requested.
+
+        | Symbol     | Dimension         | Description                                                            |
+        |------------|-------------------|------------------------------------------------------------------------|
+        | $m_F$      | [mass]            | fuel mass burned during flight                                         |
+        | $R$        | [length]          | mission range                                                          |
+
+
+        Parameters
+        ----------
+        acft : str
+            ICAO Aircraft Designator. Note that some aircraft
+        R : ureg.Quantity
+            Mission range [length]
+
+        Returns
+        -------
+        dict
+            'mass_fuel_LTO' : ureg.Quantity
+                Fuel mass (LTO segment) [kg]
+            'mass_fuel_taxi_in' : ureg.Quantity
+                Fuel mass (taxi-in segment) [kg]
+            'mass_fuel_climbout' : ureg.Quantity
+                Fuel mass (climbout segment) [kg]
+            'mass_fuel_takeoff' : ureg.Quantity
+                Fuel mass (takeoff segment) [kg]
+            'mass_fuel_climb_cruise_descent' : ureg.Quantity
+                Fuel mass (climb, cruise, and descent segments) [kg]
+            'mass_fuel_approach_landing' : ureg.Quantity
+                Fuel mass (approach and landing segment) [kg]
+            'mass_fuel_taxi_out' : ureg.Quantity            
+
+        Raises
+        ------
+        ValueError
+            If the ICAO Aircraft Designator is not found in the model data.
+        ValueError
+            If the range is negative or the range is outside the available data range for the given aircraft.
+        """
         
-        fuel_categories = [
+        R = R.to('nmi').magnitude
+
+        if acft not in eea_emission_inventory_2009._aircraft_data:
+            raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data.")
+
+        aircraft_data = eea_emission_inventory_2009._aircraft_data[acft]
+        list_distance_points = sorted([int(k) for k in aircraft_data['total'].keys()])
+
+        if R < list_distance_points[0]:
+            raise ValueError(f"Range must be at least {list_distance_points[0]} nmi.")
+        if R > list_distance_points[-1]:
+            raise ValueError(f"Range must be at most {list_distance_points[-1]} nmi.")
+        
+        list_flight_phases = [
             'total',
             'LTO',
             'taxi_in',
             'climbout',
             'takeoff',
-            'climb+cruise+descent',
-            'approach+landing',
+            'climb_cruise_descent',
+            'approach_landing',
             'taxi_out',
         ]
 
         dict_fuel_burn = {}
-        for category in fuel_categories:
-            fuel_dict = data[category]
-            keys = sorted(fuel_dict.keys())
+        for flight_phase in list_flight_phases:
+            dict_fuel_burn_per_distance = {int(key): value for key, value in aircraft_data[flight_phase].items()}
             
-            # Find the two closest range values for interpolation
-            for i in range(len(keys) - 1):
-                if keys[i] <= range < keys[i + 1]:
-                    x1, x2 = keys[i], keys[i + 1]
-                    y1, y2 = fuel_dict[x1], fuel_dict[x2]
-                    # Linear interpolation
-                    dict_fuel_burn[category] = y1 + (range - x1) * (y2 - y1) / (x2 - x1)
+            for index_distance_point in range(len(list_distance_points) - 1):
+                if list_distance_points[index_distance_point] <= R < list_distance_points[index_distance_point + 1]:
+                    x1, x2 = list_distance_points[index_distance_point], list_distance_points[index_distance_point + 1]
+                    y1, y2 = dict_fuel_burn_per_distance[x1], dict_fuel_burn_per_distance[x2]
+                    dict_fuel_burn[flight_phase] = y1 + (R - x1) * (y2 - y1) / (x2 - x1)
                     break
-            # If range equals the last key value
-            if range == keys[-1]:
-                dict_fuel_burn[category] = fuel_dict[keys[-1]]
-            
-        return dict_fuel_burn
+            # If R equals the last key value
+            if R == list_distance_points[-1]:
+                dict_fuel_burn[flight_phase] = dict_fuel_burn_per_distance[list_distance_points[-1]]
 
-# %%
+        dict_fuel_burn_result = {}
+        for key, value in dict_fuel_burn.items():
+            dict_fuel_burn_result[f'mass_fuel_{key}'] = value * ureg('kg')
+        
+        return dict_fuel_burn_result
