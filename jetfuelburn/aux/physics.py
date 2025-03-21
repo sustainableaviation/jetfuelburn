@@ -151,8 +151,8 @@ def _calculate_dynamic_pressure(
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
-    from jetfuelburn.aux.physics import _calculate_atmospheric_conditions
-    _calculate_atmospheric_conditions(
+    from jetfuelburn.aux.physics import _calculate_dynamic_pressure
+    _calculate_dynamic_pressure(
         speed=833*ureg.kph,
         altitude=10000*ureg.m
     )
