@@ -3,6 +3,11 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## `0.0.7` (24. March 2025)
+
+- Added EMEP/EEA Emissions Model ([#5](https://github.com/sustainableaviation/jetfuelburn/issues/5))
+- Added warning and interactive plot to Lee et al. (2010) Model
+
 ## `0.0.5` (14. March 2025)
 
 !!! note
