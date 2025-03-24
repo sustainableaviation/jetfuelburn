@@ -135,6 +135,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.venvjetfuelburn
 
 # Spyder project settings
 .spyderproject

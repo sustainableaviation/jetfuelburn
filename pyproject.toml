@@ -55,12 +55,16 @@ packages = [
   "jetfuelburn.data",
   "jetfuelburn.data.AIM2015",
   "jetfuelburn.data.PS2025",
+  "jetfuelburn.data.EEA2009",
+  "jetfuelburn.data.Lee2010",
 ]
 
 [tool.setuptools.package-data]
 "jetfuelburn.data" = ["*.csv"]
 "jetfuelburn.data.AIM2015" = ["*.csv"]
 "jetfuelburn.data.PS2025" = ["*.csv"]
+"jetfuelburn.data.EEA2009" = ["*.json"]
+"jetfuelburn.data.Lee2010" = ["*.csv"]
 
 [tool.setuptools.dynamic]
 version = {attr = "jetfuelburn.__version__"} 

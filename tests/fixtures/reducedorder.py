@@ -6,6 +6,10 @@ def fixture_aim2015_B787():
     """
     Fixture returning a factory function to generate test cases.
 
+    The `cases` dictionary contains:
+    - `key`: range [km]
+    - `value`: expected value for calculated fuel burn [kg]
+
     Notes
     -----
     - We assume: "(...) 95 kg for a passenger with luggage and an average of 4500 kg hold freight." - P.97, Dray et al. (2019)
@@ -45,6 +49,10 @@ def fixture_aim2015_B787():
 def fixture_seymour_B738():
     """
     Fixture returning a factory function to generate test cases.
+
+    The `cases` dictionary contains:
+    - `key`: range [km]
+    - `value`: expected value for calculated fuel burn [kg]
     
     See Also
     --------
@@ -74,8 +82,13 @@ def fixture_seymour_B738():
 
 @pytest.fixture(scope="module")
 def fixture_yanto_B739():
+
     """
     Fixture returning a factory function to generate test cases.
+
+    The `cases` dictionary contains:
+    - `key`: range [km]
+    - `value`: expected value for calculated fuel burn [kg]
     
     See Also
     --------
@@ -108,6 +121,10 @@ def fixture_yanto_B739():
 def fixture_lee_B732():
     """
     Fixture returning a factory function to generate test cases.
+
+    The `cases` dictionary contains:
+    - `key`: range [km]
+    - `value`: expected value for calculated fuel burn [kg]
     
     See Also
     --------
@@ -141,6 +158,41 @@ def fixture_lee_B732():
             raise ValueError(f"No expected output defined for d={d}")
         input_data = base_data | {'d': d}
         expected_output = cases[d]
+        return input_data, expected_output
+    
+    return _make_case, list(cases.keys())
+
+@pytest.fixture(scope="module")
+def fixture_eea_A320():
+    """
+    Fixture returning a factory function to generate test cases.
+
+    The `cases` dictionary contains:
+    - `key`: range [km]
+    - `value`: expected value for calculated fuel burn [kg] ("total" segment only!)
+    
+    See Also
+    --------
+    [Pytest Documentation "Factories as Fixtures"](https://docs.pytest.org/en/stable/how-to/fixtures.html#factories-as-fixtures)
+
+    References
+    ----------
+    [EMEP/EEA air pollutant emission inventory guidebook - 2009, Part B, Section 1 (Energy), Subsection 1.A.3.a (`Aviation_annex.zip`)](https://www.eea.europa.eu/en/analysis/publications/emep-eea-emission-inventory-guidebook-2009)
+    """
+    base_data = {
+        'acft': 'A320',
+    }
+
+    cases = {
+        1000 * ureg.nmi: 6027.22755694583 * ureg.kg,
+        1300 * ureg.nmi: 7547.557937 * ureg.kg,
+    }
+
+    def _make_case(R):
+        if R not in cases:
+            raise ValueError(f"No expected output defined for R={R}")
+        input_data = base_data | {'R': R}
+        expected_output = cases[R]
         return input_data, expected_output
     
     return _make_case, list(cases.keys())
