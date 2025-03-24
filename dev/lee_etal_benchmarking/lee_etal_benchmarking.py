@@ -32,7 +32,7 @@ plt.rcParams.update({
 
 # Read CSV data
 df_fres_const = pd.read_csv(
-    filepath_or_buffer='data/fres_0.08.csv',
+    filepath_or_buffer='data/fres_0-08.csv',
     header=0,
     index_col=None
 )
