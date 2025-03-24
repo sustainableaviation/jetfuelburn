@@ -3,4 +3,7 @@ mkdocstrings-python
 pymdown-extensions
 markdown-exec
 mkdocs-include-markdown-plugin
+# requirements for interactive figures
 plotly-express
+pandas
+jetfuelburn
