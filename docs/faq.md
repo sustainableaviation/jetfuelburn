@@ -1,18 +1,5 @@
 # FAQ
 
-## In-Browser Code Editor
-
-### Missing Values
-
-Some return values are currently not shown correctly, such as the dictionary returned by the [`jetfuelburn.aux.allocation.footprint_allocation_by_area`][] function:
-
-```
-{'fuel_eco': , 'fuel_premiumeco': 0, 'fuel_business': , 'fuel_first': 0}
-```
-
-This is because the dictionary values are `pint` quantities, which are rendered as long float/string combinations:
-
-```
->>> return_dict['fuel_eco']
-81.87134502923978 kilogram
-```
+<div class="video-wrapper">
+  <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/NfDUkR3DOFw?si=MuoWNsIrBm_QjA5_" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>

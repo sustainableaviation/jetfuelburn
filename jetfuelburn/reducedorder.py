@@ -1,7 +1,7 @@
 # %%
 
 import csv
-import yaml
+import json
 import math
 from importlib import resources
 from jetfuelburn import ureg
@@ -212,6 +212,20 @@ class lee_etal:
     Closed-form takeoff weight estimation model for air transportation simulation.
     In _10th AIAA Aviation Technology, Integration, and Operations (ATIO) Conference_ (p. 9156).
     doi:[10.2514/6.2010-9156](https://doi.org/10.2514/6.2010-9156)
+
+    Warnings
+    --------
+
+    Note that the present implementation of the Lee et al. (2010)
+    cannot completely replicate aircraft payload in a small segment of Figure 6 in referenced paper.
+    The calculated aircraft payload for extreme aircraft ranges differs from the one shown in the paper:
+
+    ```python exec="true" html="true"
+    from jetfuelburn.figures.reducedorder import figure_lee2010
+    fig = figure_lee2010()
+    print(fig.to_html(full_html=False, include_plotlyjs="cdn"))
+    # https://pawamoy.github.io/markdown-exec/gallery/#with-plotly
+    ```
 
     Examples
     --------
@@ -901,7 +915,7 @@ class eea_emission_inventory_2009:
 
     References
     ----------
-    - [EMEP/EEA air pollutant emission inventory guidebook - 2009, Part B, Section 1 (Energy), Subsection 1.A.3.a `Aviation_annex.zip`](https://www.eea.europa.eu/en/analysis/publications/emep-eea-emission-inventory-guidebook-2009)
+    - [EMEP/EEA air pollutant emission inventory guidebook - 2009, Part B, Section 1 (Energy), Subsection 1.A.3.a (`Aviation_annex.zip`)](https://www.eea.europa.eu/en/analysis/publications/emep-eea-emission-inventory-guidebook-2009)
 
     Examples
     --------
@@ -946,7 +960,7 @@ class eea_emission_inventory_2009:
             m_F(R=200) = m_F(125) + (200-125) \cdot \frac{m_F(250) - m_F(125)}{250 - 125}
         $$
 
-        where data is available for $R=[125,250]$ miles and a user-defined range of $R=200$ miles is requested.
+        where in this example, data is available for $R=[125,250]$ miles and a user-defined range of $R=200$ miles is requested.
 
         | Symbol     | Dimension         | Description                                                            |
         |------------|-------------------|------------------------------------------------------------------------|
@@ -964,6 +978,8 @@ class eea_emission_inventory_2009:
         Returns
         -------
         dict
+            'mass_fuel_total' : ureg.Quantity
+                Fuel mass (total segment) [kg]
             'mass_fuel_LTO' : ureg.Quantity
                 Fuel mass (LTO segment) [kg]
             'mass_fuel_taxi_in' : ureg.Quantity
