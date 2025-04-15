@@ -127,7 +127,7 @@ class yanto_etal:
 
     @staticmethod
     @ureg.check(
-        None,  # acft
+        None, # acft
         '[length]',
         '[mass]',
     )
