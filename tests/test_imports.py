@@ -12,6 +12,14 @@ def test_diagrams():
     assert callable(calculate_fuel_consumption_payload_range)
 
 
+def test_averages():
+    import jetfuelburn.averages
+
+    from jetfuelburn.averages import myclimate
+    assert callable(myclimate.available_aircraft)
+    assert callable(myclimate.calculate_fuel_consumption)
+
+
 def test_reducedorder():
     import jetfuelburn.reducedorder
     
