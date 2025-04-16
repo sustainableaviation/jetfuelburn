@@ -5,6 +5,7 @@ copyright: © Paul Scherrer Institute (PSI) and Contributors | Code under MIT Li
 nav: 
   - Home: 'index.md'
   - About: 'about.md'
+  - Comparing Models: 'comparison.md'
   - Getting Started:
     - Installation: 'installation.md'
     - Working with Physical Units: 'interactive/units.md'
@@ -13,6 +14,7 @@ nav:
   - API Reference (Public):
     - PL/R-Diagrams: 'api/diagrams.md'
     - Range Equation: 'api/breguet.md'
+    - Statistical/Average Models: 'api/averages.md'
     - Reduced Order Models: 'api/reducedorder.md'
     - Combined Models: 'api/combined.md'
     - Closed Form Models: 'api/closedform.md' 

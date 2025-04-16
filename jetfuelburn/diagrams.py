@@ -66,16 +66,18 @@ def calculate_fuel_consumption_payload_range(
         Operating Empty Weight (OEW) of the aircraft [mass]
     mtow : float
         Maximum Takeoff Weight (MTOW) of the aircraft [mass]
-    payload_point_B : float
-        Payload mass at point A [mass]
-    range_point_B : float
+    range_point_A : float
         Range at point A [length]
-    payload_point_C : float
+    payload_point_B : float
         Payload mass at point B [mass]
-    range_point_C : float
+    range_point_B : float
         Range at point B [length]
-    range_point_D : float
+    payload_point_C : float
+        Payload mass at point C [mass]
+    range_point_C : float
         Range at point C [length]
+    range_point_D : float
+        Range at point D [length]
 
     Returns
     -------
