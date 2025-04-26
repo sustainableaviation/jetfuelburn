@@ -1,10 +1,16 @@
-def _process_data_usdot_t2(
+# %%
+import pint
+ureg = pint.get_application_registry()
+import pandas as pd
+import pint_pandas
+
+
+def process_data_usdot_t2(
     path_csv_t2: str = 'jetfuelburn/data/USDOT/T_SCHEDULE_T2.csv',
     path_csv_aircraft_types: str = 'jetfuelburn/data/USDOT/T_SCHEDULE_T2_WITH_ICAO.csv',
 ) -> pd.DataFrame:
-    """_summary_
-
-    _extended_summary_
+    """
+    Function for processing the US DOT T2 dataset.
 
     Notes
     -----
@@ -30,7 +36,7 @@ def _process_data_usdot_t2(
         header=0,
         index_col=None,
         sep=',',
-        names=['AIRCRAFT_TYPE', 'Aircraft Designation (US DOT Schedule T2)', 'Aircraft Designation (ICAO)'],
+        names=['AIRCRAFT_TYPE', 'Aircraft Designation (US DOT Schedule T2)'],
     )
     df_t2 = pd.merge(
         left=df_t2,
@@ -109,7 +115,6 @@ def _process_data_usdot_t2(
 
     list_return_columns = [
         'Aircraft Designation (US DOT Schedule T2)',
-        'Aircraft Designation (ICAO)',
         'Fuel/Available Seat Distance',
         'Fuel/Revenue Seat Distance',
         'Fuel/Available Weight Distance',
@@ -120,7 +125,6 @@ def _process_data_usdot_t2(
     # AIRCRAFT AVERGAGES
 
     agg_dict = {
-        'Aircraft Designation (ICAO)': 'first',
         'Fuel/Available Seat Distance': 'mean',
         'Fuel/Revenue Seat Distance': 'mean',
         'Fuel/Available Weight Distance': 'mean',
@@ -143,7 +147,7 @@ def _process_data_usdot_t2(
 
     return df_t2
 
-df = _process_data_usdot_t2(
-    path_csv_aircraft_types='/Users/michaelweinold/github/jetfuelburn/jetfuelburn/data/USDOT/2023/L_AIRCRAFT_TYPE_WITH_ICAO.csv',
-    path_csv_t2='/Users/michaelweinold/github/jetfuelburn/jetfuelburn/data/USDOT/2023/T_SCHEDULE_T2.csv'
+df = process_data_usdot_t2(
+    path_csv_aircraft_types='data/L_AIRCRAFT_TYPE.csv',
+    path_csv_t2='data/T_SCHEDULE_T2.csv'
 )
