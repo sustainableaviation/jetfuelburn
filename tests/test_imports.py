@@ -13,9 +13,9 @@ def test_diagrams():
 
 
 def test_averages():
-    import jetfuelburn.averages
+    import jetfuelburn.statistics
 
-    from jetfuelburn.averages import myclimate
+    from jetfuelburn.statistics import myclimate
     assert callable(myclimate.available_aircraft)
     assert callable(myclimate.calculate_fuel_consumption)
 

@@ -94,24 +94,34 @@ class usdot():
     - [US DOT: BTS: Air Carrier Summary Data: T2 (U.S. Air Carrier Traffic And Capacity Statistics by Aircraft Type)](https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FIH)
     """
 
+    _years = [2023]
     _aircraft_data = {}
-    with resources.open_text("jetfuelburn.data.USDOT.2023", "USDOT_data_2023.json") as file:
-        _aircraft_data = json.load(file)
+    for year in _years:
+        with resources.open_text("jetfuelburn.data.USDOT", f"USDOT_data_{year}.json") as file:
+            _aircraft_data[year] = json.load(file)
 
     @staticmethod
-    def available_aircraft() -> list[str]:
+    def available_years() -> list[int]:
         """
-        Returns a sorted list of available ICAO aircraft designators included in the model.
+        Returns a sorted list of available years included in the model.
         """
-        return sorted(usdot._aircraft_data.keys())
+        return sorted(usdot._years)
+    @staticmethod
+    def available_aircraft(year: int) -> list[str]:
+        """
+        Given a year, returns a sorted list of available ICAO aircraft designators included in the model.
+        """
+        return sorted(usdot._aircraft_data[year].keys())
     
     @staticmethod
     @ureg.check(
+        None,
         None,
         '[length]',
         '[mass]',
     )
     def calculate_fuel_consumption_per_weight(
+        year: int,
         acft: str,
         R: float,
         W: float,
@@ -124,10 +134,12 @@ class usdot():
             R = R.to(ureg('km'))
             W = W.to(ureg('kg'))
 
-        if acft not in usdot._aircraft_data:
+        if year not in usdot._years:
+            raise ValueError(f"No data available for year '{year}'.")
+        if acft not in usdot._aircraft_data[year]:
             raise ValueError(f"US DOT Aircraft Designator '{acft}' not found in model data.")
         else:
-            aircraft_data = usdot._aircraft_data[acft]
+            aircraft_data = usdot._aircraft_data[year][acft]
 
         fuelburn = (aircraft_data['Fuel/Revenue Weight Distance'] * ureg('1/km')) * R * W
         fuelburn = fuelburn.to(ureg('kg'))
@@ -138,9 +150,11 @@ class usdot():
     @staticmethod
     @ureg.check(
         None,
+        None,
         '[length]',
     )
     def calculate_fuel_consumption_per_seat(
+        year: int,
         acft: str,
         R: float,
     ) -> dict:
@@ -151,14 +165,14 @@ class usdot():
         else:
             R = R.to(ureg('km'))
 
-        if acft not in usdot._aircraft_data:
+        if year not in usdot._years:
+            raise ValueError(f"No data available for year '{year}'.")
+        if acft not in usdot._aircraft_data[year]:
             raise ValueError(f"US DOT Aircraft Designator '{acft}' not found in model data.")
         else:
-            aircraft_data = usdot._aircraft_data[acft]
+            aircraft_data = usdot._aircraft_data[year][acft]
 
         fuelburn = (aircraft_data['Fuel/Revenue Seat Distance'] * ureg('kg/km')) * R
         fuelburn = fuelburn.to(ureg('kg'))
 
         return fuelburn
-# %%
-
