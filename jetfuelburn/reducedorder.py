@@ -1006,9 +1006,9 @@ class eea_emission_inventory_2009:
 
         if acft not in eea_emission_inventory_2009._aircraft_data:
             raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data.")
-
-        aircraft_data = eea_emission_inventory_2009._aircraft_data[acft]
-        list_distance_points = sorted([int(k) for k in aircraft_data['total'].keys()])
+        else:
+            aircraft_data = eea_emission_inventory_2009._aircraft_data[acft]
+            list_distance_points = sorted([int(k) for k in aircraft_data['total'].keys()])
 
         if R < list_distance_points[0]:
             raise ValueError(f"Range must be at least {list_distance_points[0]} nmi.")
