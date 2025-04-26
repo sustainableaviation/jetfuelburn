@@ -1,7 +1,7 @@
 import pytest
 
 from jetfuelburn.aux.tests import approx_with_units
-from jetfuelburn.averages import (
+from jetfuelburn.statistics import (
     myclimate
 )
     
