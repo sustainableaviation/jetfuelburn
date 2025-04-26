@@ -30,7 +30,9 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "pint"
+    "pint",
+    "Pint-Pandas",
+    "pandas",
 ]
 
 [project.urls]
@@ -57,6 +59,7 @@ packages = [
   "jetfuelburn.data.PS2025",
   "jetfuelburn.data.EEA2009",
   "jetfuelburn.data.Lee2010",
+  "jetfuelburn.data.FAA",
 ]
 
 [tool.setuptools.package-data]
@@ -65,6 +68,7 @@ packages = [
 "jetfuelburn.data.PS2025" = ["*.csv"]
 "jetfuelburn.data.EEA2009" = ["*.json"]
 "jetfuelburn.data.Lee2010" = ["*.csv"]
+"jetfuelburn.data.FAA" = ["*.csv"]
 
 [tool.setuptools.dynamic]
 version = {attr = "jetfuelburn.__version__"} 
