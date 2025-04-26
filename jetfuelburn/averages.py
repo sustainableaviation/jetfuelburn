@@ -7,22 +7,89 @@ from importlib import resources
 
 class usdot():
     """
-    This class contains methods to process, analyze and use statistical data on aircraft fuel consumption
-    from the US Department of Transport (US DOT) based on the "T2" dataset.
+    This class contains methods to access statistical data on aircraft fuel consumption
+    reported by "large certified air carriers" to the US Department of Transport (US DOT).
 
-    `Air Carrier Summary : T2: U.S. Air Carrier TRAFFIC And Capacity Statistics`
+    Data is based on averages of fuel consumption per passenger mile and per ton mile,
+    reported by the US DOT in table T2, summarizing Form 41 Schedule T-100.
 
-    _extended_summary_
-
-    Notes
+    Terminology
     -----
-    Required data must be downloaded from the US Department of Transport:
-    - ["AircraftType": `L_AIRCRAFT_TYPE.csv`]()
-    - ["Data Tools: Download": `T_SCHEDULE_T2.csv`]()
+    - **Form 41**
+    
+        Form 41 is a report that the U.S. Department of Transportation (DOT) generates
+        based on data which large certified air carriers are required to provide.
+
+        The _Financial Report_ part of this form includes balance sheet, cash flow, employment, income statement, fuel cost and consumption,
+        aircraft operating expenses, and operating expenses.
+        The _Air Carrier Statistics_ part of this form includes data on
+        passengers, freight and mail transported.
+        It also includes aircraft type, service class, available capacity and seats, and aircraft hours ramp-to-ramp and airborne.
+
+        The reporting requirements of Schedule T-100 of Form 41 are defined in federal law: 
+
+        | Reglation | Scope |
+        | --------- | ----- |
+        | [14 CFR 291.45](https://www.ecfr.gov/current/title-14/section-291.45) | General |
+        | [Appendix A to Subpart E of Part 291, Title 14](https://www.ecfr.gov/current/title-14/part-291/appendix-Appendix%20A%20to%20Subpart%20E%20of%20Part%20291) | US Air Carriers |
+        | [Appendix A to Part 217, Title 14](https://www.ecfr.gov/current/title-14/part-217/appendix-Appendix A to Part 217) | Foreign Air Carriers |
+
+    - **Schedule** (in the context of Form 41)
+
+        A schedule is a specific section of the Form 41 that contains
+        a particular type of data:
+
+        > "the Air Carrier Financial Reports (Form 41 Financial Data) (...)
+        > Each table in this database contains a different type of financial report or “schedule” (...)"
+
+        [Durso (2007) "An Introduction to DOT Form 41 web resources for airline financial analysis"](https://rosap.ntl.bts.gov/view/dot/16264/dot_16264_DS1.pdf)
+
+    - Schedule **T100**
+
+        > "Form 41 Schedule T-100(f) provides flight stage data covering both passenger/cargo
+        > and all cargo operations in scheduled and nonscheduled services.
+        > The schedule is used to report all flights which serve points in the United States
+        > or its territories as defined in this part."
+
+        [Appendix A to Part 217, Title 14](https://www.ecfr.gov/current/title-14/part-217/appendix-Appendix A to Part 217)
+    
+    - (table) **T2**
+
+        > This table summarizes the T-100 traffic data reported by U.S. air carriers. The quarterly summary (...)
+
+    - (table) **T1**
+
+        > This table summarizes the T-100 traffic data reported by U.S. air carriers. The monthly summary (...)
+        
+    Warning
+    -------
+    Form 41 Schedule T-100 data is can be downloaded from the US Department of Transportation website.
+    Unfortunately, there are no permalinks to the data files, and even regular URLs are
+    generated dynamically based on some JavaScript magic.
+    
+    The best way to obtain the correct files is to search by name, according to the following hierarchy:
+
+    ```
+    Database Name: Air Carrier Summary Data (Form 41 and 298C Summary Data)
+    T2: U.S. Air Carrier TRAFFIC And Capacity Statistics by Aircraft Type
+    ```
+
+    On the `T2: (...)` page, click on the "Download" button in the "Data Tools" sidebar (left).
+    The download should be an archive, containing the following file:
+
+    ```
+    T_SCHEDULE_T2.csv
+    ```
+
+    Aircraft types in this file are labeled using integer codes. These codes are
+    defined in a separate file, which must also be downloaded.
+    On the `T2: (...)` page, click on the `AircraftType` Field Name entry
+    and on the following page, click on the "Download Lookup Table" button.
 
     See Also
     --------
-    Additional information can be found at:
+    Working links to the relevant files (05-2025):
+    
     - [US DOT: BTS: Air Carrier Summary Data (Form 41 and 298C Summary Data)](https://www.transtats.bts.gov/Tables.asp?QO_VQ=EGD&QO)
     - [US DOT: BTS: Air Carrier Summary Data: T2 (U.S. Air Carrier Traffic And Capacity Statistics by Aircraft Type)](https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FIH)
     """
@@ -93,3 +160,5 @@ class usdot():
         fuelburn = fuelburn.to(ureg('kg'))
 
         return fuelburn
+# %%
+
