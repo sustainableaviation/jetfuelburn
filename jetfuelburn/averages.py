@@ -63,7 +63,7 @@ class usdot():
         
     Warning
     -------
-    Form 41 Schedule T-100 data is can be downloaded from the US Department of Transportation website.
+    Form 41 Schedule T-100 data can be downloaded from the US Department of Transportation website.
     Unfortunately, there are no permalinks to the data files, and even regular URLs are
     generated dynamically based on some JavaScript magic.
     
