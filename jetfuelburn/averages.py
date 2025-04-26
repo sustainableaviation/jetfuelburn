@@ -1,148 +1,154 @@
+# %%
 from jetfuelburn import ureg
-import math
+import pint
+import pint_pandas
+import pandas as pd
+ureg = pint.get_application_registry()
 
 
-class myclimate:
-    r"""
-    This class implements the public part of the myClimate Flight Emissions Calculator.
+class usdot():
+    """
+    This class contains methods to process, analyze and use statistical data on aircraft fuel consumption
+    from the US Department of Transport (US DOT) based on the "T2" dataset.
 
-    Fuel burn is calculated using a quadratic function of the form
-    defined in the myClimate Flight Emissions Calculator Calculation Principles:
+    `Air Carrier Summary : T2: U.S. Air Carrier TRAFFIC And Capacity Statistics`
 
-    $$
-    f(x) + LTO = ax^2 + bx + c
-    $$
-
-    where:
-
-    | Symbol     | Dimension         | Description                                                            |
-    |------------|-------------------|------------------------------------------------------------------------|
-    | $f(x)$     | [mass]            | Fuel consumption (cruise) in kg                                        |
-    | $LTO$      | [mass]            | Fuel consumption (landing-takeoff-cycle (LTO)) in kg                   |
-    | $x$        | [distance]        | Distance in km                                                         |
-    | $a$        | [mass]            | Coefficient of the quadratic term                                      |
-    | $b$        | [mass]            | Coefficient of the linear term                                         |
-    | $c$        | [mass]            | Coefficient of the constant term                                       |
+    _extended_summary_
 
     Notes
     -----
-    As of early 2025, the myClimate calculator offers a selection of 10 specific aircraft types.
-    For 4 of these, specific parameters are provided on the Flight Emissions Calculator Calculation Principles page:
+    Required data must be downloaded from the US Department of Transport:
+    - ["AircraftType": `L_AIRCRAFT_TYPE.csv`]()
+    - ["Data Tools: Download": `T_SCHEDULE_T2.csv`]()
 
-    | Size Category         | Range [km]    | # of Seats         |
-    |-----------------------|---------------|--------------------|
-    | "standard short-haul" | $<1500km$     | 157.86             |
-    | "standard long-haul"  | $>2500km$     | 302.58             |
-    | B737                  | not provided  | 148.00             |
-    | A320                  | not provided  | 165.00             |
-    | A330                  | not provided  | 287.00             |
-    | B777                  | not provided  | 370.00             |
-
-    Key assumptions of this fuel calculation function:
-
-    | Parameter         | Assumption                                                                 |
-    |-------------------|----------------------------------------------------------------------------|
-    | data availability | N/A, fleet-average values only                                             |
-    | aircraft payload  | average                                                                    |
-    | climb/descent     | considered in "LTO" factor, which is not made public                       |
-    | fuel reserves     | not considered explicitly                                                  |
-    | alternate airport | not considered explicitly                                                  |
-
-    References
-    ----------
-    [myClimate Flight Emissions Calculator Calculation Principles](https://www.myclimate.org/en/information/about-myclimate/downloads/flight-emission-calculator/)
-
-    Examples
+    See Also
     --------
-    ```pyodide install='jetfuelburn'
-    import jetfuelburn
-    from jetfuelburn import ureg
-    from jetfuelburn.averages import myclimate
-    myclimate.available_aircraft()[0:10]
-    myclimate.calculate_fuel_consumption(
-        acft='B737',
-        x=2200*ureg.km,
-    )
-    ```
+    Additional information can be found at:
+    - [US DOT: BTS: Air Carrier Summary Data (Form 41 and 298C Summary Data)](https://www.transtats.bts.gov/Tables.asp?QO_VQ=EGD&QO)
+    - [US DOT: BTS: Air Carrier Summary Data: T2 (U.S. Air Carrier Traffic And Capacity Statistics by Aircraft Type)](https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FIH)
     """
 
-    _regression_coefficients = {
-        'A320': {'a': 0.00016, 'b': 1.454, 'c': 1531.722},
-        'B737': {'a': 0.000032, 'b': 2.588, 'c': 1212.084 },
-        'A330': {'a': 0.00034, 'b': 4.384, 'c': 2457.737},
-        'B777': {'a': 0.00034, 'b': 6.112, 'c': 3403.041},
-        'standard aircraft': {},
-    }
 
-    @staticmethod
-    def available_aircraft() -> list[str]:
-        """
-        Returns a sorted list of available ICAO aircraft designators included in the model.
-        """
-        return sorted(myclimate._regression_coefficients.keys())
 
-    @staticmethod
-    @ureg.check(
-         None, # acft
-        '[length]',
+def _process_data_usdot_t2(
+    path_csv_t2: str = 'jetfuelburn/data/USDOT/T_SCHEDULE_T2.csv',
+    path_csv_aircraft_types: str = 'jetfuelburn/data/USDOT/T_SCHEDULE_T2.csv',
+) -> pd.DataFrame:
+    """_summary_
+
+    _extended_summary_
+
+    Notes
+    -----
+    Required data must be downloaded from the US Department of Transport:
+    - ["AircraftType": `L_AIRCRAFT_TYPE.csv`]()
+    - ["Data Tools: Download": `T_SCHEDULE_T2.csv`]()
+
+    See Also
+    --------
+    Additional information can be found at:
+    - [US DOT: BTS: Air Carrier Summary Data (Form 41 and 298C Summary Data)](https://www.transtats.bts.gov/Tables.asp?QO_VQ=EGD&QO)
+    - [US DOT: BTS: Air Carrier Summary Data: T2 (U.S. Air Carrier Traffic And Capacity Statistics by Aircraft Type)](https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FIH)
+    """
+
+    df_t2 = pd.read_csv(
+        filepath_or_buffer=path_csv_t2,
+        header=0,
+        index_col=None,
+        sep=',',
     )
-    def calculate_fuel_consumption(
-        acft: str,
-        x: float,
-    ) -> float:
-        r"""
-        Given a flight distance, calculate the fleet-average fuel consumption of a flight using the
-        [myClimate Flight Emissions Calculator](https://co2.myclimate.org/en/flight_calculators/new).
+    df_aircraft_types = pd.read_csv(
+        filepath_or_buffer=path_csv_aircraft_types,
+        header=0,
+        index_col=None,
+        sep=',',
+        names=['AIRCRAFT_TYPE', 'Aircraft Designation (US DOT Schedule T2)'],
+    )
+    df_t2 = pd.merge(
+        left=df_t2,
+        right=df_aircraft_types,
+        on='AIRCRAFT_TYPE',
+        how='left',
+    )
 
-        Warnings
-        --------
-        It is not entirely clear from the description of the myClimate Flight Emissions Calculator
-        how distances of <1500km for short-haul aircraft and distances of >2500km for long-haul aircraft
-        are handled. [The description](https://www.myclimate.org/en/information/about-myclimate/downloads/flight-emission-calculator/) mentions that
+    """
+    Column names in the T2 dataset sometimes have numbers appended.
+    In order to unify the column names, these numbers are removed.
 
-        > "The fuel consumption for distances between 1500 and 2500 km is linearly interpolated."
+    For example, as of 11-2024, the dictionary generated below will look like:
 
-        but this would make sense only for the "standard short-haul" and "standard long-haul" aircraft?
+    dict_columns_for_renaming = {
+        'AVL_SEAT_MILES_320': 'AVL_SEAT_MILES',
+        'REV_PAX_MILES_140': 'REV_PAX_MILES',
+        'AIRCRAFT_FUELS_921': 'AIRCRAFT_FUELS',
+        'CARRIER_GROUP': 'CARRIER_GROUP',
+        'AIRCRAFT_CONFIG': 'AIRCRAFT_CONFIG',
+        'AIRCRAFT_TYPE': 'AIRCRAFT_TYPE',
+    }
+    """
 
-        In this function, short-haul aircraft can therefore only be used for distances of <1500km
-        and long-haul aircraft can only be used for distances of >2500km. The `standard aircraft` option
-        can be used for all distances.
+    dict_columns_and_units = {
+        'AVL_SEAT_MILES': 'pint[miles]',
+        'REV_PAX_MILES': 'pint[miles]',
+        'AIRCRAFT_FUELS': 'pint[gallons]',
+        'CARRIER_GROUP': 'pint[]',
+        'AIRCRAFT_CONFIG': 'pint[]',
+        'AIRCRAFT_TYPE': 'pint[]',
+    }
+    dict_columns_for_renaming = {df_t2.filter(like=column_name).columns[0]: column_name for column_name in dict_columns_and_units.keys()}
+    df_t2 = df_t2.rename(columns=dict_columns_for_renaming)
+    df_t2 = df_t2.astype(dict_columns_and_units)
 
-        Parameters
-        ----------
-        x : float
-            Mission distance [length].
+    df_t2['AIRCRAFT_FUELS'] = df_t2['AIRCRAFT_FUELS'].pint.to(ureg('liters'))
+    df_t2['AVL_SEAT_MILES'] = df_t2['AVL_SEAT_MILES'].pint.to(ureg('km'))
+    df_t2['REV_PAX_MILES'] = df_t2['REV_PAX_MILES'].pint.to(ureg('km'))
+    
+    # DATA FILTERING
+    
+    df_t2 = df_t2.loc[df_t2['CARRIER_GROUP'] == 3] # major carriers only
+    #df_t2 = df_t2.loc[df_t2['AIRCRAFT_CONFIG'] == 1] # passenger aircraft only
+    df_t2 = df_t2.drop(columns=['CARRIER_GROUP', 'AIRCRAFT_CONFIG'])
 
-        Returns
-        -------
-        float
-            Fuel consumption [mass] in kg.
-        """
-        if x < (0 * ureg.km):
-            raise ValueError("Distance must not be negative.")
-        x = x.to('km').magnitude
+    list_numeric_columns = [
+        'AVL_SEAT_MILES',
+        'REV_PAX_MILES',
+        'AIRCRAFT_FUELS',
+    ]
+    df_t2[list_numeric_columns] = df_t2[list_numeric_columns].replace(
+        to_replace=0,
+        value=pd.NA
+    )
 
-        if acft in ['A320', 'B737'] and x > 2500:
-            raise ValueError(f"Aircraft {acft} is not valid for distances > 2500 km.")
-        if acft in ['A330', 'B777'] and x < 1500:
-            raise ValueError(f"Aircraft {acft} is not valid for distances < 1500 km.")
-        
-        if acft == 'standard aircraft':
-            if x < 1500:
-                a = 0.000007
-                b = 2.775
-                c = 1260.608
-            elif x < 2500:
-                a = 0.000007 + 0.000283 * (x - 1500) / 1000
-                b = 2.775 + 0.7 * (x - 1500) / 1000
-                c = 1260.608 + 1999.083 * (x - 1500) / 1000
-            elif x >= 2500:
-                a = 0.00029
-                b = 3.475
-                c = 3259.691
-        else:
-            a = myclimate._regression_coefficients[acft]['a']
-            b = myclimate._regression_coefficients[acft]['b']
-            c = myclimate._regression_coefficients[acft]['c']
+    # CUSTOM COLUMN CALCULATIONS
 
-        return (a * x**2 + b * x + c) * ureg.kg
+    df_t2['Fuel/Available Seat Distance'] = df_t2['AIRCRAFT_FUELS']/df_t2['AVL_SEAT_MILES']
+    df_t2['Fuel/Revenue Seat Distance'] = df_t2['AIRCRAFT_FUELS']/df_t2['REV_PAX_MILES']
+
+    # SANITY CHECKS
+
+    df_t2 = df_t2.loc[df_t2['REV_PAX_MILES'] <= df_t2['AVL_SEAT_MILES']]
+
+    # COLUMN SELECTION
+
+    list_return_columns = [
+        'Aircraft Designation (US DOT Schedule T2)',
+        'Fuel/Available Seat Distance',
+        'Fuel/Revenue Seat Distance',
+    ]
+    df_t2 = df_t2[list_return_columns]
+    df_t2 = df_t2.reset_index(drop=True)
+
+    # AIRCRAFT AVERGAGES
+
+    df_t2 = df_t2.groupby(
+        by='Aircraft Designation (US DOT Schedule T2)',
+        as_index=False,
+    ).mean()
+
+    # UNIT CONVERSION
+
+    density_jetfuel = ((775+840)/2) * ureg('g/liter') # https://en.wikipedia.org/wiki/Jet_fuel
+    df_t2['Fuel/Available Seat Distance'] = (df_t2['Fuel/Available Seat Distance'] * density_jetfuel).pint.to('kg/km')
+    df_t2['Fuel/Revenue Seat Distance'] = (df_t2['Fuel/Revenue Seat Distance'] * density_jetfuel).pint.to('kg/km')
+
+    return df_t2
