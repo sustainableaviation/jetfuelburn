@@ -149,5 +149,13 @@ def process_data_usdot_t2(
 
 df = process_data_usdot_t2(
     path_csv_aircraft_types='data/L_AIRCRAFT_TYPE.csv',
-    path_csv_t2='data/T_SCHEDULE_T2.csv'
+    path_csv_t2='data/T_SCHEDULE_T2_2024.csv'
+)
+df_dequantified = df.pint.dequantify()
+df_dequantified.columns = df_dequantified.columns.droplevel(1)
+
+df_dequantified.to_json(
+    path_or_buf='out.json',
+    orient='index',
+    indent=4,
 )
