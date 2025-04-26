@@ -1,0 +1,618 @@
+{
+    "A200-100 BD-500-1A10":{
+        "Aircraft Designation (ICAO)":"BCS1",
+        "Fuel\/Available Seat Distance":0.0265396128,
+        "Fuel\/Revenue Seat Distance":0.0402845274,
+        "Fuel\/Available Weight Distance":0.0002225555,
+        "Fuel\/Revenue Weight Distance":0.0004330872
+    },
+    "A220-300 BD-500-1A11":{
+        "Aircraft Designation (ICAO)":"BCS3",
+        "Fuel\/Available Seat Distance":0.0201918397,
+        "Fuel\/Revenue Seat Distance":0.028488006,
+        "Fuel\/Available Weight Distance":0.0001629524,
+        "Fuel\/Revenue Weight Distance":0.0003111071
+    },
+    "Aerospatiale Caravelle SE-210":{
+        "Aircraft Designation (ICAO)":"CRVL",
+        "Fuel\/Available Seat Distance":null,
+        "Fuel\/Revenue Seat Distance":null,
+        "Fuel\/Available Weight Distance":null,
+        "Fuel\/Revenue Weight Distance":null
+    },
+    "Aerospatiale\/Aeritalia ATR-42":{
+        "Aircraft Designation (ICAO)":"ATR4",
+        "Fuel\/Available Seat Distance":0.0459866922,
+        "Fuel\/Revenue Seat Distance":0.088877793,
+        "Fuel\/Available Weight Distance":0.0004549293,
+        "Fuel\/Revenue Weight Distance":0.0009814356
+    },
+    "Aerospatiale\/Aeritalia ATR-72":{
+        "Aircraft Designation (ICAO)":"ATR7",
+        "Fuel\/Available Seat Distance":0.0313265095,
+        "Fuel\/Revenue Seat Distance":0.049082594,
+        "Fuel\/Available Weight Distance":0.0003174248,
+        "Fuel\/Revenue Weight Distance":0.0005405406
+    },
+    "Airbus Industrie A-318":{
+        "Aircraft Designation (ICAO)":"A318",
+        "Fuel\/Available Seat Distance":0.0294496573,
+        "Fuel\/Revenue Seat Distance":0.0356068528,
+        "Fuel\/Available Weight Distance":0.0002267983,
+        "Fuel\/Revenue Weight Distance":0.0003905263
+    },
+    "Airbus Industrie A300-600\/R\/CF\/RCF":{
+        "Aircraft Designation (ICAO)":"A306",
+        "Fuel\/Available Seat Distance":0.0317425382,
+        "Fuel\/Revenue Seat Distance":0.0444372219,
+        "Fuel\/Available Weight Distance":0.0002211415,
+        "Fuel\/Revenue Weight Distance":0.0003970761
+    },
+    "Airbus Industrie A300B\/C\/F-100\/200":{
+        "Aircraft Designation (ICAO)":"A30B",
+        "Fuel\/Available Seat Distance":0.0444148512,
+        "Fuel\/Revenue Seat Distance":0.0730553223,
+        "Fuel\/Available Weight Distance":0.0003728451,
+        "Fuel\/Revenue Weight Distance":0.0007026081
+    },
+    "Airbus Industrie A310-200C\/F":{
+        "Aircraft Designation (ICAO)":"A310",
+        "Fuel\/Available Seat Distance":1.7312827285,
+        "Fuel\/Revenue Seat Distance":2.0830519253,
+        "Fuel\/Available Weight Distance":0.0115154991,
+        "Fuel\/Revenue Weight Distance":0.0159146661
+    },
+    "Airbus Industrie A310-300":{
+        "Aircraft Designation (ICAO)":"A310",
+        "Fuel\/Available Seat Distance":0.0379832889,
+        "Fuel\/Revenue Seat Distance":0.0618452944,
+        "Fuel\/Available Weight Distance":0.0002764967,
+        "Fuel\/Revenue Weight Distance":0.0005473611
+    },
+    "Airbus Industrie A319":{
+        "Aircraft Designation (ICAO)":"A319",
+        "Fuel\/Available Seat Distance":0.029264128,
+        "Fuel\/Revenue Seat Distance":0.0387016392,
+        "Fuel\/Available Weight Distance":0.0002472403,
+        "Fuel\/Revenue Weight Distance":0.0004194378
+    },
+    "Airbus Industrie A320-100\/200":{
+        "Aircraft Designation (ICAO)":"A320",
+        "Fuel\/Available Seat Distance":0.0253871392,
+        "Fuel\/Revenue Seat Distance":0.0334470483,
+        "Fuel\/Available Weight Distance":0.0002246057,
+        "Fuel\/Revenue Weight Distance":0.000361073
+    },
+    "Airbus Industrie A320-200n":{
+        "Aircraft Designation (ICAO)":"A20N",
+        "Fuel\/Available Seat Distance":0.0186959651,
+        "Fuel\/Revenue Seat Distance":0.0250594079,
+        "Fuel\/Available Weight Distance":0.0002062523,
+        "Fuel\/Revenue Weight Distance":0.0002762321
+    },
+    "Airbus Industrie A321-200n":{
+        "Aircraft Designation (ICAO)":"A21N",
+        "Fuel\/Available Seat Distance":0.0273003239,
+        "Fuel\/Revenue Seat Distance":0.0508360762,
+        "Fuel\/Available Weight Distance":0.0002243911,
+        "Fuel\/Revenue Weight Distance":0.0005547066
+    },
+    "Airbus Industrie A321\/Lr":{
+        "Aircraft Designation (ICAO)":"A321",
+        "Fuel\/Available Seat Distance":0.022607457,
+        "Fuel\/Revenue Seat Distance":0.0289973097,
+        "Fuel\/Available Weight Distance":0.0001952829,
+        "Fuel\/Revenue Weight Distance":0.0003160091
+    },
+    "Airbus Industrie A330-200":{
+        "Aircraft Designation (ICAO)":"A332",
+        "Fuel\/Available Seat Distance":0.1092522656,
+        "Fuel\/Revenue Seat Distance":0.1323529193,
+        "Fuel\/Available Weight Distance":0.0006106911,
+        "Fuel\/Revenue Weight Distance":0.0009584505
+    },
+    "Airbus Industrie A330-300\/333":{
+        "Aircraft Designation (ICAO)":"A333",
+        "Fuel\/Available Seat Distance":0.0277998733,
+        "Fuel\/Revenue Seat Distance":0.03936828,
+        "Fuel\/Available Weight Distance":0.0001802768,
+        "Fuel\/Revenue Weight Distance":0.0003421837
+    },
+    "Airbus Industrie A330-900":{
+        "Aircraft Designation (ICAO)":"A339",
+        "Fuel\/Available Seat Distance":0.0244626458,
+        "Fuel\/Revenue Seat Distance":0.0542734146,
+        "Fuel\/Available Weight Distance":0.0001550599,
+        "Fuel\/Revenue Weight Distance":0.0003914787
+    },
+    "Airbus Industrie A350-900":{
+        "Aircraft Designation (ICAO)":"A359",
+        "Fuel\/Available Seat Distance":0.0259006546,
+        "Fuel\/Revenue Seat Distance":0.0493448674,
+        "Fuel\/Available Weight Distance":0.0001821239,
+        "Fuel\/Revenue Weight Distance":0.000340082
+    },
+    "B787-800 Dreamliner":{
+        "Aircraft Designation (ICAO)":"B788",
+        "Fuel\/Available Seat Distance":0.0413290758,
+        "Fuel\/Revenue Seat Distance":0.0911638971,
+        "Fuel\/Available Weight Distance":0.0001709769,
+        "Fuel\/Revenue Weight Distance":0.0003257966
+    },
+    "B787-900 Dreamliner":{
+        "Aircraft Designation (ICAO)":"B789",
+        "Fuel\/Available Seat Distance":0.0321016723,
+        "Fuel\/Revenue Seat Distance":0.0918559117,
+        "Fuel\/Available Weight Distance":0.0001423558,
+        "Fuel\/Revenue Weight Distance":0.000448279
+    },
+    "Beech 1900 A\/B\/C\/D":{
+        "Aircraft Designation (ICAO)":"B190",
+        "Fuel\/Available Seat Distance":null,
+        "Fuel\/Revenue Seat Distance":null,
+        "Fuel\/Available Weight Distance":null,
+        "Fuel\/Revenue Weight Distance":null
+    },
+    "Boeing 717-200":{
+        "Aircraft Designation (ICAO)":"B712",
+        "Fuel\/Available Seat Distance":0.0447754382,
+        "Fuel\/Revenue Seat Distance":0.062073182,
+        "Fuel\/Available Weight Distance":0.0003973329,
+        "Fuel\/Revenue Weight Distance":0.0006763209
+    },
+    "Boeing 727-100":{
+        "Aircraft Designation (ICAO)":"B721",
+        "Fuel\/Available Seat Distance":0.0712856906,
+        "Fuel\/Revenue Seat Distance":0.1365858098,
+        "Fuel\/Available Weight Distance":0.0004804098,
+        "Fuel\/Revenue Weight Distance":0.0010207183
+    },
+    "Boeing 727-200\/231A":{
+        "Aircraft Designation (ICAO)":"B722",
+        "Fuel\/Available Seat Distance":0.0484637958,
+        "Fuel\/Revenue Seat Distance":0.0759385911,
+        "Fuel\/Available Weight Distance":0.0004327987,
+        "Fuel\/Revenue Weight Distance":0.0007956363
+    },
+    "Boeing 737-100\/200":{
+        "Aircraft Designation (ICAO)":"B731\/B732",
+        "Fuel\/Available Seat Distance":0.0498233765,
+        "Fuel\/Revenue Seat Distance":0.0772410858,
+        "Fuel\/Available Weight Distance":0.0004408244,
+        "Fuel\/Revenue Weight Distance":0.0008237963
+    },
+    "Boeing 737-200C":{
+        "Aircraft Designation (ICAO)":"B732",
+        "Fuel\/Available Seat Distance":0.0806999892,
+        "Fuel\/Revenue Seat Distance":0.1366934745,
+        "Fuel\/Available Weight Distance":0.0005406534,
+        "Fuel\/Revenue Weight Distance":0.0010921859
+    },
+    "Boeing 737-300":{
+        "Aircraft Designation (ICAO)":"B733",
+        "Fuel\/Available Seat Distance":0.032242945,
+        "Fuel\/Revenue Seat Distance":0.0480289962,
+        "Fuel\/Available Weight Distance":0.0002904499,
+        "Fuel\/Revenue Weight Distance":0.0005136834
+    },
+    "Boeing 737-400":{
+        "Aircraft Designation (ICAO)":"B734",
+        "Fuel\/Available Seat Distance":0.0329700756,
+        "Fuel\/Revenue Seat Distance":0.046537753,
+        "Fuel\/Available Weight Distance":0.0002657102,
+        "Fuel\/Revenue Weight Distance":0.0004687236
+    },
+    "Boeing 737-500":{
+        "Aircraft Designation (ICAO)":"B735",
+        "Fuel\/Available Seat Distance":0.036760468,
+        "Fuel\/Revenue Seat Distance":0.052190842,
+        "Fuel\/Available Weight Distance":0.0003305286,
+        "Fuel\/Revenue Weight Distance":0.0005583659
+    },
+    "Boeing 737-700\/700LR\/Max 7":{
+        "Aircraft Designation (ICAO)":"B737\/B37M",
+        "Fuel\/Available Seat Distance":0.0292313522,
+        "Fuel\/Revenue Seat Distance":0.0390471963,
+        "Fuel\/Available Weight Distance":0.000254688,
+        "Fuel\/Revenue Weight Distance":0.0004201726
+    },
+    "Boeing 737-800":{
+        "Aircraft Designation (ICAO)":"B738",
+        "Fuel\/Available Seat Distance":0.0241192877,
+        "Fuel\/Revenue Seat Distance":0.0330353494,
+        "Fuel\/Available Weight Distance":0.0002104174,
+        "Fuel\/Revenue Weight Distance":0.0003514179
+    },
+    "Boeing 737-900":{
+        "Aircraft Designation (ICAO)":"B739",
+        "Fuel\/Available Seat Distance":0.027593216,
+        "Fuel\/Revenue Seat Distance":0.051265746,
+        "Fuel\/Available Weight Distance":0.0002607867,
+        "Fuel\/Revenue Weight Distance":0.0005302825
+    },
+    "Boeing 737-900ER":{
+        "Aircraft Designation (ICAO)":"B739",
+        "Fuel\/Available Seat Distance":0.0213067287,
+        "Fuel\/Revenue Seat Distance":0.0279275378,
+        "Fuel\/Available Weight Distance":0.0001794968,
+        "Fuel\/Revenue Weight Distance":0.0003008277
+    },
+    "Boeing 747-100":{
+        "Aircraft Designation (ICAO)":"B741",
+        "Fuel\/Available Seat Distance":0.0381417898,
+        "Fuel\/Revenue Seat Distance":0.065431556,
+        "Fuel\/Available Weight Distance":0.0002759828,
+        "Fuel\/Revenue Weight Distance":0.0004825642
+    },
+    "Boeing 747-200\/300":{
+        "Aircraft Designation (ICAO)":"B742\/B743",
+        "Fuel\/Available Seat Distance":0.0581371478,
+        "Fuel\/Revenue Seat Distance":0.0826778337,
+        "Fuel\/Available Weight Distance":0.0004207434,
+        "Fuel\/Revenue Weight Distance":0.0007849545
+    },
+    "Boeing 747-400":{
+        "Aircraft Designation (ICAO)":"B744",
+        "Fuel\/Available Seat Distance":2.4606881386,
+        "Fuel\/Revenue Seat Distance":211.4257016496,
+        "Fuel\/Available Weight Distance":0.0005758847,
+        "Fuel\/Revenue Weight Distance":0.0026456786
+    },
+    "Boeing 747-400F":{
+        "Aircraft Designation (ICAO)":"B74F",
+        "Fuel\/Available Seat Distance":null,
+        "Fuel\/Revenue Seat Distance":null,
+        "Fuel\/Available Weight Distance":null,
+        "Fuel\/Revenue Weight Distance":null
+    },
+    "Boeing 747SP":{
+        "Aircraft Designation (ICAO)":"B74S",
+        "Fuel\/Available Seat Distance":0.0978297688,
+        "Fuel\/Revenue Seat Distance":0.1335899591,
+        "Fuel\/Available Weight Distance":0.0006540937,
+        "Fuel\/Revenue Weight Distance":0.0010453441
+    },
+    "Boeing 757-200":{
+        "Aircraft Designation (ICAO)":"B752",
+        "Fuel\/Available Seat Distance":0.0273473414,
+        "Fuel\/Revenue Seat Distance":0.0368082132,
+        "Fuel\/Available Weight Distance":0.0002256551,
+        "Fuel\/Revenue Weight Distance":0.0003878702
+    },
+    "Boeing 757-300":{
+        "Aircraft Designation (ICAO)":"B753",
+        "Fuel\/Available Seat Distance":0.0305346181,
+        "Fuel\/Revenue Seat Distance":0.0405630182,
+        "Fuel\/Available Weight Distance":0.0002653465,
+        "Fuel\/Revenue Weight Distance":0.0004108492
+    },
+    "Boeing 767-200\/ER\/EM":{
+        "Aircraft Designation (ICAO)":"B762",
+        "Fuel\/Available Seat Distance":0.0692831039,
+        "Fuel\/Revenue Seat Distance":0.3882397366,
+        "Fuel\/Available Weight Distance":0.0002558692,
+        "Fuel\/Revenue Weight Distance":0.000552094
+    },
+    "Boeing 767-300\/300ER":{
+        "Aircraft Designation (ICAO)":"B763",
+        "Fuel\/Available Seat Distance":0.032953662,
+        "Fuel\/Revenue Seat Distance":0.0583034998,
+        "Fuel\/Available Weight Distance":0.000184315,
+        "Fuel\/Revenue Weight Distance":0.0003739833
+    },
+    "Boeing 767-400\/ER":{
+        "Aircraft Designation (ICAO)":"B764",
+        "Fuel\/Available Seat Distance":0.0302439368,
+        "Fuel\/Revenue Seat Distance":0.0405189272,
+        "Fuel\/Available Weight Distance":0.0001927125,
+        "Fuel\/Revenue Weight Distance":0.0003396429
+    },
+    "Boeing 777-200ER\/200LR\/233LR":{
+        "Aircraft Designation (ICAO)":"B772",
+        "Fuel\/Available Seat Distance":0.0512666187,
+        "Fuel\/Revenue Seat Distance":0.0863083245,
+        "Fuel\/Available Weight Distance":0.0002097174,
+        "Fuel\/Revenue Weight Distance":0.0003818277
+    },
+    "Boeing 777-300\/300ER\/333ER":{
+        "Aircraft Designation (ICAO)":"B773",
+        "Fuel\/Available Seat Distance":0.0703253984,
+        "Fuel\/Revenue Seat Distance":0.1534658486,
+        "Fuel\/Available Weight Distance":0.0001891525,
+        "Fuel\/Revenue Weight Distance":0.0004378981
+    },
+    "Boeing 787-10 Dreamliner":{
+        "Aircraft Designation (ICAO)":"B78X",
+        "Fuel\/Available Seat Distance":0.0258007474,
+        "Fuel\/Revenue Seat Distance":0.0934360493,
+        "Fuel\/Available Weight Distance":0.000134209,
+        "Fuel\/Revenue Weight Distance":0.0002675468
+    },
+    "Boeing B737 Max 800":{
+        "Aircraft Designation (ICAO)":"B38M",
+        "Fuel\/Available Seat Distance":0.0268921842,
+        "Fuel\/Revenue Seat Distance":0.0328492167,
+        "Fuel\/Available Weight Distance":0.0002385366,
+        "Fuel\/Revenue Weight Distance":0.0003576812
+    },
+    "Boeing B737 Max 900":{
+        "Aircraft Designation (ICAO)":"B39M",
+        "Fuel\/Available Seat Distance":0.0188385523,
+        "Fuel\/Revenue Seat Distance":0.0226405919,
+        "Fuel\/Available Weight Distance":0.0001596176,
+        "Fuel\/Revenue Weight Distance":0.0002457157
+    },
+    "Boeing B747-8":{
+        "Aircraft Designation (ICAO)":"B748\/B74Y",
+        "Fuel\/Available Seat Distance":4432.8934582575,
+        "Fuel\/Revenue Seat Distance":4432.8934582575,
+        "Fuel\/Available Weight Distance":0.0001515987,
+        "Fuel\/Revenue Weight Distance":0.0002276715
+    },
+    "British Aerospace BAe-146-200":{
+        "Aircraft Designation (ICAO)":"B462",
+        "Fuel\/Available Seat Distance":0.0543514114,
+        "Fuel\/Revenue Seat Distance":0.0946893035,
+        "Fuel\/Available Weight Distance":0.0004742189,
+        "Fuel\/Revenue Weight Distance":0.0010296415
+    },
+    "British Aerospace Jetstream 31":{
+        "Aircraft Designation (ICAO)":"J31",
+        "Fuel\/Available Seat Distance":0.0745188074,
+        "Fuel\/Revenue Seat Distance":0.1119339125,
+        "Fuel\/Available Weight Distance":0.0007591129,
+        "Fuel\/Revenue Weight Distance":0.0012337935
+    },
+    "Canadair (Bombardier) Challlenger 601":{
+        "Aircraft Designation (ICAO)":"CL61",
+        "Fuel\/Available Seat Distance":0.0387699748,
+        "Fuel\/Revenue Seat Distance":0.0636087904,
+        "Fuel\/Available Weight Distance":0.0003232402,
+        "Fuel\/Revenue Weight Distance":0.0006710537
+    },
+    "Canadair CRJ 900":{
+        "Aircraft Designation (ICAO)":"CRJ9",
+        "Fuel\/Available Seat Distance":0.0432036356,
+        "Fuel\/Revenue Seat Distance":0.0551407444,
+        "Fuel\/Available Weight Distance":0.0004074163,
+        "Fuel\/Revenue Weight Distance":0.0006077598
+    },
+    "Canadair RJ-100\/RJ-100ER":{
+        "Aircraft Designation (ICAO)":"CRJ1",
+        "Fuel\/Available Seat Distance":0.0522325094,
+        "Fuel\/Revenue Seat Distance":0.0711260821,
+        "Fuel\/Available Weight Distance":0.000460545,
+        "Fuel\/Revenue Weight Distance":0.000783815
+    },
+    "Canadair RJ-200ER \/RJ-440":{
+        "Aircraft Designation (ICAO)":"CRJ2",
+        "Fuel\/Available Seat Distance":0.0843575578,
+        "Fuel\/Revenue Seat Distance":0.115045692,
+        "Fuel\/Available Weight Distance":0.0007030863,
+        "Fuel\/Revenue Weight Distance":0.0012675379
+    },
+    "Canadair RJ-700":{
+        "Aircraft Designation (ICAO)":"CRJ7",
+        "Fuel\/Available Seat Distance":0.0387359895,
+        "Fuel\/Revenue Seat Distance":0.0518586931,
+        "Fuel\/Available Weight Distance":0.0003325441,
+        "Fuel\/Revenue Weight Distance":0.0005715091
+    },
+    "De Havilland DHC8-100 Dash-8":{
+        "Aircraft Designation (ICAO)":"DH8A",
+        "Fuel\/Available Seat Distance":0.0452911102,
+        "Fuel\/Revenue Seat Distance":0.0750871394,
+        "Fuel\/Available Weight Distance":0.0004277576,
+        "Fuel\/Revenue Weight Distance":0.0008251046
+    },
+    "De Havilland DHC8-200Q Dash-8":{
+        "Aircraft Designation (ICAO)":"DH8B",
+        "Fuel\/Available Seat Distance":null,
+        "Fuel\/Revenue Seat Distance":null,
+        "Fuel\/Available Weight Distance":null,
+        "Fuel\/Revenue Weight Distance":null
+    },
+    "Dornier 328":{
+        "Aircraft Designation (ICAO)":"D328",
+        "Fuel\/Available Seat Distance":0.0813924062,
+        "Fuel\/Revenue Seat Distance":0.156320439,
+        "Fuel\/Available Weight Distance":0.0007556228,
+        "Fuel\/Revenue Weight Distance":0.0017215924
+    },
+    "Embraer 190":{
+        "Aircraft Designation (ICAO)":"E190",
+        "Fuel\/Available Seat Distance":0.0477270333,
+        "Fuel\/Revenue Seat Distance":0.064479362,
+        "Fuel\/Available Weight Distance":0.0004050318,
+        "Fuel\/Revenue Weight Distance":0.0007097925
+    },
+    "Embraer EMB-120 Brasilia":{
+        "Aircraft Designation (ICAO)":"E120",
+        "Fuel\/Available Seat Distance":0.0513007356,
+        "Fuel\/Revenue Seat Distance":0.0877433944,
+        "Fuel\/Available Weight Distance":0.000449382,
+        "Fuel\/Revenue Weight Distance":0.0009669368
+    },
+    "Embraer ERJ-175":{
+        "Aircraft Designation (ICAO)":"E75S",
+        "Fuel\/Available Seat Distance":0.0307951831,
+        "Fuel\/Revenue Seat Distance":0.0445991843,
+        "Fuel\/Available Weight Distance":0.0002775375,
+        "Fuel\/Revenue Weight Distance":0.0004915922
+    },
+    "Embraer-135":{
+        "Aircraft Designation (ICAO)":"E135",
+        "Fuel\/Available Seat Distance":0.0973821387,
+        "Fuel\/Revenue Seat Distance":0.1441877859,
+        "Fuel\/Available Weight Distance":0.0009788211,
+        "Fuel\/Revenue Weight Distance":0.0015884093
+    },
+    "Embraer-140":{
+        "Aircraft Designation (ICAO)":"E140",
+        "Fuel\/Available Seat Distance":0.0464389513,
+        "Fuel\/Revenue Seat Distance":0.0656768751,
+        "Fuel\/Available Weight Distance":0.0004398275,
+        "Fuel\/Revenue Weight Distance":0.000723765
+    },
+    "Embraer-145":{
+        "Aircraft Designation (ICAO)":"E145",
+        "Fuel\/Available Seat Distance":0.0572075328,
+        "Fuel\/Revenue Seat Distance":0.0773332483,
+        "Fuel\/Available Weight Distance":0.0005662528,
+        "Fuel\/Revenue Weight Distance":0.0008520209
+    },
+    "Embraer-Emb-170":{
+        "Aircraft Designation (ICAO)":"E170",
+        "Fuel\/Available Seat Distance":0.0383036643,
+        "Fuel\/Revenue Seat Distance":0.0579259676,
+        "Fuel\/Available Weight Distance":0.0003206824,
+        "Fuel\/Revenue Weight Distance":0.0006378163
+    },
+    "Fokker 100":{
+        "Aircraft Designation (ICAO)":"F100",
+        "Fuel\/Available Seat Distance":0.0493796562,
+        "Fuel\/Revenue Seat Distance":0.0848963533,
+        "Fuel\/Available Weight Distance":0.0004498036,
+        "Fuel\/Revenue Weight Distance":0.0009035333
+    },
+    "Fokker F28-1000 Fellowship":{
+        "Aircraft Designation (ICAO)":"F28",
+        "Fuel\/Available Seat Distance":0.0696592541,
+        "Fuel\/Revenue Seat Distance":0.1155697698,
+        "Fuel\/Available Weight Distance":0.0006581673,
+        "Fuel\/Revenue Weight Distance":0.0012355608
+    },
+    "Fokker F28-4000\/6000 Fellowship":{
+        "Aircraft Designation (ICAO)":"F28",
+        "Fuel\/Available Seat Distance":0.065219669,
+        "Fuel\/Revenue Seat Distance":0.1101847413,
+        "Fuel\/Available Weight Distance":0.000590278,
+        "Fuel\/Revenue Weight Distance":0.0011738037
+    },
+    "Fokker Friendship F-27\/Fairchild F-27\/A\/B\/F\/J":{
+        "Aircraft Designation (ICAO)":"F27",
+        "Fuel\/Available Seat Distance":0.0932615213,
+        "Fuel\/Revenue Seat Distance":0.1764884924,
+        "Fuel\/Available Weight Distance":0.0005399794,
+        "Fuel\/Revenue Weight Distance":0.0017139521
+    },
+    "Gates Learjet Lear-25":{
+        "Aircraft Designation (ICAO)":"LJ25",
+        "Fuel\/Available Seat Distance":0.075665468,
+        "Fuel\/Revenue Seat Distance":0.1123403306,
+        "Fuel\/Available Weight Distance":0.0006848209,
+        "Fuel\/Revenue Weight Distance":0.0011954788
+    },
+    "Gates Learjet Lear-31\/35\/36":{
+        "Aircraft Designation (ICAO)":"LJ31\/LJ35",
+        "Fuel\/Available Seat Distance":0.0455200751,
+        "Fuel\/Revenue Seat Distance":0.0720386422,
+        "Fuel\/Available Weight Distance":0.000410524,
+        "Fuel\/Revenue Weight Distance":0.0007785684
+    },
+    "Lockheed L-1011-1\/100\/200":{
+        "Aircraft Designation (ICAO)":"L101",
+        "Fuel\/Available Seat Distance":0.0360989702,
+        "Fuel\/Revenue Seat Distance":0.059940967,
+        "Fuel\/Available Weight Distance":0.0003443886,
+        "Fuel\/Revenue Weight Distance":0.000600237
+    },
+    "Lockheed L-1011-500 Tristar":{
+        "Aircraft Designation (ICAO)":"L101",
+        "Fuel\/Available Seat Distance":0.0793649291,
+        "Fuel\/Revenue Seat Distance":0.1380769904,
+        "Fuel\/Available Weight Distance":0.0007129248,
+        "Fuel\/Revenue Weight Distance":0.0014095605
+    },
+    "McDonnell Douglas DC-10-10":{
+        "Aircraft Designation (ICAO)":"DC10",
+        "Fuel\/Available Seat Distance":0.038149474,
+        "Fuel\/Revenue Seat Distance":0.0582108296,
+        "Fuel\/Available Weight Distance":0.0002797303,
+        "Fuel\/Revenue Weight Distance":0.0005384059
+    },
+    "McDonnell Douglas DC-10-30":{
+        "Aircraft Designation (ICAO)":"DC10",
+        "Fuel\/Available Seat Distance":0.0405844555,
+        "Fuel\/Revenue Seat Distance":0.0551108232,
+        "Fuel\/Available Weight Distance":0.000272236,
+        "Fuel\/Revenue Weight Distance":0.0004726193
+    },
+    "McDonnell Douglas DC-10-40":{
+        "Aircraft Designation (ICAO)":"DC10",
+        "Fuel\/Available Seat Distance":0.0427453602,
+        "Fuel\/Revenue Seat Distance":0.0625832012,
+        "Fuel\/Available Weight Distance":0.0002926813,
+        "Fuel\/Revenue Weight Distance":0.0005592153
+    },
+    "McDonnell Douglas DC-8-71":{
+        "Aircraft Designation (ICAO)":"DC8R",
+        "Fuel\/Available Seat Distance":0.0359462174,
+        "Fuel\/Revenue Seat Distance":0.0509883272,
+        "Fuel\/Available Weight Distance":0.0003065634,
+        "Fuel\/Revenue Weight Distance":0.0005230341
+    },
+    "McDonnell Douglas DC-9-10":{
+        "Aircraft Designation (ICAO)":"DC91",
+        "Fuel\/Available Seat Distance":0.0679576795,
+        "Fuel\/Revenue Seat Distance":0.1150506437,
+        "Fuel\/Available Weight Distance":0.0006044646,
+        "Fuel\/Revenue Weight Distance":0.0011948736
+    },
+    "McDonnell Douglas DC-9-30":{
+        "Aircraft Designation (ICAO)":"DC93",
+        "Fuel\/Available Seat Distance":0.0529726618,
+        "Fuel\/Revenue Seat Distance":0.0867368151,
+        "Fuel\/Available Weight Distance":0.0004884081,
+        "Fuel\/Revenue Weight Distance":0.0009130277
+    },
+    "McDonnell Douglas DC-9-40":{
+        "Aircraft Designation (ICAO)":"DC94",
+        "Fuel\/Available Seat Distance":0.0508376291,
+        "Fuel\/Revenue Seat Distance":0.0801124093,
+        "Fuel\/Available Weight Distance":0.0004603244,
+        "Fuel\/Revenue Weight Distance":0.0008433488
+    },
+    "McDonnell Douglas DC-9-50":{
+        "Aircraft Designation (ICAO)":"DC95",
+        "Fuel\/Available Seat Distance":0.0486836081,
+        "Fuel\/Revenue Seat Distance":0.0749169319,
+        "Fuel\/Available Weight Distance":0.000431292,
+        "Fuel\/Revenue Weight Distance":0.0007942082
+    },
+    "McDonnell Douglas DC9 Super 80\/MD81\/82\/83\/88":{
+        "Aircraft Designation (ICAO)":"MD80",
+        "Fuel\/Available Seat Distance":0.0359345803,
+        "Fuel\/Revenue Seat Distance":0.0515437568,
+        "Fuel\/Available Weight Distance":0.0003199864,
+        "Fuel\/Revenue Weight Distance":0.0005509836
+    },
+    "McDonnell Douglas DC9 Super 87":{
+        "Aircraft Designation (ICAO)":"MD87",
+        "Fuel\/Available Seat Distance":0.0487636365,
+        "Fuel\/Revenue Seat Distance":0.075712054,
+        "Fuel\/Available Weight Distance":0.0003663591,
+        "Fuel\/Revenue Weight Distance":0.0008226728
+    },
+    "McDonnell Douglas MD-11":{
+        "Aircraft Designation (ICAO)":"MD11",
+        "Fuel\/Available Seat Distance":0.0403149452,
+        "Fuel\/Revenue Seat Distance":0.0788268927,
+        "Fuel\/Available Weight Distance":0.0002335231,
+        "Fuel\/Revenue Weight Distance":0.0006323648
+    },
+    "McDonnell Douglas MD-90":{
+        "Aircraft Designation (ICAO)":"MD90",
+        "Fuel\/Available Seat Distance":0.0294130871,
+        "Fuel\/Revenue Seat Distance":0.0411039181,
+        "Fuel\/Available Weight Distance":0.0002571429,
+        "Fuel\/Revenue Weight Distance":0.0004440464
+    },
+    "Saab-Fairchild 340\/B":{
+        "Aircraft Designation (ICAO)":"SF34",
+        "Fuel\/Available Seat Distance":0.0761706922,
+        "Fuel\/Revenue Seat Distance":0.1223721261,
+        "Fuel\/Available Weight Distance":0.0007634826,
+        "Fuel\/Revenue Weight Distance":0.0013475747
+    }
+}
