@@ -80,6 +80,8 @@ def _process_data_usdot_t2(
     dict_columns_for_renaming = {
         'AVL_SEAT_MILES_320': 'AVL_SEAT_MILES',
         'REV_PAX_MILES_140': 'REV_PAX_MILES',
+        'REV_TON_MILES_240': 'REV_TON_MILES',
+        'AVL_TON_MILES_280': 'AVL_TON_MILES',
         'AIRCRAFT_FUELS_921': 'AIRCRAFT_FUELS',
         'CARRIER_GROUP': 'CARRIER_GROUP',
         'AIRCRAFT_CONFIG': 'AIRCRAFT_CONFIG',
@@ -90,6 +92,8 @@ def _process_data_usdot_t2(
     dict_columns_and_units = {
         'AVL_SEAT_MILES': 'pint[miles]',
         'REV_PAX_MILES': 'pint[miles]',
+        'REV_TON_MILES': 'pint[miles*short_ton]',
+        'AVL_TON_MILES': 'pint[miles*short_ton]',
         'AIRCRAFT_FUELS': 'pint[gallons]',
         'CARRIER_GROUP': 'pint[]',
         'AIRCRAFT_CONFIG': 'pint[]',
@@ -102,16 +106,19 @@ def _process_data_usdot_t2(
     df_t2['AIRCRAFT_FUELS'] = df_t2['AIRCRAFT_FUELS'].pint.to(ureg('liters'))
     df_t2['AVL_SEAT_MILES'] = df_t2['AVL_SEAT_MILES'].pint.to(ureg('km'))
     df_t2['REV_PAX_MILES'] = df_t2['REV_PAX_MILES'].pint.to(ureg('km'))
+    df_t2['REV_TON_MILES'] = df_t2['REV_TON_MILES'].pint.to(ureg('km*kg'))
+    df_t2['AVL_TON_MILES'] = df_t2['AVL_TON_MILES'].pint.to(ureg('km*kg'))
     
     # DATA FILTERING
     
     df_t2 = df_t2.loc[df_t2['CARRIER_GROUP'] == 3] # major carriers only
-    #df_t2 = df_t2.loc[df_t2['AIRCRAFT_CONFIG'] == 1] # passenger aircraft only
     df_t2 = df_t2.drop(columns=['CARRIER_GROUP', 'AIRCRAFT_CONFIG'])
 
     list_numeric_columns = [
         'AVL_SEAT_MILES',
         'REV_PAX_MILES',
+        'REV_TON_MILES',
+        'AVL_TON_MILES',
         'AIRCRAFT_FUELS',
     ]
     df_t2[list_numeric_columns] = df_t2[list_numeric_columns].replace(
@@ -123,6 +130,8 @@ def _process_data_usdot_t2(
 
     df_t2['Fuel/Available Seat Distance'] = df_t2['AIRCRAFT_FUELS']/df_t2['AVL_SEAT_MILES']
     df_t2['Fuel/Revenue Seat Distance'] = df_t2['AIRCRAFT_FUELS']/df_t2['REV_PAX_MILES']
+    df_t2['Fuel/Available Weight Distance'] = df_t2['AIRCRAFT_FUELS']/df_t2['AVL_TON_MILES']
+    df_t2['Fuel/Revenue Weight Distance'] = df_t2['AIRCRAFT_FUELS']/df_t2['REV_TON_MILES']
 
     # SANITY CHECKS
 
@@ -134,6 +143,8 @@ def _process_data_usdot_t2(
         'Aircraft Designation (US DOT Schedule T2)',
         'Fuel/Available Seat Distance',
         'Fuel/Revenue Seat Distance',
+        'Fuel/Available Weight Distance',
+        'Fuel/Revenue Weight Distance',
     ]
     df_t2 = df_t2[list_return_columns]
     df_t2 = df_t2.reset_index(drop=True)
@@ -148,7 +159,10 @@ def _process_data_usdot_t2(
     # UNIT CONVERSION
 
     density_jetfuel = ((775+840)/2) * ureg('g/liter') # https://en.wikipedia.org/wiki/Jet_fuel
-    df_t2['Fuel/Available Seat Distance'] = (df_t2['Fuel/Available Seat Distance'] * density_jetfuel).pint.to('kg/km')
-    df_t2['Fuel/Revenue Seat Distance'] = (df_t2['Fuel/Revenue Seat Distance'] * density_jetfuel).pint.to('kg/km')
+    density_jetfuel = density_jetfuel.to('kg/liter')
+    df_t2['Fuel/Available Seat Distance'] = df_t2['Fuel/Available Seat Distance'] * density_jetfuel
+    df_t2['Fuel/Revenue Seat Distance'] = df_t2['Fuel/Revenue Seat Distance'] * density_jetfuel
+    df_t2['Fuel/Available Weight Distance'] = df_t2['Fuel/Available Weight Distance'] * density_jetfuel
+    df_t2['Fuel/Revenue Weight Distance'] = df_t2['Fuel/Revenue Weight Distance'] * density_jetfuel
 
     return df_t2
