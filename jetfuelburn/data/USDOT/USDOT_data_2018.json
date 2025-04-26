@@ -1,0 +1,218 @@
+{
+    "Airbus Industrie A319":{
+        "Fuel\/Available Seat Distance":0.0280759817,
+        "Fuel\/Revenue Seat Distance":0.0332765204,
+        "Fuel\/Available Weight Distance":0.0002628625,
+        "Fuel\/Revenue Weight Distance":0.0003643492
+    },
+    "Airbus Industrie A320-100\/200":{
+        "Fuel\/Available Seat Distance":0.0273164687,
+        "Fuel\/Revenue Seat Distance":0.0327450062,
+        "Fuel\/Available Weight Distance":0.0002582758,
+        "Fuel\/Revenue Weight Distance":0.0003595984
+    },
+    "Airbus Industrie A320-200n":{
+        "Fuel\/Available Seat Distance":0.0248513568,
+        "Fuel\/Revenue Seat Distance":0.0309749674,
+        "Fuel\/Available Weight Distance":0.0002739393,
+        "Fuel\/Revenue Weight Distance":0.0003414406
+    },
+    "Airbus Industrie A321-200n":{
+        "Fuel\/Available Seat Distance":0.1303318554,
+        "Fuel\/Revenue Seat Distance":0.1919765817,
+        "Fuel\/Available Weight Distance":0.0010637634,
+        "Fuel\/Revenue Weight Distance":0.0021143804
+    },
+    "Airbus Industrie A321\/Lr":{
+        "Fuel\/Available Seat Distance":0.0216330751,
+        "Fuel\/Revenue Seat Distance":0.0256046508,
+        "Fuel\/Available Weight Distance":0.0002011108,
+        "Fuel\/Revenue Weight Distance":0.000280792
+    },
+    "Airbus Industrie A330-200":{
+        "Fuel\/Available Seat Distance":0.0299646616,
+        "Fuel\/Revenue Seat Distance":0.0369349725,
+        "Fuel\/Available Weight Distance":0.0001642642,
+        "Fuel\/Revenue Weight Distance":0.0003236263
+    },
+    "Airbus Industrie A330-300\/333":{
+        "Fuel\/Available Seat Distance":0.0297743551,
+        "Fuel\/Revenue Seat Distance":0.0373642084,
+        "Fuel\/Available Weight Distance":0.0001931658,
+        "Fuel\/Revenue Weight Distance":0.0003492401
+    },
+    "Airbus Industrie A350-900":{
+        "Fuel\/Available Seat Distance":0.027059602,
+        "Fuel\/Revenue Seat Distance":0.0314862942,
+        "Fuel\/Available Weight Distance":0.0001945493,
+        "Fuel\/Revenue Weight Distance":0.0002859505
+    },
+    "B787-800 Dreamliner":{
+        "Fuel\/Available Seat Distance":0.0289471962,
+        "Fuel\/Revenue Seat Distance":0.0345060274,
+        "Fuel\/Available Weight Distance":0.0001683745,
+        "Fuel\/Revenue Weight Distance":0.0002758392
+    },
+    "B787-900 Dreamliner":{
+        "Fuel\/Available Seat Distance":0.0262780182,
+        "Fuel\/Revenue Seat Distance":0.0341132577,
+        "Fuel\/Available Weight Distance":0.0001441541,
+        "Fuel\/Revenue Weight Distance":0.0002517433
+    },
+    "Boeing 717-200":{
+        "Fuel\/Available Seat Distance":0.0409777529,
+        "Fuel\/Revenue Seat Distance":0.0521785302,
+        "Fuel\/Available Weight Distance":0.0003404246,
+        "Fuel\/Revenue Weight Distance":0.0005692142
+    },
+    "Boeing 737-700\/700LR\/Max 7":{
+        "Fuel\/Available Seat Distance":0.0539964455,
+        "Fuel\/Revenue Seat Distance":0.0641660162,
+        "Fuel\/Available Weight Distance":0.0004508362,
+        "Fuel\/Revenue Weight Distance":0.0006986369
+    },
+    "Boeing 737-800":{
+        "Fuel\/Available Seat Distance":0.0225537834,
+        "Fuel\/Revenue Seat Distance":0.0271829109,
+        "Fuel\/Available Weight Distance":0.0002013872,
+        "Fuel\/Revenue Weight Distance":0.0002945562
+    },
+    "Boeing 737-900":{
+        "Fuel\/Available Seat Distance":0.0563620609,
+        "Fuel\/Revenue Seat Distance":0.067383428,
+        "Fuel\/Available Weight Distance":0.0005670147,
+        "Fuel\/Revenue Weight Distance":0.000735425
+    },
+    "Boeing 737-900ER":{
+        "Fuel\/Available Seat Distance":0.0243301889,
+        "Fuel\/Revenue Seat Distance":0.0278517917,
+        "Fuel\/Available Weight Distance":0.0002058084,
+        "Fuel\/Revenue Weight Distance":0.0003017399
+    },
+    "Boeing 747-400":{
+        "Fuel\/Available Seat Distance":10.1588080832,
+        "Fuel\/Revenue Seat Distance":2033.8402009262,
+        "Fuel\/Available Weight Distance":0.0001017135,
+        "Fuel\/Revenue Weight Distance":0.0004150789
+    },
+    "Boeing 757-200":{
+        "Fuel\/Available Seat Distance":0.0273798223,
+        "Fuel\/Revenue Seat Distance":0.0325029959,
+        "Fuel\/Available Weight Distance":0.0002185568,
+        "Fuel\/Revenue Weight Distance":0.0003469351
+    },
+    "Boeing 757-300":{
+        "Fuel\/Available Seat Distance":0.0368964529,
+        "Fuel\/Revenue Seat Distance":0.0530946558,
+        "Fuel\/Available Weight Distance":0.000323444,
+        "Fuel\/Revenue Weight Distance":0.0005629661
+    },
+    "Boeing 767-200\/ER\/EM":{
+        "Fuel\/Available Seat Distance":0.1868159367,
+        "Fuel\/Revenue Seat Distance":2.7166740792,
+        "Fuel\/Available Weight Distance":0.0000960142,
+        "Fuel\/Revenue Weight Distance":0.0007860483
+    },
+    "Boeing 767-300\/300ER":{
+        "Fuel\/Available Seat Distance":0.0313165478,
+        "Fuel\/Revenue Seat Distance":0.0626917982,
+        "Fuel\/Available Weight Distance":0.0001720002,
+        "Fuel\/Revenue Weight Distance":0.000338769
+    },
+    "Boeing 767-400\/ER":{
+        "Fuel\/Available Seat Distance":0.0295467777,
+        "Fuel\/Revenue Seat Distance":0.036125105,
+        "Fuel\/Available Weight Distance":0.0001837061,
+        "Fuel\/Revenue Weight Distance":0.0003185571
+    },
+    "Boeing 777-200ER\/200LR\/233LR":{
+        "Fuel\/Available Seat Distance":0.0310588626,
+        "Fuel\/Revenue Seat Distance":0.0377233965,
+        "Fuel\/Available Weight Distance":0.000191297,
+        "Fuel\/Revenue Weight Distance":0.0003052989
+    },
+    "Boeing 777-300\/300ER\/333ER":{
+        "Fuel\/Available Seat Distance":0.0332504371,
+        "Fuel\/Revenue Seat Distance":0.0422981264,
+        "Fuel\/Available Weight Distance":0.0001777444,
+        "Fuel\/Revenue Weight Distance":0.0003267726
+    },
+    "Boeing 787-10 Dreamliner":{
+        "Fuel\/Available Seat Distance":0.0219745877,
+        "Fuel\/Revenue Seat Distance":0.0292502753,
+        "Fuel\/Available Weight Distance":0.000118584,
+        "Fuel\/Revenue Weight Distance":0.0003019676
+    },
+    "Boeing B737 Max 800":{
+        "Fuel\/Available Seat Distance":0.0227311071,
+        "Fuel\/Revenue Seat Distance":0.0264531838,
+        "Fuel\/Available Weight Distance":0.0002013722,
+        "Fuel\/Revenue Weight Distance":0.0002880128
+    },
+    "Boeing B737 Max 900":{
+        "Fuel\/Available Seat Distance":0.0200474597,
+        "Fuel\/Revenue Seat Distance":0.0222592148,
+        "Fuel\/Available Weight Distance":0.0001681359,
+        "Fuel\/Revenue Weight Distance":0.0002438804
+    },
+    "Canadair CRJ 900":{
+        "Fuel\/Available Seat Distance":0.2106734506,
+        "Fuel\/Revenue Seat Distance":0.2675652801,
+        "Fuel\/Available Weight Distance":0.0022755505,
+        "Fuel\/Revenue Weight Distance":0.0029493937
+    },
+    "Canadair RJ-200ER \/RJ-440":{
+        "Fuel\/Available Seat Distance":0.0455374979,
+        "Fuel\/Revenue Seat Distance":0.0575941955,
+        "Fuel\/Available Weight Distance":0.0003965274,
+        "Fuel\/Revenue Weight Distance":0.0006348673
+    },
+    "Canadair RJ-700":{
+        "Fuel\/Available Seat Distance":0.0477516927,
+        "Fuel\/Revenue Seat Distance":0.0625746168,
+        "Fuel\/Available Weight Distance":0.0004050375,
+        "Fuel\/Revenue Weight Distance":0.0006897462
+    },
+    "Embraer 190":{
+        "Fuel\/Available Seat Distance":0.0563176812,
+        "Fuel\/Revenue Seat Distance":0.0716866607,
+        "Fuel\/Available Weight Distance":0.0004763827,
+        "Fuel\/Revenue Weight Distance":0.000789761
+    },
+    "Embraer ERJ-175":{
+        "Fuel\/Available Seat Distance":0.0304235657,
+        "Fuel\/Revenue Seat Distance":0.039200891,
+        "Fuel\/Available Weight Distance":0.000306274,
+        "Fuel\/Revenue Weight Distance":0.0004320883
+    },
+    "Embraer-135":{
+        "Fuel\/Available Seat Distance":0.2572237049,
+        "Fuel\/Revenue Seat Distance":0.4095992594,
+        "Fuel\/Available Weight Distance":0.0028354149,
+        "Fuel\/Revenue Weight Distance":0.0045150801
+    },
+    "Embraer-140":{
+        "Fuel\/Available Seat Distance":0.0507548172,
+        "Fuel\/Revenue Seat Distance":0.0664154114,
+        "Fuel\/Available Weight Distance":0.0004879467,
+        "Fuel\/Revenue Weight Distance":0.0007319238
+    },
+    "Embraer-145":{
+        "Fuel\/Available Seat Distance":0.1088972585,
+        "Fuel\/Revenue Seat Distance":0.1380684302,
+        "Fuel\/Available Weight Distance":0.0011532449,
+        "Fuel\/Revenue Weight Distance":0.0015217859
+    },
+    "McDonnell Douglas DC9 Super 80\/MD81\/82\/83\/88":{
+        "Fuel\/Available Seat Distance":0.037273961,
+        "Fuel\/Revenue Seat Distance":0.0452941077,
+        "Fuel\/Available Weight Distance":0.0003593999,
+        "Fuel\/Revenue Weight Distance":0.0004954166
+    },
+    "McDonnell Douglas MD-90":{
+        "Fuel\/Available Seat Distance":0.0315536167,
+        "Fuel\/Revenue Seat Distance":0.0374518646,
+        "Fuel\/Available Weight Distance":0.0002876912,
+        "Fuel\/Revenue Weight Distance":0.0004085992
+    }
+}
