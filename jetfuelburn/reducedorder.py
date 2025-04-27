@@ -1,5 +1,3 @@
-# %%
-
 import csv
 import json
 import math
@@ -63,8 +61,8 @@ class yanto_etal:
     Neither assuming that the axis multiplier `1e4` nor the unit `nm` (sic!) are incorrect explains this issue.
     Figure 5 was instead used to test the implementation of the method.
 
-    Examples
-    --------
+    Example
+    -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
@@ -135,7 +133,7 @@ class yanto_etal:
         acft: str,
         R: float,
         PL: float,
-    ) -> ureg.Quantity:
+    ) -> float:
         """
         Given an ICAO aircraft designator, mission range and payload mass, calculates the fuel burned.
 
@@ -227,8 +225,8 @@ class lee_etal:
     # https://pawamoy.github.io/markdown-exec/gallery/#with-plotly
     ```
 
-    Examples
-    --------
+    Example
+    -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
@@ -309,7 +307,7 @@ class lee_etal:
         h: float,
         V: float,
         d: float,
-    ) -> dict[ureg.Quantity, ureg.Quantity]:
+    ) -> dict[float, float]:
         """
         Given an ICAO aircraft designator, mission range and payload mass, calculates the fuel burned.
 
@@ -487,8 +485,8 @@ class seymour_etal:
     doi:[10.1016/j.trd.2020.102528](https://doi.org/10.1016/j.trd.2020.102528)
     - [FEAT Model GitHub Repository](https://github.com/kwdseymour/FEAT/tree/master)
     
-    Examples
-    --------
+    Example
+    -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
@@ -653,7 +651,7 @@ class seymour_etal:
     def calculate_fuel_consumption(
         acft: str,
         R: float,
-    ) -> ureg.Quantity:
+    ) -> float:
         """
         Given an ICAO aircraft designator and mission range, calculates the fuel burned.
         
@@ -767,8 +765,8 @@ class aim2015:
     - [AIM2015 documentation (v11)](https://web.archive.org/web/20231001131622/https://www.atslab.org/wp-content/uploads/2023/02/AIM-2015-Documentation-v11.pdf)
     - [AIM2015 information in the EU MIDAS system](https://web.jrc.ec.europa.eu/policy-model-inventory/explore/models/model-aim/)
 
-    Examples
-    --------
+    Example
+    -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
@@ -809,11 +807,11 @@ class aim2015:
     )
     def calculate_fuel_consumption(
         acft_size_class: int,
-        D_climb: ureg.Quantity,
-        D_cruise: ureg.Quantity,
-        D_descent: ureg.Quantity,
-        PL: ureg.Quantity,
-    ) -> dict[ureg.Quantity, ureg.Quantity, ureg.Quantity]:
+        D_climb: float,
+        D_cruise: float,
+        D_descent: float,
+        PL: float,
+    ) -> dict[float, float, float]:
         """
         Given an aircraft size class integer, payload and distances for climb, cruise, and descent, calculates the fuel burned during flight.
 
@@ -917,8 +915,8 @@ class eea_emission_inventory_2009:
     ----------
     - [EMEP/EEA air pollutant emission inventory guidebook - 2009, Part B, Section 1 (Energy), Subsection 1.A.3.a (`Aviation_annex.zip`)](https://www.eea.europa.eu/en/analysis/publications/emep-eea-emission-inventory-guidebook-2009)
 
-    Examples
-    --------
+    Example
+    -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
@@ -949,7 +947,7 @@ class eea_emission_inventory_2009:
     )
     def calculate_fuel_consumption(
         acft: str,
-        R: ureg.Quantity,
+        R: float,
     ) -> dict:
         r"""
         Given an aircraft name and range, calculates the fuel burned during flight.
@@ -1097,8 +1095,8 @@ class myclimate:
     ----------
     [myClimate Flight Emissions Calculator Calculation Principles](https://www.myclimate.org/en/information/about-myclimate/downloads/flight-emission-calculator/)
 
-    Examples
-    --------
+    Example
+    -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg

@@ -22,7 +22,7 @@ def calculate_fuel_consumption_payload_range(
     payload_point_C: float,
     range_point_C: float,
     range_point_D: float,
-) -> dict[ureg.Quantity, ureg.Quantity]:
+) -> dict[float, float]:
     r"""
     Given aircraft performance parameters from a payload/range diagram and a flight distance $d$,
     calculates the required fuel mass $m_F$ and payload mass $m_{PL}$ for a given mission.
@@ -96,8 +96,8 @@ def calculate_fuel_consumption_payload_range(
     ValueError
         If the distance exceeds the maximum range of the aircraft as per the payload-range diagram.
 
-    Examples
-    --------
+    Example
+    -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg

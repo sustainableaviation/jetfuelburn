@@ -70,8 +70,8 @@ def _calculate_atmospheric_conditions(altitude: float) -> dict[float, float]:
         'temperature' : ureg.Quantity
             Air temperature [°C]
 
-    Examples
-    --------
+    Example
+    -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
@@ -146,8 +146,8 @@ def _calculate_dynamic_pressure(
     float
         Dynamic pressure [Pa]
 
-    Examples
-    --------
+    Example
+    -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
@@ -205,8 +205,8 @@ def _calculate_aircraft_velocity(
     float
         Aircraft velocity [km/h]
 
-    Examples
-    --------
+    Example
+    -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
