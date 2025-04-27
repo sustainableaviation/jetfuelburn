@@ -88,8 +88,8 @@ def calculate_fuel_consumption_range_equation(
     float
         Required fuel mass [kg]
 
-    Examples
-    --------
+    Example
+    -------
     ```pyodide install='jetfuelburn' assets='no'
     from jetfuelburn.breguet import calculate_fuel_consumption_range_equation
     calculate_fuel_consumption_range_equation(

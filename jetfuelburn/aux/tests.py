@@ -3,8 +3,8 @@ import pytest
 
 
 def approx_with_units(
-    value_check: ureg.Quantity,
-    value_expected: ureg.Quantity,
+    value_check,
+    value_expected,
     rel=None,
     abs=None
 ) -> bool:

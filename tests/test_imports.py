@@ -13,11 +13,13 @@ def test_diagrams():
 
 
 def test_averages():
-    import jetfuelburn.averages
+    import jetfuelburn.statistics
 
-    from jetfuelburn.averages import myclimate
-    assert callable(myclimate.available_aircraft)
-    assert callable(myclimate.calculate_fuel_consumption)
+    from jetfuelburn.statistics import usdot
+    assert callable(usdot.available_years)
+    assert callable(usdot.available_aircraft)
+    assert callable(usdot.calculate_fuel_consumption_per_seat)
+    assert callable(usdot.calculate_fuel_consumption_per_weight)
 
 
 def test_reducedorder():
@@ -39,6 +41,9 @@ def test_reducedorder():
     assert callable(aim2015.available_aircraft)
     assert callable(aim2015.calculate_fuel_consumption)
 
+    from jetfuelburn.reducedorder import myclimate
+    assert callable(myclimate.available_aircraft)
+    assert callable(myclimate.calculate_fuel_consumption)
 
 def test_combined():
     from jetfuelburn.combined import calculate_fuel_consumption_combined_model
