@@ -1,6 +1,6 @@
 # %%
 from jetfuelburn import ureg
-from jetfuelburn.averages import myclimate
+from jetfuelburn.statistics import myclimate
 from jetfuelburn.reducedorder import seymour_etal
 from importlib import resources
 import plotly.graph_objects as go

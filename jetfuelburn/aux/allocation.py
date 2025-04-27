@@ -109,8 +109,8 @@ def footprint_allocation_by_area(
     dict[float, float, float, float]
         Fuel burn per passenger per flight in economy, premium economy, business and first class.
 
-    Examples
-    --------
+    Example
+    -------
     ```pyodide install="jetfuelburn"
     from jetfuelburn import ureg
     from jetfuelburn.aux.allocation import footprint_allocation_by_area
