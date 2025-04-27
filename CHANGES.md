@@ -3,6 +3,12 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## `0.0.9` (27. April 2025)
+
+- Added US Department of Transportation (USDOT) Statistical Data (Form 41 Schedule T-100 Table T2) ([#14](https://github.com/sustainableaviation/jetfuelburn/issues/14)).
+- Fixed `Example` sections of function/class docstrings (were named `Examples` previously).
+- Moved `jetfuelburn.averages.myclimate` to `jetfuelburn.reducedorder.myclimate`.
+
 ## `0.0.8` (16. April 2025)
 
 - Added MyClimate Average/Statistical Model ([#10](https://github.com/sustainableaviation/jetfuelburn/issues/10)).

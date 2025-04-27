@@ -6,7 +6,8 @@ from jetfuelburn.reducedorder import (
     aim2015,
     seymour_etal,
     lee_etal,
-    eea_emission_inventory_2009
+    eea_emission_inventory_2009,
+    myclimate
 )
 from .fixtures.reducedorder import (
     fixture_yanto_B739,
@@ -14,6 +15,7 @@ from .fixtures.reducedorder import (
     fixture_seymour_B738,
     fixture_lee_B732,
     fixture_eea_A320,
+    fixture_myclimate_standard
 )
 
 
@@ -77,6 +79,22 @@ def test_eea2009(fixture_eea_A320):
         )
         assert approx_with_units(
             value_check=calculated_output['mass_fuel_total'].to('kg'),
+            value_expected=expected_output.to('kg'),
+            rel=0.075
+        )
+
+
+def test_myclimate_standard(fixture_myclimate_standard):
+    make_case, params = fixture_myclimate_standard
+
+    for x in params:
+        input_data, expected_output = make_case(x)
+        calculated_output = myclimate.calculate_fuel_consumption(
+            acft='standard aircraft',
+            x=input_data['x'],
+        )
+        assert approx_with_units(
+            value_check=calculated_output,
             value_expected=expected_output.to('kg'),
             rel=0.075
         )

@@ -31,8 +31,6 @@ classifiers = [
 requires-python = ">=3.9"
 dependencies = [
     "pint",
-    "Pint-Pandas",
-    "pandas",
 ]
 
 [project.urls]

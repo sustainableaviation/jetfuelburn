@@ -92,9 +92,25 @@ class usdot():
     
     - [US DOT: BTS: Air Carrier Summary Data (Form 41 and 298C Summary Data)](https://www.transtats.bts.gov/Tables.asp?QO_VQ=EGD&QO)
     - [US DOT: BTS: Air Carrier Summary Data: T2 (U.S. Air Carrier Traffic And Capacity Statistics by Aircraft Type)](https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FIH)
+
+    Example
+    --------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.statistics import usdot
+    usdot.available_years()
+    usdot.available_aircraft(userdot.available_years()[0])
+    usdot.calculate_fuel_consumption_per_weight(
+        year=2023,
+        acft='B787-800 Dreamliner',
+        R=1000 * ureg.nmi,
+        W=1000 * ureg.kg
+    )
+    ```
     """
 
-    _years = [2023]
+    _years = [2013, 2018, 2024]
     _aircraft_data = {}
     for year in _years:
         with resources.open_text("jetfuelburn.data.USDOT", f"USDOT_data_{year}.json") as file:
@@ -127,6 +143,52 @@ class usdot():
         W: float,
     ) -> dict:
         r"""
+        Given an aircraft name, range and payload weight, calculates the fuel burned during flight.
+
+        Data is based on averages of fuel consumption per weight-distance flown by specific aircraft types,
+        in specific years, reported by "large certified air carriers" to the US Department of Transport (US DOT):
+
+        $$
+        f = \frac{F(t=\text{year})}{WD(t=\text{year})} * R * W
+        $$
+
+        where:
+
+        | Symbol | Units   | Description                                                                 |
+        | ------ | ------- | --------------------------------------------------------------------------- |
+        | $f$    | [kg]    | Fuel burned during flight                                                   |
+        | $F$    | [kg]    | Total fuel consumption for a specific aircraft type in a specific year      |
+        | $WD$   | [kg*km] | Total weight-distance flown on a specific aircraft type in a specific year  |
+        | $R$    | [km]    | Range of the flight                                                         |
+        | $W$    | [kg]    | Payload weight of the flight                                                |
+
+        Warnings
+        --------
+        Aircraft types here are given as full-length strings, e.g. "Boeing 737-800", instead of the ususal ICAO designator "B738".
+        These are taken directly from the `L_AIRCRAFT_TYPE.csv` US DOT lookup table file.
+
+        Parameters
+        ----------
+        year : int
+            Year of the data to be used for the calculation.
+        acft : str
+            Aircraft type to be used for the calculation.
+        R : pint.Quantity
+            Range of the flight.
+        W : pint.Quantity
+            Payload weight of the flight.
+
+        Returns
+        -------
+        pint.Quantity
+            Fuel burned during flight.
+
+        Raises
+        ------
+        ValueError
+            If the range or weight is negative.  
+            If the year is not available in the model.  
+            If the aircraft type is not available in the model for the given year.
         """
         if R.magnitude < 0 or W.magnitude < 0:
             raise ValueError(f"Range and/or weight must not be negative.")
@@ -159,6 +221,49 @@ class usdot():
         R: float,
     ) -> dict:
         r"""
+        Given an aircraft name and range, calculates the fuel burned during flight per passenger.
+
+        Data is based on averages of fuel consumption per passenger-distance flown by specific aircraft types,
+        in specific years, reported by "large certified air carriers" to the US Department of Transport (US DOT):
+
+        $$
+        f = \frac{F(t=\text{year})}{paxD(t=\text{year})} * R
+        $$
+
+        where:
+
+        | Symbol | Units   | Description                                                                   |
+        | ------ | ------- | ----------------------------------------------------------------------------- |
+        | $f$    | [kg]    | Fuel burned during flight                                                     |
+        | $F$    | [kg]    | Total fuel consumption for a specific aircraft type in a specific year        |
+        | $paxD$ | [kg*km] | Total passenger-distance flown on a specific aircraft type in a specific year |
+        | $R$    | [km]    | Range of the flight                                                           |
+
+        Warnings
+        --------
+        Aircraft types here are given as full-length strings, e.g. "Boeing 737-800", instead of the ususal ICAO designator "B738".
+        These are taken directly from the `L_AIRCRAFT_TYPE.csv` US DOT lookup table file.
+
+        Parameters
+        ----------
+        year : int
+            Year of the data to be used for the calculation.
+        acft : str
+            Aircraft type to be used for the calculation.
+        R : pint.Quantity
+            Range of the flight.
+
+        Returns
+        -------
+        pint.Quantity
+            Fuel burned per passenger during flight.
+
+        Raises
+        ------
+        ValueError
+            If the range is negative.  
+            If the year is not available in the model.  
+            If the aircraft type is not available in the model for the given year.
         """
         if R.magnitude < 0:
             raise ValueError(f"Range must not be negative.")
