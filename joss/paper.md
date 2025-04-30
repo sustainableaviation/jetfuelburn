@@ -54,11 +54,11 @@ If some basic aircraft performance parameters are known, the Breguet range equat
 
 ## Reduced Order Models
 
-If access to propriatary aircraft performance simulation software is available, fuel burn for specific aircraft missions can be simulated with high resolution. However, these simulations can be computationally expensive. Reduced order models instead use regression to extract a simplified model from a large set of high resolution simulation results. While the simulations may include many aircraft and mission parameters, reduced order models only require a few key parameter, such as payload and range. Publications implemented in the initial version of `jetfuelburn` include young2017performance][@dray2019aim2015][@seymour2020fuel][@yanto2017efficient][@lee2010closed].
+If access to propriatary aircraft performance simulation software is available, fuel burn for specific aircraft missions can be simulated with high resolution. However, these simulations can be computationally expensive. Reduced order models instead use regression to extract a simplified model from a large set of high resolution simulation results. While the simulations may include many aircraft and mission parameters, reduced order models only require a few key parameter, such as payload and range. Publications implemented in the initial version of `jetfuelburn` include [@young2017performance][@dray2019aim2015][@seymour2020fuel][@yanto2017efficient][@lee2010closed].
 
 ## Statistical Models
 
-If only a statistical average of fuel burn per passenger-kilometer or ton-kilometer is required, data from the US Department of Transportation (DOT) can be used. All major air carriers are required to report data on an annual basis. The `jetfuelburn` package includes a method for this purpose.
+If only a statistical average of fuel burn per passenger-kilometer or ton-kilometer is required, data from the US Department of Transportation (DOT) can be used ("Form 41, Schedule T-100, Table T2"). The `jetfuelburn` package includes a method for this purpose.
 
 # Auxiliary Functions
 
