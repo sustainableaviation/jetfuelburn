@@ -4,7 +4,9 @@ tags:
   - Python
   - aviation
   - efficiency
+  - air transport
   - fuel burn
+  - fuel consumption
   - emissions
   - life-cycle assessment
 authors:
@@ -12,16 +14,12 @@ authors:
     orcid: 0000-0003-4859-2650
     equal-contrib: false
     affiliation: "1, 2" # (Multiple affiliations must be quoted)
-  - name: Russell McKenna
-    equal-contrib: false # (This is how you can denote equal contributions between multiple authors)
-    orcid: 0000-0001-6758-482X
-    affiliation: "1, 2"
 affiliations:
  - name: Laboratory for Energy Systems Analysis, PSI Centers for Nuclear Engineering \& Sciences and Energy \& Environmental Sciences, Villigen, Switzerland
    index: 1
  - name: Chair of Energy Systems Analysis, Institute of Energy and Process Engineering, Department of Mechanical and Process Engineering, ETH Zurich, Zurich, Switzerland
    index: 2
-date: 14 March 2025
+date: 01 May 2025
 bibliography: paper.bib
 
 ---
