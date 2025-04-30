@@ -1,5 +1,5 @@
 from jetfuelburn import ureg
-from jetfuelburn.breguet import calculate_fuel_consumption_based_on_breguet_range_equation
+from jetfuelburn.breguet import calculate_fuel_consumption_range_equation
 
 
 @ureg.check(
@@ -40,8 +40,6 @@ def calculate_fuel_consumption_combined_model(
     Given aircraft performance parameters, payload, climb/descent segment information and a flight distances,
     calculates the required fuel mass $m_F$ for a given mission.
 
-    _extended_summary_
-
     ![Diagram](../_static/combined.svg)
 
     For `dict_climb_segments`, only 'takeoff' is required; other segments are optional.
@@ -60,6 +58,7 @@ def calculate_fuel_consumption_combined_model(
         'approach': <flight_segment_dict>,
         (...)
     }
+    ```
 
     Each `flight_segment_dict` must contain a time key-value pair and either an absolute
     `fuel_flow_per_engine` value-pair or a relative `fuel_flow_per_engine_relative_to_takeoff` value-pair.
@@ -94,23 +93,38 @@ def calculate_fuel_consumption_combined_model(
     in Annex 16 to the Convention on Civil Aviation, "Environmental Protection", Volume II - Aircraft Engine Emissions, 
     Fourth Edition, July 2017
 
-
     Parameters
     ----------
     payload : float
         Aircraft payload [mass]
-    fuel_flow_takeoff : float
+    oew : float
+        Aircraft operating empty weight [mass]
+    number_of_engines : int
+        Number of engines on the aircraft [unitless]
+    fuel_flow_per_engine_idle : float
+        Fuel flow during taxi (eg. from ICAO Aircraft Engine Emissions Databank) [mass/time]
+    fuel_flow_per_engine_takeoff : float
         Fuel flow during takeoff (eg. from ICAO Aircraft Engine Emissions Databank) [mass/time]
+    speed_cruise : float
+        Cruise speed [speed]
+    tsfc_cruise : float
+        Cruise TSFC [time/mass]
     lift_to_drag : float
         Aircraft cruise lift-to-Drag ratio [dimensionless]
-    climb_segment_dict : dict
-        Dictionary of climb segment information
-    descent_segment_dict : dict
-        Dictionary of descent segment information
+    dict_climb_segments_origin_to_destination : dict
+        Dictionary of climb segment information (origin to destination)
+    dict_descent_segments_origin_to_destination : dict
+        Dictionary of descent segment information (origin to destination)
     R_cruise_origin_to_destination : float
-        Cruise distance from origin to destination (can be zero) [length]
+        Cruise distance (origin to destination, can be zero) [length]
+    time_taxi : float
+        Time spent taxiing [time]
+    dict_climb_segments_destination_to_alternate : dict
+        Dictionary of climb segment information (destination to alternate)
+    dict_descent_segments_destination_to_alternate : dict
+        Dictionary of descent segment information (destination to alternate)
     R_cruise_destination_to_alternate : float
-        Cruise distance from destination to alternate (can be zero) [length]
+        Cruise distance (destination to alternate ,can be zero) [length]
 
     Returns
     -------
@@ -172,7 +186,7 @@ def calculate_fuel_consumption_combined_model(
 
     m_f_taxi = fuel_flow_per_engine_idle * number_of_engines * time_taxi
 
-    m_f_final_reserve = calculate_fuel_consumption_based_on_breguet_range_equation(
+    m_f_final_reserve = calculate_fuel_consumption_range_equation(
         R=(speed_cruise * 30 * ureg.min).to('km'),
         LD=lift_to_drag,
         m_after_cruise=(oew + payload),
@@ -211,7 +225,7 @@ def calculate_fuel_consumption_combined_model(
             number_of_engines
         )
 
-    m_f_cruise_destination_to_alternate = calculate_fuel_consumption_based_on_breguet_range_equation(
+    m_f_cruise_destination_to_alternate = calculate_fuel_consumption_range_equation(
         R=R_cruise_destination_to_alternate,
         LD=lift_to_drag,
         m_after_cruise=(
@@ -254,7 +268,7 @@ def calculate_fuel_consumption_combined_model(
         number_of_engines
     )
 
-    m_f_cruise_origin_to_destination = calculate_fuel_consumption_based_on_breguet_range_equation(
+    m_f_cruise_origin_to_destination = calculate_fuel_consumption_range_equation(
         R=R_cruise_origin_to_destination,
         LD=lift_to_drag,
         m_after_cruise=(

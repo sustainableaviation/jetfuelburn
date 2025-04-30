@@ -12,7 +12,7 @@ from jetfuelburn import ureg
     '[length]',
     '[length]',
 )
-def calculate_fuel_consumption_based_on_payload_range(
+def calculate_fuel_consumption_payload_range(
     d: float,
     oew: float,
     mtow: float,
@@ -22,7 +22,7 @@ def calculate_fuel_consumption_based_on_payload_range(
     payload_point_C: float,
     range_point_C: float,
     range_point_D: float,
-) -> dict[ureg.Quantity, ureg.Quantity]:
+) -> dict[float, float]:
     r"""
     Given aircraft performance parameters from a payload/range diagram and a flight distance $d$,
     calculates the required fuel mass $m_F$ and payload mass $m_{PL}$ for a given mission.
@@ -66,16 +66,18 @@ def calculate_fuel_consumption_based_on_payload_range(
         Operating Empty Weight (OEW) of the aircraft [mass]
     mtow : float
         Maximum Takeoff Weight (MTOW) of the aircraft [mass]
-    payload_point_B : float
-        Payload mass at point A [mass]
-    range_point_B : float
+    range_point_A : float
         Range at point A [length]
-    payload_point_C : float
+    payload_point_B : float
         Payload mass at point B [mass]
-    range_point_C : float
+    range_point_B : float
         Range at point B [length]
-    range_point_D : float
+    payload_point_C : float
+        Payload mass at point C [mass]
+    range_point_C : float
         Range at point C [length]
+    range_point_D : float
+        Range at point D [length]
 
     Returns
     -------
@@ -94,11 +96,13 @@ def calculate_fuel_consumption_based_on_payload_range(
     ValueError
         If the distance exceeds the maximum range of the aircraft as per the payload-range diagram.
 
-    Examples
-    --------
-    ```pyodide install='jetfuelburn' assets='no'
-    from jetfuelburn.diagrams import calculate_fuel_consumption_based_on_payload_range
-    calculate_fuel_consumption_based_on_payload_range(
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.diagrams import calculate_fuel_consumption_payload_range
+    calculate_fuel_consumption_payload_range(
         d=2000*ureg.nmi,
         oew=142.4*ureg.metric_ton,
         mtow=280*ureg.metric_ton,

@@ -6,6 +6,10 @@ def fixture_aim2015_B787():
     """
     Fixture returning a factory function to generate test cases.
 
+    The `cases` dictionary contains:
+    - `key`: range [km]
+    - `value`: expected value for calculated fuel burn [kg]
+
     Notes
     -----
     - We assume: "(...) 95 kg for a passenger with luggage and an average of 4500 kg hold freight." - P.97, Dray et al. (2019)
@@ -45,6 +49,10 @@ def fixture_aim2015_B787():
 def fixture_seymour_B738():
     """
     Fixture returning a factory function to generate test cases.
+
+    The `cases` dictionary contains:
+    - `key`: range [km]
+    - `value`: expected value for calculated fuel burn [kg]
     
     See Also
     --------
@@ -74,8 +82,13 @@ def fixture_seymour_B738():
 
 @pytest.fixture(scope="module")
 def fixture_yanto_B739():
+
     """
     Fixture returning a factory function to generate test cases.
+
+    The `cases` dictionary contains:
+    - `key`: range [km]
+    - `value`: expected value for calculated fuel burn [kg]
     
     See Also
     --------
@@ -108,6 +121,10 @@ def fixture_yanto_B739():
 def fixture_lee_B732():
     """
     Fixture returning a factory function to generate test cases.
+
+    The `cases` dictionary contains:
+    - `key`: range [km]
+    - `value`: expected value for calculated fuel burn [kg]
     
     See Also
     --------
@@ -143,4 +160,83 @@ def fixture_lee_B732():
         expected_output = cases[d]
         return input_data, expected_output
     
+    return _make_case, list(cases.keys())
+
+@pytest.fixture(scope="module")
+def fixture_eea_A320():
+    """
+    Fixture returning a factory function to generate test cases.
+
+    The `cases` dictionary contains:
+    - `key`: range [km]
+    - `value`: expected value for calculated fuel burn [kg] ("total" segment only!)
+    
+    See Also
+    --------
+    [Pytest Documentation "Factories as Fixtures"](https://docs.pytest.org/en/stable/how-to/fixtures.html#factories-as-fixtures)
+
+    References
+    ----------
+    [EMEP/EEA air pollutant emission inventory guidebook - 2009, Part B, Section 1 (Energy), Subsection 1.A.3.a (`Aviation_annex.zip`)](https://www.eea.europa.eu/en/analysis/publications/emep-eea-emission-inventory-guidebook-2009)
+    """
+    base_data = {
+        'acft': 'A320',
+    }
+
+    cases = {
+        1000 * ureg.nmi: 6027.22755694583 * ureg.kg,
+        1300 * ureg.nmi: 7547.557937 * ureg.kg,
+    }
+
+    def _make_case(R):
+        if R not in cases:
+            raise ValueError(f"No expected output defined for R={R}")
+        input_data = base_data | {'R': R}
+        expected_output = cases[R]
+        return input_data, expected_output
+    
+    return _make_case, list(cases.keys())
+
+
+@pytest.fixture(scope="module")
+def fixture_myclimate_standard():
+    """
+    Fixture returning a factory function to generate test cases for myclimate A320.
+
+    The `cases` dictionary contains:
+    - `key`: distance [km]
+    - `value`: expected value for calculated fuel burn [kg]
+
+    Notes
+    -----
+    Expected values are computed using the myclimate formula for A320:
+    fuel = 0.00016 * x^2 + 1.454 * x + 1531.722, where x is in km.
+    Fuel burn includes both cruise and LTO phases.
+    Distances are limited to <= 2500 km for A320, as per the method's restrictions.
+
+    See Also
+    --------
+    [Pytest Documentation "Factories as Fixtures"](https://docs.pytest.org/en/stable/how-to/fixtures.html#factories-as-fixtures)
+
+    xeferences
+    ----------
+    [myClimate Flight Emissions Calculator Calculation Principles](https://www.myclimate.org/en/information/about-myclimate/downloads/flight-emission-calculator/)
+    """
+    base_data = {
+        'acft': 'A320',
+    }
+
+    cases = {
+        1000 * ureg.km: 4040 * ureg.kg,
+        2000 * ureg.km: 9100 * ureg.kg,
+        2500 * ureg.km: 13750 * ureg.kg,
+    }
+
+    def _make_case(x):
+        if x not in cases:
+            raise ValueError(f"No expected output defined for x={x}")
+        input_data = base_data | {'x': x}
+        expected_output = cases[x]
+        return input_data, expected_output
+
     return _make_case, list(cases.keys())

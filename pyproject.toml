@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68.0"]
+requires = ["setuptools>=75.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -10,7 +10,7 @@ authors = [
 maintainers = [
   { name="Michael Weinold", email="michaelphilippweinold+jetfuelburn@gmail.com" }
 ]
-description = "Python package for calculating fuel burn of commercial aircraft."
+description = "A Python package for calculating fuel burn of commercial aircraft."
 readme = "README.md"
 license = {text = "MIT"}
 dynamic = ["version"]
@@ -30,7 +30,7 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "pint"
+    "pint",
 ]
 
 [project.urls]
@@ -50,13 +50,17 @@ testing = [
 [tool.setuptools]
 include-package-data = true
 packages = [
-  "jetfuelburn",
-  "jetfuelburn.aux"
+    "jetfuelburn",
+    "jetfuelburn.aux",
+    "jetfuelburn.data"
 ]
+
+[tool.setuptools.package-data]
+"jetfuelburn.data" = ["**/*.csv", "**/*.json"]
 
 [tool.setuptools.dynamic]
 version = {attr = "jetfuelburn.__version__"} 
 readme = {file = "README.md"}
 
 [tool.pytest.ini_options]
-testpaths = ["tests/*.py"]
+testpaths = ["tests/*.py"] 

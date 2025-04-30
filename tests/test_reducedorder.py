@@ -1,12 +1,21 @@
 import pytest
 
 from jetfuelburn.aux.tests import approx_with_units
-from jetfuelburn.reducedorder import yanto_etal, aim2015, seymour_etal, lee_etal
+from jetfuelburn.reducedorder import (
+    yanto_etal,
+    aim2015,
+    seymour_etal,
+    lee_etal,
+    eea_emission_inventory_2009,
+    myclimate
+)
 from .fixtures.reducedorder import (
     fixture_yanto_B739,
     fixture_aim2015_B787,
     fixture_seymour_B738,
-    fixture_lee_B732
+    fixture_lee_B732,
+    fixture_eea_A320,
+    fixture_myclimate_standard
 )
 
 
@@ -47,11 +56,42 @@ def test_aim2015(fixture_aim2015_B787):
 def test_seymour(fixture_seymour_B738):
     make_case, ranges = fixture_seymour_B738
     
-    for r in ranges:
-        input_data, expected_output = make_case(r)
+    for R in ranges:
+        input_data, expected_output = make_case(R)
         calculated_output = seymour_etal.calculate_fuel_consumption(
             acft=input_data['acft'],
             R=input_data['R'],
+        )
+        assert approx_with_units(
+            value_check=calculated_output,
+            value_expected=expected_output.to('kg'),
+            rel=0.075
+        )
+
+def test_eea2009(fixture_eea_A320):
+    make_case, ranges = fixture_eea_A320
+    
+    for R in ranges:
+        input_data, expected_output = make_case(R)
+        calculated_output = eea_emission_inventory_2009.calculate_fuel_consumption(
+            acft=input_data['acft'],
+            R=input_data['R'],
+        )
+        assert approx_with_units(
+            value_check=calculated_output['mass_fuel_total'].to('kg'),
+            value_expected=expected_output.to('kg'),
+            rel=0.075
+        )
+
+
+def test_myclimate_standard(fixture_myclimate_standard):
+    make_case, params = fixture_myclimate_standard
+
+    for x in params:
+        input_data, expected_output = make_case(x)
+        calculated_output = myclimate.calculate_fuel_consumption(
+            acft='standard aircraft',
+            x=input_data['x'],
         )
         assert approx_with_units(
             value_check=calculated_output,

@@ -1,8 +1,3 @@
 # JetFuelBurn
 
-
-## Development
-
-```bash
-pip install -e ".[testing]"
-```
+A Python package for calculating fuel burn of commercial aircraft.
