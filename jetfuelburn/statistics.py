@@ -100,9 +100,9 @@ class usdot():
     from jetfuelburn import ureg
     from jetfuelburn.statistics import usdot
     usdot.available_years()
-    usdot.available_aircraft(userdot.available_years()[0])
+    usdot.available_aircraft(usdot.available_years()[0])
     usdot.calculate_fuel_consumption_per_weight(
-        year=2023,
+        year=2024,
         acft='B787-800 Dreamliner',
         R=1000 * ureg.nmi,
         W=1000 * ureg.kg
@@ -193,8 +193,8 @@ class usdot():
         if R.magnitude < 0 or W.magnitude < 0:
             raise ValueError(f"Range and/or weight must not be negative.")
         else:
-            R = R.to(ureg('km'))
-            W = W.to(ureg('kg'))
+            R = R.to('km')
+            W = W.to('kg')
 
         if year not in usdot._years:
             raise ValueError(f"No data available for year '{year}'.")
@@ -204,7 +204,7 @@ class usdot():
             aircraft_data = usdot._aircraft_data[year][acft]
 
         fuelburn = (aircraft_data['Fuel/Revenue Weight Distance'] * ureg('1/km')) * R * W
-        fuelburn = fuelburn.to(ureg('kg'))
+        fuelburn = fuelburn.to('kg')
 
         return fuelburn
     
@@ -268,7 +268,7 @@ class usdot():
         if R.magnitude < 0:
             raise ValueError(f"Range must not be negative.")
         else:
-            R = R.to(ureg('km'))
+            R = R.to('km')
 
         if year not in usdot._years:
             raise ValueError(f"No data available for year '{year}'.")
@@ -278,6 +278,5 @@ class usdot():
             aircraft_data = usdot._aircraft_data[year][acft]
 
         fuelburn = (aircraft_data['Fuel/Revenue Seat Distance'] * ureg('kg/km')) * R
-        fuelburn = fuelburn.to(ureg('kg'))
-
+        fuelburn = fuelburn.to('kg')
         return fuelburn

@@ -921,9 +921,9 @@ class eea_emission_inventory_2009:
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import eea_emission_inventory_2009
-    eea_emission_inventory_2009(
+    eea_emission_inventory_2009.calculate_fuel_consumption(
         acft='A320',
-        range=1500*ureg.km
+        R=1500*ureg.km
     )
     ```
     """

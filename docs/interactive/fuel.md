@@ -1,5 +1,9 @@
 # Fuel Burn Calculations
 
+!!! tip
+    This page lists a selection of the fuel burn calculations available in the `jetfuelburn` package.  
+    For a full list, see the **API Reference (Public)**.
+
 ## Breguet Range Equation
 
 Using the Breguet range equation is perhaps the most well-known approach to computing the range of an aircraft.
@@ -62,15 +66,7 @@ Both the range equation and payload/range diagrams cannot capture the full compl
 For example, they do not explicitly consider the impact of climb/descent phases. This is why researchers have developed _reduced order models_.
 
 These models are based on detailed simulations, using eg. the [EUROCONTROL BADA](https://www.eurocontrol.int/model/bada) or [Piano X](https://www.lissys.uk/index2.html) software.
-Both are physics-based models that simulate the fuel-burn of aircraft depending on its flight profile. All reduced-order models used these high-resolution models to compute many data points and then fit a simplified (=reduced order) model to these data points. Some reduced order models have only one variable (eg. range), while others have more (eg. range, payload, altitude, etc.).
-
-!!! note
-    Currently, the `jetfuelburn` package includes reduced-order models from:
-
-     - [Yanto et al. (2017/2019)](https://doi.org/10.2514/6.2017-3338)
-     - [Lee et al. (2010)](https://doi.org/10.2514/6.2010-9156)
-     - [Seymour et al. (2019) "FEAT Model"](https://doi.org/10.1016/j.trd.2020.102528)
-     - [Drey et al. (2015) "AIM215 Model"](https://doi.org/10.1016/j.tranpol.2019.04.013)
+Both are physics-based models that simulate the fuel-burn of aircraft depending on its flight profile. All reduced-order models used these high-resolution models to compute many data points and then fit a simplified (=reduced order) model to these data points. Some reduced order models have only one variable (eg. range), while others have more (eg. range, payload, altitude, etc.). Below is a selection of models implemented in the `jetfuelburn` package:
 
 #### Yanto et al. (2017-2019)
 
