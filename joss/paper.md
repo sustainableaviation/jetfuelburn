@@ -1,5 +1,5 @@
 ---
-title: 'JetFuelBurn: A Python package for calculating fuel burn of commercial aircraft.'
+title: 'JetFuelBurn: A Python package for calculating fuel burn of commercial aircraft'
 tags:
   - Python
   - aviation
@@ -36,7 +36,7 @@ bibliography: paper.bib
 
 The environmental assessment of air travel has received increasing attention in the context of efforts to decarbonize transportation. In this context, life-cycle assessment has emerged as the primary method used to evaluate the magnitude of environmental burdens [@keiser2023life]. In air travel specifically, it has been shown that _"The most important life sequence is the use sequence, which makes up over 99\% of emission for every aircraft."_ [@jakovljevic2018carbon, P.865]. Robust methods for computing two key parameters are therefore central to any reliable evaluation of the environmental impact of air travel: The fuel burn of the aircraft itself and the environmental burdens associated with fuel production.
 
-While researchers in aerospace engineering have therefore proposed various methods for estimating the fuel burn of commercial aircraft, few of these have been incorporated into software packages, particularly in a lightweight, user-friendly Python format. To address this gap, the `jetfuelburn` package has been developed as the first comprehensive Python tool offering a robust set of fuel burn models for commercial aircraft. Designed for applications such as environmental impact assessments of air travel, aircraft performance analysis, and optimization, this package promises to be a valuable enhancement to existing fuel burn calculators and related tools.
+Aerospace engineering researchers have proposed numerous methods for estimating commercial aircraft fuel burn, yet few are implemented in accessible, lightweight Python packages. Sun’s 2022 OpenAP package \cite{sun2022openap} is a standout, offering an innovative and user-friendly solution for fuel burn modeling. However, there is still no tool for comparative analysis of different models. The `jetfuelburn` package fills this gap as the first comprehensive Python package for comparing different aircraft fuel burn models from peer-reviewed publications. Tailored for environmental impact assessments, aircraft performance analysis, and optimization, it enhances existing calculators.
 
 \clearpage
 
@@ -50,13 +50,15 @@ As an initial estimate, the fuel burn of aircraft can be "read off" payload/rang
 
 ## Range Equation
 
-The Breguet range equation is a simple model that relates the range of an aircraft to its fuel burn and efficiency. It can also be solved for fuel burn as a function of the range [@young2017performance, Sec. 13.7.3]. The `jetfuelburn` package includes a dedicated method this purpose.
+If some basic aircraft performance parameters are known, the Breguet range equation is a good model for estimating fuel consumption in cruise [@young2017performance, Sec. 13.7.3]. The `jetfuelburn` package includes a dedicated method this purpose.
 
 ## Reduced Order Models
 
-If access to propriatary aircraft performance simulation software is available, fuel burn for specific aircraft missions can be simulated with high resolution. However, these simulations can be computationally expensive. Reduced order models instead use regression to extract a simplified model from a large set of high resolution simulation results. While the simulations may include many aircraft and mission parameters, reduced order models only require a few key parameter, such as payload and range. 
+If access to propriatary aircraft performance simulation software is available, fuel burn for specific aircraft missions can be simulated with high resolution. However, these simulations can be computationally expensive. Reduced order models instead use regression to extract a simplified model from a large set of high resolution simulation results. While the simulations may include many aircraft and mission parameters, reduced order models only require a few key parameter, such as payload and range. Publications implemented in the initial version of `jetfuelburn` include \cite{young2017performance}\cite{dray2019aim2015}\cite{seymour2020fuel}\cite{yanto2017efficient}\cite{lee2010closed}.
 
-The present verion of the `jetfuelburn` package implements four different reduced order models, proposed by [@lee2010closed;@yanto2017efficient;@dray2019aim2015;@seymour2020fuel].
+## Statistical Models
+
+If only a statistical average of fuel burn per passenger-kilometer or ton-kilometer is required, data from the US Department of Transportation (DOT) can be used. All major air carriers are required to report data on an annual basis. The `jetfuelburn` package includes a method for this purpose.
 
 # Auxiliary Functions
 
