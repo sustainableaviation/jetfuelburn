@@ -1,4 +1,5 @@
 import csv
+import json
 import math
 from importlib import resources
 from jetfuelburn import ureg
@@ -59,6 +60,20 @@ class yanto_etal:
     According to panel (a), the maximum achievable range of a Boeing 777 would be ~30'000NM. This is ~1.6x the circumference of the Earth.
     Neither assuming that the axis multiplier `1e4` nor the unit `nm` (sic!) are incorrect explains this issue.
     Figure 5 was instead used to test the implementation of the method.
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.reducedorder import yanto_etal
+    yanto_etal.available_aircraft()[0:10]
+    yanto_etal.calculate_fuel_consumption(
+        acft='A321',
+        R=2200*ureg.km,
+        PL=18*ureg.metric_ton
+    )
+    ```
     """
 
     _regression_coefficients = {
@@ -110,7 +125,7 @@ class yanto_etal:
 
     @staticmethod
     @ureg.check(
-        None,  # acft
+        None, # acft
         '[length]',
         '[mass]',
     )
@@ -118,7 +133,7 @@ class yanto_etal:
         acft: str,
         R: float,
         PL: float,
-    ) -> ureg.Quantity:
+    ) -> float:
         """
         Given an ICAO aircraft designator, mission range and payload mass, calculates the fuel burned.
 
@@ -195,6 +210,43 @@ class lee_etal:
     Closed-form takeoff weight estimation model for air transportation simulation.
     In _10th AIAA Aviation Technology, Integration, and Operations (ATIO) Conference_ (p. 9156).
     doi:[10.2514/6.2010-9156](https://doi.org/10.2514/6.2010-9156)
+
+    Warnings
+    --------
+
+    Note that the present implementation of the Lee et al. (2010)
+    cannot completely replicate aircraft payload in a small segment of Figure 6 in referenced paper.
+    The calculated aircraft payload for extreme aircraft ranges differs from the one shown in the paper:
+
+    ```python exec="true" html="true"
+    from jetfuelburn.figures.reducedorder import figure_lee2010
+    fig = figure_lee2010()
+    print(fig.to_html(full_html=False, include_plotlyjs="cdn"))
+    # https://pawamoy.github.io/markdown-exec/gallery/#with-plotly
+    ```
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.reducedorder import lee_etal
+    lee_etal.available_aircraft()[0:10]
+    lee_etal.calculate_fuel_consumption(
+        acft='B732',
+        W_E=265825*ureg.N,
+        W_MPLD=156476*ureg.N,
+        W_MTO=513422*ureg.N,
+        W_MF=142365*ureg.N,
+        S=91.09*ureg.m ** 2,
+        C_D0=0.0214,
+        C_D2=0.0462,
+        c=(2.131E-4)/ureg.s,
+        h=9144*ureg.m,
+        V=807.65*ureg.kph,
+        d=2000*ureg.nmi
+    )
+    ```
     """
     _regression_coefficients = {
         "FA50": {'k_1': -18.2e-12, 'k_2': 3.11e-9, 'k_3': -163e-9, 'k_4': 2.46e-6, 'k_5': 47.1e-6, 'k_6': -0.823e-3},
@@ -255,7 +307,7 @@ class lee_etal:
         h: float,
         V: float,
         d: float,
-    ) -> dict[ureg.Quantity, ureg.Quantity]:
+    ) -> dict[float, float]:
         """
         Given an ICAO aircraft designator, mission range and payload mass, calculates the fuel burned.
 
@@ -432,7 +484,19 @@ class seymour_etal:
     _Transportation Research Part D: Transport and Environment_, 88, 102528.
     doi:[10.1016/j.trd.2020.102528](https://doi.org/10.1016/j.trd.2020.102528)
     - [FEAT Model GitHub Repository](https://github.com/kwdseymour/FEAT/tree/master)
-
+    
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.reducedorder import seymour_etal
+    seymour_etal.available_aircraft()[0:10]
+    seymour_etal.calculate_fuel_consumption(
+        acft='A321',
+        R=2200*ureg.km,
+    )
+    ```
     """
     _regression_coefficients = {
         'A140': {'reduced_fuel_a1': 0.0001570270040569, 'reduced_fuel_a2': 1.2982777526024196, 'reduced_fuel_intercept': 160.62447178027185},
@@ -587,7 +651,7 @@ class seymour_etal:
     def calculate_fuel_consumption(
         acft: str,
         R: float,
-    ) -> ureg.Quantity:
+    ) -> float:
         """
         Given an ICAO aircraft designator and mission range, calculates the fuel burned.
         
@@ -631,7 +695,7 @@ class seymour_etal:
 
 class aim2015:
     r"""
-    Given an aircraft size class integer, payload and range calculates the fuel burned during flight (climb, cruise, takeoff).
+    Reduced-order fuel burn model based on Dray et al. (2019).
 
     The class implements the reduced-order fuel burn model of the [AIM2015 air transport model](https://www.atslab.org/data-tools/) (part "Aircraft Performance Model"):
 
@@ -700,6 +764,21 @@ class aim2015:
     - [AIM2015 documentation (v9)](https://web.archive.org/web/20241206191807/https://www.atslab.org/wp-content/uploads/2019/12/AIM-2015-Documentation-v9-122019.pdf)
     - [AIM2015 documentation (v11)](https://web.archive.org/web/20231001131622/https://www.atslab.org/wp-content/uploads/2023/02/AIM-2015-Documentation-v11.pdf)
     - [AIM2015 information in the EU MIDAS system](https://web.jrc.ec.europa.eu/policy-model-inventory/explore/models/model-aim/)
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.reducedorder import aim2015
+    aim2015.calculate_fuel_consumption(
+        acft_size_class=8,
+        D_climb=300*ureg.km,
+        D_cruise=(15000-300-200)*ureg.km,
+        D_descent=200*ureg.km,
+        PL=55.5*ureg.metric_ton
+    )
+    ```
     """
 
     _regression_coefficients = {}
@@ -728,11 +807,11 @@ class aim2015:
     )
     def calculate_fuel_consumption(
         acft_size_class: int,
-        D_climb: ureg.Quantity,
-        D_cruise: ureg.Quantity,
-        D_descent: ureg.Quantity,
-        PL: ureg.Quantity,
-    ) -> dict[ureg.Quantity, ureg.Quantity, ureg.Quantity]:
+        D_climb: float,
+        D_cruise: float,
+        D_descent: float,
+        PL: float,
+    ) -> dict[float, float, float]:
         """
         Given an aircraft size class integer, payload and distances for climb, cruise, and descent, calculates the fuel burned during flight.
 
@@ -810,3 +889,303 @@ class aim2015:
             'mass_fuel_cruise': m_f_cruise * ureg('kg'),
             'mass_fuel_descent': m_f_descent * ureg('kg'),
         }
+
+
+class eea_emission_inventory_2009:
+    r"""
+    The class implements the reduced-order fuel burn model of the [EMEP/EEA air pollutant emission inventory guidebook](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023) (2009).
+
+    ![Payload/Range Diagram](../_static/reduced_order_eea2009.svg)
+    
+    In this model, fuel burn calculations are based on a regression model.
+    The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
+    by simulating flights using the [PianoX software](https://www.lissys.uk/PianoX.html).
+
+    Key assumptions of this fuel calculation function:
+
+    | Parameter             | Assumption                                                                  |
+    |-----------------------|-----------------------------------------------------------------------------|
+    | data availability     | 19 selected aircraft                                                        |
+    | aircraft payload      | fixed, unclear                                                              |
+    | climb/descent         | not considered separately                                                   |
+    | reserve fuel uplift   | considered implicitly (?)                                                   |
+    | diversion fuel uplift | considered implicitly (?)                                                   |
+
+    References
+    ----------
+    - [EMEP/EEA air pollutant emission inventory guidebook - 2009, Part B, Section 1 (Energy), Subsection 1.A.3.a (`Aviation_annex.zip`)](https://www.eea.europa.eu/en/analysis/publications/emep-eea-emission-inventory-guidebook-2009)
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.reducedorder import eea_emission_inventory_2009
+    eea_emission_inventory_2009.calculate_fuel_consumption(
+        acft='A320',
+        R=1500*ureg.km
+    )
+    ```
+    """
+
+    _aircraft_data = {}
+    with resources.open_text("jetfuelburn.data.EEA2009", "data.json") as file:
+        _aircraft_data = json.load(file)
+
+    @staticmethod
+    def available_aircraft() -> list[str]:
+        """
+        Returns a sorted list of available ICAO aircraft designators included in the model.
+        """
+        return sorted(eea_emission_inventory_2009._aircraft_data.keys())
+    
+
+    @staticmethod
+    @ureg.check(
+        None,
+        '[length]',
+    )
+    def calculate_fuel_consumption(
+        acft: str,
+        R: float,
+    ) -> dict:
+        r"""
+        Given an aircraft name and range, calculates the fuel burned during flight.
+
+        Data between reported range/fuel-burn points is extrapolated linearly:
+
+        $$
+            m_F(R=200) = m_F(125) + (200-125) \cdot \frac{m_F(250) - m_F(125)}{250 - 125}
+        $$
+
+        where in this example, data is available for $R=[125,250]$ miles and a user-defined range of $R=200$ miles is requested.
+
+        | Symbol     | Dimension         | Description                                                            |
+        |------------|-------------------|------------------------------------------------------------------------|
+        | $m_F$      | [mass]            | fuel mass burned during flight                                         |
+        | $R$        | [length]          | mission range                                                          |
+
+
+        Parameters
+        ----------
+        acft : str
+            ICAO Aircraft Designator. Note that some aircraft
+        R : ureg.Quantity
+            Mission range [length]
+
+        Returns
+        -------
+        dict
+            'mass_fuel_total' : ureg.Quantity
+                Fuel mass (total segment) [kg]
+            'mass_fuel_LTO' : ureg.Quantity
+                Fuel mass (LTO segment) [kg]
+            'mass_fuel_taxi_in' : ureg.Quantity
+                Fuel mass (taxi-in segment) [kg]
+            'mass_fuel_climbout' : ureg.Quantity
+                Fuel mass (climbout segment) [kg]
+            'mass_fuel_takeoff' : ureg.Quantity
+                Fuel mass (takeoff segment) [kg]
+            'mass_fuel_climb_cruise_descent' : ureg.Quantity
+                Fuel mass (climb, cruise, and descent segments) [kg]
+            'mass_fuel_approach_landing' : ureg.Quantity
+                Fuel mass (approach and landing segment) [kg]
+            'mass_fuel_taxi_out' : ureg.Quantity            
+
+        Raises
+        ------
+        ValueError
+            If the ICAO Aircraft Designator is not found in the model data.
+        ValueError
+            If the range is negative or the range is outside the available data range for the given aircraft.
+        """
+        
+        R = R.to('nmi').magnitude
+
+        if acft not in eea_emission_inventory_2009._aircraft_data:
+            raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data.")
+        else:
+            aircraft_data = eea_emission_inventory_2009._aircraft_data[acft]
+            list_distance_points = sorted([int(k) for k in aircraft_data['total'].keys()])
+
+        if R < list_distance_points[0]:
+            raise ValueError(f"Range must be at least {list_distance_points[0]} nmi.")
+        if R > list_distance_points[-1]:
+            raise ValueError(f"Range must be at most {list_distance_points[-1]} nmi.")
+        
+        list_flight_phases = [
+            'total',
+            'LTO',
+            'taxi_in',
+            'climbout',
+            'takeoff',
+            'climb_cruise_descent',
+            'approach_landing',
+            'taxi_out',
+        ]
+
+        dict_fuel_burn = {}
+        for flight_phase in list_flight_phases:
+            dict_fuel_burn_per_distance = {int(key): value for key, value in aircraft_data[flight_phase].items()}
+            
+            for index_distance_point in range(len(list_distance_points) - 1):
+                if list_distance_points[index_distance_point] <= R < list_distance_points[index_distance_point + 1]:
+                    x1, x2 = list_distance_points[index_distance_point], list_distance_points[index_distance_point + 1]
+                    y1, y2 = dict_fuel_burn_per_distance[x1], dict_fuel_burn_per_distance[x2]
+                    dict_fuel_burn[flight_phase] = y1 + (R - x1) * (y2 - y1) / (x2 - x1)
+                    break
+            # If R equals the last key value
+            if R == list_distance_points[-1]:
+                dict_fuel_burn[flight_phase] = dict_fuel_burn_per_distance[list_distance_points[-1]]
+
+        dict_fuel_burn_result = {}
+        for key, value in dict_fuel_burn.items():
+            dict_fuel_burn_result[f'mass_fuel_{key}'] = value * ureg('kg')
+        
+        return dict_fuel_burn_result
+    
+
+class myclimate:
+    r"""
+    This class implements the public part of the myClimate Flight Emissions Calculator.
+
+    Fuel burn is calculated using a quadratic function of the form
+    defined in the myClimate Flight Emissions Calculator Calculation Principles:
+
+    $$
+    f(x) + LTO = ax^2 + bx + c
+    $$
+
+    where:
+
+    | Symbol     | Dimension         | Description                                                            |
+    |------------|-------------------|------------------------------------------------------------------------|
+    | $f(x)$     | [mass]            | Fuel consumption (cruise) in kg                                        |
+    | $LTO$      | [mass]            | Fuel consumption (landing-takeoff-cycle (LTO)) in kg                   |
+    | $x$        | [distance]        | Distance in km                                                         |
+    | $a$        | [mass]            | Coefficient of the quadratic term                                      |
+    | $b$        | [mass]            | Coefficient of the linear term                                         |
+    | $c$        | [mass]            | Coefficient of the constant term                                       |
+
+    Notes
+    -----
+    As of early 2025, the myClimate calculator offers a selection of 10 specific aircraft types.
+    For 4 of these, specific parameters are provided on the Flight Emissions Calculator Calculation Principles page:
+
+    | Size Category         | Range [km]    | # of Seats         |
+    |-----------------------|---------------|--------------------|
+    | "standard short-haul" | $<1500km$     | 157.86             |
+    | "standard long-haul"  | $>2500km$     | 302.58             |
+    | B737                  | not provided  | 148.00             |
+    | A320                  | not provided  | 165.00             |
+    | A330                  | not provided  | 287.00             |
+    | B777                  | not provided  | 370.00             |
+
+    Key assumptions of this fuel calculation function:
+
+    | Parameter         | Assumption                                                                 |
+    |-------------------|----------------------------------------------------------------------------|
+    | data availability | N/A, fleet-average values only                                             |
+    | aircraft payload  | average                                                                    |
+    | climb/descent     | considered in "LTO" factor, which is not made public                       |
+    | fuel reserves     | not considered explicitly                                                  |
+    | alternate airport | not considered explicitly                                                  |
+
+    References
+    ----------
+    [myClimate Flight Emissions Calculator Calculation Principles](https://www.myclimate.org/en/information/about-myclimate/downloads/flight-emission-calculator/)
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.reducedorder import myclimate
+    myclimate.available_aircraft()[0:10]
+    myclimate.calculate_fuel_consumption(
+        acft='B737',
+        x=2200*ureg.km,
+    )
+    ```
+    """
+
+    _regression_coefficients = {
+        'A320': {'a': 0.00016, 'b': 1.454, 'c': 1531.722},
+        'B737': {'a': 0.000032, 'b': 2.588, 'c': 1212.084 },
+        'A330': {'a': 0.00034, 'b': 4.384, 'c': 2457.737},
+        'B777': {'a': 0.00034, 'b': 6.112, 'c': 3403.041},
+        'standard aircraft': {},
+    }
+
+    @staticmethod
+    def available_aircraft() -> list[str]:
+        """
+        Returns a sorted list of available ICAO aircraft designators included in the model.
+        """
+        return sorted(myclimate._regression_coefficients.keys())
+
+    @staticmethod
+    @ureg.check(
+         None, # acft
+        '[length]',
+    )
+    def calculate_fuel_consumption(
+        acft: str,
+        x: float,
+    ) -> float:
+        r"""
+        Given a flight distance, calculate the fleet-average fuel consumption of a flight using the
+        [myClimate Flight Emissions Calculator](https://co2.myclimate.org/en/flight_calculators/new).
+
+        Warnings
+        --------
+        It is not entirely clear from the description of the myClimate Flight Emissions Calculator
+        how distances of <1500km for short-haul aircraft and distances of >2500km for long-haul aircraft
+        are handled. [The description](https://www.myclimate.org/en/information/about-myclimate/downloads/flight-emission-calculator/) mentions that
+
+        > "The fuel consumption for distances between 1500 and 2500 km is linearly interpolated."
+
+        but this would make sense only for the "standard short-haul" and "standard long-haul" aircraft?
+
+        In this function, short-haul aircraft can therefore only be used for distances of <1500km
+        and long-haul aircraft can only be used for distances of >2500km. The `standard aircraft` option
+        can be used for all distances.
+
+        Parameters
+        ----------
+        x : float
+            Mission distance [length].
+
+        Returns
+        -------
+        float
+            Fuel consumption [mass] in kg.
+        """
+        if x < (0 * ureg.km):
+            raise ValueError("Distance must not be negative.")
+        x = x.to('km').magnitude
+
+        if acft in ['A320', 'B737'] and x > 2500:
+            raise ValueError(f"Aircraft {acft} is not valid for distances > 2500 km.")
+        if acft in ['A330', 'B777'] and x < 1500:
+            raise ValueError(f"Aircraft {acft} is not valid for distances < 1500 km.")
+        
+        if acft == 'standard aircraft':
+            if x < 1500:
+                a = 0.000007
+                b = 2.775
+                c = 1260.608
+            elif x < 2500:
+                a = 0.000007 + 0.000283 * (x - 1500) / 1000
+                b = 2.775 + 0.7 * (x - 1500) / 1000
+                c = 1260.608 + 1999.083 * (x - 1500) / 1000
+            elif x >= 2500:
+                a = 0.00029
+                b = 3.475
+                c = 3259.691
+        else:
+            a = myclimate._regression_coefficients[acft]['a']
+            b = myclimate._regression_coefficients[acft]['b']
+            c = myclimate._regression_coefficients[acft]['c']
+
+        return (a * x**2 + b * x + c) * ureg.kg

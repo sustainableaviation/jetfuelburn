@@ -8,7 +8,7 @@ import math
     '[speed]',
     '[time]/[length]' # [mg/Ns] = s/m
 )
-def calculate_fuel_consumption_based_on_breguet_range_equation(
+def calculate_fuel_consumption_range_equation(
     R: float,
     LD: float,
     m_after_cruise: float,
@@ -88,11 +88,11 @@ def calculate_fuel_consumption_based_on_breguet_range_equation(
     float
         Required fuel mass [kg]
 
-    Examples
-    --------
-    ```pyodide install='jetfuelburn' assets='no'
-    from jetfuelburn.breguet import calculate_fuel_consumption_based_on_breguet_range_equation
-    calculate_fuel_consumption_based_on_breguet_range_equation(
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    from jetfuelburn.breguet import calculate_fuel_consumption_range_equation
+    calculate_fuel_consumption_range_equation(
         R=2000*ureg.nmi,
         LD=18,
         m_after_cruise=100*ureg.metric_ton,
@@ -102,18 +102,18 @@ def calculate_fuel_consumption_based_on_breguet_range_equation(
     ```
     """
 
-    if R < 0:
+    if R.magnitude < 0:
         raise ValueError("Range must be greater than zero.")
     if LD <= 1:
         raise ValueError("Lift-to-Drag ratio must be greater than 1.")
-    if m_after_cruise < 0:
+    if m_after_cruise.magnitude < 0:
         raise ValueError("Mass after cruise must be greater than zero.")
-    if v_cruise <= 0:
+    if v_cruise.magnitude <= 0:
         raise ValueError("Cruise speed must be greater than zero.")
-    if TSFC_cruise <= 0:
+    if TSFC_cruise.magnitude <= 0:
         raise ValueError("Thrust Specific Fuel Consumption must be greater than zero.")
 
-    if R==0:
+    if R.magnitude==0:
         return 0 * ureg.kg
     else:
         g = 9.81 * (ureg.meter/ureg.second**2)

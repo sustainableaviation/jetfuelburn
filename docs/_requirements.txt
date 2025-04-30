@@ -1,4 +1,9 @@
+mkdocs-material
 mkdocstrings-python
 pymdown-extensions
-mkdocs-jupyter
 markdown-exec
+mkdocs-include-markdown-plugin
+# requirements for interactive figures
+plotly-express
+pandas
+jetfuelburn

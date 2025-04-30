@@ -2,30 +2,32 @@
 site_name: JetFuelBurn Documentation
 repo_url: https://github.com/sustainableaviation/jetfuelburn
 copyright: © Paul Scherrer Institute (PSI) and Contributors | Code under MIT License
-nav:
+nav: 
   - Home: 'index.md'
   - About: 'about.md'
+  - Comparing Models: 'comparison.md'
   - Getting Started:
     - Installation: 'installation.md'
-    - Theory: 'theory.md'
-  - Try it in the Browser!:
     - Working with Physical Units: 'interactive/units.md'
-    - Fuel Calculations: 'interactive/fuel.md'
-    - Travel Class Allocation: 'interactive/allocation.md'
+    - Fuel Burn Calculations: 'interactive/fuel.md'
+    - Cabin Class Fuel Allocation: 'interactive/allocation.md'
   - API Reference (Public):
     - PL/R-Diagrams: 'api/diagrams.md'
     - Range Equation: 'api/breguet.md'
+    - Statistics Models: 'api/statistics.md'
     - Reduced Order Models: 'api/reducedorder.md'
     - Combined Models: 'api/combined.md'
     - Closed Form Models: 'api/closedform.md' 
     - Cabin Class Fuel Allocation: 'api/allocation.md'
   - API Reference (Internal):
     - Physics Functions: 'api/physics.md'
+  - FAQ: 'faq.md'
+  - Changelog: 'changelog.md'
 theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
   name: material
-  custom_dir: docs/_overrides
-  logo: _static/logo/jetfuelburn_logo.svg
-  favicon: _static/logo/jetfuelburn_logo.svg
+  #custom_dir: docs/_overrides
+  logo: _static/logos/jetfuelburn_logo.svg
+  favicon: _static/logos/jetfuelburn_logo.svg
   highlightjs: true
   navigation_depth: 4
   features:
@@ -37,9 +39,7 @@ theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
     - navigation.top
     - content.footnote.tooltips
 plugins:
-  - search:
-      min_search_length: 2
-      indexing: 'full'
+  - search
   - mkdocstrings: # https://mkdocstrings.github.io/python/usage/
       handlers:
         python:
@@ -49,13 +49,10 @@ plugins:
             show_root_heading: true
             heading_level: 2
             show_source: true
-  - mkdocs-jupyter:
-      execute: False
-      show_input: True
-      ignore_h1_titles: True
-      include_source: True
+            filters: []
   - markdown-exec
   - autorefs
+  - include-markdown
 markdown_extensions:
   - admonition
   - pymdownx.superfences
@@ -69,12 +66,15 @@ markdown_extensions:
 
 extra_javascript:
   - _javascripts/katex.js
-  - https://unpkg.com/katex@0/dist/katex.min.js
-  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
-
+  # https://cdnjs.com/libraries/KaTeX
+  # unpkg is incredibly slow (17s to load the css file)
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js
 extra_css:
-  - https://unpkg.com/katex@0/dist/katex.min.css
-  - _css/style.css
+  # https://cdnjs.com/libraries/KaTeX
+  # unpkg is incredibly slow (17s to load the css file)
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css
+  - _css/extra.css
 
 watch:
   - jetfuelburn

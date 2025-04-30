@@ -3,13 +3,23 @@ import jetfuelburn
 
 
 def test_breguet():
-    from jetfuelburn.breguet import calculate_fuel_consumption_based_on_breguet_range_equation
-    assert callable(calculate_fuel_consumption_based_on_breguet_range_equation)
+    from jetfuelburn.breguet import calculate_fuel_consumption_range_equation
+    assert callable(calculate_fuel_consumption_range_equation)
 
 
 def test_diagrams():
-    from jetfuelburn.diagrams import calculate_fuel_consumption_based_on_payload_range
-    assert callable(calculate_fuel_consumption_based_on_payload_range)
+    from jetfuelburn.diagrams import calculate_fuel_consumption_payload_range
+    assert callable(calculate_fuel_consumption_payload_range)
+
+
+def test_averages():
+    import jetfuelburn.statistics
+
+    from jetfuelburn.statistics import usdot
+    assert callable(usdot.available_years)
+    assert callable(usdot.available_aircraft)
+    assert callable(usdot.calculate_fuel_consumption_per_seat)
+    assert callable(usdot.calculate_fuel_consumption_per_weight)
 
 
 def test_reducedorder():
@@ -31,6 +41,9 @@ def test_reducedorder():
     assert callable(aim2015.available_aircraft)
     assert callable(aim2015.calculate_fuel_consumption)
 
+    from jetfuelburn.reducedorder import myclimate
+    assert callable(myclimate.available_aircraft)
+    assert callable(myclimate.calculate_fuel_consumption)
 
 def test_combined():
     from jetfuelburn.combined import calculate_fuel_consumption_combined_model
