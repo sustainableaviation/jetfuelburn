@@ -3,8 +3,8 @@ title: 'JetFuelBurn: A Python package for calculating fuel burn of commercial ai
 tags:
   - Python
   - aviation
+  - air travel
   - efficiency
-  - air transport
   - fuel burn
   - fuel consumption
   - emissions
@@ -14,6 +14,10 @@ authors:
     orcid: 0000-0003-4859-2650
     equal-contrib: false
     affiliation: "1, 2" # (Multiple affiliations must be quoted)
+  - name: Russell McKenna
+    equal-contrib: false # (This is how you can denote equal contributions between multiple authors)
+    orcid: 0000-0001-6758-482X
+    affiliation: "1, 2"
 affiliations:
  - name: Laboratory for Energy Systems Analysis, PSI Centers for Nuclear Engineering \& Sciences and Energy \& Environmental Sciences, Villigen, Switzerland
    index: 1
