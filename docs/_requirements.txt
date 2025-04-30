@@ -1,5 +1,6 @@
 mkdocs-material
 mkdocstrings-python
+ruff
 pymdown-extensions
 markdown-exec
 mkdocs-include-markdown-plugin

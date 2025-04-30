@@ -5,7 +5,7 @@ copyright: © Paul Scherrer Institute (PSI) and Contributors | Code under MIT Li
 nav: 
   - Home: 'index.md'
   - About: 'about.md'
-  - Comparing Models: 'comparison.md'
+  #- Comparing Models: 'comparison.md'
   - Getting Started:
     - Installation: 'installation.md'
     - Working with Physical Units: 'interactive/units.md'
@@ -50,6 +50,7 @@ plugins:
             heading_level: 2
             show_source: true
             filters: []
+            separate_signature: true
   - markdown-exec
   - autorefs
   - include-markdown
