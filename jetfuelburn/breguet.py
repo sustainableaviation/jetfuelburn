@@ -91,6 +91,8 @@ def calculate_fuel_consumption_range_equation(
     Example
     -------
     ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
     from jetfuelburn.breguet import calculate_fuel_consumption_range_equation
     calculate_fuel_consumption_range_equation(
         R=2000*ureg.nmi,
