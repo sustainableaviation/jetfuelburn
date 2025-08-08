@@ -1,6 +1,5 @@
-# %%
 import pint
-ureg = pint.get_application_registry()
+from jetfuelburn import ureg
 import json
 from importlib import resources
 

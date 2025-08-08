@@ -3,26 +3,50 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## `1.0.1` (08. August 2025)
+
+### Fixes
+
+- Fixed `pint` unit registry error in `statistics` module ([#20](https://github.com/sustainableaviation/jetfuelburn/issues/20)).
+
 ## `1.0.0` (27. April 2025)
 
-Initial release of `jetfuelburn` package to accompany a submission to [JOSS](https://joss.theoj.org).
+!!! note
+    Initial release of `jetfuelburn` package to accompany a submission to [JOSS](https://joss.theoj.org).
+
+### Improvements
+
+- Updated documentation.
+
+### Fixes
 
 - Fixed unit conversion errors in `jetfuelburn.breguet.calculate_fuel_consumption_range_equation()` function.
 - Fixed the `Examples` section of the `jetfuelburn.reducedorder.eea_emission_inventory_2009` module.
-- Updated documentation.
 
 ## `0.0.9` (27. April 2025) ++YANKED++
 
-- Added US Department of Transportation (USDOT) Statistical Data (Form 41 Schedule T-100 Table T2) ([#14](https://github.com/sustainableaviation/jetfuelburn/issues/14)).
+### Fixes
+
 - Fixed `Example` sections of function/class docstrings (were named `Examples` previously).
+
+### Improvements
+
+- Added US Department of Transportation (USDOT) Statistical Data (Form 41 Schedule T-100 Table T2) ([#14](https://github.com/sustainableaviation/jetfuelburn/issues/14)).
 - Moved `jetfuelburn.averages.myclimate` to `jetfuelburn.reducedorder.myclimate`.
 
 ## `0.0.8` (16. April 2025)
 
+### Improvements
+
 - Added MyClimate Average/Statistical Model ([#10](https://github.com/sustainableaviation/jetfuelburn/issues/10)).
+
+### Fixes
+
 - Fixed parameter description of `jetfuelburn.diagrams.calculate_fuel_consumption_payload_range()` function.
 
 ## `0.0.7` (24. March 2025)
+
+### Improvements
 
 - Added EMEP/EEA Emissions Model ([#5](https://github.com/sustainableaviation/jetfuelburn/issues/5)).
 - Added warning and interactive plot to Lee et al. (2010) Model.
@@ -31,6 +55,8 @@ Initial release of `jetfuelburn` package to accompany a submission to [JOSS](htt
 
 !!! note
     First working release for testing of Pyodide "Examples" fences.
+
+### Improvements
 
 - Added GitHub Actions workflow files.
 - Made `AIM2015` data files accessible.
