@@ -87,7 +87,7 @@ extra_css:
   - _css/extra.css
 
 watch:
-  - jetfuelburn
+  - src/jetfuelburn
 
 extra:
   generator: false
