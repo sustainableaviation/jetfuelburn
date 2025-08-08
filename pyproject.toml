@@ -14,13 +14,11 @@ description = "A Python package for calculating fuel burn of commercial aircraft
 readme = "README.md"
 license = {text = "MIT"}
 dynamic = ["version"]
-# Add here all kinds of additional classifiers as defined under
 # https://pypi.org/classifiers/
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -28,7 +26,7 @@ classifiers = [
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering"
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "pint",
 ]
@@ -39,8 +37,6 @@ homepage = "https://jetfuelburn.readthedocs.io"
 tracker = "https://github.com/sustainableaviation/jetfuelburn/issues"
 
 [project.optional-dependencies]
-# Getting recursive dependencies to work is a pain, this
-# seems to work, at least for now
 testing = [
     "pytest",
     "pytest-cov",
@@ -48,19 +44,16 @@ testing = [
 ]
 
 [tool.setuptools]
+package-dir = {"" = "src"}
+packages = {find = {where = ["src"]}}
 include-package-data = true
-packages = [
-    "jetfuelburn",
-    "jetfuelburn.aux",
-    "jetfuelburn.data"
-]
 
 [tool.setuptools.package-data]
 "jetfuelburn.data" = ["**/*.csv", "**/*.json"]
 
 [tool.setuptools.dynamic]
-version = {attr = "jetfuelburn.__version__"} 
+version = {attr = "jetfuelburn.__version__"}
 readme = {file = "README.md"}
 
 [tool.pytest.ini_options]
-testpaths = ["tests/*.py"] 
+testpaths = ["tests"]
