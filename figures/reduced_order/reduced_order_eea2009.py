@@ -15,6 +15,9 @@ from datetime import datetime
 # data science
 import numpy as np
 import pandas as pd
+# file paths
+from pathlib import Path
+from matplotlib.patches import Patch
 
 # SETUP #########################################
 
@@ -92,12 +95,17 @@ ax2.set_title('Flight Profile (fixed distance+payload)', fontsize=12, fontweight
 
 # PLOTTING ###################
 
+# Get the position of the right subplot in figure coordinates
 bbox = ax2.get_position()
 
-# Line from bottom right of ax2 to target point
+# The y-coordinates of your lowest and highest data points in figure coordinates
+y_bottom_target = 0.25
+y_top_target = 0.58
+
+# Line from bottom left of ax2 to the lowest data point
 line1 = plt.Line2D(
-    [bbox.x1, 0.15],  # Changed from bbox.x0 to bbox.x1
-    [bbox.y0, 0.25],
+    [bbox.x0, 0.15],
+    [bbox.y0, y_bottom_target],
     transform=fig.transFigure,
     color="red",
     linewidth=1,
@@ -105,10 +113,10 @@ line1 = plt.Line2D(
 )
 fig.add_artist(line1)
 
-# Line from top right of ax2 to target point
+# Line from top left of ax2 to the SAME lowest data point
 line2 = plt.Line2D(
-    [bbox.x1, 0.15],  # Changed from bbox.x0 to bbox.x1
-    [bbox.y1, 0.25],
+    [bbox.x0, 0.15],
+    [bbox.y1, y_bottom_target], # MODIFIED: Points to the same y-coordinate as line1
     transform=fig.transFigure,
     color="red",
     linewidth=1,
@@ -116,29 +124,31 @@ line2 = plt.Line2D(
 )
 fig.add_artist(line2)
 
-# Optional: Adjust text position
-text_x = 0.4
+# Adjust text position
+text_x = 0.3
 text_y = 0.24
 fig.text(
     text_x, text_y,
     'single points only',
     ha='center', va='center',
-    rotation=-4,
+    rotation=-7,
     color='black',
     fontsize=12
 )
 
+# Plotting the individual data points on ax1
 ax1.plot(0.15, 0.25, 'ro', transform=fig.transFigure)
-ax1.plot(0.2, 0.31, 'ro', transform=fig.transFigure)
-ax1.plot(0.25, 0.38, 'ro', transform=fig.transFigure)
-ax1.plot(0.31, 0.48, 'ro', transform=fig.transFigure)
-ax1.plot(0.36, 0.58, 'ro', transform=fig.transFigure)
+ax1.plot(0.2, 0.41, 'ro', transform=fig.transFigure)
+ax1.plot(0.25, 0.55, 'ro', transform=fig.transFigure)
+ax1.plot(0.31, 0.68, 'ro', transform=fig.transFigure)
+ax1.plot(0.36, 0.78, 'ro', transform=fig.transFigure)
 
-# Generate data for ax1
+# Generate data for ax1's curve
 x1 = np.linspace(0, 2000, 100)
 y1 = 5 * np.exp(0.0005 * x1)
 ax1.plot(x1, y1, linestyle='-', color='white')
 
+# Plot the flight profile on ax2
 ax2.plot(
     x,
     y,
@@ -146,6 +156,7 @@ ax2.plot(
     color='k'
 )
 
+# Add the shaded region to ax2
 ax2.axvspan(
     0,
     1500, 
@@ -155,7 +166,6 @@ ax2.axvspan(
 
 # LEGEND ####################
 
-from matplotlib.patches import Patch
 legend_elements = [
     Patch(facecolor='orange', edgecolor='orange', alpha=0.2, label='PianoX'),
 ]
@@ -163,9 +173,12 @@ ax2.legend(handles=legend_elements, loc='lower left')
 
 # EXPORT #########################################
 
-from pathlib import Path
-from matplotlib.patches import Patch
-figure_name: str = str(Path(__file__).stem + '.svg')
+# Safely create the figure name to avoid errors in certain environments
+try:
+    figure_name: str = str(Path(__file__).stem + '.svg')
+except NameError:
+    figure_name = "output.svg"
+
 
 plt.savefig(
     fname = figure_name,
