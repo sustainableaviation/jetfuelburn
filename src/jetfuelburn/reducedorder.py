@@ -915,6 +915,12 @@ class eea_emission_inventory_2009:
     ----------
     - [EMEP/EEA air pollutant emission inventory guidebook - 2009, Part B, Section 1 (Energy), Subsection 1.A.3.a (`Aviation_annex.zip`)](https://www.eea.europa.eu/en/analysis/publications/emep-eea-emission-inventory-guidebook-2009)
 
+    Warnings
+    --------
+    Note that only EEA data between 1999-2009 was based on Piano simulations, as documented in the `Aviation_annex.zip` file.  
+    Later versions of the EEA guidebook (2013, 2016, 2019, 2023) instead use the Eurocontrol Advanced Emission Model (AEM), as documented in the respective guidebook files.  
+    These later models could not be incorporated into `jetfuelburn` for licensing reasons.
+
     Example
     -------
     ```pyodide install='jetfuelburn'
