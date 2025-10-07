@@ -1,6 +1,6 @@
 import pytest
 
-from jetfuelburn.aux.tests import approx_with_units
+from jetfuelburn.utility.tests import approx_with_units
 from jetfuelburn.reducedorder import (
     yanto_etal,
     aim2015,

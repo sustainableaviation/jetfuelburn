@@ -1,7 +1,7 @@
 import math
 import csv
 from jetfuelburn import ureg
-from jetfuelburn.aux.physics import _calculate_dynamic_pressure
+from jetfuelburn.utility.physics import _calculate_dynamic_pressure
 
 def poll_et_al() -> None:
     r"""

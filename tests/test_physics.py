@@ -1,7 +1,7 @@
 import pytest
 
-from jetfuelburn.aux.tests import approx_with_units
-from jetfuelburn.aux.physics import _calculate_atmospheric_conditions, _calculate_aircraft_velocity
+from jetfuelburn.utility.tests import approx_with_units
+from jetfuelburn.utility.physics import _calculate_atmospheric_conditions, _calculate_aircraft_velocity
 from .fixtures.physics import atmospheric_case_fixture, mach_speed_case_fixture
 
 

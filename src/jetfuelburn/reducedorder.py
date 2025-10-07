@@ -3,7 +3,7 @@ import json
 import math
 from importlib import resources
 from jetfuelburn import ureg
-from jetfuelburn.aux.physics import _calculate_dynamic_pressure
+from jetfuelburn.utility.physics import _calculate_dynamic_pressure
 
 
 class yanto_etal:

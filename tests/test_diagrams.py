@@ -1,6 +1,6 @@
 import pytest
 
-from jetfuelburn.aux.tests import approx_with_units
+from jetfuelburn.utility.tests import approx_with_units
 from jetfuelburn.diagrams import calculate_fuel_consumption_payload_range
 from .fixtures.diagrams import make_payload_range_case
 
