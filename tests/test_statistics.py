@@ -1,6 +1,6 @@
 import pytest
 
-from jetfuelburn.aux.tests import approx_with_units
+from jetfuelburn.utility.tests import approx_with_units
 from jetfuelburn.statistics import usdot
 
 def test_usdot():

@@ -3,6 +3,12 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## `1.1.0` (07. October 2025)
+
+### Improvements
+
+Renamed module `aux` to `utility` for consistency with other packages.
+
 ## `1.0.2` (08. August 2025)
 
 ### Improvements

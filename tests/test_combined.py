@@ -1,7 +1,7 @@
 import pytest
 from jetfuelburn import ureg
 
-from jetfuelburn.aux.tests import approx_with_units
+from jetfuelburn.utility.tests import approx_with_units
 from jetfuelburn.combined import calculate_fuel_consumption_combined_model
 from .fixtures.combined import make_combined_model_case
 

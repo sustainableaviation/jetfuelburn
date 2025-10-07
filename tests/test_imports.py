@@ -51,33 +51,33 @@ def test_combined():
 
 
 def test_aux_physics():
-    import jetfuelburn.aux.physics
+    import jetfuelburn.utility.physics
     
-    from jetfuelburn.aux.physics import _calculate_atmospheric_conditions
+    from jetfuelburn.utility.physics import _calculate_atmospheric_conditions
     assert callable(_calculate_atmospheric_conditions)
     
-    from jetfuelburn.aux.physics import _calculate_dynamic_pressure
+    from jetfuelburn.utility.physics import _calculate_dynamic_pressure
     assert callable(_calculate_dynamic_pressure)
     
-    from jetfuelburn.aux.physics import _calculate_aircraft_velocity
+    from jetfuelburn.utility.physics import _calculate_aircraft_velocity
     assert callable(_calculate_aircraft_velocity)
 
 
 def test_aux_allocation():
-    import jetfuelburn.aux.allocation
+    import jetfuelburn.utility.allocation
     
-    from jetfuelburn.aux.allocation import footprint_allocation_by_area
+    from jetfuelburn.utility.allocation import footprint_allocation_by_area
     assert callable(footprint_allocation_by_area)
 
 
 def test_aux_tests():
-    import jetfuelburn.aux.tests
+    import jetfuelburn.utility.tests
     
-    from jetfuelburn.aux.tests import approx_with_units
+    from jetfuelburn.utility.tests import approx_with_units
     assert callable(approx_with_units)
     
-    from jetfuelburn.aux.tests import approx_dict
+    from jetfuelburn.utility.tests import approx_dict
     assert callable(approx_dict)
     
-    from jetfuelburn.aux.tests import approx_dict_of_dict
+    from jetfuelburn.utility.tests import approx_dict_of_dict
     assert callable(approx_dict_of_dict)

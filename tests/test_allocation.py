@@ -5,7 +5,7 @@ from .fixtures.allocation import (
     allocation_all_classes
 )
 
-from jetfuelburn.aux.allocation import footprint_allocation_by_area
+from jetfuelburn.utility.allocation import footprint_allocation_by_area
 
 @pytest.mark.parametrize(
     "fixture_name",
