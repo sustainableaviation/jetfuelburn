@@ -164,7 +164,7 @@ The `jetfuelburn` package also includes helper functions for basic atmospheric p
 Some reduced-order models call these internally - but they can also be used independently.
 
 ```pyodide session='fuel'
-from jetfuelburn.aux.physics import (
+from jetfuelburn.utility.physics import (
     _calculate_atmospheric_conditions,
     _calculate_aircraft_velocity,   
 )

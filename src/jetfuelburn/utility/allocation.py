@@ -113,7 +113,7 @@ def footprint_allocation_by_area(
     -------
     ```pyodide install="jetfuelburn"
     from jetfuelburn import ureg
-    from jetfuelburn.aux.allocation import footprint_allocation_by_area
+    from jetfuelburn.utility.allocation import footprint_allocation_by_area
     footprint_allocation_by_area(
         fuel_per_flight=14000*ureg.kg,
         size_factor_eco=1,
