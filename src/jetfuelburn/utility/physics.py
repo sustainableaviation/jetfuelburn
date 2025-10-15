@@ -75,7 +75,7 @@ def _calculate_atmospheric_conditions(altitude: float) -> dict[float, float]:
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
-    from jetfuelburn.aux.physics import _calculate_atmospheric_conditions
+    from jetfuelburn.utility.physics import _calculate_atmospheric_conditions
     _calculate_atmospheric_conditions(altitude=10000*ureg.m)
     ```
     """
@@ -151,7 +151,7 @@ def _calculate_dynamic_pressure(
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
-    from jetfuelburn.aux.physics import _calculate_dynamic_pressure
+    from jetfuelburn.utility.physics import _calculate_dynamic_pressure
     _calculate_dynamic_pressure(
         speed=833*ureg.kph,
         altitude=10000*ureg.m
@@ -210,7 +210,7 @@ def _calculate_aircraft_velocity(
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
-    from jetfuelburn.aux.physics import _calculate_aircraft_velocity
+    from jetfuelburn.utility.physics import _calculate_aircraft_velocity
     _calculate_aircraft_velocity(
         mach_number=0.8,
         altitude=10000*ureg.m
