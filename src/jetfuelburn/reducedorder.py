@@ -747,6 +747,11 @@ class aim2015:
     | reserve fuel uplift   | considered implicitly (?)                                                   |
     | diversion fuel uplift | considered implicitly (?)                                                   |
 
+    Warnings
+    --------
+    While the AIM2015 documentation lists the Boeing 777-300ER using the PW4090 engine, 
+    this aircraft variant [was exclusively powered by GE90 engines](https://en.wikipedia.org/wiki/Boeing_777#Engines).
+
     See Also
     --------
     Class `AircraftPerformanceParams` in `aim/v11/datastructures/AircraftPerformanceParams`
