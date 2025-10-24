@@ -21,6 +21,10 @@ nav:
     - Cabin Class Fuel Allocation: 'api/allocation.md'
   - API Reference (Internal):
     - Physics Functions: 'api/physics.md'
+  - API Reference (External):
+    - Statistics Models: 'api/statistics_external.md'
+    - 'Reduced Order Models': 'api/reducedorder_external.md'
+    - Closed Form Models: 'api/closedform_external.md'
   - FAQ: 'faq.md'
   - Changelog: 'changelog.md'
 theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
