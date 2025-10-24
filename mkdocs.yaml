@@ -5,7 +5,9 @@ copyright: © Paul Scherrer Institute (PSI) and Contributors | Code under MIT Li
 nav: 
   - Home: 'index.md'
   - About: 'about.md'
-  #- Comparing Models: 'comparison.md'
+  - Comparing Models:
+    - Comparison: 'comparison.md'
+    - Models (JetFuelBurn): 'notebooks/model_comparison_jetfuelburn.ipynb'
   - Getting Started:
     - Installation: 'installation.md'
     - Working with Physical Units: 'interactive/units.md'
@@ -63,6 +65,10 @@ plugins:
   - markdown-exec
   - autorefs
   - include-markdown
+  - mkdocs-jupyter:
+      include: ["notebooks.ipynb"]
+      execute: False
+      show_input: True
 markdown_extensions:
   - admonition
   - pymdownx.superfences
