@@ -3,6 +3,7 @@ mkdocstrings-python
 ruff
 pymdown-extensions
 markdown-exec
+mkdocs-jupyter
 mkdocs-include-markdown-plugin
 # requirements for interactive figures
 plotly-express
