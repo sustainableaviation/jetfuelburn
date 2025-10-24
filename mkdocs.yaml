@@ -80,6 +80,8 @@ extra_javascript:
   # unpkg is incredibly slow (17s to load the css file)
   - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js
   - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.js
+  - _javascripts/tablesort.js
 extra_css:
   # https://cdnjs.com/libraries/KaTeX
   # unpkg is incredibly slow (17s to load the css file)
