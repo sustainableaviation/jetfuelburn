@@ -5,7 +5,9 @@ copyright: © Paul Scherrer Institute (PSI) and Contributors | Code under MIT Li
 nav: 
   - Home: 'index.md'
   - About: 'about.md'
-  #- Comparing Models: 'comparison.md'
+  - Comparing Models:
+    - Aircraft Type Matrix: 'comparison.md'
+    - Models (JetFuelBurn): 'notebooks/model_comparison_jetfuelburn.ipynb'
   - Getting Started:
     - Installation: 'installation.md'
     - Working with Physical Units: 'interactive/units.md'
@@ -25,7 +27,7 @@ nav:
   - Changelog: 'changelog.md'
 theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
   name: material
-  #custom_dir: docs/_overrides
+  custom_dir: docs/_overrides
   logo: _static/logos/jetfuelburn_logo.svg
   favicon: _static/logos/jetfuelburn_logo.svg
   highlightjs: true
@@ -63,6 +65,11 @@ plugins:
   - markdown-exec
   - autorefs
   - include-markdown
+  - mkdocs-jupyter:
+      include: ["notebooks/*.ipynb"]
+      execute: False
+      show_input: True
+      include_source: True
 markdown_extensions:
   - admonition
   - pymdownx.superfences
@@ -87,6 +94,7 @@ extra_css:
   - _css/extra.css
 
 watch:
+  - docs
   - src/jetfuelburn
 
 extra:
