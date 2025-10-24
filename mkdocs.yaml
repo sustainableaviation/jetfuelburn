@@ -6,7 +6,7 @@ nav:
   - Home: 'index.md'
   - About: 'about.md'
   - Comparing Models:
-    - Comparison: 'comparison.md'
+    - Aircraft Type Matrix: 'comparison.md'
     - Models (JetFuelBurn): 'notebooks/model_comparison_jetfuelburn.ipynb'
   - Getting Started:
     - Installation: 'installation.md'
@@ -27,7 +27,7 @@ nav:
   - Changelog: 'changelog.md'
 theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
   name: material
-  #custom_dir: docs/_overrides
+  custom_dir: docs/_overrides
   logo: _static/logos/jetfuelburn_logo.svg
   favicon: _static/logos/jetfuelburn_logo.svg
   highlightjs: true
@@ -66,9 +66,10 @@ plugins:
   - autorefs
   - include-markdown
   - mkdocs-jupyter:
-      include: ["notebooks.ipynb"]
+      include: ["notebooks/*.ipynb"]
       execute: False
       show_input: True
+      include_source: True
 markdown_extensions:
   - admonition
   - pymdownx.superfences
@@ -93,6 +94,7 @@ extra_css:
   - _css/extra.css
 
 watch:
+  - docs
   - src/jetfuelburn
 
 extra:
