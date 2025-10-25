@@ -1,7 +1,5 @@
 # Closed Form Models (External)
 
-This section documents external analytical models for aircraft fuel burn that can be compared with or complement the models implemented in the `jetfuelburn` package.
-
 ## Poll–Schumann Model (via `pycontrails`)
 
 The Poll–Schumann model provides a closed-form, physics-based method to estimate aircraft fuel flow and performance along flight trajectories. It is implemented in [`pycontrails`](https://py.contrails.org), an open-source library for modeling contrails and aviation climate impacts.
