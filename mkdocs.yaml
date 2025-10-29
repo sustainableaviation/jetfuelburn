@@ -6,14 +6,14 @@ nav:
   - Home: 'index.md'
   - About: 'about.md'
   - Comparing Models:
-    - Aircraft Type Matrix: 'comparison.md'
-    - Models (JetFuelBurn): 'notebooks/model_comparison_jetfuelburn.ipynb'
+    - Aircraft Type Matrix: 'comparison/comparison.md'
+    - Models (JetFuelBurn): 'comparison/model_comparison_jetfuelburn.ipynb'
   - Getting Started:
     - Installation: 'installation.md'
     - Working with Physical Units: 'interactive/units.md'
     - Fuel Burn Calculations: 'interactive/fuel.md'
     - Cabin Class Fuel Allocation: 'interactive/allocation.md'
-  - API Reference (Public):
+  - API Reference:
     - PL/R-Diagrams: 'api/diagrams.md'
     - Range Equation: 'api/breguet.md'
     - Statistics Models: 'api/statistics.md'
@@ -21,8 +21,11 @@ nav:
     - Combined Models: 'api/combined.md'
     - Closed Form Models: 'api/closedform.md' 
     - Cabin Class Fuel Allocation: 'api/allocation.md'
-  - API Reference (Internal):
-    - Physics Functions: 'api/physics.md'
+    - Physics Utility Functions: 'api/physics.md'
+  - API Reference (External):
+    - Statistics Models: 'api/statistics_external.md'
+    - Reduced Order Models: 'api/reducedorder_external.md'
+    - Closed Form Models: 'api/closedform_external.md'
   - FAQ: 'faq.md'
   - Changelog: 'changelog.md'
 theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
@@ -66,7 +69,7 @@ plugins:
   - autorefs
   - include-markdown
   - mkdocs-jupyter:
-      include: ["notebooks/*.ipynb"]
+      include: ["*.ipynb"]
       execute: False
       show_input: True
       include_source: True
@@ -87,6 +90,8 @@ extra_javascript:
   # unpkg is incredibly slow (17s to load the css file)
   - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js
   - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.js
+  - _javascripts/tablesort.js
 extra_css:
   # https://cdnjs.com/libraries/KaTeX
   # unpkg is incredibly slow (17s to load the css file)
