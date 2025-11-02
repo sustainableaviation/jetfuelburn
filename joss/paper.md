@@ -40,6 +40,14 @@ Aerospace engineering researchers have proposed numerous methods for estimating 
 
 \clearpage
 
+# Example Use Case
+
+![Comparison of for the routes shown in ](_media/map_flights_emissions_flight_routes.png){height="5cm"}
+
+![Comparison of for the routes shown in adapted from [@weinold2025csfm]](_media/fuel_calc_comparison.svg){height="5cm"}
+
+\clearpage
+
 # Fuel Calculation Model Categories
 
 The `jetfuelburn` package includes different methods for calculating fuel burn of commercial aircraft. These methods can be broadly categorized into four groups:
@@ -54,7 +62,7 @@ If some basic aircraft performance parameters are known, the Breguet range equat
 
 ## Reduced Order Models
 
-If access to propriatary aircraft performance simulation software is available, fuel burn for specific aircraft missions can be simulated with high resolution. However, these simulations can be computationally expensive. Reduced order models instead use regression to extract a simplified model from a large set of high resolution simulation results. While the simulations may include many aircraft and mission parameters, reduced order models only require a few key parameter, such as payload and range. Publications implemented in the initial version of `jetfuelburn` include [@young2017performance][@dray2019aim2015][@seymour2020fuel][@yanto2017efficient][@lee2010closed].
+If access to propriatary aircraft performance simulation software is available, fuel burn for specific aircraft missions can be simulated with high resolution. However, these simulations can be computationally expensive. Reduced order models instead use regression to extract a simplified model from a large set of high resolution simulation results. While the simulations may include many aircraft and mission parameters, reduced order models only require a few key parameter, such as payload and range. Publications implemented in the initial version of `jetfuelburn` include [@young2017performance; @dray2019aim2015; @seymour2020fuel; @yanto2017efficient; @lee2010closed].
 
 ## Statistical Models
 
@@ -67,8 +75,6 @@ The `jetfuelburn` package includes helper functions for basic problems in atmosp
 # Interactive Documentation
 
 The package documentation allows users to compute fuel burn directly in the browser, without the need to install the package locally. This is achieved through the use of a [Pyodide](https://pyodide.org/en/stable/) Web Assembly Python kernel. The interactive documentation is available at [jetfuelburn.readthedocs.io](https://jetfuelburn.readthedocs.io).
-
-![some caption](_media/fuel_calc_comparison.svg){height="9pt"}
 
 # Acknowledgements
 
