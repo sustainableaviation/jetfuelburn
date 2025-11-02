@@ -38,13 +38,15 @@ The environmental assessment of air travel has received increasing attention in 
 
 Aerospace engineering researchers have proposed numerous methods for estimating commercial aircraft fuel burn, yet few are implemented in accessible, lightweight Python packages. Sun’s 2022 OpenAP package [@sun2022openap] is a standout, offering an innovative and user-friendly solution for fuel burn modeling. However, there is still no tool for comparative analysis of different models. The `jetfuelburn` package fills this gap as the first comprehensive Python package for comparing different aircraft fuel burn models from peer-reviewed publications. Tailored for environmental impact assessments, aircraft performance analysis, and optimization, it enhances existing calculators.
 
+![](_media/airbus.png){height="2cm"}
+
 \clearpage
 
 # Example Use Case
 
-![Comparison of for the routes shown in ](_media/map_flights_emissions_flight_routes.png){height="5cm"}
+![Comparison of for the routes shown in @[fig:fuel-calc-comparison]](_media/map_flights_emissions_flight_routes.png){height="5cm"}
 
-![Comparison of for the routes shown in adapted from [@weinold2025csfm]](_media/fuel_calc_comparison.svg){height="5cm"}
+![Comparison of for the routes shown in adapted from [@weinold2025csfm]](_media/fuel_calc_comparison.svg){height="5cm"}{#fig:fuel-calc-comparison}
 
 \clearpage
 
