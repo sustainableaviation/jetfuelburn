@@ -38,15 +38,15 @@ The environmental assessment of air travel has received increasing attention in 
 
 Aerospace engineering researchers have proposed numerous methods for estimating commercial aircraft fuel burn, yet few are implemented in accessible, lightweight Python packages. Sun’s 2022 OpenAP package [@sun2022openap] is a standout, offering an innovative and user-friendly solution for fuel burn modeling. However, there is still no tool for comparative analysis of different models. The `jetfuelburn` package fills this gap as the first comprehensive Python package for comparing different aircraft fuel burn models from peer-reviewed publications. Tailored for environmental impact assessments, aircraft performance analysis, and optimization, it enhances existing calculators.
 
-!(_media/airbus.png){height="2cm"}
-
 \clearpage
 
 # Example Use Case
 
-![Comparison of for the routes shown in \autoref{fig:comparison}](_media/map_flights_emissions_flight_routes.png){height="5cm"}
+The `jetfuelburn` package can be used to compare different fuel burn models for specific flight routes and aircraft types. \autoref{fig:comparison} shows a comparison of fuel burn estimates for five different route/aircraft-combinations, using several models implemented in the `jetfuelburn` package. The results show that while all models generally agree on the trend of increasing fuel burn with distance, there are significant differences in the absolute values predicted by each model. These differences become larger as the flight distance increases. This highlights the importance of selecting an appropriate model for specific applications, as the choice of model can have a significant impact on the results of environmental assessments.
 
-![Comparison of for the routes shown in adapted from [@weinold2025csfm] \label{fig:comparison}](_media/fuel_calc_comparison.svg){height="5cm"}
+![Comparison of fuel burn estimates for different routes/aircraft-combinations. Colors indicate model type: orange - statistical, red: machine-learning, blue: reduced-order, green: closed-form. For a geographical representation of the routes, compare \autoref{fig:map}. Adapted from [@weinold2025csfm, Figure 4] \label{fig:comparison}](_media/fuel_calc_comparison.svg){height="5cm"}
+
+![Overview of the routes shown in \autoref{fig:comparison}. \label{fig:map}](_media/map_flights_emissions_flight_routes.png){height="5cm"}
 
 \clearpage
 
