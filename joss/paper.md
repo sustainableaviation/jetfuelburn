@@ -68,6 +68,8 @@ The `jetfuelburn` package includes helper functions for basic problems in atmosp
 
 The package documentation allows users to compute fuel burn directly in the browser, without the need to install the package locally. This is achieved through the use of a [Pyodide](https://pyodide.org/en/stable/) Web Assembly Python kernel. The interactive documentation is available at [jetfuelburn.readthedocs.io](https://jetfuelburn.readthedocs.io).
 
+![some caption](_media/fuel_calc_comparison.svg){height="9pt"}
+
 # Acknowledgements
 
 This work has been supported by the Swiss Innovation Agency Innosuisse in the context of the WISER flagship project (PFFS-21-72). In addition, Michael P. Weinold gratefully acknowledges the support of the Swiss Study Foundation.
