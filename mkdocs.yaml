@@ -7,7 +7,6 @@ nav:
   - About: 'about.md'
   - Comparing Models:
     - Aircraft Type Matrix: 'comparison/comparison.md'
-    - Models (JetFuelBurn): 'comparison/model_comparison_jetfuelburn.ipynb'
   - Getting Started:
     - Installation: 'installation.md'
     - Working with Physical Units: 'interactive/units.md'

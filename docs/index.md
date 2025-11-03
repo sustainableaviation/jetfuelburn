@@ -9,10 +9,10 @@ import csv
 import plotly.express as px
 
 data = {'Range (km)': [], 'Value': [], 'Aircraft': []}
-with open('docs/_static/figure_data/airbus_fuel_burn.csv', 'r') as file:
+with open('docs/_static/figure_data/usdot_fuel_burn.csv', 'r') as file:
     csv_reader = csv.DictReader(file)
     for row in csv_reader:
-        for aircraft in ['A320', 'A388', 'A333', 'A343', 'A359']:
+        for aircraft in ['A320', 'B737', 'A330', 'B757', 'A350', 'B787']:
             data['Range (km)'].append(int(row['Range (km)']))
             data['Value'].append(float(row[aircraft]))
             data['Aircraft'].append(aircraft)
@@ -42,4 +42,4 @@ fig.add_layout_image(
 print(fig.to_html(full_html=False, include_plotlyjs="cdn"))
 # https://pawamoy.github.io/markdown-exec/gallery/#with-plotly
 ```
-_Interactive visualization of fuel burn for different Airbus aircraft types, based on the "FEAT" model by Seymour et al. ([`jetfuelburn.reducedorder.seymour_etal`][])._
+_Interactive visualization of fuel burn for different Airbus aircraft types, based on the "FEAT" model by Seymour et al. ([`jetfuelburn.statistics.usdot`][])._

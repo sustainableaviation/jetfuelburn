@@ -18,11 +18,9 @@ def calculate_fuel_consumption_range_equation(
     r"""
     Given a flight distance (=range) $R$ and aircraft performance parameters (see table),
     returns the fuel mass burned during the flight $m_f$ [kg] based on the Breguet range equation.
-
     $$
         m_f = (e^{\frac{R \cdot TSFC \cdot g}{L/D \cdot v}} - 1 ) m_2
     $$
-
     where:
 
     | Symbol     | Dimension         | Description                                                            |
