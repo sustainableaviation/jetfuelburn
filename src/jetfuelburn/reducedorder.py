@@ -19,11 +19,9 @@ class yanto_etal:
     Cruise segment fuel burn is calculated using the Breguet range equation.
 
     Fuel burn is calculated according to Table 5 in Yanto and Liem (2017):
-
     $$
         W_f = c_R \cdot R + c_P \cdot PL + c_C
     $$
-
     where:
 
     | Symbol     | Dimension         | Description                                                            |
@@ -437,11 +435,9 @@ class seymour_etal:
     from the Eurocontrol BADA flight trajectory simulation model and climb/descent fuel burn data based on engine data.
 
     Fuel burn is calculated according to Table M.7 in the supplement to Seymour et al. (2020):
-
     $$
         F=a_1 \cdot R^2 + a_2 \cdot R + c
     $$
-
     where:
 
     | Symbol     | Dimension            | Description                                   |
@@ -464,6 +460,18 @@ class seymour_etal:
     | **GitHub** `.csv` | 7.378617475106708e-05 | 2.920849872328848 | 1218.8211966548952     |
 
     This implementation uses the coefficients provided in the GitHub `.csv` file.
+
+    Warnings
+    --------
+    Note that Seymour et al. in the Disclaimers section of their publication mention, that:
+    > The fuel burn models provided in (...) [the supplementary information] shall not be used for 
+    > comparing fuel efficiency and emission data between aircraft models and manufacturers. 
+    > Recommended model applications are reported in Section 3.5.
+
+    Section 3.5 then mentions as potential applications:
+    > (...) computing global CO2 emissions using the reduced order models (...) [and] 
+    > (...) fleet turnover and flight route projections can be combined to create any 
+    > number of future flight movement scenarios which together with the reduced order models can be leveraged to generate valuable insights. 
 
     Notes
     -----
@@ -1062,11 +1070,9 @@ class myclimate:
 
     Fuel burn is calculated using a quadratic function of the form
     defined in the myClimate Flight Emissions Calculator Calculation Principles:
-
     $$
     f(x) + LTO = ax^2 + bx + c
     $$
-
     where:
 
     | Symbol     | Dimension         | Description                                                            |
