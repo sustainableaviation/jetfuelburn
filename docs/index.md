@@ -42,4 +42,4 @@ fig.add_layout_image(
 print(fig.to_html(full_html=False, include_plotlyjs="cdn"))
 # https://pawamoy.github.io/markdown-exec/gallery/#with-plotly
 ```
-_Interactive visualization of fuel burn for different Airbus aircraft types, based on 2018 statistical data provided by the U.S. Department of Transportation ([`jetfuelburn.statistics.usdot`][])._
+_Interactive visualization of fuel burn for different Airbus and Boeing aircraft types, based on 2018 statistical data provided by the U.S. Department of Transportation ([`jetfuelburn.statistics.usdot`][])._
