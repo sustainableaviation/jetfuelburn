@@ -22,7 +22,7 @@ nav:
     - Cabin Class Fuel Allocation: 'api/allocation.md'
     - Physics Utility Functions: 'api/physics.md'
   - API Reference (External):
-    - Statistics Models: 'api/statistics_external.md'
+    - EU Flight Emissions Label: 'api/eu_fel.md'
     - Reduced Order Models: 'api/reducedorder_external.md'
     - Closed Form Models: 'api/closedform_external.md'
   - FAQ: 'faq.md'
@@ -75,6 +75,7 @@ plugins:
 markdown_extensions:
   - admonition
   - pymdownx.superfences
+  - pymdownx.details
   - toc:
       permalink: true
   - pymdownx.arithmatex:
