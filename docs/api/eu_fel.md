@@ -35,44 +35,31 @@ Each FEL record represents a unique combination:
 The following extracts provide the legal foundation for the Flight Emissions Label (FEL). They are quoted directly from EU law with context for application within JetFuelBurn.
 
 ### § 14 — Establishment of the Flight Emissions Label
-> **Regulation (EU) 2023/2405 — ReFuelEU Aviation**  
-> [📘 Full text on EUR-Lex](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023R2405#art_14)
 
-!!! reference "§ 14 – Voluntary Environmental Labelling Scheme"
-    > (1) “A voluntary environmental labelling scheme enabling the environmental performance of flights to be measured is hereby established.”  
-    >  
-    > (2) “Labels issued pursuant to this Article shall apply to aircraft operators falling within the scope of this Regulation for flights covered by this Regulation departing from Union airports. Where an aircraft operator requests the issuance of a label under this Article, it shall request such a label for all its flights covered by this Regulation departing from Union airports.”  
-    >  
-    > “Aircraft operators may request the issuance of labels under this Article also for their flights covered by this Regulation arriving at Union airports. Where an aircraft operator requests the issuance of a label under this subparagraph, it shall request such a label for all its flights arriving at Union airports.”  
-    >  
-    > …  
-    >  
-    > (9) “In order to finance the costs of the service provided by the Agency, the issuing of a label at the request of an aircraft operator shall be subject to the payment of a charge … The amount of the charge shall be defined pursuant to Article 126(4) of Regulation (EU) 2018/1139.”  
-    >  
-    > …  
-    >  
-    > (12) “By 1 July 2027, the Commission shall identify and assess … with a view in particular to establish a compulsory environmental labelling scheme … The Commission shall present a report … to the European Parliament and to the Council.”  
-    — *§ 14 (1)–(2), (9), (12) Reg. (EU) 2023/2405 (ReFuelEU Aviation), OJ L 2023/2405, 31 Oct 2023.*
+> (1) “A voluntary environmental labelling scheme enabling the environmental performance of flights to be measured is hereby established.”  
+>  
+> (2) “Labels issued pursuant to this Article shall apply to aircraft operators falling within the scope of this Regulation for flights covered by this Regulation departing from Union airports. Where an aircraft operator requests the issuance of a label under this Article, it shall request such a label for all its flights covered by this Regulation departing from Union airports.”  
+>  
+> “Aircraft operators may request the issuance of labels under this Article also for their flights covered by this Regulation arriving at Union airports. Where an aircraft operator requests the issuance of a label under this subparagraph, it shall request such a label for all its flights arriving at Union airports.” (...)
+>  
+> (9) “In order to finance the costs of the service provided by the Agency, the issuing of a label at the request of an aircraft operator shall be subject to the payment of a charge … The amount of the charge shall be defined pursuant to Article 126(4) of Regulation (EU) 2018/1139.” (...) 
+>  
+> (12) “By 1 July 2027, the Commission shall identify and assess … with a view in particular to establish a compulsory environmental labelling scheme … The Commission shall present a report … to the European Parliament and to the Council.”  
+>
+> — [*§ 14 (1)–(2), (9), (12) Reg. (EU) 2023/2405 (ReFuelEU Aviation), OJ L 2023/2405, 31 Oct 2023.*](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023R2405#art_14)
 
----
 
 ### Annex II — Flight Emissions Calculation Methodology
-> **Commission Implementing Regulation (EU) 2024/3170**  
-> [📘 Full text on EUR-Lex](https://eur-lex.europa.eu/eli/reg_impl/2024/3170/oj/eng#anx_II)
 
-!!! reference "Annex II – Methodology for Estimating Flight Emissions"
-    > (Preamble) “This Annex lays down the methodology and the necessary steps that the Agency shall follow for the estimation of flight emissions.”  
-    >  
-    > § 1 Abs. 1 “Flight emissions shall be calculated by multiplying the estimated consumption of aviation fuels … by the weighted average of lifecycle emissions of the aviation fuels uplifted at the departure airport. At the same time, flight emissions are equal to the sum of cabin and freight emissions.”  
-    >  
-    > …  
-    >  
-    > § 1 Abs. 3 lit. b) “If primary data for the scheduled flights does not exist, is insufficient, cannot be verified or exists only for operating conditions significantly differing from those reported, the estimated aviation fuels consumption shall be calculated by approximation using the Breguet-Range equation.”  
-    >  
-    > …  
-    >  
-    > § 2 Abs. 1 “Flight emissions shall be attributed to the cabin and to freight on the basis of the respective apportionment of cabin and freight mass.”  
-    — *Annex II § 1 Abs. 1, § 1 Abs. 3 lit. b), § 2 Abs. 1 Implementing Reg. (EU) 2024/3170, OJ L 2024/3170, 12 Nov 2024.*
+> (Preamble) “This Annex lays down the methodology and the necessary steps that the Agency shall follow for the estimation of flight emissions.”  
+>  
+> § 1 Abs. 1 “Flight emissions shall be calculated by multiplying the estimated consumption of aviation fuels … by the weighted average of lifecycle emissions of the aviation fuels uplifted at the departure airport. At the same time, flight emissions are equal to the sum of cabin and freight emissions.”  (...)
+>  
+> § 1 Abs. 3 lit. b) “If primary data for the scheduled flights does not exist, is insufficient, cannot be verified or exists only for operating conditions significantly differing from those reported, the estimated aviation fuels consumption shall be calculated by approximation using the Breguet-Range equation.” (...)
+>  
+> § 2 Abs. 1 “Flight emissions shall be attributed to the cabin and to freight on the basis of the respective apportionment of cabin and freight mass.”  
+>
+— [*Annex II § 1 Abs. 1, § 1 Abs. 3 lit. b), § 2 Abs. 1 Implementing Reg. (EU) 2024/3170, OJ L 2024/3170, 12 Nov 2024.*](https://eur-lex.europa.eu/eli/reg_impl/2024/3170/oj/eng#anx_II)
 
 !!! reference "See Also"
     - [EASA Flight Emissions Portal](https://www.flightemissions.eu/en)  
