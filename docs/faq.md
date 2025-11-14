@@ -9,9 +9,19 @@ Q: Was Eurocontrol BADA model data used in developing (parts of) the JetFuelBurn
 
 A: **No, not directly**.
 
-Consider, for instance, the [Seymour et al.](https://doi.org/10.1016/j.trd.2020.102528) model implemented in the [`jetfuelburn.reducedorder.seymour_etal`](https://jetfuelburn.readthedocs.io/en/latest/api/reducedorder/#jetfuelburn.reducedorder.seymour_etal) class:
+The [reduced order](../api/reducedorder) module of the JetFuelBurn package implements three regression models which were in part developed based on BADA data. However, no BADA model data was used in developing any part of the JetFuelBurn package itself. 
 
-The Seymour et al. model for fuel burn estimation of commercial aircraft is a _reduced order_ model. This means that the model is based on statistical analysis (regression) of a more complex model. In this specific case, Seymour et al. used a combination of BADA and ICAO Engine Emissions Databank data to compute high-resolution fuel burn estimates. 
+### Model Overview
+
+| Model |  Publication Year | Disclaimer/Limitations |
+|-------|-------------------|------------------------|
+| [`jetfuelburn.reducedorder.lee_etal`][] | 2010 | None |
+| [`jetfuelburn.reducedorder.yanto_etal`][] | 2017 | None |
+| [`jetfuelburn.reducedorder.seymour_etal`][] | 2020 | Yes: `The fuel burn models provided (...) shall not be used for comparing fuel efficiency and emission data between aircraft models and manufacturers.` |
+
+### Seymour et al. Model Disclaimer
+
+The [`jetfuelburn.reducedorder.seymour_etal`][] model for fuel burn estimation of commercial aircraft is a reduced order model. This means that the model is based on statistical analysis (regression) of a more complex model. In this specific case, Seymour et al. used a combination of BADA and ICAO Engine Emissions Databank data to compute high-resolution fuel burn estimates.
 
 Having computed many such high-resolution estimates for different routes, they then performed a regression analysis to derive a reduced order model that can be used to compute fuel burn estimates with much lower computational effort. Their regression is in the variable of range $R$ only, since they assume an average payload per aircraft:
 $$
