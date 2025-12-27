@@ -46,7 +46,7 @@ The `jetfuelburn` package can be used to compare different fuel burn models for 
 
 ![Comparison of per-passenger economy-class carbon emissions derived from fuel burn estimates for different routes/aircraft-combinations. A conversion factor of 2.63 kg CO$_2$ per liter of Jet A/A-1 fuel was used. Colors indicate model type: orange - statistical, red: machine-learning, blue: reduced-order, green: closed-form. For a geographical representation of the routes, compare \autoref{fig:map}. Adapted from [@weinold2025csfm, Figure 4] \label{fig:comparison}](_media/fuel_calc_comparison.svg){height="5.5cm"}
 
-![Overview of the routes shown in \autoref{fig:comparison}. Note that in cases where a flight along the great-circle between origin and destination is not possible due to eg. geopolitical reasons, a multiplier can be applied. \label{fig:map}](_media/map_flights_emissions_flight_routes.png){height="5cm"}
+![Overview of the routes shown in \autoref{fig:comparison}. Note that in cases where a flight along the great-circle between origin and destination is not possible due to e.g., geopolitical reasons, a multiplier can be applied. \label{fig:map}](_media/map_flights_emissions_flight_routes.png){height="5cm"}
 
 \clearpage
 
@@ -64,7 +64,7 @@ If some basic aircraft performance parameters are known, the Breguet range equat
 
 ## Reduced Order Models
 
-If access to propriatary aircraft performance simulation software is available, fuel burn for specific aircraft missions can be simulated with high resolution. However, these simulations can be computationally expensive. Reduced order models instead use regression to extract a simplified model from a large set of high resolution simulation results. While the simulations may include many aircraft and mission parameters, reduced order models only require a few key parameter, such as payload and range. Publications implemented in the initial version of `jetfuelburn` include [@young2017performance; @dray2019aim2015; @seymour2020fuel; @yanto2017efficient; @lee2010closed].
+If access to propriatary aircraft performance simulation software is available, fuel burn for specific aircraft missions can be simulated with high resolution. However, these simulations can be computationally expensive. Reduced order models instead use regression to extract a simplified model from a large set of high resolution simulation results. While the simulations may include many aircraft and mission parameters, reduced order models only require a few key parameter, such as payload and range. The initial version of `jetfuelburn` implements methods from [@young2017performance; @dray2019aim2015; @seymour2020fuel; @yanto2017efficient; @lee2010closed].
 
 ## Statistical Models
 
