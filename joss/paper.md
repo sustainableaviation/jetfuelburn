@@ -64,7 +64,7 @@ If some basic aircraft performance parameters are known, the Breguet range equat
 
 ## Reduced Order Models
 
-If access to propriatary aircraft performance simulation software is available, fuel burn for specific aircraft missions can be simulated with high resolution. However, these simulations can be computationally expensive. Reduced order models instead use regression to extract a simplified model from a large set of high resolution simulation results. While the simulations may include many aircraft and mission parameters, reduced order models only require a few key parameter, such as payload and range. The initial version of `jetfuelburn` implements methods from [@young2017performance; @dray2019aim2015; @seymour2020fuel; @yanto2017efficient; @lee2010closed].
+If access to propriatary aircraft performance simulation software is available, fuel burn for specific aircraft missions can be simulated with high resolution. However, these simulations can be computationally expensive. Reduced order models instead use regression to extract a simplified model from a large set of high resolution simulation results. While the simulations may include many aircraft and mission parameters, reduced order models only require a few key parameter, such as payload and range. The initial version of `jetfuelburn` implements methods from @young2017performance, @dray2019aim2015, @seymour2020fuel, @yanto2017efficient and @lee2010closed.
 
 ## Statistical Models
 
