@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Weinold"
+  given-names: "Michael P."
+- family-names: "McKenna"
+  given-names: "Russell"
+title: "JetFuelBurn: A Python package for calculating fuel burn of commercial aircraft"
+license: MIT
+doi: 10.21105/joss.09280
+date-released: 2026-01-10
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Weinold"
+    given-names: "Michael P."
+  - family-names: "McKenna"
+    given-names: "Russell"
+  doi: "10.21105/joss.09280"
+  journal: "Journal of Open Source Software"
+  month: 1
+  start: 9280
+  title: "JetFuelBurn: A Python package for calculating fuel burn of commercial aircraft"
+  issue: 117
+  volume: 11
+  year: 2026
