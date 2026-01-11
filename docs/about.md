@@ -12,21 +12,21 @@ The `jetfuelburn` package was developed by [Michael Weinold](https://www.linkedi
 
 ## Citing the Tool
 
-To cite the use of `jetfuelburn` in academic work, please the main publication:
+To cite the use of `jetfuelburn` in academic work, please use the main publication:
 
 > Weinold and McKenna, (2026). JetFuelBurn: A Python package for calculating fuel burn of commercial aircraft. _Journal of Open Source Software_, 11(117), 9280, [doi:10.21105/joss.09280](https://doi.org/10.21105/joss.09280).
 
 ??? quote "BibTeX Entry"
     ```bibtex
     @article{weinold2026jetfuelburn,
-    title={JetFuelBurn: A Python package for calculating fuel burn of commercial aircraft},
-    author={Weinold, Michael P and McKenna, Russell},
-    journal={Journal of Open Source Software},
-    volume={11},
-    number={117},
-    pages={9280},
-    year={2026},
-    doi={10.21105/joss.09280}
+        title={JetFuelBurn: A Python package for calculating fuel burn of commercial aircraft},
+        author={Weinold, Michael P and McKenna, Russell},
+        journal={Journal of Open Source Software},
+        volume={11},
+        number={117},
+        pages={9280},
+        year={2026},
+        doi={10.21105/joss.09280}
     }
     ```
 
