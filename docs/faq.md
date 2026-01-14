@@ -9,7 +9,7 @@ Q: Was Eurocontrol BADA model data used in developing (parts of) the JetFuelBurn
 
 A: **No, not directly**.
 
-The [reduced order](../api/reducedorder) module of the JetFuelBurn package implements three regression models which were in part developed based on BADA data. However, no BADA model data was used in developing any part of the JetFuelBurn package itself. 
+The [reduced order](api/reducedorder.md) module of the JetFuelBurn package implements three regression models which were in part developed based on BADA data. However, no BADA model data was used in developing any part of the JetFuelBurn package itself. 
 
 ### Model Overview
 
