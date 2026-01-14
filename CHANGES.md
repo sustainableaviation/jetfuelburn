@@ -3,6 +3,12 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## `1.2.0` (14. January 2026)
+
+### Improvements
+
+- Added the fuel burn model of the AeroMaps software framework by Planès et al. (2023) to the `jetfuelburn.statistics` module.
+
 ## `1.1.1` (20. December 2025)
 
 Release for Zenodo archiving and JOSS publication.
