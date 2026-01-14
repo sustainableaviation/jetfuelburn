@@ -10,9 +10,21 @@ class aeromaps:
     r"""
     This class implements the the reduced-order fuel burn model of the AeroMaps software tool by Planès et al. (2023).
 
-    In this model, fuel burn calculations are based on statistical average values in MJ/ASK (megajoule per available seat-kilometer) for three representative aircraft types. 
+    In this model, fuel burn calculations are based on statistical average values in MJ/ASK (megajoule per available seat-kilometer) for three representative aircraft types, 
+    with future efficiency improvements modelled over time:
+
+    > The corresponding historical fleet was calibrated using mean fuel consumption per market and representative aircraft.  
+    > - [Planès et al. (2023), P.5](https://doi.org/10.59490/joas.2023.7147)
+
+    > The future aircraft fleet can be modelled using two solutions: a top-down approach  based on annual efficiency gains, and a bottom-up approach in which aircraft data (performance,  entry-into-service...) are coupled with fleet renewal models.  
+    > - [Planès et al. (2023), P.5](https://doi.org/10.59490/joas.2023.7147)
+
     Here, the `drop_in` (fuel) data is used, although the model also data on future `hydrogen` aircraft.
-    
+
+    Warnings
+    --------
+    It is unclear from the model documentation whether the fuel consumption values given in MJ/ASK for future years are based on the top-down or bottom-up approach.
+
     References
     ----------
     Planès, T., Delbecq, S., & Salgas, A. (2023).
