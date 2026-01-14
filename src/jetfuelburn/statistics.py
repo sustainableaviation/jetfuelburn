@@ -1,7 +1,9 @@
-import pint
+# %%
 from jetfuelburn import ureg
-import json
 from importlib import resources
+import json
+import csv
+from jetfuelburn import ureg
 
 
 class aeromaps:
@@ -32,7 +34,7 @@ class aeromaps:
     """
 
     _statistical_data = {}
-    with resources.open_text("jetfuelburn.data.AeroMaps", "aeromaps_data.csv") as file:
+    with resources.open_text("jetfuelburn.data.AeroMaps", "aeromaps_data.csv", encoding='utf-8-sig') as file:
         csv_reader = csv.DictReader(file)
         for row in csv_reader:
             year = int(row.pop('year'))
