@@ -10,10 +10,8 @@ class aeromaps:
     r"""
     This class implements the the reduced-order fuel burn model of the AeroMaps software tool by Planès et al. (2023).
 
-    In this model, fuel burn calculations are based on statistical average values in MJ/ASK (megajoule per available seat-kilometer) for three representative aircraft types.
-    Data is stored in an Excel file included in the AeroMAPS repository: [`aeromaps/resources/data/data.xlsx`](https://github.com/AeroMAPS/AeroMAPS/blob/5febefe03cd69815a6949b67c43906c209ac14b1/aeromaps/resources/data/data.xlsx)
-
-    A conversion factor of 
+    In this model, fuel burn calculations are based on statistical average values in MJ/ASK (megajoule per available seat-kilometer) for three representative aircraft types. 
+    Here, the `drop_in` (fuel) data is used, although the model also data on future `hydrogen` aircraft.
     
     References
     ----------
@@ -31,6 +29,23 @@ class aeromaps:
     A Comprehensive Methodology for Performing Prospective Life Cycle Assessments of Future Air Transport Scenarios.
     In _34th Congress of the International Council of the Aeronautical Sciences_.
     hal:[hal-04703961](https://hal.science/hal-04703961v1)
+
+    See Also
+    --------
+    Excel in the AeroMAPS repository containing the statistical average energy use of aircraft types (short/medium/long-haul): [`aeromaps/resources/data/data.xlsx`](https://github.com/AeroMAPS/AeroMAPS/blob/5febefe03cd69815a6949b67c43906c209ac14b1/aeromaps/resources/data/data.xlsx)
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.statistics import aeromaps
+    aeromaps.calculate_fuel_consumption(
+        acft_type='long_range',
+        year=2020,
+        R=4000*ureg('km')
+    )
+    ```
     """
 
     _statistical_data = {}
@@ -72,9 +87,50 @@ class aeromaps:
         R: float,
     ) -> float:
         r"""
+        Given an aircraft type and range, calculates the fuel burned during flight **per passenger**.
+
+        Data is based on averages of fuel consumption per weight-distance flown by specific aircraft types,
+        in specific years, based on the assumptions of the AeroMaps software framework by Planès et al. (2023):
+
         $$
-        F = R / E_{spec}
+        F/pax = MJ/ASK * R / e
         $$
+
+        where:
+
+        | Symbol     | Dimension     | Description                              |
+        | ---------- | ------------- | ---------------------------------------- |
+        | $F$        | [weight]      | Fuel burned during flight                |
+        | $pax$      | [1]           | Number of passengers                     |
+        | $R$        | length        | Range of the flight                      |
+        | $MJ/ASK$   | energy/length | Average energy use per available seat-km |
+        | $e$        | energy/weight | Specific energy content of jet fuel      |
+
+        Warnings
+        --------
+        This model does not 
+
+        Parameters
+        ----------
+        year : int
+            Year of the data to be used for the calculation.
+        acft : str
+            Aircraft type (short/medium/long-haul) to be used for the calculation.
+        R : pint.Quantity
+            Range of the flight.
+
+        Returns
+        -------
+        pint.Quantity
+            Fuel burned during flight per passenger.
+
+        Raises
+        ------
+        ValueError
+            If the range is negative.  
+            If the year is not available in the model.  
+            If the aircraft type (short/medium/long-haul) is not available in the model for the given year.
+
         """
         if R.magnitude < 0:
             raise ValueError(f"Range must not be negative.")
