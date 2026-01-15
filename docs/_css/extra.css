@@ -2,3 +2,7 @@
 .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__link {
     font-weight: bold;
 }
+/* Reduce space around KaTeX/MathJax display blocks */
+.katex-display, .MathJax_Display {
+    margin: 0em 0 !important; /* Adjust 0.5em to whatever size you prefer */
+}
