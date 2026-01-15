@@ -126,7 +126,7 @@ class aeromaps:
         ----------
         year : int
             Year of the data to be used for the calculation.
-        acft : str
+        acft_type : str
             Aircraft type (short/medium/long-haul) to be used for the calculation.
         R : pint.Quantity
             Range of the flight.
