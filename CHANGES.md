@@ -3,6 +3,12 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## `1.3.0` (15. January 2026)
+
+### Improvements
+
+- Added the fuel burn model of @romainsacchi (2023) to the `jetfuelburn.reducedorder` module.
+
 ## `1.2.0` (14. January 2026)
 
 ### Improvements
@@ -17,7 +23,7 @@ Release for Zenodo archiving and JOSS publication.
 
 ### Improvements
 
-Renamed module `aux` to `utility` for consistency with other packages.
+- Renamed module `aux` to `utility` for consistency with other packages.
 
 ## `1.0.2` (08. August 2025)
 
