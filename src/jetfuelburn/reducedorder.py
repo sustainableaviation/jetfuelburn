@@ -7,13 +7,21 @@ from jetfuelburn import ureg
 from jetfuelburn.utility.physics import _calculate_dynamic_pressure
 
 
-
 class montlaur_etal:
     r"""
     This class implements the reduced-order fuel burn model of Montlaur et al. (2025):
 
+    ![Montlaur et al. Visual Abstract](../_static/reduced_order_montlaur_etal.svg)
+
+    In this model, fuel burn calculations are based on a regression model.
+    The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
+    from the Eurocontrol IMPACT model.
+
+    Fuel burn is calculated according to the function `compute_fuel_ask()` in [the code supplement](https://github.com/luis-uow/emissions_fuel_estimation) 
+    to Montlaur et al. (2025):
+    
     $$
-        \text{Fuel}_{ASK} = \beta_0 + \frac{\beta_1}{D} + \beta_2 D + \beta_3 S + \beta_4 (D \cdot S)
+        F/ASK = \beta_0 + \frac{\beta_1}{D} + \beta_2 D + \beta_3 S + \beta_4 (D \cdot S)
     $$
 
     where:
@@ -23,24 +31,19 @@ class montlaur_etal:
     | $F/ASK$        | [mass] / ([length] $\cdot$ [seats]) | Fuel per Available Seat Kilometer                              |
     | $D$            | [length]                            | Flight distance                                                |
     | $S$            | [dimensionless]                     | Number of available seats                                      |
-    | $\beta_{0..4}$ | varies                              | Regression coefficients                                        |
-
-    The model uses specific coefficients depending on the aircraft classification:
-
-    | Coefficient            | Small Aircraft (Eq 2)                 | Large Aircraft (Eq 3)                 |
-    |------------------------|---------------------------------------|---------------------------------------|
-    | $\beta_0$ (Intercept)  | $34.67$                               | $0.7361$                              |
-    | $\beta_1$ ($1/D$)      | $6608$                                | $6651$                                |
-    | $\beta_2$ ($D$)        | $-1.196 \times 10^{-3}$               | $5.989 \times 10^{-4}$                |
-    | $\beta_3$ ($S$)        | $-0.1354$                             | $6.152 \times 10^{-2}$                |
-    | $\beta_4$ ($D \cdot S$)| $1.338 \times 10^{-5}$                | $-1.014 \times 10^{-6}$               |
+    | $\beta_{0-4}$  | varies                              | Regression coefficients                                        |
 
     References
     ----------
     Montlaur, A., Trapote-Barreira, C., & Delgado, L. (2025).
     Analytical models of flight fuel consumption and Non-CO2 emissions as a function of aircraft capacity.
     _Applied Sciences_, 15(17), 9688. 
-    doi:[10.3390/app15179688](https://doi.org/10.3390/app15179688)
+    doi:[10.3390/app15179688](https://doi.org/10.3390/app15179688)  
+
+    Montlaur, A., Delgado, L., & Trapote-Barreira, C. (2021). 
+    Analytical models for CO2 emissions and travel time for short-to-medium-haul flights considering available seats. 
+    _Sustainability_, 13(18), 10401. 
+    doi:[10.3390/su131810401](https://doi.org/10.3390/su131810401)
 
     See Also
     --------
@@ -70,19 +73,19 @@ class montlaur_etal:
     """
 
     _REGRESSION_COEFFICIENTS_MODEL_B_D = {
-        "intercept": 34.67,
-        "inv_dist": 6608.0,
-        "dist": -1.196e-3,
-        "seats": -0.1354,
-        "interaction": 1.338e-5
+        "intercept": 34.67 * ureg('dimensionless'),
+        "inv_dist": 6608.0 * ureg('km'),
+        "dist": -1.196e-3 / ureg('km'),
+        "seats": -0.1354 * ureg('dimensionless'),
+        "interaction": 1.338e-5 / ureg('km')
     }
 
     _REGRESSION_COEFFICIENTS_MODEL_D_E = {
-        "intercept": 0.7361,
-        "inv_dist": 6651.0,
-        "dist": 5.989e-4,
-        "seats": 6.152e-2,
-        "interaction": -1.014e-6
+        "intercept": 0.7361 * ureg('dimensionless'),
+        "inv_dist": 6651.0 * ureg('km'),
+        "dist": 5.989e-4 / ureg('km'),
+        "seats": 6.152e-2 * ureg('dimensionless'),
+        "interaction": -1.014e-6 / ureg('km')
     }
 
     @staticmethod
@@ -102,9 +105,9 @@ class montlaur_etal:
         Parameters
         ----------
         distance : float
-            Flight distance [length].
+            Flight distance [length]
         available_seats : int
-            Number of available seats.
+            Number of available seats
         model : str, optional
             Model designation to use: `B_D` for large aircraft, `D_E` for small aircraft.  
             If left blank, the model will auto-select based on available seats and distance.
@@ -113,7 +116,7 @@ class montlaur_etal:
         Returns
         -------
         ureg.Quantity
-            Estimated fuel consumption in [mass] / [length].
+            Estimated fuel consumption [mass/length]
 
         Raises
         ------
@@ -124,11 +127,11 @@ class montlaur_etal:
 
         if not (50 <= available_seats <= 365):
             raise ValueError(f"Seats available {available_seats} out of range (50 - 365).")
-        if not (100 <= d_km <= 12000):
+        if not (100 * ureg.km <= d_km <= 12000 * ureg.km):
             raise ValueError(f"Distance {d_km} out of range (100 - 12,000 km).")
-        if d_km > 5000 and available_seats < 172:
+        if d_km > 5000 * ureg.km and available_seats < 172:
             raise ValueError("Flights over 5,000 km require at least 172 seats.")
-        if available_seats >= 172 and d_km < 200:
+        if available_seats >= 172 and d_km < 200 * ureg.km:
             raise ValueError("Flights under 200 km are invalid for aircraft with 172+ seats.")
         if model not in ("B_D", "D_E") and model != "":
             raise ValueError(f"Model '{model}' is not recognized. Use 'B_D', 'D_E', or leave blank for auto-selection based on available seats and distance.")
@@ -154,7 +157,7 @@ class montlaur_etal:
             (beta["interaction"] * d_km * available_seats)
         )
 
-        return fuel_ask_value * ureg('gram / available_seat_kilometer')
+        return fuel_ask_value * ureg('gram / km')
 
 
 class sacchi_etal:
