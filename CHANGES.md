@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Improvements
 
-- Added the fuel burn model of Montlaur et al. (2023) to the `jetfuelburn.reducedorder` module.
+- Added the fuel burn model of Montlaur et al. (2025) to the `jetfuelburn.reducedorder` module.
 
 ## `1.3.0` (15. January 2026)
 
