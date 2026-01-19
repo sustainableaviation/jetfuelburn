@@ -145,7 +145,7 @@ class sacchi_etal:
         """
         Helper function to calculate fuel for a specific given takeoff weight $TOW$ (including fuel).
         """
-        if year <= 2018:
+        if year < 2018:
             raise ValueError("Year must be 2018 or later.")
 
         eff_factor_hist = (1 + sacchi_etal.historical_improvement_rate) ** (2018 - 2004)
@@ -215,7 +215,7 @@ class sacchi_etal:
         float
             Total fuel mass [kg].
         """
-        if year <= 2018: raise ValueError("Year must be 2018 or later.")
+        if year < 2018: raise ValueError("Year must be 2018 or later.")
         if pax < 0 or pax > pax_max:
             raise ValueError(f"Number of passengers must be between 0 and maximum pax {pax_max}.")
         
