@@ -1,9 +1,241 @@
+# %%
 import csv
 import json
 import math
 from importlib import resources
 from jetfuelburn import ureg
 from jetfuelburn.utility.physics import _calculate_dynamic_pressure
+
+
+class sacchi_etal:
+    r"""
+    This class implements the reduced-order fuel burn model of Sacchi et al. (2023):
+
+    ![Sacchi et al. Visual Abstract](../_static/reduced_order_sacchi.svg)
+
+    In this model, fuel burn calculations are based on a weight-based power law.
+    The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
+    from the European Environmental Agency [EMEP/EEA air pollutant emission inventory guidebook - 2013](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2013) 
+    which in turn is based on a combination of Eurocontrol BADA flight trajectory simulation model data and the ICAO Engine Emissions Databank (EDB).
+    Cruise segment fuel burn is calculated using the [Eurocontrol BADA](https://www.eurocontrol.int/model/bada) model. 
+    Climb and descent segment fuel burn is calculated using the values provided in the ICAO Engine Emissions Databank.
+
+    Fuel burn is calculated according to Supplement 1 of Sacchi et al. (2023):
+    
+    $$
+        F_{total} = \eta(t) \cdot \left( 
+        \underbrace{a_{LTO} \cdot W^{b_{LTO}}}_{\text{LTO}} + 
+        \underbrace{a_{CD} \cdot W^{b_{CD}}}_{\text{Climb/Descent}} + 
+        \underbrace{(a_{cruise} \cdot W^{b_{cruise}} + c_{cruise}) \cdot R}_{\text{cruise}} 
+        \right)
+    $$
+
+    where:
+
+    | Symbol         | Dimension         | Description                                                            |
+    |----------------|-------------------|------------------------------------------------------------------------|
+    | $F_{total}$    | [mass]            | Total fuel consumption of the flight                                   |
+    | $W$            | [mass]            | Operating empty weight of the aircraft                                 |
+    | $R$            | [length]          | Range of the aircraft (=mission distance)                              |
+    | $t$            | [time]            | Scenario year                                                          |
+    | $a_{LTO}$      |                   | Coefficient 'a' for LTO phase                                          |
+    | $b_{LTO}$      |                   | Exponent 'b' for LTO phase                                             |
+    | $a_{CD}$       |                   | Coefficient 'a' for Climb/Descent phase                                |
+    | $b_{CD}$       |                   | Exponent 'b' for Climb/Descent phase                                   |
+    | $a_{cruise}$   |                   | Coefficient 'a' for Cruise phase                                     |
+    | $b_{cruise}$   |                   | Exponent 'b' for Cruise phase                                          |
+    | $c_{cruise}$   |                   | Constant 'c' for Cruise phase (fuel per km)                            |
+    | $r_{hist}$     | [dimensionless]   | Historical annual improvement rate (2004-2018)                         |
+    | $r_{fut}$      | [dimensionless]   | Future annual improvement rate (post-2018)                             |
+
+    Efficiency $\eta(t)$ for years after 2018 is defined through two constant annual improvement factors for the periods 2004-2018 and post-2018:
+
+    $$
+        \eta(t) = (1 + r_{hist})^{14} \cdot (1 + r_{fut})^{(t - 2018)}
+    $$
+
+    where:
+
+    | Symbol         | Dimension         | Description                                                            |
+    |----------------|-------------------|------------------------------------------------------------------------|
+    | $\eta(t)$      | [dimensionless]   | Efficiency improvement over 2004 baseline                              |
+    | $r_{hist}$     | [dimensionless]   | Historical annual improvement rate (2004-2018)                         |
+    | $r_{fut}$      | [dimensionless]   | Projected future annual improvement rate (post-2018)                   |
+    | $t$            | [time]            | Scenario year (>=2018)                                                 |
+
+    ![Annual Improvement Plot](../_static/reduced_order_sacchi_improvement.svg)
+
+    Operating empty weight (OEW) is calculated as a function of maximum passenger capacity:
+
+    $$
+    OEW = \left(0.0927 \cdot pax_{max}^2 + 253.6 \cdot pax_{max} \cdot (1 - 0.00174)^{(t - 2004)}\right) \; [kg]
+    $$
+
+    ![Weight Approximation](../_static/reduced_order_sacchi_weight.svg)
+
+    Notes
+    -----
+    Key assumptions of this fuel calculation function:
+
+    | Parameter             | Assumption                                                                       |
+    |-----------------------|----------------------------------------------------------------------------------|
+    | data availability     | approximation of aircraft operating empty weight as a function of max passengers |
+    | aircraft payload      | variable                                                                         |
+    | climb/descent         | considered implicitly                                                            |
+    | reserve fuel uplift   | 45 min for long-haul flights assumed                                             |
+    | diversion fuel uplift | not considered                                                                   |
+
+    Refences
+    --------
+    Sacchi, R., Becattini, V., Gabrielli, P., Cox, B., Dirnaichner, A., Bauer, C., & Mazzotti, M. (2023).  
+    How to make climate-neutral aviation fly. _Nature Communications_. doi:[10.1038/s41467-023-39749-y](https://doi.org/10.1038/s41467-023-39749-y)
+
+    See Also
+    --------
+    Cell `DM8` in [Supplement 1 of Sacchi et al. (2020)](https://doi.org/10.5281/zenodo.8059750) for fuel burn in cruise.  
+    Cell `CQ8` in [Supplement 1 of Sacchi et al. (2020)](https://doi.org/10.5281/zenodo.8059750) for fuel burn in climb/descent.  
+    Cell `BU8` in [Supplement 1 of Sacchi et al. (2020)](https://doi.org/10.5281/zenodo.8059750) for fuel burn in takeoff/landing.  
+    Cell `BP8` in [Supplement 1 of Sacchi et al. (2020)](https://doi.org/10.5281/zenodo.8059750) for OEW as a function of max passengers.  
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.reducedorder import sacchi_etal
+    sacchi_etal.calculate_fuel_consumption(
+        year=2025,
+        pax_max=180,
+        pax=150,
+        R=2200*ureg.km
+    )
+    ```
+    """
+
+    coefficients_LTO = {
+        'a': 0.09047379 * (ureg.kg ** (1 - 0.850276476)),
+        'b': 0.850276476, # Dimensionless exponent
+    }
+
+    coefficients_CD = {
+        'a': 1.144010778 * (ureg.kg ** (1 - 0.5374018)),
+        'b': 0.5374018,   # Dimensionless exponent
+    }
+
+    coefficients_cruise = {
+        'a': 5.8583E-05 * (ureg.kg ** (1 - 0.976183654)) / ureg.km,
+        'b': 0.976183654, # Dimensionless exponent
+        'c': 0.783563064 * ureg.kg / ureg.km,
+    }
+    historical_improvement_rate = -0.006    
+    future_improvement_rate = -0.008
+    
+
+    @staticmethod
+    @ureg.check(
+        None, # year
+        '[mass]', # TOW
+        '[length]' # R
+    )
+    def _calculate_single_pass(
+        year: int,
+        TOW: float,
+        R: float
+    ) -> float:
+        """
+        Helper function to calculate fuel for a specific given takeoff weight $TOW$ (including fuel).
+        """
+        if year < 2018:
+            raise ValueError("Year must be 2018 or later.")
+
+        eff_factor_hist = (1 + sacchi_etal.historical_improvement_rate) ** (2018 - 2004)
+        years_post_2018 = year - 2018
+        eff_factor_future = (1 + sacchi_etal.future_improvement_rate) ** years_post_2018
+        total_efficiency_factor = eff_factor_hist * eff_factor_future
+
+        lto_fuel_base = (
+            sacchi_etal.coefficients_LTO['a'] * (TOW ** sacchi_etal.coefficients_LTO['b'])
+        )
+        cd_fuel_base = (
+            sacchi_etal.coefficients_CD['a'] * (TOW ** sacchi_etal.coefficients_CD['b'])
+        )
+        cruise_rate_per_km = (
+            sacchi_etal.coefficients_cruise['a'] * (TOW ** sacchi_etal.coefficients_cruise['b'])
+            + sacchi_etal.coefficients_cruise['c']
+        )
+        cruise_fuel_base = cruise_rate_per_km * R
+
+        return (lto_fuel_base + cd_fuel_base + cruise_fuel_base) * total_efficiency_factor
+
+
+    @classmethod
+    @ureg.check(
+        None, # cls
+        None, # year
+        None, # pax_max
+        None, # pax
+        '[length]', # R
+        '[time]', # reserve
+        '[mass]', # tolerance
+        None, # max_iterations
+    )
+    def calculate_fuel_consumption(
+        cls,
+        year: int,
+        pax_max: int,
+        pax: int,
+        R: float,
+        reserve: float = 45 * ureg('min'),
+        tolerance: float = 100 * ureg('kg'),
+        max_iterations: int = 20
+    ) -> float:
+        """
+        Calculates the required fuel mass iteratively.
+        
+        Since Fuel depends on Take-Off Weight (TOW), and TOW includes Fuel,
+        this method iterates until the fuel mass converges.
+
+        Parameters
+        ----------
+        year : int
+            Scenario year (>=2018).
+        pax_max : int
+            Maximum passenger capacity of the aircraft.
+        pax : int
+            Number of passengers on board (assumed to weigh 110kg incl. luggage each).
+        R : float
+            Mission range [length].
+        tolerance : float, optional
+            Convergence tolerance for fuel mass [mass]. Default is 100 kg.
+        max_iterations : int, optional
+            Maximum number of iterations. Default is 20.
+
+        Returns
+        -------
+        float
+            Total fuel mass [kg].
+        """
+        if year < 2018: raise ValueError("Year must be 2018 or later.")
+        if pax < 0 or pax > pax_max:
+            raise ValueError(f"Number of passengers must be between 0 and maximum pax {pax_max}.")
+        
+        OEW = (0.0927 * pax_max ** 2 + 253.6 * pax_max * (1 - 0.00174) ** (year - 2004)) * ureg('kg')
+        payload = pax * 110 * ureg('kg')
+        R = R.to('km') + reserve.to('hr') * 800 * ureg('km/hr') # add reserve distance (assuming 800km/h cruise speed)
+
+        fuel_guess = 0.0 * ureg('kg') # initial guess: fuel is 0, or a small fraction of weight
+        
+        for i in range(max_iterations):
+            current_TOW = OEW + payload + fuel_guess
+            
+            new_fuel = cls._calculate_single_pass(year, current_TOW, R)
+            
+            if abs(new_fuel - fuel_guess) < tolerance:
+                return new_fuel
+            
+            fuel_guess = new_fuel
+            
+        raise RuntimeError(f"Fuel calculation did not converge after {max_iterations} iterations.")
 
 
 class yanto_etal:
@@ -15,13 +247,15 @@ class yanto_etal:
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
     from a combination of Eurocontrol BADA flight trajectory simulation model and the Breguet range equation.
-    Climb and descent segment fuel burn is calculated using the [EUROCONTROL BADA](https://www.eurocontrol.int/model/bada) model.
+    Climb and descent segment fuel burn is calculated using the [Eurocontrol BADA](https://www.eurocontrol.int/model/bada) model.
     Cruise segment fuel burn is calculated using the Breguet range equation.
 
     Fuel burn is calculated according to Table 5 in Yanto and Liem (2017):
+
     $$
         W_f = c_R \cdot R + c_P \cdot PL + c_C
     $$
+
     where:
 
     | Symbol     | Dimension         | Description                                                            |
@@ -184,7 +418,7 @@ class lee_etal:
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
     from a combination of Eurocontrol BADA flight trajectory simulation model and the Breguet range equation.
-    Climb segment fuel burn is calculated using the [EUROCONTROL BADA](https://www.eurocontrol.int/model/bada) model.
+    Climb segment fuel burn is calculated using the [Eurocontrol BADA](https://www.eurocontrol.int/model/bada) model.
     Descent segment fuel burn is assumed equal to cruise segment fuel burn.
     Cruise segment fuel burn is calculated using the Breguet range equation.
 
@@ -435,9 +669,11 @@ class seymour_etal:
     from the Eurocontrol BADA flight trajectory simulation model and climb/descent fuel burn data based on engine data.
 
     Fuel burn is calculated according to Table M.7 in the supplement to Seymour et al. (2020):
+
     $$
         F=a_1 \cdot R^2 + a_2 \cdot R + c
     $$
+
     where:
 
     | Symbol     | Dimension            | Description                                   |
@@ -1070,9 +1306,11 @@ class myclimate:
 
     Fuel burn is calculated using a quadratic function of the form
     defined in the myClimate Flight Emissions Calculator Calculation Principles:
+
     $$
     f(x) + LTO = ax^2 + bx + c
     $$
+
     where:
 
     | Symbol     | Dimension         | Description                                                            |
