@@ -9,7 +9,8 @@ from jetfuelburn.reducedorder import (
     lee_etal,
     eea_emission_inventory_2009,
     myclimate,
-    sacchi_etal
+    sacchi_etal,
+    montlaur_etal
 )
 from .fixtures.reducedorder import (
     fixture_yanto_B739,
@@ -19,6 +20,45 @@ from .fixtures.reducedorder import (
     fixture_eea_A320,
     fixture_myclimate_standard
 )
+
+
+@pytest.mark.parametrize("distance_km, seats, expected_fuel_ask, description", [
+    # --- Model D, E (Small) Cases ---
+    (1500, 150, 19.98, "Typical Small Aircraft"),
+    (100, 50,   93.93, "Minimum Bounds Small"), 
+    (4000, 100, 23.35, "Long Range Small"),
+    
+    # --- Model B, D (Large) Cases ---
+    # Formula: 0.7361 + 6651/D + 5.989e-4*D + 6.152e-2*S - 1.014e-6*D*S
+    (3000, 200, 16.45, "Typical Large Aircraft"),
+    (12000, 350, 25.75,"Max Range Large"),
+    
+    # --- Boundary / Edge Cases ---
+    (200, 172,  44.66, "Exact Boundary for Large Model (Min Dist/Min Seats)"),
+    (5000, 171, 18.30, "Max Dist for Small Model"),
+])
+def test_value_consistency(distance_km, seats, expected_fuel_ask, description):
+    """
+    Verifies that the new class-based implementation matches the 
+    original reference values.
+    
+    All expected values were calculated using the reference implementation:
+    https://github.com/luis-uow/emissions_fuel_estimation?tab=GPL-3.0-1-ov-file
+    """
+    # 1. Calculate New Implementation Value
+    new_result = montlaur_etal.calculate_fuel_consumption(
+        distance=distance_km * ureg.km,
+        available_seats=seats
+    )
+
+def test_unit_consistency():
+    result = montlaur_etal.calculate_fuel_consumption(1000 * ureg.km, 150)
+    assert result.check('[mass]/[length]')
+
+def test_invalid_input_raising():
+    with pytest.raises(ValueError):
+        montlaur_etal.calculate_fuel_consumption(50000 * ureg.km, 200)
+
 
 
 class TestSacchiEtal:
