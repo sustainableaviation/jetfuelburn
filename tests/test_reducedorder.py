@@ -21,7 +21,6 @@ from .fixtures.reducedorder import (
     fixture_myclimate_standard
 )
 
-from tests.code.montlaur_etal import compute_fuel_ask as reference_compute_fuel_ask
 
 @pytest.mark.parametrize("distance_km, seats, expected_fuel_ask, description", [
     # --- Model D, E (Small) Cases ---
