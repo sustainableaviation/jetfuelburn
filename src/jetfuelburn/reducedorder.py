@@ -72,7 +72,7 @@ class montlaur_etal:
     ```
     """
 
-    _REGRESSION_COEFFICIENTS_MODEL_B_D = {
+    _REGRESSION_COEFFICIENTS_MODEL_D_E = {
         "intercept": 34.67 * ureg('dimensionless'),
         "inv_dist": 6608.0 * ureg('km'),
         "dist": -1.196e-3 / ureg('km'),
@@ -80,7 +80,7 @@ class montlaur_etal:
         "interaction": 1.338e-5 / ureg('km')
     }
 
-    _REGRESSION_COEFFICIENTS_MODEL_D_E = {
+    _REGRESSION_COEFFICIENTS_MODEL_B_D = {
         "intercept": 0.7361 * ureg('dimensionless'),
         "inv_dist": 6651.0 * ureg('km'),
         "dist": 5.989e-4 / ureg('km'),
