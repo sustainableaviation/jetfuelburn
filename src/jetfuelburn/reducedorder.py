@@ -7,6 +7,159 @@ from jetfuelburn import ureg
 from jetfuelburn.utility.physics import _calculate_dynamic_pressure
 
 
+class montlaur_etal:
+    r"""
+    This class implements the reduced-order fuel burn model of Montlaur et al. (2025):
+
+    ![Montlaur et al. Visual Abstract](../_static/reduced_order_montlaur_etal.svg)
+
+    In this model, fuel burn calculations are based on a regression model.
+    The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
+    from the Eurocontrol IMPACT model.
+
+    Fuel burn is calculated according to the function `compute_fuel_ask()` in [the code supplement](https://github.com/luis-uow/emissions_fuel_estimation) 
+    to Montlaur et al. (2025):
+    
+    $$
+        F/ASK = \beta_0 + \frac{\beta_1}{D} + \beta_2 D + \beta_3 S + \beta_4 (D \cdot S)
+    $$
+
+    where:
+
+    | Symbol         | Unit                                | Description                                                    |
+    |----------------|-------------------------------------|----------------------------------------------------------------|
+    | $F/ASK$        | [mass] / ([length] $\cdot$ [seats]) | Fuel per Available Seat Kilometer                              |
+    | $D$            | [length]                            | Flight distance                                                |
+    | $S$            | [dimensionless]                     | Number of available seats                                      |
+    | $\beta_{0-4}$  | varies                              | Regression coefficients                                        |
+
+    References
+    ----------
+    Montlaur, A., Trapote-Barreira, C., & Delgado, L. (2025).
+    Analytical models of flight fuel consumption and Non-CO2 emissions as a function of aircraft capacity.
+    _Applied Sciences_, 15(17), 9688. 
+    doi:[10.3390/app15179688](https://doi.org/10.3390/app15179688)  
+
+    Montlaur, A., Delgado, L., & Trapote-Barreira, C. (2021). 
+    Analytical models for CO2 emissions and travel time for short-to-medium-haul flights considering available seats. 
+    _Sustainability_, 13(18), 10401. 
+    doi:[10.3390/su131810401](https://doi.org/10.3390/su131810401)
+
+    See Also
+    --------
+    [`emissions_fuel_estimation.emissions_fuel_model.compute_fuel_ask()`](https://github.com/luis-uow/emissions_fuel_estimation/blob/6d415b38e6089f29ff46a86646db0d5cc04744ba/emissions_fuel_model.py#L9)
+
+    Notes
+    -----
+    The model differentiates between "Small Aircraft" and "Large Aircraft" based on seat capacity and flight distance, 
+    as defined in Table 1 of Montlaur et al. (2020):
+
+    | Model Designation | Seat Capacity ($S$)         | Flight Distance ($D$)         | Representative Aircraft                                              |
+    |-------------------|-----------------------------|-------------------------------|------------------------------------------------------------------------|
+    | "Model D, E"      | $50 \le S \le 172$          | $100 \le D \le 5000$ km       | **CAT D:** B38M, A319<br>**CAT E:** CRJ2, CRJ9, E190                  |
+    | "Model B, D"      | $172 \le S \le 350$         | $200 \le D \le 12000$ km      | **CAT B:** A359, A339, B77W, B788, B789<br>**CAT D:** A21N, A20N, B38M |
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.reducedorder import montlaur_etal
+    result = montlaur_etal.calculate_fuel_consumption(
+        distance=1500 * ureg.km,
+        available_seats=180,
+    )
+    ```
+    """
+
+    _REGRESSION_COEFFICIENTS_MODEL_D_E = {
+        "intercept": 34.67 * ureg('dimensionless'),
+        "inv_dist": 6608.0 * ureg('km'),
+        "dist": -1.196e-3 / ureg('km'),
+        "seats": -0.1354 * ureg('dimensionless'),
+        "interaction": 1.338e-5 / ureg('km')
+    }
+
+    _REGRESSION_COEFFICIENTS_MODEL_B_D = {
+        "intercept": 0.7361 * ureg('dimensionless'),
+        "inv_dist": 6651.0 * ureg('km'),
+        "dist": 5.989e-4 / ureg('km'),
+        "seats": 6.152e-2 * ureg('dimensionless'),
+        "interaction": -1.014e-6 / ureg('km')
+    }
+
+    @staticmethod
+    @ureg.check(
+        '[length]',
+        None,
+        None
+    )
+    def calculate_fuel_consumption(
+        distance: float, 
+        available_seats: int,
+        model: str = "",
+    ) -> ureg.Quantity:
+        """
+        Calculates the estimated fuel consumption per Available Seat Kilometer.
+
+        Parameters
+        ----------
+        distance : float
+            Flight distance [length]
+        available_seats : int
+            Number of available seats
+        model : str, optional
+            Model designation to use: `B_D` for large aircraft, `D_E` for small aircraft.  
+            If left blank, the model will auto-select based on available seats and distance.
+            Default is "" (auto-select).
+        
+        Returns
+        -------
+        ureg.Quantity
+            Estimated fuel consumption [mass/length]
+
+        Raises
+        ------
+        ValueError
+            If inputs are outside the valid operational bounds and model designation is invalid.
+        """
+        d_km = distance.to('km')
+
+        if not (50 <= available_seats <= 365):
+            raise ValueError(f"Seats available {available_seats} out of range (50 - 365).")
+        if not (100 * ureg.km <= d_km <= 12000 * ureg.km):
+            raise ValueError(f"Distance {d_km} out of range (100 - 12,000 km).")
+        if d_km > 5000 * ureg.km and available_seats < 172:
+            raise ValueError("Flights over 5,000 km require at least 172 seats.")
+        if available_seats >= 172 and d_km < 200 * ureg.km:
+            raise ValueError("Flights under 200 km are invalid for aircraft with 172+ seats.")
+        if model not in ("B_D", "D_E") and model != "":
+            raise ValueError(f"Model '{model}' is not recognized. Use 'B_D', 'D_E', or leave blank for auto-selection based on available seats and distance.")
+        
+        if model == "":
+            if 172 <= available_seats <= 365 and 200 * ureg.km <= d_km <= 12000 * ureg.km:
+                model="B_D"
+            else:
+                model="D_E"
+
+        beta: dict = (
+            montlaur_etal._REGRESSION_COEFFICIENTS_MODEL_B_D 
+            if model == 'B_D' 
+            else montlaur_etal._REGRESSION_COEFFICIENTS_MODEL_D_E
+        )
+
+        # Fuel/ASK = b0 + b1/D + b2*D + b3*S + b4*D*S
+        fuel_ask_value = (
+            beta["intercept"] + 
+            (beta["inv_dist"] / d_km) + 
+            (beta["dist"] * d_km) + 
+            (beta["seats"] * available_seats) + 
+            (beta["interaction"] * d_km * available_seats)
+        )
+
+        return fuel_ask_value * ureg('gram / km')
+
+
 class sacchi_etal:
     r"""
     This class implements the reduced-order fuel burn model of Sacchi et al. (2023):
