@@ -3,6 +3,12 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## `1.4.0` (20. June 2026)
+
+### Improvements
+
+- Added the fuel burn model of Montlaur et al. (2023) to the `jetfuelburn.reducedorder` module.
+
 ## `1.3.0` (15. January 2026)
 
 ### Improvements
