@@ -51,7 +51,7 @@ packages = {find = {where = ["src"]}}
 include-package-data = true
 
 [tool.setuptools.package-data]
-"jetfuelburn.data" = ["**/*.csv", "**/*.json"]
+"jetfuelburn.data" = ["**/*.csv", "**/*.json", "**/*.gz"]
 
 [tool.setuptools.dynamic]
 version = {attr = "jetfuelburn.__version__"}
