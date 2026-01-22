@@ -1,4 +1,3 @@
-# %%
 import csv
 import gzip
 from importlib.resources import files
@@ -162,6 +161,39 @@ def calculate_distance_between_airports(
 ):
     r"""
     Calculates the Great Circle distance between two airports.
+
+    ```python exec="true" html="true"
+    import plotly.graph_objects as go
+
+    # SYD: -33.9399, 151.1753
+    # LHR: 51.4700, -0.4543
+    lats = [-33.9399, 51.4700]
+    lons = [151.1753, -0.4543]
+
+    fig = go.Figure(data=go.Scattergeo(
+        lat=lats,
+        lon=lons,
+        mode='lines+markers',
+        line=dict(width=2, color='blue'),
+        marker=dict(size=8, color='red'),
+        text=['SYD', 'LHR'],
+    ))
+
+    fig.update_layout(
+        height=500,
+        margin={"r":0,"t":30,"l":0,"b":0},
+        geo=dict(
+            projection_type="natural earth",
+            showland=True,
+            landcolor="rgb(243, 243, 243)",
+            countrycolor="rgb(204, 204, 204)",
+        )
+    )
+
+    print(fig.to_html(full_html=False, include_plotlyjs="cdn"))
+    ```
+    _Great Circle route between Sydney (SYD) and London Heathrow (LHR).  
+    On a mercator projection, the shortest path appears curved._
 
     Parameters
     ----------

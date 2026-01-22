@@ -3,7 +3,12 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## `1.4.0` (20. June 2026)
+## `1.5.0` (22. January 2026)
+
+### Improvements
+- Added a function to calculate Great Circle distances between two airports to the `jetfuelburn.utility.geography` module.
+
+## `1.4.0` (20. January 2026)
 
 ### Improvements
 
