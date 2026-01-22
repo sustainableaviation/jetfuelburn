@@ -96,26 +96,62 @@ def _calculate_haversine_distance(lat1, lon1, lat2, lon2):
     Calculates the Great Circle distance between two points 
     on the earth (specified in decimal degrees).
 
+    \begin{align*}
+    a &= \sin^2\left(\frac{\Delta\phi}{2}\right) + \cos \phi_1 \cdot \cos \phi_2 \cdot \sin^2\left(\frac{\Delta\lambda}{2}\right) \\
+    c &= 2 \cdot \operatorname{atan2}\left(\sqrt{a}, \sqrt{1-a}\right) \\
+    d &= R \cdot c
+    \end{align*}
+
+    where:
+
+    | Symbol                        | Description                                      |
+    |-------------------------------|--------------------------------------------------|
+    | $\phi$, $\lambda$             | Latitude and Longitude                           |
+    | $\Delta\phi$, $\Delta\lambda$ | Difference in latitude and longitude (in radians)|
+    | $R$                           | Mean earth radius (approx. 6,371 km)             |
+
     See Also
     --------
     [Haversine formula](https://en.wikipedia.org/wiki/Haversine_formula)  
+    [Great-circle distance](https://en.wikipedia.org/wiki/Great-circle_distance)  
     [Earth radius](https://en.wikipedia.org/wiki/Earth_radius)
-    """
-    # 1. Radius of earth in kilometers. Use 3956 for miles.
-    R = 6371.0 * ureg.km
+
+    Parameters
+    ----------
+    lat1 : float
+        Latitude of point 1 in decimal degrees.
+    lon1 : float
+        Longitude of point 1 in decimal degrees.
+    lat2 : float
+        Latitude of point 2 in decimal degrees.
+    lon2 : float
+        Longitude of point 2 in decimal degrees.
     
-    # 2. Convert decimal degrees to radians
+    Returns
+    -------
+    Quantity
+        The distance between the two points [length].
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn.utility.geography import _calculate_haversine_distance
+    _calculate_haversine_distance(52.3086, 4.7639, 51.4700, -0.4543)
+    ```
+    """
+    R = 6371.0 * ureg.km # Earth radius
+    
+    #  Decimal degrees to radians
     d_lat = math.radians(lat2 - lat1)
     d_lon = math.radians(lon2 - lon1)
     
-    # 3. Apply the Haversine formula
     a = (math.sin(d_lat / 2) ** 2) + \
-        math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * \
-        (math.sin(d_lon / 2) ** 2)
+    math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * \
+    (math.sin(d_lon / 2) ** 2)
     
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     
-    # 4. Calculate the result
     return R * c
 
 
@@ -150,6 +186,14 @@ def calculate_distance_between_airports(
     ------
     ValueError
         If either airport code/name is not found.
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn.utility.geography import calculate_distance_between_airports
+    calculate_distance_between_airports('LOWI', 'LOWW', 'icao')
+    ```
     """
     airports = _get_airports_dict(by=identifier)
     origin_info = airports.get(origin)
