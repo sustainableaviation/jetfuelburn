@@ -1,0 +1,117 @@
+# %%
+import csv
+import gzip
+from importlib.resources import files
+import math
+
+def _get_airports_dict(by: str) -> dict:
+    r"""
+    Returns a dictionary of global airports and coordinates keyed by the specified field.
+
+    See Also
+    --------
+    [`ip2location-iata-icao`](https://github.com/ip2location/ip2location-iata-icao) list of airport codes, names and coordinates on GitHub.
+
+    Parameters
+    ----------
+    by : str
+        The field to key the dictionary by. Must be one of:
+        
+        `icao`: International Civil Aviation Organization code  
+        `iata`: International Air Transport Association code  
+        `name`: Full airport name
+
+    Returns
+    -------
+    dict
+        A dictionary of airports keyed by the specified field. Structure depends
+        on the `by` parameter. For example, if ``by='name'``:
+
+        ```python
+            {
+                'Al Ain International Airport': {
+                    'iata': 'AAN',
+                    'icao': 'OMAL',
+                    'latitude': 24.2617,
+                    'longitude': 55.6092
+                },
+                ...
+            }
+        ```
+
+    Raises
+    ------
+    ValueError
+        If the ``by`` parameter is not one of ``'icao'``, ``'iata'``, or ``'name'``.
+    
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn.utility.geography import _get_airports_dict
+    _get_airports_dict(by='iata').get('JFK')
+    ```
+    """
+    header_map = {
+        'icao': 'icao',
+        'iata': 'iata',
+        'name': 'airport' 
+    }
+    
+    if by not in header_map:
+        raise ValueError(f"Invalid key: '{by}'. Must be one of {list(header_map.keys())}")
+    
+    target_column = header_map[by]
+    
+    path = files("jetfuelburn.data.Airports").joinpath("airports.csv.gz")
+    
+    with path.open('rb') as binary_file:
+        with gzip.open(binary_file, mode='rt', encoding='utf-8') as text_file:
+            reader = csv.DictReader(text_file)
+            
+            airports = {}
+            for row in reader:
+                # 3. Extract the key (and remove it from the row)
+                key_value = row.pop(target_column, "").strip()
+                
+                # If the chosen key is missing (e.g. airport has no IATA), skip it.
+                if not key_value:
+                    continue
+                
+                try:
+                    row['latitude'] = float(row['latitude'])
+                    row['longitude'] = float(row['longitude'])
+                except ValueError:
+                    pass
+                
+                airports[key_value] = row
+                
+            return airports
+
+
+def calculate_distance(lat1, lon1, lat2, lon2):
+    """
+    Calculates the Great Circle distance between two points 
+    on the earth (specified in decimal degrees).
+    """
+    # 1. Radius of earth in kilometers. Use 3956 for miles.
+    R = 6371.0
+    
+    # 2. Convert decimal degrees to radians
+    d_lat = math.radians(lat2 - lat1)
+    d_lon = math.radians(lon2 - lon1)
+    
+    # 3. Apply the Haversine formula
+    a = (math.sin(d_lat / 2) ** 2) + \
+        math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * \
+        (math.sin(d_lon / 2) ** 2)
+        
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    
+    # 4. Calculate the result
+    return R * c
+
+# Example Usage:
+# New York (40.7128, -74.0060) to London (51.5074, -0.1278)
+distance = calculate_distance(40.7128, -74.0060, 51.5074, -0.1278)
+print(f"Distance: {distance:.2f} km")
