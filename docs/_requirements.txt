@@ -9,3 +9,4 @@ mkdocs-include-markdown-plugin
 plotly-express
 pandas
 jetfuelburn
+ipyleaflet

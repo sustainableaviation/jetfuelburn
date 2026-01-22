@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## `1.5.1` (22. January 2026)
 
 ### Improvements
+
 - Added a function to calculate Great Circle distances between two airports to the `jetfuelburn.utility.geography` module.
 
 ## `1.4.0` (20. January 2026)
