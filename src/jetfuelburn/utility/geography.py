@@ -3,6 +3,8 @@ import csv
 import gzip
 from importlib.resources import files
 import math
+from jetfuelburn import ureg
+
 
 def _get_airports_dict(by: str) -> dict:
     r"""
@@ -89,13 +91,18 @@ def _get_airports_dict(by: str) -> dict:
             return airports
 
 
-def calculate_distance(lat1, lon1, lat2, lon2):
-    """
+def _calculate_haversine_distance(lat1, lon1, lat2, lon2):
+    r"""
     Calculates the Great Circle distance between two points 
     on the earth (specified in decimal degrees).
+
+    See Also
+    --------
+    [Haversine formula](https://en.wikipedia.org/wiki/Haversine_formula)  
+    [Earth radius](https://en.wikipedia.org/wiki/Earth_radius)
     """
     # 1. Radius of earth in kilometers. Use 3956 for miles.
-    R = 6371.0
+    R = 6371.0 * ureg.km
     
     # 2. Convert decimal degrees to radians
     d_lat = math.radians(lat2 - lat1)
@@ -105,13 +112,54 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     a = (math.sin(d_lat / 2) ** 2) + \
         math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * \
         (math.sin(d_lon / 2) ** 2)
-        
+    
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     
     # 4. Calculate the result
     return R * c
 
-# Example Usage:
-# New York (40.7128, -74.0060) to London (51.5074, -0.1278)
-distance = calculate_distance(40.7128, -74.0060, 51.5074, -0.1278)
-print(f"Distance: {distance:.2f} km")
+
+def calculate_distance_between_airports(
+    origin: str,
+    destination: str,
+    identifier: str = 'iata'
+):
+    r"""
+    Calculates the Great Circle distance between two airports.
+
+    Parameters
+    ----------
+    origin : str
+        The origin airport code or name.
+    destination : str
+        The destination airport code or name.
+    identifier : str, optional
+        The type of airport identifier provided. Must be one of:
+        
+        `icao`: International Civil Aviation Organization code  
+        `iata`: International Air Transport Association code  
+        `name`: Full airport name  
+        
+        Default is `iata`.
+    Returns
+    -------
+    Quantity
+        The distance between the two airports as a `pint.Quantity` in kilometers.
+    
+    Raises
+    ------
+    ValueError
+        If either airport code/name is not found.
+    """
+    airports = _get_airports_dict(by=identifier)
+    origin_info = airports.get(origin)
+    destination_info = airports.get(destination)
+    if not origin_info:
+        raise ValueError(f"Origin airport '{origin}' not found using identifier '{identifier}'.")
+    if not destination_info:
+        raise ValueError(f"Destination airport '{destination}' not found using identifier '{identifier}'.")
+    lat1 = origin_info['latitude']
+    lon1 = origin_info['longitude']
+    lat2 = destination_info['latitude']
+    lon2 = destination_info['longitude']
+    return _calculate_haversine_distance(lat1, lon1, lat2, lon2)
