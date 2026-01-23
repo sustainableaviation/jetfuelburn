@@ -1,68 +1,73 @@
 import pytest
-from jetfuelburn.utility.geography import _get_airports_dict
+from jetfuelburn.utility.geography import _atlas
 
 class TestGeography:
 
-    def test_get_airports_by_icao_valid(self):
-        """Test that airports are correctly keyed by ICAO code (default behavior)."""
-        airports = _get_airports_dict(by='icao')
+    def test_get_airport_by_icao_valid(self):
+        """Test that a specific airport is retrievable by ICAO code."""
+        # We now access the singleton instance's internal method
+        airport = _atlas._get_airport('OMDB', by='icao')
         
-        # Check a known sample (Dubai Intl)
-        assert 'OMDB' in airports
-        
-        # Verify the structure of the value
-        dxb = airports['OMDB']
-        assert dxb['iata'] == 'DXB'
-        assert dxb['airport'] == 'Dubai International Airport'
+        assert airport is not None
+        assert airport['iata'] == 'DXB'
+        assert airport['name'] == 'Dubai International Airport'
         
         # Verify coordinates are floats
-        assert isinstance(dxb['latitude'], float)
-        assert isinstance(dxb['longitude'], float)
-        assert dxb['latitude'] == 25.2528
+        assert isinstance(airport['latitude'], float)
+        assert isinstance(airport['longitude'], float)
+        assert airport['latitude'] == 25.2528
 
-    def test_get_airports_by_iata_valid(self):
-        """Test that airports are correctly keyed by IATA code."""
-        airports = _get_airports_dict(by='iata')
+    def test_get_airport_by_iata_valid(self):
+        """Test that a specific airport is retrievable by IATA code."""
+        airport = _atlas._get_airport('AUH', by='iata')
         
-        # Check a known sample (Abu Dhabi Intl)
-        assert 'AUH' in airports
-        
-        # Verify cross-reference
-        auh = airports['AUH']
-        assert auh['icao'] == 'OMAA'
+        assert airport is not None
+        # Verify cross-reference works
+        assert airport['icao'] == 'OMAA'
 
-    def test_get_airports_by_name_valid(self):
-        """Test that airports are correctly keyed by full name."""
-        airports = _get_airports_dict(by='name')
+    def test_get_airport_by_name_valid(self):
+        """Test that a specific airport is retrievable by full name."""
+        target_name = 'Al Ain International Airport'
+        airport = _atlas._get_airport(target_name, by='name')
         
-        target = 'Al Ain International Airport'
-        assert target in airports
-        assert airports[target]['icao'] == 'OMAL'
+        assert airport is not None
+        assert airport['icao'] == 'OMAL'
 
-    def test_key_redundancy_removed(self):
-        """Test that the dictionary key is strictly removed from the value dictionary."""
-        # When keying by ICAO, the 'icao' field should not exist in the sub-dictionary
-        airports = _get_airports_dict(by='icao')
-        sample = airports['OMDB']
+    def test_field_renaming_and_persistence(self):
+        """
+        Test that the 'airport' CSV header is renamed to 'name', 
+        and that other keys (iata/icao) are preserved in the object.
+        """
+        airport = _atlas._get_airport('OMDB', by='icao')
         
-        assert 'icao' not in sample
-        assert 'iata' in sample
-        assert 'airport' in sample
-
-    def test_error_handling(self):
-        """Test that invalid 'by' parameters raise the correct ValueError."""
+        # 1. Verify the rename: 'airport' should be gone, 'name' should exist
+        assert 'airport' not in airport
+        assert 'name' in airport
         
-        # 1. Invalid Key Parameter
-        with pytest.raises(ValueError, match="Invalid key"):
-            _get_airports_dict(by='zipcode')
+        # 2. Verify persistence: Unlike the old function, the new class 
+        # keeps 'iata' and 'icao' keys in the row object so they can be 
+        # shared across indices.
+        assert 'iata' in airport
+        assert 'icao' in airport
 
-        # 2. Empty String (if applicable to your validation logic)
-        with pytest.raises(ValueError):
-            _get_airports_dict(by='')
+    def test_lookup_returns_none_for_missing(self):
+        """Test that looking up a non-existent airport returns None."""
+        # The public function raises ValueError, but the internal _get_airport returns None
+        assert _atlas._get_airport('ZZZZ', by='iata') is None
+        assert _atlas._get_airport('NonExistentName', by='name') is None
 
-    def test_data_integrity(self):
-        """Test that the dataset contains a reasonable amount of data."""
-        airports = _get_airports_dict(by='icao')
+    def test_error_handling_invalid_key(self):
+        """Test that invalid 'by' parameters raise ValueError."""
+        with pytest.raises(ValueError, match="Invalid identifier type"):
+            _atlas._get_airport('OMDB', by='zipcode')
+
+    def test_data_loaded_state(self):
+        """Test that the atlas flags itself as loaded after a request."""
+        # Ensure data is loaded
+        _atlas._get_airport('JFK')
+        assert _atlas._loaded is True
         
-        # Assuming the CSV is not empty
-        assert len(airports) > 0
+        # Verify internal indices are populated
+        assert len(_atlas._iata_index) > 0
+        assert len(_atlas._icao_index) > 0
+        assert len(_atlas._name_index) > 0
