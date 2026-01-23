@@ -3,12 +3,10 @@ import csv
 import gzip
 from importlib.resources import files
 import math
-
-from pyparsing import Optional
 from jetfuelburn import ureg
 
 
-class AirportAtlas:
+class _AirportAtlas:
     r"""
     Singleton-style class to manage airport data loading and lookups.
     Lazy-loads the dataset on the first request and indexes it by
@@ -21,7 +19,13 @@ class AirportAtlas:
         self._name_index: dict[str, dict] = {}
 
     def _load_data(self):
-        """Loads the GZIP data into memory and builds indices."""
+        r"""
+        Loads the GZIP containing airport data into memory and builds indices.
+        
+        See Also
+        --------
+        [`ip2location-iata-icao`](https://github.com/ip2location/ip2location-iata-icao) list of airport codes, names and coordinates on GitHub.
+        """
         if self._loaded:
             return
 
@@ -38,20 +42,70 @@ class AirportAtlas:
                     except (ValueError, KeyError):
                         continue # Skip invalid rows
 
+                    if 'airport' in row:
+                        row['name'] = row.pop('airport')
+
                     if iata := row.get('iata'):
                         self._iata_index[iata] = row
                     
                     if icao := row.get('icao'):
                         self._icao_index[icao] = row
                         
-                    if name := row.get('airport'):
+                    if name := row.get('name'):
                         self._name_index[name] = row
         
         self._loaded = True
 
 
-    def get_airport(self, identifier: str, by: str = 'iata') -> dict:
-        r"""Retrieves airport data by the specified identifier."""
+    def _get_airport(
+        self,
+        identifier: str,
+        by: str = 'iata'
+    ) -> dict:
+        r"""
+        Retrieves an airport data dictionary by the specified identifier.
+
+        Parameters
+        ----------
+        identifier : str
+            The airport identifier (IATA code, ICAO code, or Name).
+        by : str, optional
+            The type of identifier provided. Must be one of:
+            `icao`: International Civil Aviation Organization code  
+            `iata`: International Air Transport Association code  
+            `name`: Full airport name  
+            Default is `iata`.
+        
+        Returns
+        -------
+        dict or None
+            A dictionary containing airport data if found, otherwise `None`.  
+            For instance, for `by='name'` and `identifier='Al Ain International Airport'`:
+            ```python
+                {
+                    'iata': 'AAN',
+                    'icao': 'OMAL',
+                    'name': 'Al Ain International Airport',
+                    'latitude': 24.2617,
+                    'longitude': 55.6092
+                }
+            ```
+            For instance, for `by='icao'` and `identifier='LOWI'`:
+            ```python
+            {
+                'iata': 'INN',
+                'icao': 'LOWI',
+                'airport': 'Innsbruck Airport (Kranebitten Airport)',
+                'latitude': 47.2602,
+                'longitude': 11.344
+            }
+            ```
+
+        Raises
+        ------
+        ValueError
+            If `by` is not one of 'iata', 'icao', or 'name'.
+        """
         if not self._loaded:
             self._load_data()
 
@@ -65,92 +119,7 @@ class AirportAtlas:
             raise ValueError(f"Invalid identifier type: '{by}'. Must be 'iata', 'icao', or 'name'.")
 
 
-_atlas = AirportAtlas()
-
-
-def _get_airports_dict(by: str) -> dict:
-    r"""
-    Returns a dictionary of global airports and coordinates keyed by the specified field.
-
-    See Also
-    --------
-    [`ip2location-iata-icao`](https://github.com/ip2location/ip2location-iata-icao) list of airport codes, names and coordinates on GitHub.
-
-    Parameters
-    ----------
-    by : str
-        The field to key the dictionary by. Must be one of:
-        
-        `icao`: International Civil Aviation Organization code  
-        `iata`: International Air Transport Association code  
-        `name`: Full airport name
-
-    Returns
-    -------
-    dict
-        A dictionary of airports keyed by the specified field. Structure depends
-        on the `by` parameter. For example, if ``by='name'``:
-
-        ```python
-            {
-                'Al Ain International Airport': {
-                    'iata': 'AAN',
-                    'icao': 'OMAL',
-                    'latitude': 24.2617,
-                    'longitude': 55.6092
-                },
-                ...
-            }
-        ```
-
-    Raises
-    ------
-    ValueError
-        If the ``by`` parameter is not one of ``'icao'``, ``'iata'``, or ``'name'``.
-    
-    Example
-    -------
-    ```pyodide install='jetfuelburn'
-    import jetfuelburn
-    from jetfuelburn.utility.geography import _get_airports_dict
-    _get_airports_dict(by='iata').get('JFK')
-    ```
-    """
-    header_map = {
-        'icao': 'icao',
-        'iata': 'iata',
-        'name': 'airport' 
-    }
-    
-    if by not in header_map:
-        raise ValueError(f"Invalid key: '{by}'. Must be one of {list(header_map.keys())}")
-    
-    target_column = header_map[by]
-    
-    path = files("jetfuelburn.data.Airports").joinpath("airports.csv.gz")
-    
-    with path.open('rb') as binary_file:
-        with gzip.open(binary_file, mode='rt', encoding='utf-8') as text_file:
-            reader = csv.DictReader(text_file)
-            
-            airports = {}
-            for row in reader:
-                # 3. Extract the key (and remove it from the row)
-                key_value = row.pop(target_column, "").strip()
-                
-                # If the chosen key is missing (e.g. airport has no IATA), skip it.
-                if not key_value:
-                    continue
-                
-                try:
-                    row['latitude'] = float(row['latitude'])
-                    row['longitude'] = float(row['longitude'])
-                except ValueError:
-                    pass
-                
-                airports[key_value] = row
-                
-            return airports
+_atlas = _AirportAtlas()
 
 
 def _calculate_haversine_distance(lat1, lon1, lat2, lon2):
@@ -223,7 +192,8 @@ def calculate_distance_between_airports(
     identifier: str = 'iata'
 ):
     r"""
-    Calculates the Great Circle distance between two airports.
+    Calculates the Great Circle distance between two airports.  
+    The list of airports is sourced from the `ip2location-iata-icao` dataset.
 
     ```python exec="true" html="true"
     import plotly.graph_objects as go
@@ -258,6 +228,10 @@ def calculate_distance_between_airports(
     _Great Circle route between Sydney (SYD) and London Heathrow (LHR).  
     On a mercator projection, the shortest path appears curved._
 
+    See Also
+    --------
+    [`ip2location-iata-icao`](https://github.com/ip2location/ip2location-iata-icao) list of airport codes, names and coordinates on GitHub.
+
     Parameters
     ----------
     origin : str
@@ -290,8 +264,8 @@ def calculate_distance_between_airports(
     calculate_distance_between_airports('LOWI', 'LOWW', 'icao')
     ```
     """
-    origin_info = _atlas.get_airport(origin, by=identifier)
-    destination_info = _atlas.get_airport(destination, by=identifier)
+    origin_info = _atlas._get_airport(origin, by=identifier)
+    destination_info = _atlas._get_airport(destination, by=identifier)
 
     if not origin_info:
         raise ValueError(f"Origin airport '{origin}' not found using identifier '{identifier}'.")
