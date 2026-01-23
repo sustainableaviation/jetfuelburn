@@ -1,8 +1,71 @@
+# %%
 import csv
 import gzip
 from importlib.resources import files
 import math
+
+from pyparsing import Optional
 from jetfuelburn import ureg
+
+
+class AirportAtlas:
+    r"""
+    Singleton-style class to manage airport data loading and lookups.
+    Lazy-loads the dataset on the first request and indexes it by
+    IATA code, ICAO code, and Name simultaneously to avoid repeated file I/O.
+    """
+    def __init__(self):
+        self._loaded = False
+        self._iata_index: dict[str, dict] = {}
+        self._icao_index: dict[str, dict] = {}
+        self._name_index: dict[str, dict] = {}
+
+    def _load_data(self):
+        """Loads the GZIP data into memory and builds indices."""
+        if self._loaded:
+            return
+
+        path = files("jetfuelburn.data.Airports").joinpath("airports.csv.gz")
+        
+        with path.open('rb') as binary_file:
+            with gzip.open(binary_file, mode='rt', encoding='utf-8') as text_file:
+                reader = csv.DictReader(text_file)
+                
+                for row in reader:
+                    try:
+                        row['latitude'] = float(row['latitude'])
+                        row['longitude'] = float(row['longitude'])
+                    except (ValueError, KeyError):
+                        continue # Skip invalid rows
+
+                    if iata := row.get('iata'):
+                        self._iata_index[iata] = row
+                    
+                    if icao := row.get('icao'):
+                        self._icao_index[icao] = row
+                        
+                    if name := row.get('airport'):
+                        self._name_index[name] = row
+        
+        self._loaded = True
+
+
+    def get_airport(self, identifier: str, by: str = 'iata') -> dict:
+        r"""Retrieves airport data by the specified identifier."""
+        if not self._loaded:
+            self._load_data()
+
+        if by == 'iata':
+            return self._iata_index.get(identifier)
+        elif by == 'icao':
+            return self._icao_index.get(identifier)
+        elif by == 'name':
+            return self._name_index.get(identifier)
+        else:
+            raise ValueError(f"Invalid identifier type: '{by}'. Must be 'iata', 'icao', or 'name'.")
+
+
+_atlas = AirportAtlas()
 
 
 def _get_airports_dict(by: str) -> dict:
@@ -227,15 +290,17 @@ def calculate_distance_between_airports(
     calculate_distance_between_airports('LOWI', 'LOWW', 'icao')
     ```
     """
-    airports = _get_airports_dict(by=identifier)
-    origin_info = airports.get(origin)
-    destination_info = airports.get(destination)
+    origin_info = _atlas.get_airport(origin, by=identifier)
+    destination_info = _atlas.get_airport(destination, by=identifier)
+
     if not origin_info:
         raise ValueError(f"Origin airport '{origin}' not found using identifier '{identifier}'.")
     if not destination_info:
         raise ValueError(f"Destination airport '{destination}' not found using identifier '{identifier}'.")
+    
     lat1 = origin_info['latitude']
     lon1 = origin_info['longitude']
     lat2 = destination_info['latitude']
     lon2 = destination_info['longitude']
+
     return _calculate_haversine_distance(lat1, lon1, lat2, lon2)
