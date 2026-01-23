@@ -3,6 +3,11 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## `1.5.2` (23. January 2026)
+
+### Fixes
+- Updated the file I/O handling in the `jetfuelburn.utility.geography` module to avoid repeated file openings when calculating Great Circle distances.
+
 ## `1.5.1` (22. January 2026)
 
 ### Improvements
