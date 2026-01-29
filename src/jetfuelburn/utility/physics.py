@@ -60,7 +60,7 @@ def _calculate_atmospheric_conditions(altitude: float) -> dict[float, float]:
     References
     --------
     - Temperature: [Eqn.(1.6) in Sadraey (2nd Edition, 2024)](https://doi.org/10.1201/9781003279068)
-    - [Density Equations on Wikipedia](https://en.wikipedia.org/wiki/Barometric_formula#Density_equations)
+    - [Density Equations entry on Wikipedia](https://en.wikipedia.org/wiki/Barometric_formula#Density_equations)
 
     Returns
     -------
@@ -131,7 +131,7 @@ def _calculate_dynamic_pressure(
 
     References
     --------
-    - [Dynamic Pressure on Wikipedia](https://en.wikipedia.org/wiki/Dynamic_pressure)
+    - [Dynamic Pressure entry on Wikipedia](https://en.wikipedia.org/wiki/Dynamic_pressure)
     - [Eqn.(2.63) in Young (2018)](https://doi.org/10.1002/9781118534786)
 
     Parameters
@@ -197,7 +197,7 @@ def _calculate_aircraft_velocity(
 
     References
     --------
-    - [Mach Number on Wikipedia](https://en.wikipedia.org/wiki/Mach_number#Calculation)
+    - [Mach Number entry on Wikipedia](https://en.wikipedia.org/wiki/Mach_number#Calculation)
     - [Eqn.(1.33)-(1.34) in Sadraey (2nd Edition, 2024)](https://doi.org/10.1201/9781003279068)
 
     Returns

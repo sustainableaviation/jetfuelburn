@@ -143,9 +143,9 @@ def _calculate_haversine_distance(lat1, lon1, lat2, lon2):
 
     See Also
     --------
-    [Haversine formula](https://en.wikipedia.org/wiki/Haversine_formula)  
-    [Great-circle distance](https://en.wikipedia.org/wiki/Great-circle_distance)  
-    [Earth radius](https://en.wikipedia.org/wiki/Earth_radius)
+    [Haversine formula entry on Wikipedia](https://en.wikipedia.org/wiki/Haversine_formula)  
+    [Great-circle distance entry on Wikipedia](https://en.wikipedia.org/wiki/Great-circle_distance)  
+    [Earth radius entry on Wikipedia](https://en.wikipedia.org/wiki/Earth_radius)
 
     Parameters
     ----------
