@@ -1,0 +1,1 @@
+::: jetfuelburn.rangeequation
