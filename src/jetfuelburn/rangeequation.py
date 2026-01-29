@@ -11,6 +11,7 @@ import math
     '[speed]',
     '[time]/[length]' # [mg/Ns] = s/m
 )
+<<<<<<< HEAD
 def calculate_fuel_consumption_breguet_improved(
     R: float,
     LD: float,
@@ -39,6 +40,8 @@ def calculate_fuel_consumption_breguet_improved(
     '[speed]',
     '[time]/[length]' # [mg/Ns] = s/m
 )
+=======
+>>>>>>> ccabb7f (updated module and function names)
 def calculate_fuel_consumption_breguet(
     R: float,
     LD: float,
