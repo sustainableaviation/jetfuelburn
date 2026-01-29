@@ -3,7 +3,7 @@ import jetfuelburn
 
 
 def test_breguet():
-    from jetfuelburn.breguet import calculate_fuel_consumption_range_equation
+    from jetfuelburn.rangeequation import calculate_fuel_consumption_range_equation
     assert callable(calculate_fuel_consumption_range_equation)
 
 

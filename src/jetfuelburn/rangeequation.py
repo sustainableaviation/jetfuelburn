@@ -11,7 +11,7 @@ import math
     '[speed]',
     '[time]/[length]' # [mg/Ns] = s/m
 )
-def calculate_fuel_consumption_range_equation(
+def calculate_fuel_consumption_breguet(
     R: float,
     LD: float,
     m_after_cruise: float,
@@ -108,8 +108,8 @@ def calculate_fuel_consumption_range_equation(
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
-    from jetfuelburn.breguet import calculate_fuel_consumption_range_equation
-    calculate_fuel_consumption_range_equation(
+    from jetfuelburn.rangeequation import calculate_fuel_consumption_breguet
+    calculate_fuel_consumption_breguet(
         R=2000*ureg.nmi,
         LD=18,
         m_after_cruise=100*ureg.metric_ton,

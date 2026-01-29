@@ -1,5 +1,5 @@
 from jetfuelburn import ureg
-from jetfuelburn.breguet import calculate_fuel_consumption_range_equation
+from jetfuelburn.rangeequation import calculate_fuel_consumption_range_equation
 
 
 @ureg.check(
