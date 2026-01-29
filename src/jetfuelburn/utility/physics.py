@@ -45,63 +45,6 @@ def _calculate_atmospheric_temperature(altitude):
 
     Returns
     -------
-    ureg.Quantity [temperature]
-        Air temperature in degrees Celsius.
-
-    Raises
-    ------
-    ValueError
-        If altitude is less than 0 m or greater than 20,000 m.
-
-    Example
-    -------
-    ```pyodide install='jetfuelburn'
-    import jetfuelburn
-    from jetfuelburn import ureg
-    from jetfuelburn.utility.physics import _calculate_atmospheric_temperature
-    _calculate_atmospheric_temperature(altitude=10000*ureg.m)
-    ```
-    """
-    if altitude < 0 * ureg.m:
-        raise ValueError("Altitude must not be < 0.")
-    elif altitude > 20000 * ureg.m:
-        raise ValueError("Altitude must not be > 20000 m.")
-
-    temperature_0 = 288.15 * ureg.K            # Sea-level standard temperature
-    lapse_rate = 0.0065 * (ureg.K / ureg.m)    # Temperature lapse rate
-    temperature_stratosphere = 216.65 * ureg.K # Constant temp in lower stratosphere
-
-    if altitude <= 11000 * ureg.m:
-        temperature = temperature_0 - lapse_rate * altitude
-    else:
-        temperature = temperature_stratosphere
-
-    return temperature.to(ureg.celsius)
-
-
-@ureg.check('[length]')
-def _calculate_atmospheric_density(altitude):
-    r"""
-    Computes the air density as a function of altitude up to 20,000 meters 
-    based on the International Standard Atmosphere (ISA):
-
-    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/International_Standard_Atmosphere.svg" width="250">
-
-    Density in the Troposphere (<= 11,000 m) is calculated according to
-
-    Temperature in the lower Stratosphere (> 11,000 m) is assumed constant at -56.5°C (216.65 K).
-
-    References
-    ----------
-    Eqn.(1.6) in Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. doi:[10.1201/9781003279068](https://doi.org/10.1201/9781003279068)
-
-    Parameters
-    ----------
-    altitude : Quantity [length]
-        Altitude above sea level (0 to 20,000 meters).
-
-    Returns
-    -------
     ureg.Quantity (float) [temperature]
         Air temperature (°C).
 
@@ -211,13 +154,6 @@ def _calculate_atmospheric_density(altitude):
 
     Returns
     -------
-    ureg.Quantity [mass/volume]
-        Air density in kg/m³.
-
-    Raises
-    ------
-    ValueError
-        If altitude is less than 0 m or greater than 20,000 m.
     ureg.Quantity (float) [mass/volume]
         Air density (kg/m³).
 
@@ -272,9 +208,6 @@ def _calculate_atmospheric_density(altitude):
 
     return rho.to(ureg.kg / ureg.m**3)
 
-    return rho.to(ureg.kg / ureg.m**3)
-
-
 
 @ureg.check(
     '[speed]',
@@ -308,10 +241,13 @@ def _calculate_dynamic_pressure(
     --------
     [Dynamic Pressure entry on Wikipedia](https://en.wikipedia.org/wiki/Dynamic_pressure)
 
+    See Also
+    --------
+    [Dynamic Pressure entry on Wikipedia](https://en.wikipedia.org/wiki/Dynamic_pressure)
+
     References
     --------
-    - [Dynamic Pressure entry on Wikipedia](https://en.wikipedia.org/wiki/Dynamic_pressure)
-    - Eqn. (2.63) in in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
+    Eqn. (2.63) in in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
 
     Parameters
     ----------
@@ -322,6 +258,8 @@ def _calculate_dynamic_pressure(
 
     Returns
     -------
+    ureg.Quantity (float) [pressure]
+        Dynamic pressure (Pascals).
     ureg.Quantity (float) [pressure]
         Dynamic pressure (Pascals).
     ureg.Quantity (float) [pressure]
@@ -339,6 +277,7 @@ def _calculate_dynamic_pressure(
     )
     ```
     """
+    air_density = _calculate_atmospheric_density(altitude)
     air_density = _calculate_atmospheric_density(altitude)
     air_density = _calculate_atmospheric_density(altitude)
     dynamic_pressure = 0.5 * air_density * speed ** 2
@@ -395,13 +334,23 @@ def _calculate_aircraft_velocity(
     --------
     [Mach Number entry on Wikipedia](https://en.wikipedia.org/wiki/Mach_number#Calculation)
 
-    References
+    Returns
+    -------
+    ureg.Quantity (float) [speed]
+        Aircraft velocity (km/h).
+
+    See Also
     --------
-    - [Mach Number entry on Wikipedia](https://en.wikipedia.org/wiki/Mach_number#Calculation)
-    - [Eqn.(1.33)-(1.34) in Sadraey (2nd Edition, 2024)](https://doi.org/10.1201/9781003279068)
+    [Mach Number entry on Wikipedia](https://en.wikipedia.org/wiki/Mach_number#Calculation)
+
+    References
+    ----------
+    Eqn.(1.33)-(1.34) Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. doi:[10.1201/9781003279068](https://doi.org/10.1201/9781003279068)
 
     Returns
     -------
+    ureg.Quantity (float) [speed]
+        Aircraft velocity in kilometers per hour.
     ureg.Quantity (float) [speed]
         Aircraft velocity in kilometers per hour.
     ureg.Quantity (float) [speed]
@@ -419,6 +368,7 @@ def _calculate_aircraft_velocity(
     )
     ```
     """
+    temperature = _calculate_atmospheric_temperature(altitude)
     temperature = _calculate_atmospheric_temperature(altitude)
     temperature = _calculate_atmospheric_temperature(altitude)
 
@@ -461,68 +411,6 @@ def _calculate_speed_of_sound(temperature):
 
     References
     ----------
-    Eqn. (2.77) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
-
-    Parameters
-    ----------
-    temperature : Quantity [temperature]
-        The local air temperature.
-
-    Returns
-    -------
-    ureg.Quantity (float) [velocity]
-        Speed of sound (km/h).
-
-    Raises
-    ------
-    ValueError
-        If temperature is below absolute zero.
-    """
-    T_val = temperature.to(ureg.kelvin)
-    if T_val.magnitude < 0:
-        raise ValueError("Temperature must be above absolute zero. If you really did manage to measure a temperature below absolute zero, please contact the JetFuelBurn developers.")
-    
-    a0 = 661.479 * ureg.knot   # Standard speed of sound at sea level
-    T0 = 288.15 * ureg.kelvin  # Standard sea level temperature    
-    
-    speed_of_sound = a0 * math.sqrt((T_val / T0).magnitude)
-    
-    return speed_of_sound.to(ureg.kph)
-
-
-@ureg.check('[temperature]')
-def _calculate_speed_of_sound(temperature):
-    r"""
-    Computes the speed of sound in air as a function of temperature uses the relationship for an ideal gas:
-
-    $$
-    a = a_0 \sqrt{\frac{T}{T_0}}
-    $$
-    
-    Or equivalently:
-    
-    $$
-    a = \sqrt{\gamma R T}
-    $$
-
-    where:
-    
-    | Symbol   | Dimension                | Description                     | Value             |
-    |----------|--------------------------|---------------------------------|-------------------|
-    | $a$      | [velocity]               | speed of sound                  | N/A               |
-    | $a_0$    | [velocity]               | speed of sound at sea level     | 340.29 m/s        |
-    | $T$      | [temperature]            | local air temperature           | N/A               |
-    | $T_0$    | [temperature]            | standard sea level temp         | 288.15 K          |
-    | $\gamma$ | [dimensionless]          | ratio of specific heats         | 1.40              |
-    | $R$      | [energy/(mass*temp)]     | gas constant                    | 287.05 m²/(s²K)   |
-
-    See Also
-    --------
-    [`_calculate_atmospheric_temperature`][]
-
-    References
-    ----------
-    Eqn. (2.77) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
 
     Parameters
     ----------
