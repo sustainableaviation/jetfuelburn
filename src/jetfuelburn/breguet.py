@@ -1,6 +1,9 @@
 from jetfuelburn import ureg
 import math
 
+
+
+
 @ureg.check(
     '[length]',
     '[]',
@@ -16,11 +19,13 @@ def calculate_fuel_consumption_range_equation(
     TSFC_cruise: float,
 ) -> float:
     r"""
-    Given a flight distance (=range) $R$ and aircraft performance parameters (see table),
+    Given a flight distance (=range) $R$ and basic aircraft performance parameters (see table),
     returns the fuel mass burned during the flight $m_f$ [kg] based on the Breguet range equation.
+
     $$
         m_f = (e^{\frac{R \cdot TSFC \cdot g}{L/D \cdot v}} - 1 ) m_2
     $$
+    
     where:
 
     | Symbol     | Dimension         | Description                                                            |
@@ -47,19 +52,31 @@ def calculate_fuel_consumption_range_equation(
     | fuel reserves     | can be considered through $m_2$                                            |
     | alternate airport | can be considered through $m_2$                                            |
 
+    Note also that some authors spell "Breguet" as "Bréguet" (with accent on the "e"). This is not limited to non-French speakers. 
+    Even in his original 1923 publication "Calcul du Poids de Combustible Consummé par un Avion en vol Ascendant", Breguet's name is spelled **without** an accent: 
+
+    ![](../_static/breguet/breguet_title.png){ width="300" }
+
+    But in the same publication, an aircraft manufactured by his company is spelled **with** accent:
+
+    ![](../_static/breguet/breguet_intext.png){ width="500" }
+
     Warnings
     --------
-    Like any adaption of the range equation, this fuel calculation function represents a simplification of actual flight dynamics.
-    Specifically, this function implements the Breguet range equation under the assumption of
-    constant-airspeed and constant-lift-coefficient flight (cf. Young (2018), Sec. 13.7.2).
+    This analytical fuel calculation method represents a simplification of actual flight dynamics.
+    Specifically, this function assumes a _flight schedule_ with constant airspeed and constant lift coefficient, resulting in a cruise-climb. 
+    Young (2017) shows this in Section 13.3.3 "Second Flight Schedule":
+
+    > (...) the airplane must be flown in a way that will ensure that the ratio (...) [of weight to air density] remains constant. 
+    > This is possible if the airplane is allowed to climb very slowly so that the relative density (...) decreases in direct proportion to the decrease in airplane weight (...).
 
     References
     --------
     - Young, T. M. (2017).
-    _Performance of the Jet Transport Airplane: Analysis Methods, Flight Operations, and Regulations._
-    John Wiley & Sons.
-    doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
-    - [Range (Aeronautics), Wikipedia](https://en.wikipedia.org/wiki/Range_(aeronautics))
+    Performance of the Jet Transport Airplane (Section 13.7.3 "Fuel Required for Specified Range"). _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
+    - Cavcar, M. (2006). Bréguet range equation?. _Journal of Aircraft_. doi:[10.2514/1.17696](https://doi.org/10.2514/1.17696)
+    - [Range (Aeronautics) entry on Wikipedia](https://en.wikipedia.org/wiki/Range_(aeronautics))  
+    - [MIT OpenCourseWare: Breguet Range Equation](https://ocw.mit.edu/courses/16-001-unified-engineering-materials-and-structures-fall-2021/mit16_001_f21_lec_driver_art.pdf)
 
     Raises
     ------
