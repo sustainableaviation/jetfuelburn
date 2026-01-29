@@ -327,6 +327,7 @@ def _calculate_speed_of_sound(temperature):
 
     References
     ----------
+    Eqn. (2.77) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
 
     Parameters
     ----------
