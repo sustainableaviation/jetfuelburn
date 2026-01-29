@@ -2,7 +2,7 @@ import pytest
 
 from jetfuelburn import ureg
 from jetfuelburn.utility.tests import approx_with_units
-from jetfuelburn.breguet import calculate_fuel_consumption_range_equation
+from jetfuelburn.rangeequation import calculate_fuel_consumption_range_equation
 from .fixtures.breguet import breguet_range_fuel_calculation_data_1
 
 
