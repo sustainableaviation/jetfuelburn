@@ -3,6 +3,20 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## `2.0.0` (29. January 2026)
+
+### Breaking Changes
+
+- Renamed the `breguet` module to `rangeequation` for clarity and consistency with other modules.
+- Renamed the `calculate_fuel_consumption_range_equation()` function to `calculate_fuel_consumption_breguet()`.
+
+## `2.0.0` (29. January 2026)
+
+### Breaking Changes
+
+- Renamed the `breguet` module to `rangeequation` for clarity and consistency with other modules.
+- Renamed the `calculate_fuel_consumption_range_equation()` function to `calculate_fuel_consumption_breguet()`.
+
 ## `1.6.0` (01. February 2026)
 
 ## Improvements
