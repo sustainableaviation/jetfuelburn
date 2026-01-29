@@ -81,13 +81,14 @@ def calculate_fuel_consumption_breguet(
     | alternate airport | can be considered through $m_2$                                            |
 
     Note also that some authors spell "Breguet" as "Bréguet" (with accent on the "e"). This is not limited to non-French speakers. 
-    Even in his original 1923 publication "Calcul du Poids de Combustible Consummé par un Avion en vol Ascendant", Breguet's name is spelled **without** an accent: 
+    Even in his original 1923 publication ["Calcul du Poids de Combustible Consummé par un Avion en vol Ascendant"](https://fr.wikisource.org/wiki/Livre:Comptes_rendus_hebdomadaires_des_séances_de_l’Académie_des_sciences,_tome_177,_1923.djvu)
+    , Breguet's name is spelled **without** an accent: 
 
     ![](../_static/breguet/breguet_title.png){ width="300" }
 
     But in the same publication, an aircraft manufactured by his company is spelled **with** accent:
 
-    ![](../_static/breguet/breguet_intext.png){ width="500" }
+    ![](../_static/breguet/breguet_intext.png){ width="300" }
 
     Warnings
     --------
