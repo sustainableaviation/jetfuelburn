@@ -11,6 +11,34 @@ import math
     '[speed]',
     '[time]/[length]' # [mg/Ns] = s/m
 )
+def calculate_fuel_consumption_breguet_improved(
+    R: float,
+    LD: float,
+    m_after_cruise: float,
+    v_cruise: float,
+    TSFC_cruise: float,
+) -> float:
+    r"""
+
+    References
+    --------
+    Randle, W. E., Hall, C. A., & Vera-Morales, M. (2011). Improved range equation based on aircraft flight data. _Journal of Aircraft_. doi:[10.2514/1.C031262](https://doi.org/10.2514/1.C031262)
+
+    See Also
+    --------
+    [`jetfuelburn.rangeequation.calculate_fuel_consumption_breguet`][]
+
+    """
+    return
+
+
+@ureg.check(
+    '[length]',
+    '[]',
+    '[mass]',
+    '[speed]',
+    '[time]/[length]' # [mg/Ns] = s/m
+)
 def calculate_fuel_consumption_breguet(
     R: float,
     LD: float,
@@ -72,12 +100,15 @@ def calculate_fuel_consumption_breguet(
 
     References
     --------
-    - Young, T. M. (2017).
+    - Young, T. M. (2018).
     Performance of the Jet Transport Airplane (Section 13.7.3 "Fuel Required for Specified Range"). _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
     - Cavcar, M. (2006). Bréguet range equation?. _Journal of Aircraft_. doi:[10.2514/1.17696](https://doi.org/10.2514/1.17696)
     - [Range (Aeronautics) entry on Wikipedia](https://en.wikipedia.org/wiki/Range_(aeronautics))  
-    - [MIT OpenCourseWare: Breguet Range Equation](https://ocw.mit.edu/courses/16-001-unified-engineering-materials-and-structures-fall-2021/mit16_001_f21_lec_driver_art.pdf)
 
+    See Also
+    --------
+    [`jetfuelburn.rangeequation.calculate_fuel_consumption_breguet_improved`][]
+    
     Raises
     ------
     ValueError

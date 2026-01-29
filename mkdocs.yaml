@@ -14,7 +14,7 @@ nav:
     - Cabin Class Fuel Allocation: 'interactive/allocation.md'
   - API Reference:
     - PL/R-Diagrams: 'api/diagrams.md'
-    - Range Equation: 'api/breguet.md'
+    - Range Equation: 'api/rangeequation.md'
     - Statistics Models: 'api/statistics.md'
     - Reduced Order Models: 'api/reducedorder.md'
     #- Combined Models: 'api/combined.md'

@@ -9,6 +9,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 - Renamed the `breguet` module to `rangeequation` for clarity and consistency with other modules.
 - Renamed the `calculate_fuel_consumption_range_equation()` function to `calculate_fuel_consumption_breguet()`.
+- Split up the `_calculate_atmospheric_conditions()` function from the `utility.physics` module into separate functions: 
+    - `calculate_air_temperature_at_altitude()`
+    - `calculate_density_at_altitude()`
+
+### Improvements
+
+- Added a function to calculate the speed of sound at a given altitude to the `jetfuelburn.utility.physics` module.
 
 ## `1.5.2` (23. January 2026)
 
