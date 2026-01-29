@@ -206,10 +206,19 @@ def _calculate_atmospheric_density(altitude):
 
     Parameters
     ----------
-    altitude : Quantity [length]
-        Altitude above sea level (0 to 20,000 meters).
-    altitude : Quantity [length]
-        Altitude above sea level (0 to 20,000 meters).
+    altitude : float [distance]
+        Altitude above sea level
+
+    Notes
+    -----
+    Compare also the function
+    [`atmos()` in `openap/extra/aero.py`](https://github.com/TUDelft-CNS-ATM/openap/blob/39619977962fe6b4a86ab7efbefa70890eecfe36/openap/extra/aero.py#L48C5-L48C10)
+    by [Junzi Sun](https://github.com/junzis). Note that `jetfuelburn` function has been re-written completely and does not build on the `openap` code.
+
+    References
+    --------
+    - Temperature: [Eqn.(1.6) in Sadraey (2nd Edition, 2024)](https://doi.org/10.1201/9781003279068)
+    - [Density Equations entry on Wikipedia](https://en.wikipedia.org/wiki/Barometric_formula#Density_equations)
 
     Returns
     -------
@@ -312,8 +321,8 @@ def _calculate_dynamic_pressure(
 
     References
     --------
-    Eqn. (2.63) in in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
-    Eqn. (2.63) in in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
+    - [Dynamic Pressure entry on Wikipedia](https://en.wikipedia.org/wiki/Dynamic_pressure)
+    - [Eqn.(2.63) in Young (2018)](https://doi.org/10.1002/9781118534786)
 
     Parameters
     ----------
@@ -398,10 +407,9 @@ def _calculate_aircraft_velocity(
     [Mach Number entry on Wikipedia](https://en.wikipedia.org/wiki/Mach_number#Calculation)
 
     References
-    ----------
-    Eqn.(1.33)-(1.34) Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. doi:[10.1201/9781003279068](https://doi.org/10.1201/9781003279068)
-    ----------
-    Eqn.(1.33)-(1.34) Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. doi:[10.1201/9781003279068](https://doi.org/10.1201/9781003279068)
+    --------
+    - [Mach Number entry on Wikipedia](https://en.wikipedia.org/wiki/Mach_number#Calculation)
+    - [Eqn.(1.33)-(1.34) in Sadraey (2nd Edition, 2024)](https://doi.org/10.1201/9781003279068)
 
     Returns
     -------
