@@ -3,19 +3,11 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## `2.0.0` (29. January 2026)
+## `2.0.0` (02. February 2026)
 
 ### Breaking Changes
 
-- Renamed the `breguet` module to `rangeequation` for clarity and consistency with other modules.
-- Renamed the `calculate_fuel_consumption_range_equation()` function to `calculate_fuel_consumption_breguet()`.
-- Split up the `_calculate_atmospheric_conditions()` function from the `utility.physics` module into separate functions: 
-    - `calculate_air_temperature_at_altitude()`
-    - `calculate_density_at_altitude()`
-
-### Improvements
-
-- Added a function to calculate the speed of sound at a given altitude to the `jetfuelburn.utility.physics` module.
+- Updated the `utility.physics` module XXXX
 
 ## `1.5.2` (23. January 2026)
 
