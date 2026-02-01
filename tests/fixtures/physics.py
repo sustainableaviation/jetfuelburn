@@ -6,25 +6,25 @@ from jetfuelburn import ureg
 def atmospheric_case_fixture():
     """
     Fixture providing expected ISA atmospheric conditions (Density and Temperature).
-    [cite_start]Data extracted directly from Table A.1 International Standard Atmosphere[cite: 3].
+    Data extracted directly from Table A.1 International Standard Atmosphere[cite: 3].
     """
     cases = {
-        # [cite_start]Sea Level: Standard Day [cite: 4]
+        # Sea Level: Standard Day [cite: 4]
         0 * ureg.ft: {
             'density': 1.2250 * ureg.kg / ureg.m**3,
             'temperature': ureg.Quantity(15.00, ureg.degC)
         },
-        # [cite_start]10,000 ft (3,048 m): Mid-Troposphere [cite: 4]
+        # 10,000 ft (3,048 m): Mid-Troposphere [cite: 4]
         10000 * ureg.ft: {
             'density': 0.9046 * ureg.kg / ureg.m**3,
             'temperature': ureg.Quantity(-4.81, ureg.degC)
         },
-        # [cite_start]20,000 ft (6,096 m): Upper Troposphere [cite: 36]
+        # 20,000 ft (6,096 m): Upper Troposphere [cite: 36]
         20000 * ureg.ft: {
             'density': 0.6527 * ureg.kg / ureg.m**3,
             'temperature': ureg.Quantity(-24.62, ureg.degC)
         },
-        # [cite_start]40,000 ft (12,192 m): Stratosphere (Isothermal region) [cite: 54]
+        # 40,000 ft (12,192 m): Stratosphere (Isothermal region) [cite: 54]
         40000 * ureg.ft: {
             'density': 0.3016 * ureg.kg / ureg.m**3,
             'temperature': ureg.Quantity(-56.50, ureg.degC)
@@ -43,21 +43,21 @@ def atmospheric_case_fixture():
 def mach_speed_case_fixture():
     """
     Fixture providing expected True Airspeed (TAS) for given Mach numbers.
-    [cite_start]Calculated using Speed of Sound (a) data from Table A.1[cite: 3].
+    Calculated using Speed of Sound (a) data from Table A.1[cite: 3].
     """
     cases = {
-        # [cite_start]10,000 ft: a = 638.3 kt [cite: 4]
+        # 10,000 ft: a = 638.3 kt [cite: 4]
         10000 * ureg.ft: {
             'mach_number': 1.0, 
             'speed': 638.3 * ureg.knot
         },
-        # [cite_start]20,000 ft: a = 614.3 kt [cite: 36]
+        # 20,000 ft: a = 614.3 kt [cite: 36]
         # Test arbitrary Mach 0.8 -> 0.8 * 614.3 = 491.44 kt
         20000 * ureg.ft: {
             'mach_number': 0.8, 
             'speed': 491.44 * ureg.knot 
         },
-        # [cite_start]40,000 ft: a = 573.6 kt [cite: 54]
+        # 40,000 ft: a = 573.6 kt [cite: 54]
         # Test arbitrary Mach 0.85 -> 0.85 * 573.6 = 487.56 kt
         40000 * ureg.ft: {
             'mach_number': 0.85, 
