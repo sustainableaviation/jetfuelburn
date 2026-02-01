@@ -3,6 +3,16 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## `1.6.0` (01. February 2026)
+
+## Improvements
+
+- Updated the `utility.physics` module:
+    - Removed function `_calculate_atmospheric_conditions`
+    - Added function `_calculate_atmospheric_temperature`
+    - Added function `_calculate_atmospheric_density`
+    - Added function `_calculate_speed_of_sound`
+
 ## `1.5.2` (23. January 2026)
 
 ### Fixes
