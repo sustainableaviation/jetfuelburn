@@ -53,12 +53,18 @@ def test_combined():
 def test_aux_physics():
     import jetfuelburn.utility.physics
     
-    from jetfuelburn.utility.physics import _calculate_atmospheric_conditions
-    assert callable(_calculate_atmospheric_conditions)
+    from jetfuelburn.utility.physics import _calculate_atmospheric_temperature
+    assert callable(_calculate_atmospheric_temperature)
+    
+    from jetfuelburn.utility.physics import _calculate_atmospheric_density
+    assert callable(_calculate_atmospheric_density)
     
     from jetfuelburn.utility.physics import _calculate_dynamic_pressure
     assert callable(_calculate_dynamic_pressure)
-    
+
+    from jetfuelburn.utility.physics import _calculate_speed_of_sound
+    assert callable(_calculate_speed_of_sound)
+
     from jetfuelburn.utility.physics import _calculate_aircraft_velocity
     assert callable(_calculate_aircraft_velocity)
 
