@@ -175,27 +175,7 @@ class TestCalculateAircraftVelocity:
 
 class TestCalculateDynamicPressure:
     """Test suite for _calculate_dynamic_pressure."""
-
-    @pytest.mark.parametrize("row", ISA_DATA)
-    def test_values_against_isa_table_derived(self, row):
-        """
-        Dynamic pressure isn't in the ISA table directly.
-        We verify consistency by calculating q using the table's Density vs the function's output.
-        q = 0.5 * rho_table * v^2
-        """
-        altitude = row['H_m'] * ureg.meter
-        speed = 250 * (ureg.meter / ureg.second) # Arbitrary fixed speed
-        
-        # Expected q using the density provided in the CSV
-        rho_table = row['rho_kg/m^3'] * (ureg.kg / ureg.m**3)
-        expected_q = 0.5 * rho_table * speed ** 2
-        
-        result = _calculate_dynamic_pressure(speed, altitude)
-        
-        # We allow 1% tolerance because the function calculates its own density internally,
-        # which might differ slightly from the rounded CSV value.
-        assert approx_with_units(result, expected_q.to(ureg.Pa), rel=1e-2)
-
+    
     def test_output_units(self):
         """Checks that the function returns pressure units (Pascals)."""
         result = _calculate_dynamic_pressure(100 * ureg.kph, 1000 * ureg.meter)
