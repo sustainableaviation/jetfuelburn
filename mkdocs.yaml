@@ -2,7 +2,7 @@
 site_name: JetFuelBurn Documentation
 repo_url: https://github.com/sustainableaviation/jetfuelburn
 copyright: © Paul Scherrer Institute (PSI) and Contributors | Code under MIT License
-nav: 
+nav:
   - Home: 'index.md'
   - About: 'about.md'
   - Comparing Models:
