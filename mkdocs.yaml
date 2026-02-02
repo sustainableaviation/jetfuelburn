@@ -20,9 +20,11 @@ nav:
     #- Combined Models: 'api/combined.md'
     #- Closed Form Models: 'api/closedform.md' 
     - Cabin Class Fuel Allocation: 'api/allocation.md'
-    - Physics Utility Functions: 'api/physics.md'
-    - Geography Utility Functions: 'api/geography.md'
-    - Math Utility Functions: 'api/math.md'
+  - API Reference (Utility):
+    - Aerodynamics: 'api/aerodynamics.md'
+    - Physics: 'api/physics.md'
+    - Geography: 'api/geography.md'
+    - Math: 'api/math.md'
   - API Reference (External):
     - EU Flight Emissions Label: 'api/eu_fel.md'
     - Reduced Order Models: 'api/reducedorder_external.md'
