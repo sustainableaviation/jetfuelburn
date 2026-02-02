@@ -1,0 +1,44 @@
+{
+  "B737": {
+    "description": "Boeing 737-700 (Clean Cruise)",
+    "source": "https://github.com/JSBSim-Team/jsbsim/blob/master/aircraft/737/737.xml",
+    "k_factor": 0.043,
+    "wing_area_sqft": 1171.0,
+    "cd0_table": {
+      "comment": "Parasite Drag (CD0) vs Alpha (rad). Source: aero/coefficient/CD0",
+      "alpha": [-1.57, -0.26, 0.00, 0.26, 1.57],
+      "cd0": [1.500, 0.042, 0.021, 0.042, 1.500]
+    },
+    "wave_drag_table": {
+      "comment": "Compressibility Drag (Delta CD) vs Mach. Source: aero/coefficient/CDmach",
+      "mach": [0.00, 0.79, 1.10, 1.80],
+      "cd_wave": [0.000, 0.000, 0.023, 0.015]
+    },
+    "lift_table": {
+      "comment": "Lift Coefficient (CL) vs Alpha (rad). Source: aero/coefficient/CLalpha",
+      "alpha": [-0.20, 0.00, 0.23, 0.46],
+      "cl": [-0.68, 0.20, 1.20, 0.20]
+    }
+  },
+  "B788": {
+    "description": "Boeing 787-8 Dreamliner (Clean Cruise)",
+    "source": "https://sourceforge.net/p/flightgear/fgaddon/HEAD/tree/trunk/Aircraft/787-8/787-8.xml",
+    "k_factor": 0.04,
+    "wing_area_sqft": 3501.7984,
+    "cd0_table": {
+      "comment": "Parasite Drag (CD0) vs Alpha (rad). Source: aero/force/Drag_basic",
+      "alpha": [-1.57, -0.26, 0.00, 0.26, 1.57],
+      "cd0": [1.400, 0.020, 0.015, 0.026, 1.600]
+    },
+    "wave_drag_table": {
+      "comment": "Compressibility Drag (Delta CD) vs Mach. Source: aero/force/Drag_mach",
+      "mach": [0.00, 0.79, 1.10, 1.80],
+      "cd_wave": [0.000, 0.001, 0.043, 0.055]
+    },
+    "lift_table": {
+      "comment": "Lift Coefficient (CL) vs Alpha (rad). Source: aero/coefficient/CLalpha",
+      "alpha": [-0.2000, 0.0000, 0.0400, 0.1740, 0.3000, 0.4500, 0.6000],
+      "cl": [-0.8000, 0.3400, 0.5700, 1.0054, 1.3400, 1.2500, 0.8000]
+    }
+  }
+}
