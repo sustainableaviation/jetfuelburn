@@ -81,3 +81,10 @@ def test_aux_tests():
     
     from jetfuelburn.utility.tests import approx_dict_of_dict
     assert callable(approx_dict_of_dict)
+
+
+def test_aux_math():
+    import jetfuelburn.utility.math
+    
+    from jetfuelburn.utility.math import _interpolate
+    assert callable(_interpolate)
