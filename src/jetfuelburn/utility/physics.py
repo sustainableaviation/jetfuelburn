@@ -325,7 +325,7 @@ def _calculate_speed_of_sound(temperature):
 
     See Also
     --------
-    [`_calculate_atmospheric_temperature`][]
+    [`jetfuelburn.utility.physics._calculate_atmospheric_temperature`][]
 
     References
     ----------

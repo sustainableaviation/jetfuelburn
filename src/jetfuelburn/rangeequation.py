@@ -1,7 +1,6 @@
 from jetfuelburn import ureg
+from jetfuelburn import g
 import math
-
-
 
 
 @ureg.check(
@@ -9,27 +8,104 @@ import math
     '[]',
     '[mass]',
     '[speed]',
-    '[time]/[length]' # [mg/Ns] = s/m
+    '[speed]',
+    '[time]/[length]' # [mg/Ns] = s/m,
+    '[]',
+    '[]',
 )
 def calculate_fuel_consumption_breguet_improved(
     R: float,
     LD: float,
     m_after_cruise: float,
-    v_cruise: float,
-    TSFC_cruise: float,
+    V: float,
+    V_headwind: float,
+    TSFC: float,
+    lost_fuel_fraction: float = 0.0152,
+    recovered_fuel_fraction: float = 0.001,
 ) -> float:
     r"""
 
+    $$
+    W_{\text{fuel}} = W_{\text{LDG}} \left( \frac{1}{\exp\left\{ \frac{-R}{H}\left(1 - \frac{V_{\text{HW}}}{V}\right)} \right\} - \frac{\Delta W_{\text{lost}}}{W_{\text{TO}}} + \frac{\Delta W_{\text{rec}}}{W_{\text{TO}}}} - 1 \right)
+    $$
+
+    with
+
+    $$
+    H = \frac{L/D \cdot V}{TSFC \cdot g}
+    $$
+
+    where:
+
+    | Symbol                      | Dimension         | Description                                                    |
+    |-----------------------------|-------------------|----------------------------------------------------------------|
+    | $m_{f}$                     | [mass]            | Fuel required for the mission of the aircraft                  |
+    | $m_{LDG}$                   | [mass]            | Mass of the aircraft after cruise segment                      |
+    | $R$                         | [distance]        | Range of the aircraft (=mission distance)                      |
+    | $TSFC$                      | [time/distance]   | Thrust Specific Fuel Consumption of the aircraft during cruise |
+    | $g$                         | [acceleration]    | Acceleration due to gravity                                    |
+    | $L/D$                       | [dimensionless]   | Lift-to-Drag ratio of the aircraft                             |
+    | $V$                         | [speed]           | Average speed of the aircraft (TAS)                            |
+    | $V_{HW}$                    | [speed]           | Average speed of headwind component                            |
+    | $\frac{\Delta m_L}{m_{TO}}$ | [dimensionless]   | Lost fuel fraction                                             |
+    | $\frac{\Delta m_R}{m_{TO}}$ | [dimensionless]   | Recovered fuel fraction                                        | 
+
+    Warnings
+    --------
+    Unlike the equation in Randle et al. (2011), this function uses mass [kg] 
+    instead of weight [N] for the fuel mass.
+
+    Notes
+    -----
+    Assumes a lost fuel fraction $\Delta W_{lost}=0.0152$ 
+    and a recovered fuel fraction $\Delta W_{rec}=0.001$ as per 
+    section D of Randle et al. (2011). 
+    Values can be adjusted through function parameters.
+
     References
     --------
-    Randle, W. E., Hall, C. A., & Vera-Morales, M. (2011). Improved range equation based on aircraft flight data. _Journal of Aircraft_. doi:[10.2514/1.C031262](https://doi.org/10.2514/1.C031262)
+    Eqn. 19 in Randle, W. E., Hall, C. A., & Vera-Morales, M. (2011). 
+    Improved range equation based on aircraft flight data. 
+    _Journal of Aircraft_. 
+    doi:[10.2514/1.C031262](https://doi.org/10.2514/1.C031262)
 
     See Also
     --------
     [`jetfuelburn.rangeequation.calculate_fuel_consumption_breguet`][]
 
+    Raises
+    ------
+    ValueError
+        If the dimensions of the inputs are invalid.
+    ValueError
+        If the magnitude of the inputs are invalid (eg. negative).
+    
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.rangeequation import calculate_fuel_consumption_breguet_improved
+    calculate_fuel_consumption_breguet_improved(
+        R=2000*ureg.nmi,
+        LD=18,
+        m_after_cruise=100*ureg.metric_ton,
+        V=800*ureg.kph,
+        TSFC=17*(ureg.mg/ureg.N/ureg.s),
+    )
+    ```
     """
-    return
+    if R==0 * ureg.meter:
+        return 0 * ureg.kg
+    else:
+        H = (LD * V) / (TSFC * g)
+        m_fuel = m_after_cruise * (
+            (1 / math.exp( (-R / H) * (1 - (V_headwind / V)) )) 
+            - lost_fuel_fraction 
+            + recovered_fuel_fraction
+            - 1
+        )
+        return m_fuel.to('kg')
 
 
 @ureg.check(
@@ -43,8 +119,8 @@ def calculate_fuel_consumption_breguet(
     R: float,
     LD: float,
     m_after_cruise: float,
-    v_cruise: float,
-    TSFC_cruise: float,
+    V: float,
+    TSFC: float,
 ) -> float:
     r"""
     Given a flight distance (=range) $R$ and basic aircraft performance parameters (see table),
@@ -125,9 +201,9 @@ def calculate_fuel_consumption_breguet(
         Lift-to-Drag ratio of the aircraft [dimensionless]
     m_after_cruise : float
         Mass of the aircraft after landing (eg. OEW + Payload + Crew + Reserves) [mass]
-    v_cruise : float
+    V : float
         Average cruise speed of the aircraft (TAS) [speed]
-    TSFC_cruise : float
+    TSFC : float
         Average Thrust Specific Fuel Consumption of the aircraft during cruise [time/distance (results from the definition of TSFC)]
 
     Returns
@@ -145,8 +221,8 @@ def calculate_fuel_consumption_breguet(
         R=2000*ureg.nmi,
         LD=18,
         m_after_cruise=100*ureg.metric_ton,
-        v_cruise=800*ureg.kph,
-        TSFC_cruise=17*(ureg.mg/ureg.N/ureg.s),
+        V=800*ureg.kph,
+        TSFC=17*(ureg.mg/ureg.N/ureg.s),
     )
     ```
     """
@@ -155,16 +231,15 @@ def calculate_fuel_consumption_breguet(
         raise ValueError("Range must be greater than zero.")
     if LD <= 1:
         raise ValueError("Lift-to-Drag ratio must be greater than 1.")
-    if m_after_cruise.magnitude < 0:
+    if m_after_cruise < 0 * ureg.kg:
         raise ValueError("Mass after cruise must be greater than zero.")
-    if v_cruise.magnitude <= 0:
+    if V <= 0 * ureg.kph:
         raise ValueError("Cruise speed must be greater than zero.")
-    if TSFC_cruise.magnitude <= 0:
+    if TSFC.magnitude <= 0:
         raise ValueError("Thrust Specific Fuel Consumption must be greater than zero.")
 
-    if R.magnitude==0:
+    if R==0 * ureg.meter:
         return 0 * ureg.kg
     else:
-        g = 9.81 * (ureg.meter/ureg.second**2)
-        m_fuel =  m_after_cruise * (math.exp((R * TSFC_cruise * g) / (LD * v_cruise)) - 1)
+        m_fuel =  m_after_cruise * (math.exp((R * TSFC * g) / (LD * V)) - 1)
         return m_fuel.to('kg')

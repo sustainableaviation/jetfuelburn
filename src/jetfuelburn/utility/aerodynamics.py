@@ -36,9 +36,9 @@ class jsbsim_drag_polars:
     )
     def calculate_drag(
         acft: str,
-        L: float,
-        M: float,
-        H: float,
+        L: float | int,
+        M: float | int,
+        H: float | int,
     ) -> dict:
         r"""
         asdf
@@ -138,9 +138,9 @@ class openap_drag_polars:
     )
     def calculate_drag(
         acft: str,
-        L: float,
-        M: float,
-        H: float,
+        L: float | int,
+        M: float | int,
+        H: float | int,
     ) -> dict:
         r"""
         Calculates the drag force for a given aircraft based on a low-speed drag polar 
@@ -156,16 +156,16 @@ class openap_drag_polars:
 
         where:
 
-        | Symbol | Dimension             | Description                |
-        |--------|-----------------------|----------------------------|
-        | D      | [force]               | Drag force                 |
-        | q      | [pressure]            | Dynamic pressure           |
-        | S      | [area]                | Wing reference area        |
-        | C_D    | [dimensionless]       | Total drag coefficient     |
-        | C_{D0} | [dimensionless]       | Zero-lift drag coefficient |
-        | K      | [dimensionless]       | Induced drag factor        |
-        | C_L    | [dimensionless]       | Lift coefficient           |
-        | L      | [force]               | Lift force                 |
+        | Symbol   | Dimension             | Description                |
+        |----------|-----------------------|----------------------------|
+        | $D$      | [force]               | Drag force                 |
+        | $q$      | [pressure]            | Dynamic pressure           |
+        | $S$      | [area]                | Wing reference area        |
+        | $C_D$    | [dimensionless]       | Total drag coefficient     |
+        | $C_{D0}$ | [dimensionless]       | Zero-lift drag coefficient |
+        | $K$      | [dimensionless]       | Induced drag factor        |
+        | $C_L$    | [dimensionless]       | Lift coefficient           |
+        | $L$      | [force]               | Lift force                 |
 
         See Also
         --------
