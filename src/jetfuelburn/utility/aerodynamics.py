@@ -109,7 +109,6 @@ class openap_drag_polars:
       doi:[10.1016/j.trc.2020.01.026](https://doi.org/10.1016/j.trc.2020.01.026)
     """
 
-    # Parsed from your CSV
     _aircraft_data = {}
     with resources.open_text("jetfuelburn.data.OpenAP", "data.csv") as file:
         reader = csv.DictReader(file)
@@ -128,6 +127,44 @@ class openap_drag_polars:
         Returns a sorted list of available ICAO aircraft designators included in the model.
         """
         return sorted(openap_drag_polars._aircraft_data.keys())
+
+
+    @staticmethod
+    def get_basic_drag_parameters(acft: str) -> dict:
+        r"""
+        Retrieves the basic drag parameters (wing area, zero-lift drag coefficient, and induced drag factor) for a given aircraft.
+
+        Parameters
+        ----------
+        acft : str
+            ICAO Aircraft Designator (e.g., 'A320', 'B737', etc.)
+        
+        Returns
+        -------
+        dict
+            A dictionary containing the following keys:
+            - 'S': Wing reference area in square meters [m²]
+            - 'CD0': Zero-lift drag coefficient (dimensionless)
+            - 'K': Induced drag factor (dimensionless)
+
+        Raises
+        ------
+        ValueError
+            If the ICAO Aircraft Designator is not found in the model data.
+
+        Example
+        -------
+        ```pyodide install='jetfuelburn'
+        from jetfuelburn.utility.aerodynamics import openap_drag_polars
+        params = openap_drag_polars.get_basic_drag_parameters('A320')
+        ```
+        """
+        if acft not in openap_drag_polars._aircraft_data:
+            raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data.")
+        data: dict = openap_drag_polars._aircraft_data[acft]
+        data['S'] = data.pop('wing_area_m2') * ureg('m^2')
+        return data
+
 
     @staticmethod
     @ureg.check(
