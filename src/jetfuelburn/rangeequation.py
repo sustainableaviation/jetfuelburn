@@ -2,6 +2,105 @@
 from jetfuelburn import ureg
 from jetfuelburn import g
 import math
+from jetfuelburn.utility.physics import _calculate_atmospheric_density
+
+
+@ureg.check(
+    '[length]',
+    '[length]',
+    '[]',
+    '[]',
+    '[mass]',
+    '[area]',
+    '[speed]',
+    '[time]/[length]', # [mg/Ns] = s/m
+)
+def calculate_fuel_consumption_arctan(
+    R: float | int,
+    h: float | int,
+    K: float | int,
+    C_D0: float | int,
+    m_after_cruise: float | int,
+    S: float | int,
+    V: float | int,
+    TSFC: float | int,
+) -> float:
+    r"""
+
+    $$
+        m_f = \frac{(B + m_{LDG}^2) \tan(\theta)}{\sqrt{B} - m_{LDG} \tan(\theta)}
+    $$
+
+    with
+
+    \begin{align*}
+    \theta &= \frac{R g TSFC}{2 E_{max} V} \\
+    B &= \left( \frac{C_{D_0}}{K} \right) \left( \frac{\rho V^2 S}{2g} \right)^2
+    \end{align*}
+
+    where:
+
+    | Symbol     | Dimension         | Description                                                            |
+    |------------|-------------------|------------------------------------------------------------------------|
+    | $m_{fuel}$ | [mass]            | Fuel required for the mission of the aircraft                          |
+    | $R$        | [distance]        | Range of the aircraft (=mission distance)                              |
+    | $TSFC$     | [time/distance]   | Thrust Specific Fuel Consumption of the aircraft during cruise         |
+    | $g$        | [acceleration]    | Acceleration due to gravity                                            |
+    | $V$        | [speed]           | Average cruise speed of the aircraft (TAS)                             |
+    | $E_{max}$  | [energy/mass]     | Maximum lift-to-drag ratio according to drag parabola                  |
+    | $C_{D_0}$  | [dimensionless]   | Zero-lift drag coefficient of the aircraft                             |
+    | $K$        | [dimensionless]   | Lift-dependent drag factor of the aircraft                             |
+    | $\rho$     | [mass/volume]     | Air density at cruise altitude                                         |
+    | $S$        | [area]            | Wing reference area of the aircraft                                    |
+
+    References
+    ----------
+    Eqn. 13.25a ff. in 
+    Young, T. M. (2018). 
+    Performance of the Jet Transport Airplane. 
+    _John Wiley & Sons_. 
+    doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.rangeequation import calculate_fuel_consumption_arctan
+    calculate_fuel_consumption_arctan(
+        R=2000*ureg.nmi,
+        h=35000*ureg.feet,
+        K=0.045,
+        C_D0=0.02,
+        m_after_cruise=100*ureg.metric_ton,
+        S=122.6*ureg.meter**2,
+        V=800*ureg.kph,
+        TSFC=17*(ureg.mg/ureg.N/ureg.s),
+    )
+    ```
+
+    """
+    if R==0 * ureg.meter:
+        return 0 * ureg.kg
+    if R < 0 * ureg.meter:
+        raise ValueError("Range must be greater than zero.")
+    if h < 0 * ureg.meter:
+        raise ValueError("Altitude must be greater than zero.")
+    if m_after_cruise < 0 * ureg.kg:
+        raise ValueError("Mass after cruise must be greater than zero.")
+    if S <= 1 * ureg.meter**2:
+        raise ValueError("Lift-to-Drag ratio must be greater than 1.")
+    if V <= 0 * ureg.kph:
+        raise ValueError("Cruise speed must be greater than zero.")
+    if TSFC.magnitude <= 0:
+        raise ValueError("Thrust Specific Fuel Consumption must be greater than zero.")
+    
+    E_max = 0.5 * (1 / math.sqrt(C_D0 * K))
+    rho = _calculate_atmospheric_density(altitude=h)
+    theta = (R * g * TSFC) / (2 * E_max * V)
+    B = (C_D0 / K) * ((rho * V**2 * S) / (2 * g))**2
+    m_fuel = ((B + m_after_cruise**2) * math.tan(theta)) / (B**0.5 - m_after_cruise * math.tan(theta)) # math.sqrt(pint.Quantity) is not supported
+    return m_fuel.to('kg')
 
 
 @ureg.check(
@@ -15,12 +114,12 @@ import math
     '[]',
 )
 def calculate_fuel_consumption_breguet_improved(
-    R: float,
-    LD: float,
-    m_after_cruise: float,
-    V: float,
-    V_headwind: float,
-    TSFC: float,
+    R: float | int,
+    LD: float | int,
+    m_after_cruise: float | int,
+    V: float | int,
+    V_headwind: float | int,
+    TSFC: float | int,
     lost_fuel_fraction: float = 0.0152,
     recovered_fuel_fraction: float = 0.001,
 ) -> float:
@@ -148,11 +247,11 @@ def calculate_fuel_consumption_breguet_improved(
     '[time]/[length]' # [mg/Ns] = s/m
 )
 def calculate_fuel_consumption_breguet(
-    R: float,
-    LD: float,
-    m_after_cruise: float,
-    V: float,
-    TSFC: float,
+    R: float | int,
+    LD: float | int,
+    m_after_cruise: float | int,
+    V: float | int,
+    TSFC: float | int,
 ) -> float:
     r"""
     Given a flight distance (=range) $R$ and basic aircraft performance parameters (see table),
@@ -189,16 +288,6 @@ def calculate_fuel_consumption_breguet(
     | climb/descent     | not considered, only cruise-phase                                          |
     | fuel reserves     | can be considered through $m_2$                                            |
     | alternate airport | can be considered through $m_2$                                            |
-
-    Note also that some authors spell "Breguet" as "Bréguet" (with accent on the "e"). This is not limited to non-French speakers. 
-    Even in his original 1923 publication ["Calcul du Poids de Combustible Consummé par un Avion en vol Ascendant"](https://fr.wikisource.org/wiki/Livre:Comptes_rendus_hebdomadaires_des_séances_de_l’Académie_des_sciences,_tome_177,_1923.djvu)
-    , Breguet's name is spelled **without** an accent: 
-
-    ![](../_static/breguet/breguet_title.png){ width="300" }
-
-    But in the same publication, an aircraft manufactured by his company is spelled **with** accent:
-
-    ![](../_static/breguet/breguet_intext.png){ width="300" }
 
     Warnings
     --------
