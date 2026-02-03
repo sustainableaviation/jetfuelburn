@@ -1,3 +1,4 @@
+# %%
 from jetfuelburn import ureg
 from jetfuelburn import g
 import math
@@ -9,7 +10,7 @@ import math
     '[mass]',
     '[speed]',
     '[speed]',
-    '[time]/[length]' # [mg/Ns] = s/m,
+    '[time]/[length]', # [mg/Ns] = s/m
     '[]',
     '[]',
 )
@@ -24,9 +25,16 @@ def calculate_fuel_consumption_breguet_improved(
     recovered_fuel_fraction: float = 0.001,
 ) -> float:
     r"""
+    Given a flight distance (=range) $R$ and basic aircraft performance parameters (see table),
+    returns the fuel mass burned during the flight $m_f$ [kg] based on the improved Breguet range equation from Randle et al. (2011).
+
+    This improved Breguet range equation accounts for headwind effects
+    as well as lost fuel during takeoff and climb and recovered fuel during descent and landing.
+
+    Fuel mass is calculated as:
 
     $$
-    W_{\text{fuel}} = W_{\text{LDG}} \left( \frac{1}{\exp\left\{ \frac{-R}{H}\left(1 - \frac{V_{\text{HW}}}{V}\right)} \right\} - \frac{\Delta W_{\text{lost}}}{W_{\text{TO}}} + \frac{\Delta W_{\text{rec}}}{W_{\text{TO}}}} - 1 \right)
+    m_{\text{fuel}} = m_{\text{LDG}} \left( \frac{1}{\exp\left\{ \frac{-R}{H \left(1 - \frac{V_{\text{HW}}}{V}\right)} \right\} - \frac{\Delta m_{\text{lost}}}{m_{\text{TO}}} + \frac{\Delta m_{\text{rec}}}{m_{\text{TO}}}} - 1 \right)
     $$
 
     with
@@ -50,6 +58,29 @@ def calculate_fuel_consumption_breguet_improved(
     | $\frac{\Delta m_L}{m_{TO}}$ | [dimensionless]   | Lost fuel fraction                                             |
     | $\frac{\Delta m_R}{m_{TO}}$ | [dimensionless]   | Recovered fuel fraction                                        | 
 
+    ??? info "Derivation"
+
+        Equation 19 in Randle et al. (2011) expresses the fuel mass burned $m_f$
+        during a flight of distance $s$ (=range $R$) as a function of the takeoff mass $m_{TO}$.
+        However, in practical applications, the more relevant known parameter is the landing mass after cruise 
+        
+        $m_{LDG}$ (= $m_{after\_cruise}$)
+        
+        Therefore, the equation is rearranged here to solve for $m_f$ as a function of $m_{LDG}$:
+
+        \begin{align}
+            m_f &= m_{\text{TO}} \left( 1 - e^{-\frac{s}{H}} + \frac{\Delta m_{\text{lost}}}{m_{\text{TO}}} - \frac{\Delta m_{\text{rec}}}{m_{\text{TO}}} \right) \\
+            m_f &= (m_f + m_{\text{LDG}}) \left( 1 - e^{-\frac{s}{H}} + \frac{\Delta m_{\text{lost}}}{m_{\text{TO}}} - \frac{\Delta m_{\text{rec}}}{m_{\text{TO}}} \right) \\
+            m_f &= (m_f + m_{\text{LDG}}) \cdot 1 + (m_f + m_{\text{LDG}}) \left( -e^{-\frac{s}{H}} + \frac{\Delta m_{\text{lost}}}{m_{\text{TO}}} - \frac{\Delta m_{\text{rec}}}{m_{\text{TO}}} \right) \\
+            m_f &= m_f + m_{\text{LDG}} + (m_f + m_{\text{LDG}}) \left( -e^{-\frac{s}{H}} + \frac{\Delta m_{\text{lost}}}{m_{\text{TO}}} - \frac{\Delta m_{\text{rec}}}{m_{\text{TO}}} \right) \\
+            0 &= m_{\text{LDG}} + (m_f + m_{\text{LDG}}) \left( -e^{-\frac{s}{H}} + \frac{\Delta m_{\text{lost}}}{m_{\text{TO}}} - \frac{\Delta m_{\text{rec}}}{m_{\text{TO}}} \right) \\
+            -m_{\text{LDG}} &= (m_f + m_{\text{LDG}}) \left( -e^{-\frac{s}{H}} + \frac{\Delta m_{\text{lost}}}{m_{\text{TO}}} - \frac{\Delta m_{\text{rec}}}{m_{\text{TO}}} \right) \\
+            \frac{-m_{\text{LDG}}}{-e^{-\frac{s}{H}} + \frac{\Delta m_{\text{lost}}}{m_{\text{TO}}} - \frac{\Delta m_{\text{rec}}}{m_{\text{TO}}}} &= m_f + m_{\text{LDG}} \\
+            m_f &= \frac{-m_{\text{LDG}}}{-e^{-\frac{s}{H}} + \frac{\Delta m_{\text{lost}}}{m_{\text{TO}}} - \frac{\Delta m_{\text{rec}}}{m_{\text{TO}}}} - m_{\text{LDG}} \\
+            m_f &= m_{\text{LDG}} \left( \frac{-1}{-e^{-\frac{s}{H}} + \frac{\Delta m_{\text{lost}}}{m_{\text{TO}}} - \frac{\Delta m_{\text{rec}}}{m_{\text{TO}}}} - 1 \right) \\
+            m_f &= m_{\text{LDG}} \left( \frac{1}{e^{-\frac{s}{H}} - \frac{\Delta m_{\text{lost}}}{m_{\text{TO}}} + \frac{\Delta m_{\text{rec}}}{m_{\text{TO}}}} - 1 \right)
+        \end{align}
+
     Warnings
     --------
     Unlike the equation in Randle et al. (2011), this function uses mass [kg] 
@@ -57,8 +88,8 @@ def calculate_fuel_consumption_breguet_improved(
 
     Notes
     -----
-    Assumes a lost fuel fraction $\Delta W_{lost}=0.0152$ 
-    and a recovered fuel fraction $\Delta W_{rec}=0.001$ as per 
+    Assumes a lost fuel fraction $\Delta m_{lost}=0.0152$ 
+    and a recovered fuel fraction $\Delta m_{rec}=0.001$ as per 
     section D of Randle et al. (2011). 
     Values can be adjusted through function parameters.
 
@@ -91,6 +122,7 @@ def calculate_fuel_consumption_breguet_improved(
         LD=18,
         m_after_cruise=100*ureg.metric_ton,
         V=800*ureg.kph,
+        V_headwind=50*ureg.kph,
         TSFC=17*(ureg.mg/ureg.N/ureg.s),
     )
     ```
@@ -125,6 +157,8 @@ def calculate_fuel_consumption_breguet(
     r"""
     Given a flight distance (=range) $R$ and basic aircraft performance parameters (see table),
     returns the fuel mass burned during the flight $m_f$ [kg] based on the Breguet range equation.
+
+    Fuel mass is calculated as:
 
     $$
         m_f = (e^{\frac{R \cdot TSFC \cdot g}{L/D \cdot v}} - 1 ) m_2
