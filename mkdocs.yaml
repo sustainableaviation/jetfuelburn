@@ -22,6 +22,7 @@ nav:
     - Cabin Class Fuel Allocation: 'api/allocation.md'
   - API Reference (Utility):
     - Aerodynamics: 'api/aerodynamics.md'
+    - Engines: 'api/engines.md'
     - Physics: 'api/physics.md'
     - Geography: 'api/geography.md'
     - Math: 'api/math.md'
