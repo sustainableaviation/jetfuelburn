@@ -1,8 +1,130 @@
 # %%
+import pint
 from jetfuelburn import ureg
-from jetfuelburn import g
 import math
+from typing import Callable
+
 from jetfuelburn.utility.physics import _calculate_atmospheric_density
+from jetfuelburn.utility.code import _validate_function
+
+
+
+class IntegratedRangeCalculator:
+    """
+    Performs numerical integration of the Specific Air Range (SAR) to estimate 
+    cruise performance. Supports both static and dynamic TSFC models.
+    """
+    def __init__(
+        self, 
+        func_or_scalar_tsfc: pint.Quantity[int | float] | Callable,
+        func_or_scalar_lift_to_drag: int | float | pint.Quantity[int | float] | Callable, 
+    ):
+        r"""
+        """
+        if isinstance(func_or_scalar_tsfc, pint.Quantity):
+            self.func_tsfc = lambda M, H, F: func_or_scalar_tsfc
+        elif callable(func_or_scalar_tsfc):
+            # If dynamic, validate it and use it directly
+            self._validate_function(
+                func=func_or_scalar_tsfc,
+                required_params={'M', 'H', 'F'},
+                expected_return_type=pint.Quantity
+            )
+            self.func_tsfc = func_or_scalar_tsfc
+        else:
+            raise TypeError("tsfc must be a pint.Quantity or a callable.")
+
+        if isinstance(func_or_scalar_lift_to_drag, (int, float, pint.Quantity)):
+            self.func_drag = lambda L, M, h: L / func_or_scalar_lift_to_drag
+        elif callable(func_or_scalar_lift_to_drag):
+            self._validate_function(
+                func=func_or_scalar_lift_to_drag,
+                required_params={'L', 'M', 'h'},
+                expected_return_type=pint.Quantity
+            )
+            self.func_drag = func_or_scalar_lift_to_drag
+        else:
+            raise TypeError("lift_to_drag must be a scalar or a callable.")
+        
+    
+    @ureg.check(
+        None,
+        '[mass]',
+        '[mass]',
+        '[length]',
+        '[speed]',
+        None
+    )
+    def compute_integrated_range(
+        self,
+        m_start: pint.Quantity[int | float],
+        m_end: pint.Quantity[int | float],
+        h: pint.Quantity[int | float],
+        V: pint.Quantity[int | float],
+        num_intervals: int = 20,
+    ):
+        r"""
+        asdf
+
+        """
+        m_start = m_start.to("kg")
+        m_end = m_end.to("kg")
+        m_increment = (m_end - m_start) / (num_intervals - 1)
+        m_stations = [(m_start + i * m_increment) for i in range(num_intervals)]
+
+        # 2. Performance Parameters
+        ranges = [Q_(0, "nautical_mile")]
+        times = [Q_(0, "hour")]
+        list_SAR_at_station = []
+        list_fuel_burn_per_distance = [] # New list for Fuel Burn per Distance
+        #TODO: convert speed to mach number based on altitude
+
+        # 3. Loop
+        for m_station in m_stations:
+            L = m_station * ureg.gravity
+            D = self.func_drag(
+                L=L,
+                M=,
+                h=h
+            )
+            TSFC = self.func_tsfc(
+                M=M,
+                h=h,
+                F=D
+            )
+            fuel_flow = D * TSFC
+            
+            
+            SAR = (V / fuel_flow).to("km / kg")
+            list_SAR_at_station.append(SAR)
+
+            fb_dist = (1 / SAR).to("kg / km")
+            list_fuel_burn_per_distance.append(fb_dist)
+
+        # 4. Integrate Range (Standard Procedure)
+        cumulative_r = 0 * ureg.km
+        cumulative_t = 0 * ureg.hour
+        
+        for i in range(len(m_stations) - 1):
+            SAR_avg = (list_SAR_at_station[i] + list_SAR_at_station[i+1]) / 2
+            dw_force = m_stations[i] - m_stations[i+1]
+            dw_mass = (dw_force / ureg.standard_gravity).to("kg")
+            
+            dr = SAR_avg * dw_mass
+            dt = dr / V
+            
+            cumulative_r += dr
+            cumulative_t += dt
+            ranges.append(cumulative_r)
+            times.append(cumulative_t)
+            
+        return {
+            "weight": weight_stations,
+            "range": ranges,
+            "time": times,
+            "sar": sar_values,
+            "fuel_burn_per_distance": fuel_burn_values # Return the new metric
+        }
 
 
 @ureg.check(
@@ -16,14 +138,14 @@ from jetfuelburn.utility.physics import _calculate_atmospheric_density
     '[time]/[length]', # [mg/Ns] = s/m
 )
 def calculate_fuel_consumption_arctan(
-    R: float | int,
-    h: float | int,
-    K: float | int,
-    C_D0: float | int,
-    m_after_cruise: float | int,
-    S: float | int,
-    V: float | int,
-    TSFC: float | int,
+    R: pint.Quantity[float | int],
+    h: pint.Quantity[float | int],
+    K: float | int | pint.Quantity[float | int],
+    C_D0: float | int | pint.Quantity[float | int],
+    m_after_cruise: pint.Quantity[float | int],
+    S: pint.Quantity[float | int],
+    V: pint.Quantity[float | int],
+    TSFC: pint.Quantity[float | int],
 ) -> float:
     r"""
 
@@ -97,8 +219,8 @@ def calculate_fuel_consumption_arctan(
     
     E_max = 0.5 * (1 / math.sqrt(C_D0 * K))
     rho = _calculate_atmospheric_density(altitude=h)
-    theta = (R * g * TSFC) / (2 * E_max * V)
-    B = (C_D0 / K) * ((rho * V**2 * S) / (2 * g))**2
+    theta = (R * ureg.gravity * TSFC) / (2 * E_max * V)
+    B = (C_D0 / K) * ((rho * V**2 * S) / (2 * ureg.gravity))**2
     m_fuel = ((B + m_after_cruise**2) * math.tan(theta)) / (B**0.5 - m_after_cruise * math.tan(theta)) # math.sqrt(pint.Quantity) is not supported
     return m_fuel.to('kg')
 
@@ -114,14 +236,14 @@ def calculate_fuel_consumption_arctan(
     '[]',
 )
 def calculate_fuel_consumption_breguet_improved(
-    R: float | int,
-    LD: float | int,
-    m_after_cruise: float | int,
-    V: float | int,
-    V_headwind: float | int,
-    TSFC: float | int,
-    lost_fuel_fraction: float = 0.0152,
-    recovered_fuel_fraction: float = 0.001,
+    R: pint.Quantity[float | int],
+    LD: float | int | pint.Quantity[float | int],
+    m_after_cruise: pint.Quantity[float | int],
+    V: pint.Quantity[float | int],
+    V_headwind: pint.Quantity[float | int],
+    TSFC: pint.Quantity[float | int],
+    lost_fuel_fraction: float | int | pint.Quantity[float | int] = 0.0152,
+    recovered_fuel_fraction: float | int | pint.Quantity[float | int] = 0.001,
 ) -> float:
     r"""
     Given a flight distance (=range) $R$ and basic aircraft performance parameters (see table),
@@ -229,7 +351,7 @@ def calculate_fuel_consumption_breguet_improved(
     if R==0 * ureg.meter:
         return 0 * ureg.kg
     else:
-        H = (LD * V) / (TSFC * g)
+        H = (LD * V) / (TSFC * ureg.gravity)
         m_fuel = m_after_cruise * (
             (1 / math.exp( (-R / H) * (1 - (V_headwind / V)) )) 
             - lost_fuel_fraction 
@@ -247,11 +369,11 @@ def calculate_fuel_consumption_breguet_improved(
     '[time]/[length]' # [mg/Ns] = s/m
 )
 def calculate_fuel_consumption_breguet(
-    R: float | int,
-    LD: float | int,
-    m_after_cruise: float | int,
-    V: float | int,
-    TSFC: float | int,
+    R: pint.Quantity[float | int],
+    LD: float | int | pint.Quantity[float | int],
+    m_after_cruise: pint.Quantity[float | int],
+    V: pint.Quantity[float | int],
+    TSFC: pint.Quantity[float | int],
 ) -> float:
     r"""
     Given a flight distance (=range) $R$ and basic aircraft performance parameters (see table),
@@ -364,5 +486,5 @@ def calculate_fuel_consumption_breguet(
     if R==0 * ureg.meter:
         return 0 * ureg.kg
     else:
-        m_fuel =  m_after_cruise * (math.exp((R * TSFC * g) / (LD * V)) - 1)
+        m_fuel =  m_after_cruise * (math.exp((R * TSFC * ureg.gravity) / (LD * V)) - 1)
         return m_fuel.to('kg')
