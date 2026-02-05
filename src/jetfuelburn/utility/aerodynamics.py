@@ -8,7 +8,8 @@ from jetfuelburn.utility.physics import (
     _calculate_dynamic_pressure,
     _calculate_aircraft_velocity
 )
-from jetfuelburn import ureg
+import pint
+from jetfuelburn import data, ureg
 
 
 class jsbsim_drag_polars:
@@ -36,10 +37,10 @@ class jsbsim_drag_polars:
     )
     def calculate_drag(
         acft: str,
-        L: float | int,
-        M: float | int,
-        H: float | int,
-    ) -> dict:
+        L: pint.Quantity[float | int],
+        M: float | int | pint.Quantity[float | int],
+        h: pint.Quantity[float | int],
+    ) -> pint.Quantity[float | int]:
         r"""
         asdf
         """        
@@ -50,8 +51,8 @@ class jsbsim_drag_polars:
         
         S = data["wing_area_sqft"] * ureg.square_feet
         q = _calculate_dynamic_pressure(
-            speed=_calculate_aircraft_velocity(M, H),
-            altitude=H
+            speed=_calculate_aircraft_velocity(M, h),
+            altitude=h
         )
         C_L = L / (q * S)
         
@@ -83,6 +84,35 @@ class jsbsim_drag_polars:
         
         return D
     
+    @staticmethod
+    @ureg.check(
+        None,
+        '[force]', # lift
+        '[]', # Mach number
+        '[length]', # altitude
+    )
+    def calculate_lift_to_drag(
+        acft: str,
+        L: pint.Quantity[float | int],
+        M: float | int | pint.Quantity[float | int],
+        h: pint.Quantity[float | int],
+    ) -> pint.Quantity[float | int]:
+        r"""
+        asdf
+        """        
+        if acft not in jsbsim_drag_polars._aircraft_data:
+            raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data.")
+        
+        drag = jsbsim_drag_polars.calculate_drag(
+            acft=acft,
+            L=L,
+            M=M,
+            h=h,
+        )
+        L_D_ratio = L / drag
+        L_D_ratio = L_D_ratio.to('dimensionless')
+
+        return L_D_ratio
 
 
 class openap_drag_polars:
@@ -177,7 +207,7 @@ class openap_drag_polars:
         acft: str,
         L: float | int,
         M: float | int,
-        H: float | int,
+        h: float | int,
     ) -> dict:
         r"""
         Calculates the drag force for a given aircraft based on a low-speed drag polar 
@@ -225,7 +255,7 @@ class openap_drag_polars:
             Lift force
         M : float (dimensionless)
             Mach number
-        H : float (length)
+        h : float (length)
             Altitude
         
         Returns
@@ -254,7 +284,7 @@ class openap_drag_polars:
             acft='A320',
             L=60000*ureg.newton,
             M=0.78,
-            H=35000*ureg.feet,
+            h=35000*ureg.feet,
         )
         ```
         """
@@ -262,7 +292,7 @@ class openap_drag_polars:
             raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data.")
         if M <= 0:
             raise ValueError("Mach number must be greater than zero.")
-        if H < 0 * ureg.meter:
+        if h < 0 * ureg.meter:
             raise ValueError("Altitude must be greater than or equal to zero.")
         if L <= 0 * ureg.newton:
             raise ValueError("Lift force must be greater than zero.")
@@ -271,8 +301,8 @@ class openap_drag_polars:
         
         S = data["wing_area_m2"] * ureg('m^2')
         q = _calculate_dynamic_pressure(
-            speed=_calculate_aircraft_velocity(M, H),
-            altitude=H
+            speed=_calculate_aircraft_velocity(M, h),
+            altitude=h
         )
         C_L = L / (q * S)
         CD0 = data["CD0"]
@@ -284,3 +314,33 @@ class openap_drag_polars:
         D = D.to('N')
 
         return D
+    
+
+    @staticmethod
+    @ureg.check(
+        None,
+        '[force]', # lift
+        '[]', # Mach number
+        '[length]', # altitude
+    )
+    def calculate_lift_to_drag(
+        acft: str,
+        L: pint.Quantity[float | int],
+        M: float | int | pint.Quantity[float | int],
+        h: pint.Quantity[float | int],
+    ) -> pint.Quantity[float | int]:
+        r"""
+        asdf
+        """        
+        if acft not in openap_drag_polars._aircraft_data:
+            raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data.")
+        
+        drag = openap_drag_polars.calculate_drag(
+            acft=acft,
+            L=L,
+            M=M,
+            h=h,
+        )
+        L_D_ratio = L / drag
+        L_D_ratio = L_D_ratio.to('dimensionless')
+        return L_D_ratio
