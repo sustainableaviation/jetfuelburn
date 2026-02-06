@@ -1,8 +1,8 @@
 # %%
-import math
 import json
 import csv
 from importlib import resources
+import functools
 from jetfuelburn.utility.math import _interpolate
 from jetfuelburn.utility.physics import (
     _calculate_dynamic_pressure,
@@ -91,7 +91,7 @@ class jsbsim_drag_polars:
         '[]', # Mach number
         '[length]', # altitude
     )
-    def calculate_lift_to_drag(
+    def _calculate_lift_to_drag_physics(
         acft: str,
         L: pint.Quantity[float | int],
         M: float | int | pint.Quantity[float | int],
@@ -113,6 +113,24 @@ class jsbsim_drag_polars:
         L_D_ratio = L_D_ratio.to('dimensionless')
 
         return L_D_ratio
+    
+    @staticmethod
+    def calculate_lift_to_drag(
+        acft: str,
+        L: pint.Quantity | None = None,
+        M: float | pint.Quantity | None = None,
+        h: pint.Quantity | None = None,
+    ):
+        r"""
+        Calculates Lift-to-Drag ratio. 
+        
+        If `L`, `M`, or `h` are omitted, returns a callable (partial) with `acft` pre-bound.
+        If all arguments are provided, performs the calculation immediately.
+        """
+        if L is None or M is None or h is None:
+            return functools.partial(jsbsim_drag_polars._calculate_lift_to_drag_physics, acft=acft)
+        else:
+            return jsbsim_drag_polars._calculate_lift_to_drag_physics(acft, L, M, h)
 
 
 class openap_drag_polars:
