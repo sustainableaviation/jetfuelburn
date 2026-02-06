@@ -6,7 +6,7 @@ from typing import Callable
 
 from jetfuelburn.utility.physics import (
     _calculate_atmospheric_density,
-    _calculate_aircraft_velocity,
+    _calculate_airspeed_from_mach,
 )
 from jetfuelburn.utility.code import (
     _validate_physics_function_parameters,
@@ -24,7 +24,7 @@ from jetfuelburn.utility.code import (
     '[mass]',
 )
 def calculate_integrated_range(
-    m_end: pint.Quantity,
+    m_after_cruise: pint.Quantity,
     R: pint.Quantity,
     h: pint.Quantity,
     M: float,
@@ -40,7 +40,7 @@ def calculate_integrated_range(
     from jetfuelburn import ureg
     from jetfuelburn.rangeequation import calculate_integrated_range
     calculate_integrated_range(
-        m_end=100*ureg.metric_ton,
+        m_after_cruise=100*ureg.metric_ton,
         R=2000*ureg.nmi,
         h=35000*ureg.feet,
         M=0.78,
@@ -50,8 +50,8 @@ def calculate_integrated_range(
     """
     if integration_mass_step < 1 * ureg.kg:
         raise ValueError("integration_mass_step must be at least 1 kg")
-    if m_end <= 0 * ureg.kg:
-        raise ValueError("m_end must be greater than zero")
+    if m_after_cruise <= 0 * ureg.kg:
+        raise ValueError("m_after_cruise must be greater than zero")
     if M <= 0:
         raise ValueError("Mach number must be greater than zero")
     if h < 0 * ureg.meter:
@@ -70,10 +70,10 @@ def calculate_integrated_range(
     func_TSFC: Callable = _normalize_physics_function_or_scalar(TSFC)
     func_LD: Callable = _normalize_physics_function_or_scalar(LD)
 
-    m_end = m_end.to("kg")
-    V = _calculate_aircraft_velocity(mach_number=M, altitude=h)
+    m_after_cruise = m_after_cruise.to("kg")
+    V = _calculate_airspeed_from_mach(mach_number=M, altitude=h)
 
-    m_current = m_end
+    m_current = m_after_cruise
     R_current = 0 * ureg.km
 
     while R_current < R:
@@ -86,9 +86,14 @@ def calculate_integrated_range(
         R_current += delta_R
         m_current += integration_mass_step
 
-    m_fuel = m_current - m_end
-    return m_fuel.to('kg')
+        if R_current >= R:
+            R_excess = R_current - R
+            m_excess = R_excess / SAR_avg
+            m_current -= m_excess
+            break
 
+    m_fuel = m_current - m_after_cruise
+    return m_fuel.to('kg')
 
 
 @ureg.check(

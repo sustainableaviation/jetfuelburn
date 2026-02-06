@@ -65,8 +65,8 @@ def test_aux_physics():
     from jetfuelburn.utility.physics import _calculate_speed_of_sound
     assert callable(_calculate_speed_of_sound)
 
-    from jetfuelburn.utility.physics import _calculate_aircraft_velocity
-    assert callable(_calculate_aircraft_velocity)
+    from jetfuelburn.utility.physics import _calculate_airspeed_from_mach
+    assert callable(_calculate_airspeed_from_mach)
 
 
 def test_aux_allocation():

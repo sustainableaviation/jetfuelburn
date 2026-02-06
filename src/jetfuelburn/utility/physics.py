@@ -230,7 +230,7 @@ def _calculate_dynamic_pressure(
     '[]', # mach number is dimensionless
     '[length]' # altitude
 )
-def _calculate_aircraft_velocity(
+def _calculate_airspeed_from_mach(
     mach_number: float,
     altitude: float
 ) -> float:
@@ -281,8 +281,8 @@ def _calculate_aircraft_velocity(
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
-    from jetfuelburn.utility.physics import _calculate_aircraft_velocity
-    _calculate_aircraft_velocity(
+    from jetfuelburn.utility.physics import _calculate_airspeed_from_mach
+    _calculate_airspeed_from_mach(
         mach_number=0.8,
         altitude=10000*ureg.m
     )
@@ -295,6 +295,76 @@ def _calculate_aircraft_velocity(
     velocity = mach_number * (gamma * R * temperature.to(ureg.K)) ** 0.5
 
     return velocity.to(ureg.kph)
+
+
+@ureg.check(
+    '[speed]', # airspeed
+    '[length]' # altitude
+)
+def _calculate_mach_from_airspeed(
+    airspeed: float,
+    altitude: float
+) -> float:
+    r"""
+    Converts aircraft airspeed $V$ to Mach number $M$,
+    depending on the flight altitude $h$.
+
+    $$
+        M = \frac{V}{\sqrt{\gamma R T(h)}}
+    $$
+
+    where:
+
+    | Symbol   | Dimension       | Value           | Description                   |
+    |----------|-----------------|-----------------|-------------------------------|
+    | $M$      | [dimensionless] | variable        | Mach number                   |
+    | $V$      | [speed]         | variable        | aircraft speed                |
+    | $\gamma$ | [dimensionless] | 1.4             | ratio of specific heat (air)  |
+    | $R$      | (complicated)   | 287 J/(kg*K)    | specific gas constant for air |
+
+    Parameters
+    ----------
+    airspeed : float [speed]
+        Aircraft true airspeed (TAS).
+    altitude : float [length]
+        Flight altitude above sea level.
+
+    Returns
+    -------
+    ureg.Quantity (float) [dimensionless]
+        Mach number.
+
+    See Also
+    --------
+    [Mach Number entry on Wikipedia](https://en.wikipedia.org/wiki/Mach_number#Calculation)
+
+    References
+    ----------
+    Eqn.(1.33)-(1.34) Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. doi:[10.1201/9781003279068](https://doi.org/10.1201/9781003279068)
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.utility.physics import _calculate_mach_from_airspeed
+    _calculate_mach_from_airspeed(
+        airspeed=850*ureg.kph,
+        altitude=10000*ureg.m
+    )
+    ```
+    """
+    temperature = _calculate_atmospheric_temperature(altitude)
+
+    R = 287.052874 * (ureg.J/(ureg.kg*ureg.K)) # specific gas constant for air 
+    gamma = 1.4 * ureg.dimensionless # ratio of specific heat for air
+    
+    # Calculate the speed of sound at the given altitude
+    speed_of_sound = (gamma * R * temperature.to(ureg.K)) ** 0.5
+    
+    mach_number = airspeed / speed_of_sound
+
+    return mach_number.to(ureg.dimensionless)
 
 
 @ureg.check('[temperature]')

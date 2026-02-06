@@ -7,7 +7,7 @@ from jetfuelburn.utility.physics import (
     _calculate_atmospheric_temperature,
     _calculate_atmospheric_density,
     _calculate_dynamic_pressure,
-    _calculate_aircraft_velocity,
+    _calculate_airspeed_from_mach,
     _calculate_speed_of_sound,
 )
 
@@ -146,7 +146,7 @@ class TestCalculateSpeedOfSound:
 
 
 class TestCalculateAircraftVelocity:
-    """Test suite for _calculate_aircraft_velocity."""
+    """Test suite for _calculate_airspeed_from_mach."""
 
     @pytest.mark.parametrize("row", ISA_DATA)
     def test_values_against_isa_table(self, row):
@@ -158,19 +158,19 @@ class TestCalculateAircraftVelocity:
         mach = 1.0
         expected = (row['a_kt'] * ureg.knot).to(ureg.kph)
         
-        result = _calculate_aircraft_velocity(mach, altitude)
+        result = _calculate_airspeed_from_mach(mach, altitude)
         
         assert approx_with_units(result, expected, rel=1e-3)
 
     def test_output_units(self):
         """Checks that the function returns speed units (kph)."""
-        result = _calculate_aircraft_velocity(0.8, 10000 * ureg.meter)
+        result = _calculate_airspeed_from_mach(0.8, 10000 * ureg.meter)
         assert result.units == ureg.kph
 
     def test_error_handling(self):
         """Checks that invalid inputs raise errors (propagated from atmospheric functions)."""
         with pytest.raises(ValueError):
-            _calculate_aircraft_velocity(0.8, -500 * ureg.meter)
+            _calculate_airspeed_from_mach(0.8, -500 * ureg.meter)
 
 
 class TestCalculateDynamicPressure:
