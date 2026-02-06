@@ -6,7 +6,7 @@ import functools
 from jetfuelburn.utility.math import _interpolate
 from jetfuelburn.utility.physics import (
     _calculate_dynamic_pressure,
-    _calculate_aircraft_velocity
+    _calculate_airspeed_from_mach
 )
 import pint
 from jetfuelburn import data, ureg
@@ -51,7 +51,7 @@ class jsbsim_drag_polars:
         
         S = data["wing_area_sqft"] * ureg.square_feet
         q = _calculate_dynamic_pressure(
-            speed=_calculate_aircraft_velocity(M, h),
+            speed=_calculate_airspeed_from_mach(M, h),
             altitude=h
         )
         C_L = L / (q * S)
@@ -319,7 +319,7 @@ class openap_drag_polars:
         
         S = data["wing_area_m2"] * ureg('m^2')
         q = _calculate_dynamic_pressure(
-            speed=_calculate_aircraft_velocity(M, h),
+            speed=_calculate_airspeed_from_mach(M, h),
             altitude=h
         )
         C_L = L / (q * S)
