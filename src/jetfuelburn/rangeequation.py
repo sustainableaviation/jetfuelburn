@@ -4,127 +4,91 @@ from jetfuelburn import ureg
 import math
 from typing import Callable
 
-from jetfuelburn.utility.physics import _calculate_atmospheric_density
-from jetfuelburn.utility.code import _validate_function
+from jetfuelburn.utility.physics import (
+    _calculate_atmospheric_density,
+    _calculate_aircraft_velocity,
+)
+from jetfuelburn.utility.code import (
+    _validate_physics_function_parameters,
+    _normalize_physics_function_or_scalar,
+)
 
 
-
-class IntegratedRangeCalculator:
-    """
-    Performs numerical integration of the Specific Air Range (SAR) to estimate 
-    cruise performance. Supports both static and dynamic TSFC models.
-    """
-    def __init__(
-        self, 
-        func_or_scalar_tsfc: pint.Quantity[int | float] | Callable,
-        func_or_scalar_lift_to_drag: int | float | pint.Quantity[int | float] | Callable, 
-    ):
-        r"""
-        """
-        if isinstance(func_or_scalar_tsfc, pint.Quantity):
-            self.func_tsfc = lambda M, H, F: func_or_scalar_tsfc
-        elif callable(func_or_scalar_tsfc):
-            # If dynamic, validate it and use it directly
-            self._validate_function(
-                func=func_or_scalar_tsfc,
-                required_params={'M', 'H', 'F'},
-                expected_return_type=pint.Quantity
-            )
-            self.func_tsfc = func_or_scalar_tsfc
-        else:
-            raise TypeError("tsfc must be a pint.Quantity or a callable.")
-
-        if isinstance(func_or_scalar_lift_to_drag, (int, float, pint.Quantity)):
-            self.func_drag = lambda L, M, h: L / func_or_scalar_lift_to_drag
-        elif callable(func_or_scalar_lift_to_drag):
-            self._validate_function(
-                func=func_or_scalar_lift_to_drag,
-                required_params={'L', 'M', 'h'},
-                expected_return_type=pint.Quantity
-            )
-            self.func_drag = func_or_scalar_lift_to_drag
-        else:
-            raise TypeError("lift_to_drag must be a scalar or a callable.")
-        
-    
-    @ureg.check(
-        None,
-        '[mass]',
-        '[mass]',
-        '[length]',
-        '[speed]',
-        None
+@ureg.check(
+    '[mass]',
+    '[length]',
+    '[length]',
+    '[]',
+    None,
+    None,
+    '[mass]',
+)
+def calculate_integrated_range(
+    m_end: pint.Quantity,
+    R: pint.Quantity,
+    h: pint.Quantity,
+    M: float,
+    TSFC: pint.Quantity | Callable,
+    LD: float | pint.Quantity | Callable,
+    integration_mass_step: pint.Quantity = 100 * ureg.kg
+) -> pint.Quantity:
+    r"""
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.rangeequation import calculate_integrated_range
+    calculate_integrated_range(
+        m_end=100*ureg.metric_ton,
+        R=2000*ureg.nmi,
+        h=35000*ureg.feet,
+        M=0.78,
+        TSFC=17*(ureg.mg/ureg.N/ureg.s),
+        LD=18,
     )
-    def compute_integrated_range(
-        self,
-        m_start: pint.Quantity[int | float],
-        m_end: pint.Quantity[int | float],
-        h: pint.Quantity[int | float],
-        V: pint.Quantity[int | float],
-        num_intervals: int = 20,
-    ):
-        r"""
-        asdf
+    """
+    if integration_mass_step < 1 * ureg.kg:
+        raise ValueError("integration_mass_step must be at least 1 kg")
+    if m_end <= 0 * ureg.kg:
+        raise ValueError("m_end must be greater than zero")
+    if M <= 0:
+        raise ValueError("Mach number must be greater than zero")
+    if h < 0 * ureg.meter:
+        raise ValueError("Altitude must be non-negative")
 
-        """
-        m_start = m_start.to("kg")
-        m_end = m_end.to("kg")
-        m_increment = (m_end - m_start) / (num_intervals - 1)
-        m_stations = [(m_start + i * m_increment) for i in range(num_intervals)]
+    if type(TSFC) == Callable:
+        _validate_physics_function_parameters(
+            func=TSFC,
+            required_params={'M', 'h'},
+    )
+    if type(LD) == Callable:
+        _validate_physics_function_parameters(
+            func=LD,
+            required_params={'L', 'M', 'h'},
+    )
+    func_TSFC: Callable = _normalize_physics_function_or_scalar(TSFC)
+    func_LD: Callable = _normalize_physics_function_or_scalar(LD)
 
-        # 2. Performance Parameters
-        ranges = [Q_(0, "nautical_mile")]
-        times = [Q_(0, "hour")]
-        list_SAR_at_station = []
-        list_fuel_burn_per_distance = [] # New list for Fuel Burn per Distance
-        #TODO: convert speed to mach number based on altitude
+    m_end = m_end.to("kg")
+    V = _calculate_aircraft_velocity(mach_number=M, altitude=h)
 
-        # 3. Loop
-        for m_station in m_stations:
-            L = m_station * ureg.gravity
-            D = self.func_drag(
-                L=L,
-                M=,
-                h=h
-            )
-            TSFC = self.func_tsfc(
-                M=M,
-                h=h,
-                F=D
-            )
-            fuel_flow = D * TSFC
-            
-            
-            SAR = (V / fuel_flow).to("km / kg")
-            list_SAR_at_station.append(SAR)
+    m_current = m_end
+    R_current = 0 * ureg.km
 
-            fb_dist = (1 / SAR).to("kg / km")
-            list_fuel_burn_per_distance.append(fb_dist)
+    while R_current < R:
+        L_A = m_current * ureg.gravity
+        L_B = (m_current + integration_mass_step) * ureg.gravity
+        SAR_A = (V * func_LD(L=L_A, M=M, h=h)) / (func_TSFC(M=M, h=h) * L_A)
+        SAR_B = (V * func_LD(L=L_B, M=M, h=h)) / (func_TSFC(M=M, h=h) * L_B)
+        SAR_avg = (SAR_A + SAR_B) / 2
+        delta_R = (SAR_avg * integration_mass_step).to('km')
+        R_current += delta_R
+        m_current += integration_mass_step
 
-        # 4. Integrate Range (Standard Procedure)
-        cumulative_r = 0 * ureg.km
-        cumulative_t = 0 * ureg.hour
-        
-        for i in range(len(m_stations) - 1):
-            SAR_avg = (list_SAR_at_station[i] + list_SAR_at_station[i+1]) / 2
-            dw_force = m_stations[i] - m_stations[i+1]
-            dw_mass = (dw_force / ureg.standard_gravity).to("kg")
-            
-            dr = SAR_avg * dw_mass
-            dt = dr / V
-            
-            cumulative_r += dr
-            cumulative_t += dt
-            ranges.append(cumulative_r)
-            times.append(cumulative_t)
-            
-        return {
-            "weight": weight_stations,
-            "range": ranges,
-            "time": times,
-            "sar": sar_values,
-            "fuel_burn_per_distance": fuel_burn_values # Return the new metric
-        }
+    m_fuel = m_current - m_end
+    return m_fuel.to('kg')
+
 
 
 @ureg.check(
