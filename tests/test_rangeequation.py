@@ -1,5 +1,5 @@
 import pytest
-from jetfuelburn import ureg, g
+from jetfuelburn import ureg
 import pint
 from jetfuelburn.rangeequation import (
     calculate_fuel_consumption_breguet,

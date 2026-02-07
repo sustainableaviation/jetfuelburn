@@ -1,11 +1,12 @@
+# %%
 import pint
 from jetfuelburn import ureg
 from jetfuelburn.utility.physics import _calculate_atmospheric_temperature
 
 @ureg.check(
     '[time]/[length]', # [mg/Ns] = s/m
-    '[dimensionless]',
-    '[dimensionless]',
+    '[]',
+    '[]',
     '[length]',
     '[length]',
     None
@@ -50,9 +51,20 @@ def calculate_corrected_tsfc(
     > 0.2–0.4 for low bypass turbofan engines and 0.4–0.7 for high bypass turbofan engines.  
     - P.126 in Martinez-Val & Perez (1992)
 
+    Warnings
+    --------
+    Trust-specific fuel consumption is a complex function of many parameters, 
+    and generally dependent on engine thrust as well as the Mach number:
+
+    ![TSFC vs Thrust](../_static/tsfc.svg)
+
+    The correction formula implemented in this function is a simplified empirical model 
+    which considers only variations in Mach number and atmospheric temperature, not thrust.
+
     See Also
     --------
-    [Thrust-specific fuel consumption entry on Wikipedia](https://en.wikipedia.org/wiki/Thrust-specific_fuel_consumption)
+    - [Thrust-Specific Fuel Consumption entry on Wikipedia](https://en.wikipedia.org/wiki/Thrust-specific_fuel_consumption)
+    - Bensel, A. (2018). Characteristics of the Specific Fuel Consumption for Jet Engines. _Master's Thesis_. doi:[10.15488/4316](https://doi.org/10.15488/4316)
 
     References
     ----------
@@ -92,6 +104,11 @@ def calculate_corrected_tsfc(
 
     Example
     -------
+    Engine performance charts often report TSFC at specific conditions. 
+    Consider, for example, this excerpt from the JT15D-1 engine datasheet:
+
+    ![Engine Datasheet](https://marien.sdsu.edu/Class_Materials/jt15d-engine.pdf){ type=application/pdf style="min-height:50vh;width:100%" }
+
     ```pyodide install='jetfuelburn'
     from jetfuelburn import ureg
     from jetfuelburn.utility.engines import calculate_corrected_tsfc
@@ -111,17 +128,22 @@ def calculate_corrected_tsfc(
         raise ValueError("M_reported must be > 0")
     if M_actual <= 0 * M_actual.units:
         raise ValueError("M_actual must be > 0")
-    if h_reported <= 0 * h_reported.units:
+    if h_reported < 0 * h_reported.units:
         raise ValueError("h_reported must be > 0")
-    if h_actual <= 0 * h_actual.units:
+    if h_actual < 0 * h_actual.units:
         raise ValueError("h_actual must be > 0")
     if isinstance(beta, pint.Quantity):
         beta = beta.to('dimensionless')
     if beta <= 0 * ureg.dimensionless:
         raise ValueError("beta must be > 0")
 
-    relative_temperature_reported = _calculate_atmospheric_temperature(h_reported) / _calculate_atmospheric_temperature(0 * ureg.ft)
-    relative_temperature_actual = _calculate_atmospheric_temperature(h_actual) / _calculate_atmospheric_temperature(0 * ureg.ft)
+    t_reported_abs = _calculate_atmospheric_temperature(h_reported).to('kelvin')
+    t_sea_level_abs = _calculate_atmospheric_temperature(0 * ureg.ft).to('kelvin')
+    t_actual_abs = _calculate_atmospheric_temperature(h_actual).to('kelvin')
+
+    relative_temperature_reported = t_reported_abs / t_sea_level_abs # if not coverted to Kelvin, will raise "pint.errors.OffsetUnitCalculusError: Ambiguous operation with offset unit (degree_Celsius, degree_Celsius)"
+
+    relative_temperature_actual = t_actual_abs / t_sea_level_abs
     tsfc_actual = tsfc_reported * ((M_actual / M_reported) ** beta) * (relative_temperature_actual / relative_temperature_reported) ** 0.5 
     
     return tsfc_actual

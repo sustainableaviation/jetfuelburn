@@ -23,7 +23,7 @@ from jetfuelburn.utility.code import (
     None,
     '[mass]',
 )
-def calculate_integrated_range(
+def calculate_fuel_consumption_schedule_3_integration(
     m_after_cruise: pint.Quantity,
     R: pint.Quantity,
     h: pint.Quantity,
@@ -106,7 +106,7 @@ def calculate_integrated_range(
     '[speed]',
     '[time]/[length]', # [mg/Ns] = s/m
 )
-def calculate_fuel_consumption_arctan(
+def calculate_fuel_consumption_schedule_3_arctan(
     R: pint.Quantity[float | int],
     h: pint.Quantity[float | int],
     K: float | int | pint.Quantity[float | int],

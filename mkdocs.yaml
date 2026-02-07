@@ -77,6 +77,8 @@ plugins:
       execute: False
       show_input: True
       include_source: True
+  - mkdocs-pdf
+  
 markdown_extensions:
   - admonition
   - pymdownx.superfences

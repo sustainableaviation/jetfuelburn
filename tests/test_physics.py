@@ -1,4 +1,3 @@
-# %%
 from pathlib import Path
 import pytest
 import csv
@@ -8,6 +7,7 @@ from jetfuelburn.utility.physics import (
     _calculate_atmospheric_density,
     _calculate_dynamic_pressure,
     _calculate_airspeed_from_mach,
+    _calculate_mach_from_airspeed,
     _calculate_speed_of_sound,
 )
 
@@ -185,3 +185,66 @@ class TestCalculateDynamicPressure:
         """Checks that invalid altitude inputs raise ValueError."""
         with pytest.raises(ValueError):
             _calculate_dynamic_pressure(500 * ureg.kph, 25000 * ureg.meter)
+
+    def test_calculation_accuracy(self):
+        """
+        Verifies the math: q = 0.5 * rho * v^2
+        Using Sea Level standard conditions:
+        rho = 1.225 kg/m^3
+        v = 100 m/s
+        q = 0.5 * 1.225 * 10000 = 6125 Pa
+        """
+        altitude = 0 * ureg.meter
+        speed = 100 * ureg.mps
+        expected = 6125 * ureg.Pa
+        
+        result = _calculate_dynamic_pressure(speed, altitude)
+        
+        assert approx_with_units(result, expected, rel=1e-3)
+
+
+class TestCalculateMachFromAirspeed:
+    """Test suite for _calculate_mach_from_airspeed."""
+
+    @pytest.mark.parametrize("row", ISA_DATA)
+    def test_mach_one_equivalence(self, row):
+        """
+        At Mach 1.0, True Airspeed (TAS) equals the local Speed of Sound.
+        We input the speed of sound from the ISA table and expect Mach 1.0 back.
+        """
+        altitude = row['H_m'] * ureg.meter
+        # Input speed is the local speed of sound
+        airspeed = (row['a_kt'] * ureg.knot).to(ureg.kph) 
+        
+        expected_mach = 1.0 * ureg.dimensionless
+        
+        result = _calculate_mach_from_airspeed(airspeed, altitude)
+        
+        assert approx_with_units(result, expected_mach, rel=1e-3)
+
+    def test_round_trip_conversion(self):
+        """
+        Checks consistency between the two Mach functions:
+        Mach -> Airspeed -> Mach should return the original value.
+        """
+        original_mach = 0.82
+        altitude = 10500 * ureg.meter
+        
+        airspeed = _calculate_airspeed_from_mach(original_mach, altitude)
+        result_mach = _calculate_mach_from_airspeed(airspeed, altitude)
+        
+        assert result_mach.units == ureg.dimensionless
+        assert approx_with_units(result_mach, original_mach * ureg.dimensionless, rel=1e-5)
+
+    def test_output_units(self):
+        """Checks that the function returns a dimensionless Quantity."""
+        result = _calculate_mach_from_airspeed(
+            airspeed=500 * ureg.kph, 
+            altitude=5000 * ureg.m
+        )
+        assert result.units == ureg.dimensionless
+
+    def test_error_handling(self):
+        """Checks that altitude errors propagate correctly."""
+        with pytest.raises(ValueError):
+            _calculate_mach_from_airspeed(500 * ureg.kph, 25000 * ureg.m)
