@@ -45,6 +45,7 @@ def test_reducedorder():
     assert callable(myclimate.available_aircraft)
     assert callable(myclimate.calculate_fuel_consumption)
 
+
 def test_combined():
     from jetfuelburn.combined import calculate_fuel_consumption_combined_model
     assert callable(calculate_fuel_consumption_combined_model)
@@ -94,3 +95,20 @@ def test_aux_math():
     
     from jetfuelburn.utility.math import _interpolate
     assert callable(_interpolate)
+
+
+def test_aux_code():
+    import jetfuelburn.utility.code
+    
+    from jetfuelburn.utility.code import _validate_physics_function_parameters
+    assert callable(_validate_physics_function_parameters)
+
+    from jetfuelburn.utility.code import _normalize_physics_function_or_scalar
+    assert callable(_normalize_physics_function_or_scalar)
+
+
+def test_aux_engines():
+    import jetfuelburn.utility.engines
+    
+    from jetfuelburn.utility.engines import calculate_corrected_tsfc
+    assert callable(calculate_corrected_tsfc)
