@@ -229,7 +229,12 @@ class openap_drag_polars:
     r"""
     The class implements a low-speed drag polar model based on data published with the OpenAP model.
 
-    
+    ```python exec="true" html="true"
+    from jetfuelburn.figures.aerodynamics import figure_openap_dragpolar
+    fig = figure_openap_dragpolar()
+    print(fig.to_html(full_html=False, include_plotlyjs="cdn"))
+    # https://pawamoy.github.io/markdown-exec/gallery/#with-plotly
+    ```
 
     Warning
     -------
@@ -312,7 +317,7 @@ class openap_drag_polars:
         """
         if acft not in openap_drag_polars._aircraft_data:
             raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data.")
-        data: dict = openap_drag_polars._aircraft_data[acft]
+        data: dict = openap_drag_polars._aircraft_data[acft].copy()
         data['S'] = data.pop('wing_area_m2') * ureg('m^2')
         return data
 
