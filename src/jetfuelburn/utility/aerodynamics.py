@@ -10,13 +10,33 @@ from jetfuelburn.utility.physics import (
     _calculate_airspeed_from_mach
 )
 import pint
-from jetfuelburn import data, ureg
+from jetfuelburn import ureg
 
 
 class jsbsim_drag_polars:
     r"""
     The class implements a component-based drag polar model derived from open-source 
     [JSBSim](https://github.com/JSBSim-Team/jsbsim) flight dynamics data.
+
+    ```python exec="true" html="true"
+    from jetfuelburn.figures.aerodynamics import figure_jsbsim_dragpolar_mach_effects
+    fig = figure_jsbsim_dragpolar_mach_effects()
+    print(fig.to_html(full_html=False, include_plotlyjs="cdn"))
+    # https://pawamoy.github.io/markdown-exec/gallery/#with-plotly
+    ```
+
+    Warning
+    -------
+    The data used in this model is based on data collected by 
+
+    See Also
+    --------
+    [`jetfuelburn.utility.aerodynamics.openap_drag_polars`][]
+
+    References
+    ----------
+    Berndt, J. S., & JSBSim Development Team. (2011). 
+    [JSBSim: An open source, platform-independent, flight dynamics model in C++]((https://jsbsim.sourceforge.net/JSBSimReferenceManual.pdf)). 
     """
 
     _aircraft_data = {}
@@ -33,9 +53,9 @@ class jsbsim_drag_polars:
     @staticmethod
     @ureg.check(
         None,
-        '[force]', # lift
-        '[]', # Mach number
-        '[length]', # altitude
+        '[force]',
+        '[]',
+        '[length]',
     )
     def calculate_drag(
         acft: str,
@@ -51,32 +71,76 @@ class jsbsim_drag_polars:
 
         \begin{align*}
         D &= q \cdot S \cdot C_D \\
-        C_D &= C_{D0} + C_{D_{induced}} + C_{D_{wave}} \\
-        C_{D_{induced}} &= k \cdot C_L^2
+        C_L &= \frac{L}{q \cdot S}
         \end{align*}
+
+        with the drag coefficient $C_D$ calculated as the sum of parasitic, induced, and wave drag components 
+        (drag build-up):
+
+        $$
+        C_D = C_{D0}(\alpha) + C_{D_{i}} + C_{D_{wave}} = C_{D0}(\alpha) + k \cdot C_L^2 + C_{D_{wave}}
+        $$
 
         where:
 
-        | Symbol           | Dimension             | Description                        |
-        |------------------|-----------------------|------------------------------------|
-        | $D$              | [force]               | Drag force                         |
-        | $q$              | [pressure]            | Dynamic pressure                   |
-        | $S$              | [area]                | Wing reference area                |
-        | $C_D$            | [dimensionless]       | Total drag coefficient             |
+        | Symbol           | Dimension             | Description                             |
+        |------------------|-----------------------|-----------------------------------------|
+        | $D$              | [force]               | Drag force                              |
+        | $L$              | [force]               | Lift force                              |
+        | $q$              | [pressure]            | Dynamic pressure                        |
+        | $S$              | [area]                | Wing reference area                     |
+        | $C_D$            | [dimensionless]       | Total drag coefficient                  |
         | $C_{D0}$         | [dimensionless]       | Parasitic drag coefficient at zero lift |
-        | $C_{D_{induced}}$| [dimensionless]       | Induced drag coefficient           |
-        | $C_{D_{wave}}$   | [dimensionless]       | Wave drag coefficient               |
-        | $k$              | [dimensionless]       | Induced drag factor                |
-        | $C_L$            | [dimensionless]       | Lift coefficient                   |
-        | $L$              | [force]               | Lift force                         |
+        | $C_{D_{i}}$      | [dimensionless]       | Induced drag coefficient                |
+        | $C_{D_{wave}}$   | [dimensionless]       | Wave drag coefficient                   |
+        | $k$              | [dimensionless]       | Induced drag factor                     |
+        | $C_L$            | [dimensionless]       | Lift coefficient                        |
+        | $\alpha$         | [radians]             | Angle of attack                         |
+        
+        Warning
+        -------
+        Data is derived from JSBSim flight dynamics models, the accuracy of which may vary based on the specific aircraft and flight conditions.
+        
+        Notes
+        -----
+        In this model, the parasitic drag coefficient $C_{D0}$ is a function of angle of attack ($\alpha$), 
+        which is estimated by interpolating from the lift coefficient ($C_L$) using the lift curve data.
 
         See Also
         --------
-        [JSBSim Flight Dynamics Data]
+        [JSBSim Flight Dynamics Model on Sourceforge](https://sourceforge.net/projects/jsbsim/)
 
         References
         ----------
-        """        
+        Eqn. 7.7 in 
+        Young, T. M. (2018). 
+        Performance of the Jet Transport Airplane. 
+        _John Wiley & Sons_. 
+        doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
+
+        Parameters
+        ----------
+        acft : str
+            ICAO Aircraft Designator (e.g., 'A320', 'B737', etc.)
+        L : pint.Quantity (force)
+            Lift force
+        M : float or pint.Quantity (dimensionless)
+            Mach number
+        h : pint.Quantity (length)
+            Altitude
+
+        Returns
+        -------
+        pint.Quantity (force)
+            Drag force [N]
+        
+        Raises
+        ------
+        ValueError
+            If the ICAO Aircraft Designator is not found in the model data.
+        ValueError
+            If the Mach number, altitude, or lift force are out of expected ranges (e.g., Mach number <= 0, altitude < 0, lift <= 0).
+        """
         if acft not in jsbsim_drag_polars._aircraft_data:
             raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data.")
         
@@ -117,6 +181,7 @@ class jsbsim_drag_polars:
         
         return D
     
+
     @staticmethod
     @ureg.check(
         None,
@@ -227,7 +292,8 @@ class jsbsim_drag_polars:
 
 class openap_drag_polars:
     r"""
-    The class implements a low-speed drag polar model based on data published with the OpenAP model.
+    The class implements a low-speed drag polar model based on data published with 
+    the [OpenAP model](https://openap.dev/).
 
     ```python exec="true" html="true"
     from jetfuelburn.figures.aerodynamics import figure_openap_dragpolar

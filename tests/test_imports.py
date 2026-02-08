@@ -112,3 +112,17 @@ def test_aux_engines():
     
     from jetfuelburn.utility.engines import calculate_corrected_tsfc
     assert callable(calculate_corrected_tsfc)
+
+
+def test_aux_aerodynamics():
+    import jetfuelburn.utility.aerodynamics
+    
+    from jetfuelburn.utility.aerodynamics import jsbsim_drag_polars
+    assert callable(jsbsim_drag_polars.calculate_drag)
+    assert callable(jsbsim_drag_polars.calculate_lift_to_drag)
+    assert callable(jsbsim_drag_polars.calculate_lift_to_drag_binder_function)
+
+    from jetfuelburn.utility.aerodynamics import openap_drag_polars
+    assert callable(openap_drag_polars.calculate_drag)
+    assert callable(openap_drag_polars.calculate_lift_to_drag)
+    assert callable(openap_drag_polars.calculate_lift_to_drag_binder_function)
