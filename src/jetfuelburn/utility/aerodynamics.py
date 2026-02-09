@@ -27,7 +27,7 @@ class jsbsim_drag_polars:
 
     Warning
     -------
-    The data used in this model is based on data collected by 
+    The data used in this model is based on data collected by XXXXX
 
     See Also
     --------

@@ -23,7 +23,7 @@ from jetfuelburn.utility.code import (
     None,
     '[mass]',
 )
-def calculate_fuel_consumption_schedule_3_integration(
+def calculate_fuel_consumption_stepclimb_integration(
     m_after_cruise: pint.Quantity,
     R: pint.Quantity,
     h: pint.Quantity,
@@ -33,6 +33,25 @@ def calculate_fuel_consumption_schedule_3_integration(
     integration_mass_step: pint.Quantity = 100 * ureg.kg
 ) -> pint.Quantity:
     r"""
+    Given a flight distance (=range) $R$ and basic aircraft performance parameters (see table),
+    returns the fuel mass burned during the flight $m_f$ [kg] based on a flight schedule 
+    where aircraft velocity and altitude are constant during cruise, while allowing for variable thrust-specific fuel consumption
+    and lift-to-drag ratio as a function of Mach number and altitude.
+
+    Fuel mass is calculated through numerical integration of the specific air range (SAR) over the flight distance, using the trapezoidal rule:
+
+    See Also
+    --------
+    [`jetfuelburn.rangeequation.calculate_fuel_consumption_stepclimb_arctan`][]
+
+    References
+    ----------
+    Eqn. 13.28a ff. in 
+    Young, T. M. (2018). 
+    Performance of the Jet Transport Airplane. 
+    _John Wiley & Sons_. 
+    doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
+    
     Example
     -------
     ```pyodide install='jetfuelburn'
@@ -47,6 +66,7 @@ def calculate_fuel_consumption_schedule_3_integration(
         TSFC=17*(ureg.mg/ureg.N/ureg.s),
         LD=18,
     )
+    ```
     """
     if integration_mass_step < 1 * ureg.kg:
         raise ValueError("integration_mass_step must be at least 1 kg")
@@ -106,7 +126,7 @@ def calculate_fuel_consumption_schedule_3_integration(
     '[speed]',
     '[time]/[length]', # [mg/Ns] = s/m
 )
-def calculate_fuel_consumption_schedule_3_arctan(
+def calculate_fuel_consumption_stepclimb_arctan(
     R: pint.Quantity[float | int],
     h: pint.Quantity[float | int],
     K: float | int | pint.Quantity[float | int],
@@ -117,6 +137,11 @@ def calculate_fuel_consumption_schedule_3_arctan(
     TSFC: pint.Quantity[float | int],
 ) -> float:
     r"""
+    Given a flight distance (=range) $R$ and basic aircraft performance parameters (see table),
+    returns the fuel mass burned during the flight $m_f$ [kg] based on a flight schedule where 
+    aircraft velocity and altitude are constant during cruise.
+
+    Fuel mass is calculated as:
 
     $$
         m_f = \frac{(B + m_{LDG}^2) \tan(\theta)}{\sqrt{B} - m_{LDG} \tan(\theta)}
@@ -216,10 +241,9 @@ def calculate_fuel_consumption_breguet_improved(
 ) -> float:
     r"""
     Given a flight distance (=range) $R$ and basic aircraft performance parameters (see table),
-    returns the fuel mass burned during the flight $m_f$ [kg] based on the improved Breguet range equation from Randle et al. (2011).
-
-    This improved Breguet range equation accounts for headwind effects
-    as well as lost fuel during takeoff and climb and recovered fuel during descent and landing.
+    returns the fuel mass burned during the flight $m_f$ [kg] based on a flight schedule 
+    where the lift-coefficient and velocity are constant during cruise ("cruise-climb"), 
+    while taking into account headwind effects and fuel losses during takeoff and climb, as well as fuel recovery during descent and landing. 
 
     Fuel mass is calculated as:
 
@@ -274,7 +298,7 @@ def calculate_fuel_consumption_breguet_improved(
     Warnings
     --------
     Unlike the equation in Randle et al. (2011), this function uses mass [kg] 
-    instead of weight [N] for the fuel mass.
+    instead of weight [N] for the fuel.
 
     Notes
     -----
@@ -346,7 +370,9 @@ def calculate_fuel_consumption_breguet(
 ) -> float:
     r"""
     Given a flight distance (=range) $R$ and basic aircraft performance parameters (see table),
-    returns the fuel mass burned during the flight $m_f$ [kg] based on the Breguet range equation.
+    returns the fuel mass burned during the flight $m_f$ [kg] based on a flight schedule where 
+    the lift-coefficient and velocity are constant during cruise ("cruise-climb"). 
+    This solution is also known as the **Breguet range equation**.
 
     Fuel mass is calculated as:
 
