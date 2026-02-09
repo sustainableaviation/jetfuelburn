@@ -40,13 +40,73 @@ def calculate_fuel_consumption_stepclimb_integration(
 
     Fuel mass is calculated through numerical integration of the specific air range (SAR) over the flight distance, using the trapezoidal rule:
 
+    \begin{align*}
+        R &\approx \sum_{i=0}^{n-1} \frac{r_a(m_i) + r_a(m_{i+1})}{2} \cdot (m_{i+1} - m_i) \\
+        r_a &= \frac{M \cdot a_0 \sqrt{\Theta} \cdot (L/D)}{\text{TSFC} \cdot L}
+    \end{align*}
+
+    where:
+
+    | Symbol     | Dimension         | Description                                                                                                              |
+    |------------|-------------------|--------------------------------------------------------------------------------------------------------------------------|
+    | $m_{fuel}$ | [mass]            | Fuel required for the mission of the aircraft                                                                            |
+    | $R$        | [distance]        | Range of the aircraft (=mission distance)                                                                                |
+    | $h$        | [length]          | Cruise altitude of the aircraft                                                                                          |
+    | $M$        | [dimensionless]   | Mach number during cruise                                                                                                |
+    | $TSFC$     | [time/distance]   | Thrust Specific Fuel Consumption of the aircraft during cruise                                                           |
+    | $L/D$      | [dimensionless]   | Lift-to-drag ratio of the aircraft during cruise                                                                         |
+    | $a_0$      | [speed]           | Speed of sound at sea level                                                                                              |
+    | $\Theta$   | [dimensionless]   | Temperature ratio at cruise altitude (temperature at cruise altitude divided by temperature at sea level)               |
+    | $m_i$      | [mass]            | Mass of the aircraft at step $i$ during cruise, starting with $m_0 = m_{TO}$ and ending with $m_n = m_{LDG}$ (= $m_{after\_cruise}$) |
+    | $g$        | [acceleration]    | Gravitational acceleration                                                                                               |
+
+
+    ??? info "Derivation"
+
+        Equation 19 in Randle et al. (2011) expresses the fuel mass burned $m_f$
+        during a flight of distance $s$ (=range $R$) as a function of the takeoff mass $m_{TO}$.
+        However, in practical applications, the more relevant known parameter is the landing mass after cruise 
+        
+        \begin{align}
+        r_a &= -\frac{\text{d}x}{\text{d}m} \\
+        \text{d}x &= -r_a \text{d}m \\
+        R = \int_{start}^{end} \text{d}x &= -\int_{m_{TO}}^{m_{LDG}} r_a \text{d}m \\
+        \end{align}
+
+        with the specific air range (SAR) defined as:
+        
+        \begin{align}
+        r_a &= -\frac{\text{d}x}{\text{d}m} \\
+        r_a &= -\frac{\text{d}x/\text{d}t}{\text{d}m/\text{d}t} \\
+        r_a &= \frac{V}{Q} \\
+        \end{align}
+
+        with the definition of true airspeed (=velocity) $V$ and fuel flow rate $Q$:
+        
+        \begin{align}
+        V &= M \cdot a_0 \sqrt{\Theta} \\
+        Q &= \text{TSFC} \cdot D  = \text{TSFC} \cdot \frac{L}{(L/D)}
+        \end{align}
+
+        \begin{align}
+        R = \int_{m_{TO}}^{m_{LDG}} \frac{V}{Q} \text{d}m &= \int_{m_{TO}}^{m_{LDG}} \frac{M \cdot a_0 \sqrt{\Theta}}{\text{TSFC} \cdot \frac{L}{(L/D)}} \text{d}m \\
+        R = \int_{m_{TO}}^{m_{LDG}} \frac{M \cdot a_0 \sqrt{\Theta} \cdot (L/D)}{\text{TSFC} \cdot L} \text{d}m &= \int_{m_{TO}}^{m_{LDG}} \frac{M \cdot a_0 \sqrt{\Theta} \cdot (L/D)}{\text{TSFC} \cdot m \cdot g} \text{d}m
+        \end{align}
+
+        which can now be solved through numerical integration, using the trapezoidal rule:
+
+        \begin{equation}
+        R \approx \sum_{i=0}^{n-1} \frac{r_a(m_i) + r_a(m_{i+1})}{2} \cdot (m_{i+1} - m_i)
+        \end{equation}
+
+
     See Also
     --------
     [`jetfuelburn.rangeequation.calculate_fuel_consumption_stepclimb_arctan`][]
 
     References
     ----------
-    Eqn. 13.28a ff. in 
+    Eqn. 13.1aff. and Eqn. 13.28a ff. in 
     Young, T. M. (2018). 
     Performance of the Jet Transport Airplane. 
     _John Wiley & Sons_. 
