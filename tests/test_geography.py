@@ -79,34 +79,48 @@ class TestGeography:
 
 class TestHaversine:
 
-    def test_calculate_haversine_distance_incorrect_latlon(self):   
+    def test_calculate_haversine_distance_incorrect_latlon(self):
         """Test that invalid latitude and longitude values raise ValueError."""
-        with pytest.raises(ValueError, match="Latitude must be between -90 and 90 degrees."):
+        with pytest.raises(
+            ValueError, match="Latitude must be between -90 and 90 degrees."
+        ):
             _calculate_haversine_distance(100, 0, 0, 0)  # Invalid latitude
-        with pytest.raises(ValueError, match="Latitude must be between -90 and 90 degrees."):
+        with pytest.raises(
+            ValueError, match="Latitude must be between -90 and 90 degrees."
+        ):
             _calculate_haversine_distance(0, 0, -100, 0)  # Invalid latitude
-        with pytest.raises(ValueError, match="Longitude must be between -180 and 180 degrees."):
+        with pytest.raises(
+            ValueError, match="Longitude must be between -180 and 180 degrees."
+        ):
             _calculate_haversine_distance(0, 200, 0, 0)  # Invalid longitude
-        with pytest.raises(ValueError, match="Longitude must be between -180 and 180 degrees."):
+        with pytest.raises(
+            ValueError, match="Longitude must be between -180 and 180 degrees."
+        ):
             _calculate_haversine_distance(0, 0, 0, -200)  # Invalid longitude
 
     def test_calculate_haversine_distance_noaa_examples(self):
         """Test haversine distance against NOAA Calculator (https://www.nhc.noaa.gov/gccalc.shtml)."""
-        assert approx_with_units(_calculate_haversine_distance(0,10,0,0), 1111*ureg.km, rel=0.01)
-        assert approx_with_units(_calculate_haversine_distance(0,180,0,0), 20002*ureg.km, rel=0.01)
-        assert approx_with_units(_calculate_haversine_distance(0,180,33,66), 12217*ureg.km, rel=0.01)
+        assert approx_with_units(
+            _calculate_haversine_distance(0, 10, 0, 0), 1111 * ureg.km, rel=0.01
+        )
+        assert approx_with_units(
+            _calculate_haversine_distance(0, 180, 0, 0), 20002 * ureg.km, rel=0.01
+        )
+        assert approx_with_units(
+            _calculate_haversine_distance(0, 180, 33, 66), 12217 * ureg.km, rel=0.01
+        )
 
     def test_calculate_haversine_distance_zero_distance(self):
         """Test haversine distance for the same point."""
         distance = _calculate_haversine_distance(10, 20, 10, 20)
-        assert approx_with_units(distance, 0*ureg.km, abs=1e-6*ureg.km)
+        assert approx_with_units(distance, 0 * ureg.km, abs=1e-6 * ureg.km)
 
     def test_calculate_haversine_distance_known_distance(self):
         """Test haversine distance between ZRH and SFO."""
         # Zurich (ZRH): 47.4647 N, 8.5492 E
         # San Francisco (SFO): 37.6188 N, 122.375 W
         distance = _calculate_haversine_distance(47.4647, 8.5492, 37.6188, -122.375)
-        assert approx_with_units(distance, 9370*ureg.km, rel=0.01)
+        assert approx_with_units(distance, 9370 * ureg.km, rel=0.01)
 
     def test_calculate_haversine_distance_antipodal(self):
         """Test haversine distance between antipodal points."""

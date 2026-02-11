@@ -28,7 +28,9 @@ def approx_with_units(value_check, value_expected, rel=None, abs=None) -> bool:
     """
     if value_check.units != value_expected.units:
         return False
-    return value_check.magnitude == pytest.approx(value_expected.magnitude, rel=rel, abs=abs)
+    return value_check.magnitude == pytest.approx(
+        value_expected.magnitude, rel=rel, abs=abs
+    )
 
 
 def approx_dict(dict_check: dict, dict_expected: dict, rel=None, abs=None) -> bool:
@@ -70,9 +72,11 @@ def approx_dict(dict_check: dict, dict_expected: dict, rel=None, abs=None) -> bo
         if isinstance(expected_val, ureg.Quantity):
             if check_val.units != expected_val.units:
                 return False
-            if check_val.magnitude != pytest.approx(expected_val.magnitude, rel=rel, abs=abs):
+            if check_val.magnitude != pytest.approx(
+                expected_val.magnitude, rel=rel, abs=abs
+            ):
                 return False
-        else: # not a quantity
+        else:  # not a quantity
             if check_val != pytest.approx(expected_val, rel=rel, abs=abs):
                 return False
     return True
