@@ -33,8 +33,6 @@ jobs:
             -i coverage.xml \
             -o coverage.svg \
             -n "Coverage" \
-            -t 100,90,80,70,60 \
-            -c brightgreen,green,yellowgreen,yellow,orange,red
 
       - name: Publish to Clean Branch
         run: |
