@@ -12,32 +12,50 @@ jobs:
   update-badge:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.14' 
+          python-version: '3.14'
 
       - name: Install & Test
         run: |
-          # 1. Install genbadge alongside pytest
-          pip install pytest pytest-cov genbadge[Coverage]
-          
-          # 2. Install your package
+          pip install pytest pytest-cov genbadge[coverage]
           pip install -e .
-          
-          # 3. Run tests AND generate an XML report (Required for genbadge)
           pytest --cov=./ --cov-report=xml
 
       - name: Generate Badge
         run: |
-          # 4. Generate the SVG from the XML report
-          genbadge coverage -i coverage.xml -o coverage.svg
+          # The -l flag sets the text on the left side of the badge
+          genbadge coverage -i coverage.xml -o coverage.svg -l "Coverage"
 
-      - name: Deploy Badge
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          branch: badges
-          folder: .
-          clean: false
+      - name: Publish to Clean Branch
+        run: |
+          # 1. Move the badge to a temporary place (out of the repo)
+          mv coverage.svg /tmp/coverage.svg
+
+          # 2. Configure Git
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+          # 3. Create a NEW orphan branch named 'utility'
+          # (We use a temp name to avoid conflicts with your existing messy 'badges' branch)
+          git checkout --orphan utility
+
+          # 4. NUCLEAR OPTION: Remove ALL files from the staging area
+          # This empties the branch completely.
+          git rm -rf .
+
+          # 5. Retrieve the badge from the temp folder
+          mv /tmp/coverage.svg .
+
+          # 6. Commit ONLY the badge
+          git add coverage.svg
+          git commit -m "Update coverage badge"
+
+          # 7. Force push this temp branch to the 'badges' branch on GitHub
+          # This overwrites the remote 'badges' branch with this new clean history
+          git push origin HEAD:badges --force
