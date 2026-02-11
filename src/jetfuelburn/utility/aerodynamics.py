@@ -27,7 +27,8 @@ class jsbsim_drag_polars:
 
     Warning
     -------
-    The data used in this model is based on data collected by XXXXX
+    The data used in this model is based on data collected by contributors to the JSBSim project, which is an open-source flight dynamics model.
+    The accuracy of the data may vary based on the specific aircraft and flight conditions, and it may not be suitable for all applications. 
 
     See Also
     --------
@@ -150,7 +151,8 @@ class jsbsim_drag_polars:
 
         S = data["wing_area_sqft"] * ureg.square_feet
         q = _calculate_dynamic_pressure(
-            speed=_calculate_airspeed_from_mach(M, h), altitude=h
+            speed=_calculate_airspeed_from_mach(M, h),
+            altitude=h,
         )
         C_L = L / (q * S)
 
