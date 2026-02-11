@@ -28,7 +28,7 @@ class jsbsim_drag_polars:
     Warning
     -------
     The data used in this model is based on data collected by contributors to the JSBSim project, which is an open-source flight dynamics model.
-    The accuracy of the data may vary based on the specific aircraft and flight conditions, and it may not be suitable for all applications. 
+    The accuracy of the data may vary based on the specific aircraft and flight conditions, and it may not be suitable for all applications.
 
     See Also
     --------

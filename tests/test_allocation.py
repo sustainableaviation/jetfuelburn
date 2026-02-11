@@ -96,11 +96,12 @@ class TestFootprintAllocationByArea:
             )
 
     @pytest.mark.parametrize(
-        "fixture_name", [
+        "fixture_name",
+        [
             "allocation_one_class",
             "allocation_two_classes",
             "allocation_all_classes",
-        ]
+        ],
     )
     def test_footprint_allocation_by_area_consistency(self, request, fixture_name):
         fixture = request.getfixturevalue(fixture_name)
