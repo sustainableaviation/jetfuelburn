@@ -12,29 +12,32 @@ jobs:
   update-badge:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.14'
+          python-version: '3.14' 
 
       - name: Install & Test
         run: |
-          pip install pytest pytest-cov
+          # 1. Install genbadge alongside pytest
+          pip install pytest pytest-cov genbadge[Coverage]
+          
+          # 2. Install your package
           pip install -e .
-          pytest --cov=./ 
+          
+          # 3. Run tests AND generate an XML report (Required for genbadge)
+          pytest --cov=./ --cov-report=xml
 
-      # 1. Generate the badge
       - name: Generate Badge
-        uses: tj-actions/coverage-badge-py@v2
-        with:
-          output: coverage.svg
+        run: |
+          # 4. Generate the SVG from the XML report
+          genbadge coverage -i coverage.xml -o coverage.svg
 
-      # 2. Push to a separate 'badges' branch (Clean & Org-owned)
       - name: Deploy Badge
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: badges # The branch the badge will live on
-          folder: .      # The folder to upload ('.' captures the SVG we just made)
-          clean: false   # Don't delete other files in that branch if they exist
+          branch: badges
+          folder: .
+          clean: false
