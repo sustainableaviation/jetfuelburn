@@ -3,6 +3,7 @@ import csv
 from jetfuelburn import ureg
 from jetfuelburn.utility.physics import _calculate_dynamic_pressure
 
+
 def poll_et_al() -> None:
     r"""
     This function will be implemented in a later version of `jetfuelburn`.

@@ -5,7 +5,7 @@ from jetfuelburn.rangeequation import (
     calculate_fuel_consumption_breguet,
     calculate_fuel_consumption_breguet_improved,
     calculate_fuel_consumption_stepclimb_arctan,
-    calculate_fuel_consumption_stepclimb_integration
+    calculate_fuel_consumption_stepclimb_integration,
 )
 from jetfuelburn.utility.tests import approx_with_units
 from jetfuelburn.utility.physics import _calculate_mach_from_airspeed
@@ -13,8 +13,9 @@ from jetfuelburn.utility.aerodynamics import openap_drag_polars
 
 from .fixtures.rangeequation import breguet_range_fuel_calculation_data_1
 
+
 class TestCalculateFuelConsumptionBreguet:
-    
+
     def test_valid_input_units(self):
         """
         Test that the function accepts valid units and returns a mass in kg.
@@ -26,8 +27,8 @@ class TestCalculateFuelConsumptionBreguet:
         TSFC = 0.6 * (ureg.lb / ureg.lbf / ureg.hour)
 
         result = calculate_fuel_consumption_breguet(R, LD, m_after, V, TSFC)
-        
-        assert result.check('[mass]')
+
+        assert result.check("[mass]")
         assert result.units == ureg.kg
         assert result.magnitude > 0
 
@@ -42,17 +43,26 @@ class TestCalculateFuelConsumptionBreguet:
         TSFC = 15 * (ureg.mg / ureg.N / ureg.second)
 
         result = calculate_fuel_consumption_breguet(R, LD, m_after, V, TSFC)
-        
+
         assert result.magnitude == 0
         assert result.units == ureg.kg
 
-    @pytest.mark.parametrize("invalid_input", [
-        {"R": -100 * ureg.km, "msg": "Range must be greater than zero"},
-        {"LD": 0.5, "msg": "Lift-to-Drag ratio must be greater than 1"},
-        {"m_after_cruise": -50 * ureg.kg, "msg": "Mass after cruise must be greater than zero"},
-        {"V": 0 * ureg.kph, "msg": "Cruise speed must be greater than zero"},
-        {"TSFC": -5 * (ureg.mg / ureg.N / ureg.s), "msg": "Thrust Specific Fuel Consumption must be greater than zero"},
-    ])
+    @pytest.mark.parametrize(
+        "invalid_input",
+        [
+            {"R": -100 * ureg.km, "msg": "Range must be greater than zero"},
+            {"LD": 0.5, "msg": "Lift-to-Drag ratio must be greater than 1"},
+            {
+                "m_after_cruise": -50 * ureg.kg,
+                "msg": "Mass after cruise must be greater than zero",
+            },
+            {"V": 0 * ureg.kph, "msg": "Cruise speed must be greater than zero"},
+            {
+                "TSFC": -5 * (ureg.mg / ureg.N / ureg.s),
+                "msg": "Thrust Specific Fuel Consumption must be greater than zero",
+            },
+        ],
+    )
     def test_raises_value_error_on_invalid_magnitudes(self, invalid_input):
         """
         Test that specific value errors are raised for physically impossible inputs.
@@ -63,9 +73,9 @@ class TestCalculateFuelConsumptionBreguet:
             "LD": 18,
             "m_after_cruise": 100 * ureg.metric_ton,
             "V": 800 * ureg.kph,
-            "TSFC": 17 * (ureg.mg / ureg.N / ureg.s)
+            "TSFC": 17 * (ureg.mg / ureg.N / ureg.s),
         }
-        
+
         expected_msg = invalid_input.pop("msg")
         params.update(invalid_input)
 
@@ -79,36 +89,37 @@ class TestCalculateFuelConsumptionBreguet:
         """
         with pytest.raises((ValueError, pint.errors.DimensionalityError)):
             calculate_fuel_consumption_breguet(
-                R=500 * ureg.second, # Invalid: Time instead of Length
+                R=500 * ureg.second,  # Invalid: Time instead of Length
                 LD=18,
                 m_after_cruise=50000 * ureg.kg,
                 V=200 * ureg.mps,
-                TSFC=0.0001 * (ureg.sec / ureg.meter)
+                TSFC=0.0001 * (ureg.sec / ureg.meter),
             )
 
-    def test_calculate_fuel_consumption_breguet_from_fixture(self, breguet_range_fuel_calculation_data_1):
+    def test_calculate_fuel_consumption_breguet_from_fixture(
+        self, breguet_range_fuel_calculation_data_1
+    ):
         """
         Test using a data fixture.
         """
         input_data, expected_data = breguet_range_fuel_calculation_data_1
-        
+
         # Call the function using the keys from your fixture input_data
         calculated_data = calculate_fuel_consumption_breguet(
-            R=input_data['R'],
-            LD=input_data['LD'],
-            m_after_cruise=input_data['m_after_cruise'],
-            V=input_data['v_cruise'],  # Map fixture key 'v_cruise' to function arg 'V'
-            TSFC=input_data['TSFC'],   # Map fixture key 'TSFC' to function arg 'TSFC'
-        )
-        
-        assert approx_with_units(
-            value_check=calculated_data,
-            value_expected=expected_data,
-            rel=1e-2
+            R=input_data["R"],
+            LD=input_data["LD"],
+            m_after_cruise=input_data["m_after_cruise"],
+            V=input_data["v_cruise"],  # Map fixture key 'v_cruise' to function arg 'V'
+            TSFC=input_data["TSFC"],  # Map fixture key 'TSFC' to function arg 'TSFC'
         )
 
+        assert approx_with_units(
+            value_check=calculated_data, value_expected=expected_data, rel=1e-2
+        )
+
+
 class TestCalculateFuelConsumptionBreguetImproved:
-    
+
     def test_valid_input_units(self):
         """
         Test that the improved function runs with standard inputs and extra improved parameters.
@@ -119,12 +130,12 @@ class TestCalculateFuelConsumptionBreguetImproved:
         V = 450 * ureg.knot
         V_hw = 20 * ureg.knot
         TSFC = 0.55 * (ureg.lb / ureg.lbf / ureg.hour)
-        
+
         result = calculate_fuel_consumption_breguet_improved(
             R, LD, m_after, V, V_hw, TSFC
         )
-        
-        assert result.check('[mass]')
+
+        assert result.check("[mass]")
         assert result.units == ureg.kg
         assert result.magnitude > 0
 
@@ -133,10 +144,10 @@ class TestCalculateFuelConsumptionBreguetImproved:
         result = calculate_fuel_consumption_breguet_improved(
             R=0 * ureg.km,
             LD=18,
-            m_after_cruise=50000*ureg.kg,
-            V=800*ureg.kph,
-            V_headwind=0*ureg.kph,
-            TSFC=17*(ureg.mg/ureg.N/ureg.s)
+            m_after_cruise=50000 * ureg.kg,
+            V=800 * ureg.kph,
+            V_headwind=0 * ureg.kph,
+            TSFC=17 * (ureg.mg / ureg.N / ureg.s),
         )
         assert result.magnitude == 0
 
@@ -159,14 +170,14 @@ class TestCalculateFuelConsumptionBreguetImproved:
 
         # 2. Improved Calculation (with effects nullified)
         val_improved = calculate_fuel_consumption_breguet_improved(
-            R=R, 
-            LD=LD, 
-            m_after_cruise=m_after, 
+            R=R,
+            LD=LD,
+            m_after_cruise=m_after,
             V=V,
-            V_headwind=0 * ureg.mps,     # No Wind
+            V_headwind=0 * ureg.mps,  # No Wind
             TSFC=TSFC,
-            lost_fuel_fraction=0.0,      # No lost fuel
-            recovered_fuel_fraction=0.0  # No recovered fuel
+            lost_fuel_fraction=0.0,  # No lost fuel
+            recovered_fuel_fraction=0.0,  # No recovered fuel
         )
 
         # 3. Assert Approximately Equal using helper
@@ -182,8 +193,8 @@ class TestCalculateFuelConsumptionBreguetImproved:
                 LD=18,
                 m_after_cruise=100 * ureg.kg,
                 V=800 * ureg.kph,
-                V_headwind=50 * ureg.gram, # Invalid: Mass instead of Speed
-                TSFC=17 * (ureg.mg / ureg.N / ureg.s)
+                V_headwind=50 * ureg.gram,  # Invalid: Mass instead of Speed
+                TSFC=17 * (ureg.mg / ureg.N / ureg.s),
             )
 
 
@@ -201,7 +212,7 @@ class TestCalculateFuelConsumptionStepclimbArctan:
             V=800 * ureg.kph,
             TSFC=17 * (ureg.mg / ureg.N / ureg.s),
         )
-        assert result.check('[mass]')
+        assert result.check("[mass]")
         assert result.units == ureg.kg
         assert result.magnitude > 0
 
@@ -219,14 +230,26 @@ class TestCalculateFuelConsumptionStepclimbArctan:
         )
         assert result.magnitude == 0
 
-    @pytest.mark.parametrize("invalid_input", [
-        {"R": -100 * ureg.km, "msg": "Range must be greater than zero"},
-        {"h": -100 * ureg.ft, "msg": "Altitude must be greater than zero"},
-        {"m_after_cruise": -50 * ureg.kg, "msg": "Mass after cruise must be greater than zero"},
-        {"S": 1.0 * ureg.m**2, "msg": "Lift-to-Drag ratio must be greater than 1"}, # Error msg corresponds to check S<=1 in source
-        {"V": 0 * ureg.kph, "msg": "Cruise speed must be greater than zero"},
-        {"TSFC": -5 * (ureg.mg / ureg.N / ureg.s), "msg": "Thrust Specific Fuel Consumption must be greater than zero"},
-    ])
+    @pytest.mark.parametrize(
+        "invalid_input",
+        [
+            {"R": -100 * ureg.km, "msg": "Range must be greater than zero"},
+            {"h": -100 * ureg.ft, "msg": "Altitude must be greater than zero"},
+            {
+                "m_after_cruise": -50 * ureg.kg,
+                "msg": "Mass after cruise must be greater than zero",
+            },
+            {
+                "S": 1.0 * ureg.m**2,
+                "msg": "Lift-to-Drag ratio must be greater than 1",
+            },  # Error msg corresponds to check S<=1 in source
+            {"V": 0 * ureg.kph, "msg": "Cruise speed must be greater than zero"},
+            {
+                "TSFC": -5 * (ureg.mg / ureg.N / ureg.s),
+                "msg": "Thrust Specific Fuel Consumption must be greater than zero",
+            },
+        ],
+    )
     def test_raises_value_error_on_invalid_magnitudes(self, invalid_input):
         params = {
             "R": 2000 * ureg.nmi,
@@ -238,13 +261,12 @@ class TestCalculateFuelConsumptionStepclimbArctan:
             "V": 800 * ureg.kph,
             "TSFC": 17 * (ureg.mg / ureg.N / ureg.s),
         }
-        
+
         expected_msg = invalid_input.pop("msg")
         params.update(invalid_input)
 
         with pytest.raises(ValueError, match=expected_msg):
             calculate_fuel_consumption_stepclimb_arctan(**params)
-
 
 
 class TestCalculateFuelConsumptionStepclimbIntegration:
@@ -259,13 +281,13 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
             TSFC=17 * (ureg.mg / ureg.N / ureg.s),
             LD=18,
         )
-        assert result.check('[mass]')
+        assert result.check("[mass]")
         assert result.units == ureg.kg
         assert result.magnitude > 0
 
     def test_valid_input_callable(self):
         """Test integration method with Callable TSFC and LD inputs."""
-        
+
         # Define callables that accept specific arguments as required by _validate_physics_function_parameters
         def mock_tsfc(M, h):
             return 17 * (ureg.mg / ureg.N / ureg.s)
@@ -281,16 +303,25 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
             TSFC=mock_tsfc,
             LD=mock_ld,
         )
-        assert result.check('[mass]')
+        assert result.check("[mass]")
         assert result.units == ureg.kg
         assert result.magnitude > 0
 
-    @pytest.mark.parametrize("invalid_input", [
-        {"integration_mass_step": 0.5 * ureg.kg, "msg": "integration_mass_step must be at least 1 kg"},
-        {"m_after_cruise": 0 * ureg.kg, "msg": "m_after_cruise must be greater than zero"},
-        {"M": 0, "msg": "Mach number must be greater than zero"},
-        {"h": -100 * ureg.ft, "msg": "Altitude must be non-negative"},
-    ])
+    @pytest.mark.parametrize(
+        "invalid_input",
+        [
+            {
+                "integration_mass_step": 0.5 * ureg.kg,
+                "msg": "integration_mass_step must be at least 1 kg",
+            },
+            {
+                "m_after_cruise": 0 * ureg.kg,
+                "msg": "m_after_cruise must be greater than zero",
+            },
+            {"M": 0, "msg": "Mach number must be greater than zero"},
+            {"h": -100 * ureg.ft, "msg": "Altitude must be non-negative"},
+        ],
+    )
     def test_raises_value_error_on_invalid_magnitudes(self, invalid_input):
         params = {
             "m_after_cruise": 100 * ureg.metric_ton,
@@ -299,9 +330,9 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
             "M": 0.78,
             "TSFC": 17 * (ureg.mg / ureg.N / ureg.s),
             "LD": 18,
-            "integration_mass_step": 100 * ureg.kg
+            "integration_mass_step": 100 * ureg.kg,
         }
-        
+
         expected_msg = invalid_input.pop("msg")
         params.update(invalid_input)
 
@@ -324,7 +355,7 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
         """Test dimensionality checks on arguments."""
         with pytest.raises((ValueError, pint.errors.DimensionalityError)):
             calculate_fuel_consumption_stepclimb_integration(
-                m_after_cruise=100 * ureg.meter, # Invalid: Length instead of Mass
+                m_after_cruise=100 * ureg.meter,  # Invalid: Length instead of Mass
                 R=2000 * ureg.nmi,
                 h=35000 * ureg.feet,
                 M=0.78,
@@ -341,7 +372,7 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
             M=0.78,
             TSFC=17 * (ureg.mg / ureg.N / ureg.s),
             LD=18,
-            integration_mass_step=100 * ureg.kg
+            integration_mass_step=100 * ureg.kg,
         )
 
         finer_result = calculate_fuel_consumption_stepclimb_integration(
@@ -351,11 +382,10 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
             M=0.78,
             TSFC=17 * (ureg.mg / ureg.N / ureg.s),
             LD=18,
-            integration_mass_step=10 * ureg.kg
+            integration_mass_step=10 * ureg.kg,
         )
 
         assert approx_with_units(finer_result, base_result, rel=0.01)
-
 
     def test_equivalence_to_arctan_method(self):
         """Test that the integration method gives a similar result to the arctan method for the same inputs."""
@@ -369,10 +399,10 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
         arctan_result = calculate_fuel_consumption_stepclimb_arctan(
             R=range,
             h=altitude,
-            K=openap_drag_polars.get_basic_drag_parameters('A320').get('K'),
-            C_D0=openap_drag_polars.get_basic_drag_parameters('A320').get('CD0'),
+            K=openap_drag_polars.get_basic_drag_parameters("A320").get("K"),
+            C_D0=openap_drag_polars.get_basic_drag_parameters("A320").get("CD0"),
             m_after_cruise=m_after_cruise,
-            S=openap_drag_polars.get_basic_drag_parameters('A320').get('S'),
+            S=openap_drag_polars.get_basic_drag_parameters("A320").get("S"),
             V=airspeed,
             TSFC=TSFC,
         )
@@ -383,8 +413,8 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
             h=altitude,
             M=mach,
             TSFC=TSFC,
-            LD=openap_drag_polars.calculate_lift_to_drag_binder_function(acft='A320'),
-            integration_mass_step=100 * ureg.kg
+            LD=openap_drag_polars.calculate_lift_to_drag_binder_function(acft="A320"),
+            integration_mass_step=100 * ureg.kg,
         )
 
         assert approx_with_units(integration_result, arctan_result, rel=0.05)

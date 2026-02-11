@@ -15,13 +15,13 @@ from jetfuelburn.utility.code import (
 
 
 @ureg.check(
-    '[mass]',
-    '[length]',
-    '[length]',
-    '[]',
+    "[mass]",
+    "[length]",
+    "[length]",
+    "[]",
     None,
     None,
-    '[mass]',
+    "[mass]",
 )
 def calculate_fuel_consumption_stepclimb_integration(
     m_after_cruise: pint.Quantity,
@@ -30,7 +30,7 @@ def calculate_fuel_consumption_stepclimb_integration(
     M: float,
     TSFC: pint.Quantity | Callable,
     LD: float | pint.Quantity | Callable,
-    integration_mass_step: pint.Quantity = 100 * ureg.kg
+    integration_mass_step: pint.Quantity = 100 * ureg.kg,
 ) -> pint.Quantity:
     r"""
     Given a flight distance (=range) $R$ and basic aircraft performance parameters (see table),
@@ -168,13 +168,13 @@ def calculate_fuel_consumption_stepclimb_integration(
     if type(TSFC) == Callable:
         _validate_physics_function_parameters(
             func=TSFC,
-            required_params={'M', 'h'},
-    )
+            required_params={"M", "h"},
+        )
     if type(LD) == Callable:
         _validate_physics_function_parameters(
             func=LD,
-            required_params={'L', 'M', 'h'},
-    )
+            required_params={"L", "M", "h"},
+        )
     func_TSFC: Callable = _normalize_physics_function_or_scalar(TSFC)
     func_LD: Callable = _normalize_physics_function_or_scalar(LD)
 
@@ -190,7 +190,7 @@ def calculate_fuel_consumption_stepclimb_integration(
         SAR_A = (V * func_LD(L=L_A, M=M, h=h)) / (func_TSFC(M=M, h=h) * L_A)
         SAR_B = (V * func_LD(L=L_B, M=M, h=h)) / (func_TSFC(M=M, h=h) * L_B)
         SAR_avg = (SAR_A + SAR_B) / 2
-        delta_R = (SAR_avg * integration_mass_step).to('km')
+        delta_R = (SAR_avg * integration_mass_step).to("km")
         R_current += delta_R
         m_current += integration_mass_step
 
@@ -201,18 +201,18 @@ def calculate_fuel_consumption_stepclimb_integration(
             break
 
     m_fuel = m_current - m_after_cruise
-    return m_fuel.to('kg')
+    return m_fuel.to("kg")
 
 
 @ureg.check(
-    '[length]',
-    '[length]',
-    '[]',
-    '[]',
-    '[mass]',
-    '[area]',
-    '[speed]',
-    '[time]/[length]', # [mg/Ns] = s/m
+    "[length]",
+    "[length]",
+    "[]",
+    "[]",
+    "[mass]",
+    "[area]",
+    "[speed]",
+    "[time]/[length]",  # [mg/Ns] = s/m
 )
 def calculate_fuel_consumption_stepclimb_arctan(
     R: pint.Quantity[float | int],
@@ -319,7 +319,7 @@ def calculate_fuel_consumption_stepclimb_arctan(
     ```
 
     """
-    if R==0 * ureg.meter:
+    if R == 0 * ureg.meter:
         return 0 * ureg.kg
     if R < 0 * ureg.meter:
         raise ValueError("Range must be greater than zero.")
@@ -333,24 +333,26 @@ def calculate_fuel_consumption_stepclimb_arctan(
         raise ValueError("Cruise speed must be greater than zero.")
     if TSFC.magnitude <= 0:
         raise ValueError("Thrust Specific Fuel Consumption must be greater than zero.")
-    
+
     E_max = 0.5 * (1 / math.sqrt(C_D0 * K))
     rho = _calculate_atmospheric_density(altitude=h)
     theta = (R * ureg.gravity * TSFC) / (2 * E_max * V)
-    B = (C_D0 / K) * ((rho * V**2 * S) / (2 * ureg.gravity))**2
-    m_fuel = ((B + m_after_cruise**2) * math.tan(theta)) / (B**0.5 - m_after_cruise * math.tan(theta)) # math.sqrt(pint.Quantity) is not supported
-    return m_fuel.to('kg')
+    B = (C_D0 / K) * ((rho * V**2 * S) / (2 * ureg.gravity)) ** 2
+    m_fuel = ((B + m_after_cruise**2) * math.tan(theta)) / (
+        B**0.5 - m_after_cruise * math.tan(theta)
+    )  # math.sqrt(pint.Quantity) is not supported
+    return m_fuel.to("kg")
 
 
 @ureg.check(
-    '[length]',
-    '[]',
-    '[mass]',
-    '[speed]',
-    '[speed]',
-    '[time]/[length]', # [mg/Ns] = s/m
-    '[]',
-    '[]',
+    "[length]",
+    "[]",
+    "[mass]",
+    "[speed]",
+    "[speed]",
+    "[time]/[length]",  # [mg/Ns] = s/m
+    "[]",
+    "[]",
 )
 def calculate_fuel_consumption_breguet_improved(
     R: pint.Quantity[float | int],
@@ -464,26 +466,20 @@ def calculate_fuel_consumption_breguet_improved(
     )
     ```
     """
-    if R==0 * ureg.meter:
+    if R == 0 * ureg.meter:
         return 0 * ureg.kg
     else:
         H = (LD * V) / (TSFC * ureg.gravity)
         m_fuel = m_after_cruise * (
-            (1 / math.exp( (-R / H) * (1 - (V_headwind / V)) )) 
-            - lost_fuel_fraction 
+            (1 / math.exp((-R / H) * (1 - (V_headwind / V))))
+            - lost_fuel_fraction
             + recovered_fuel_fraction
             - 1
         )
-        return m_fuel.to('kg')
+        return m_fuel.to("kg")
 
 
-@ureg.check(
-    '[length]',
-    '[]',
-    '[mass]',
-    '[speed]',
-    '[time]/[length]' # [mg/Ns] = s/m
-)
+@ureg.check("[length]", "[]", "[mass]", "[speed]", "[time]/[length]")  # [mg/Ns] = s/m
 def calculate_fuel_consumption_breguet(
     R: pint.Quantity[float | int],
     LD: float | int | pint.Quantity[float | int],
@@ -493,8 +489,8 @@ def calculate_fuel_consumption_breguet(
 ) -> float:
     r"""
     Given a flight distance (=range) $R$ and basic aircraft performance parameters (see table),
-    returns the fuel mass burned during the flight $m_f$ [kg] based on a flight schedule where 
-    the lift-coefficient and velocity are constant during cruise ("cruise-climb"). 
+    returns the fuel mass burned during the flight $m_f$ [kg] based on a flight schedule where
+    the lift-coefficient and velocity are constant during cruise ("cruise-climb").
     This solution is also known as the **Breguet range equation**.
 
     Fuel mass is calculated as:
@@ -502,7 +498,7 @@ def calculate_fuel_consumption_breguet(
     $$
         m_f = (e^{\frac{R \cdot TSFC \cdot g}{L/D \cdot v}} - 1 ) m_2
     $$
-    
+
     where:
 
     | Symbol     | Dimension         | Description                                                            |
@@ -532,10 +528,10 @@ def calculate_fuel_consumption_breguet(
     Warnings
     --------
     This analytical fuel calculation method represents a simplification of actual flight dynamics.
-    Specifically, this function assumes a _flight schedule_ with constant airspeed and constant lift coefficient, resulting in a cruise-climb. 
+    Specifically, this function assumes a _flight schedule_ with constant airspeed and constant lift coefficient, resulting in a cruise-climb.
     Young (2017) shows this in Section 13.3.3 "Second Flight Schedule":
 
-    > (...) the airplane must be flown in a way that will ensure that the ratio (...) [of weight to air density] remains constant. 
+    > (...) the airplane must be flown in a way that will ensure that the ratio (...) [of weight to air density] remains constant.
     > This is possible if the airplane is allowed to climb very slowly so that the relative density (...) decreases in direct proportion to the decrease in airplane weight (...).
 
     References
@@ -543,19 +539,19 @@ def calculate_fuel_consumption_breguet(
     - Young, T. M. (2018).
     Performance of the Jet Transport Airplane (Section 13.7.3 "Fuel Required for Specified Range"). _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
     - Cavcar, M. (2006). Bréguet range equation?. _Journal of Aircraft_. doi:[10.2514/1.17696](https://doi.org/10.2514/1.17696)
-    - [Range (Aeronautics) entry on Wikipedia](https://en.wikipedia.org/wiki/Range_(aeronautics))  
+    - [Range (Aeronautics) entry on Wikipedia](https://en.wikipedia.org/wiki/Range_(aeronautics))
 
     See Also
     --------
     [`jetfuelburn.rangeequation.calculate_fuel_consumption_breguet_improved`][]
-    
+
     Raises
     ------
     ValueError
         If the dimensions of the inputs are invalid.
     ValueError
         If the magnitude of the inputs are invalid (eg. negative).
-        
+
     Parameters
     ----------
     R : float
@@ -601,8 +597,8 @@ def calculate_fuel_consumption_breguet(
     if TSFC.magnitude <= 0:
         raise ValueError("Thrust Specific Fuel Consumption must be greater than zero.")
 
-    if R==0 * ureg.meter:
+    if R == 0 * ureg.meter:
         return 0 * ureg.kg
     else:
-        m_fuel =  m_after_cruise * (math.exp((R * TSFC * ureg.gravity) / (LD * V)) - 1)
-        return m_fuel.to('kg')
+        m_fuel = m_after_cruise * (math.exp((R * TSFC * ureg.gravity) / (LD * V)) - 1)
+        return m_fuel.to("kg")

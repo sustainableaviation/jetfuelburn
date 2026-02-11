@@ -3,13 +3,9 @@ import pint
 from jetfuelburn import ureg
 from jetfuelburn.utility.physics import _calculate_atmospheric_temperature
 
+
 @ureg.check(
-    '[time]/[length]', # [mg/Ns] = s/m
-    '[]',
-    '[]',
-    '[length]',
-    '[length]',
-    None
+    "[time]/[length]", "[]", "[]", "[length]", "[length]", None  # [mg/Ns] = s/m
 )
 def calculate_corrected_tsfc(
     tsfc_reported: pint.Quantity[float | int],
@@ -21,7 +17,7 @@ def calculate_corrected_tsfc(
 ) -> pint.Quantity[float | int]:
     r"""
     Given a reported thrust-specific fuel consumption (TSFC) at reference conditions,
-    calculates the actual TSFC under different flight conditions according to an empirical correction formula 
+    calculates the actual TSFC under different flight conditions according to an empirical correction formula
     proposed by Martinez-Val & Perez (1992) and used by Cavcar (2006).
 
     TSFC is calculated as:
@@ -47,18 +43,18 @@ def calculate_corrected_tsfc(
     Notes
     -----
     Cavcar (2006) suggests for $\beta$:
-    
-    > 0.2–0.4 for low bypass turbofan engines and 0.4–0.7 for high bypass turbofan engines.  
+
+    > 0.2–0.4 for low bypass turbofan engines and 0.4–0.7 for high bypass turbofan engines.
     - P.126 in Martinez-Val & Perez (1992)
 
     Warnings
     --------
-    Trust-specific fuel consumption is a complex function of many parameters, 
+    Trust-specific fuel consumption is a complex function of many parameters,
     and generally dependent on engine thrust as well as the Mach number:
 
     ![TSFC vs Thrust](../_static/tsfc.svg)
 
-    The correction formula implemented in this function is a simplified empirical model 
+    The correction formula implemented in this function is a simplified empirical model
     which considers only variations in Mach number and atmospheric temperature, not thrust.
 
     See Also
@@ -68,13 +64,13 @@ def calculate_corrected_tsfc(
 
     References
     ----------
-    - Eqn. 3 in Martinez-Val, R., & Perez, E. (1992). 
-    Optimum cruise lift coefficient in initial design of jet aircraft. 
-    _Journal of Aircraft_, 29(4), 712-714. 
+    - Eqn. 3 in Martinez-Val, R., & Perez, E. (1992).
+    Optimum cruise lift coefficient in initial design of jet aircraft.
+    _Journal of Aircraft_, 29(4), 712-714.
     doi:[10.2514/3.46226](https://doi.org/10.2514/3.46226)
-    - Eqn. 2 in Cavcar, A. (2006). 
-    Constant altitude-constant Mach number cruise range of transport aircraft with compressibility effects. 
-    _Journal of Aircraft_, 43(1), 125-131. 
+    - Eqn. 2 in Cavcar, A. (2006).
+    Constant altitude-constant Mach number cruise range of transport aircraft with compressibility effects.
+    _Journal of Aircraft_, 43(1), 125-131.
     doi:[10.2514/1.14252](https://doi.org/10.2514/1.14252)
 
     Parameters
@@ -91,7 +87,7 @@ def calculate_corrected_tsfc(
         The actual Mach number during the flight for which we want to calculate the TSFC.
     beta: float | int | pint.Quantity[float | int]
         An empirically derived exponent that captures how TSFC changes with Mach number.
-    
+
     Raises
     ------
     ValueError
@@ -104,7 +100,7 @@ def calculate_corrected_tsfc(
 
     Example
     -------
-    Engine performance charts often report TSFC at specific conditions. 
+    Engine performance charts often report TSFC at specific conditions.
     Consider, for example, this excerpt from the JT15D-1 engine datasheet:
 
     ![Engine Datasheet](https://marien.sdsu.edu/Class_Materials/jt15d-engine.pdf){ type=application/pdf style="min-height:50vh;width:100%" }
@@ -133,17 +129,23 @@ def calculate_corrected_tsfc(
     if h_actual < 0 * h_actual.units:
         raise ValueError("h_actual must be > 0")
     if isinstance(beta, pint.Quantity):
-        beta = beta.to('dimensionless')
+        beta = beta.to("dimensionless")
     if beta <= 0 * ureg.dimensionless:
         raise ValueError("beta must be > 0")
 
-    t_reported_abs = _calculate_atmospheric_temperature(h_reported).to('kelvin')
-    t_sea_level_abs = _calculate_atmospheric_temperature(0 * ureg.ft).to('kelvin')
-    t_actual_abs = _calculate_atmospheric_temperature(h_actual).to('kelvin')
+    t_reported_abs = _calculate_atmospheric_temperature(h_reported).to("kelvin")
+    t_sea_level_abs = _calculate_atmospheric_temperature(0 * ureg.ft).to("kelvin")
+    t_actual_abs = _calculate_atmospheric_temperature(h_actual).to("kelvin")
 
-    relative_temperature_reported = t_reported_abs / t_sea_level_abs # if not coverted to Kelvin, will raise "pint.errors.OffsetUnitCalculusError: Ambiguous operation with offset unit (degree_Celsius, degree_Celsius)"
+    relative_temperature_reported = (
+        t_reported_abs / t_sea_level_abs
+    )  # if not coverted to Kelvin, will raise "pint.errors.OffsetUnitCalculusError: Ambiguous operation with offset unit (degree_Celsius, degree_Celsius)"
 
     relative_temperature_actual = t_actual_abs / t_sea_level_abs
-    tsfc_actual = tsfc_reported * ((M_actual / M_reported) ** beta) * (relative_temperature_actual / relative_temperature_reported) ** 0.5 
-    
+    tsfc_actual = (
+        tsfc_reported
+        * ((M_actual / M_reported) ** beta)
+        * (relative_temperature_actual / relative_temperature_reported) ** 0.5
+    )
+
     return tsfc_actual

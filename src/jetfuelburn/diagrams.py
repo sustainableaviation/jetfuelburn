@@ -2,15 +2,15 @@ from jetfuelburn import ureg
 
 
 @ureg.check(
-    '[length]',
-    '[mass]',
-    '[mass]',
-    '[length]',
-    '[mass]',
-    '[length]',
-    '[mass]',
-    '[length]',
-    '[length]',
+    "[length]",
+    "[mass]",
+    "[mass]",
+    "[length]",
+    "[mass]",
+    "[length]",
+    "[mass]",
+    "[length]",
+    "[length]",
 )
 def calculate_fuel_consumption_payload_range(
     d: float,
@@ -45,7 +45,7 @@ def calculate_fuel_consumption_payload_range(
     | climb/descent     | implicitly considered                                               |
     | fuel reserves     | depends on (sometimes unknown) manufacturer assumptions             |
     | alternate airport | depends on (sometimes unknown) manufacturer assumptions             |
-    
+
     Warnings
     --------
     There is no manufacturer-independent convention for including
@@ -117,13 +117,13 @@ def calculate_fuel_consumption_payload_range(
     """
 
     #  all variables of the same dimension must use consistent units
-    oew = oew.to('kg')
-    mtow = mtow.to('kg')
-    payload_point_B = payload_point_B.to('kg')
-    payload_point_C = payload_point_C.to('kg')
-    range_point_B = range_point_B.to('km')
-    range_point_C = range_point_C.to('km')
-    range_point_D = range_point_D.to('km')
+    oew = oew.to("kg")
+    mtow = mtow.to("kg")
+    payload_point_B = payload_point_B.to("kg")
+    payload_point_C = payload_point_C.to("kg")
+    range_point_B = range_point_B.to("km")
+    range_point_C = range_point_C.to("km")
+    range_point_D = range_point_D.to("km")
 
     acft_weight_point_B = oew + payload_point_B
     acft_weight_point_C = oew + payload_point_C
@@ -132,24 +132,27 @@ def calculate_fuel_consumption_payload_range(
     if d < 0:
         raise ValueError("Distance must be greater than zero.")
     if d < range_point_B:
-        slope = (mtow - acft_weight_point_B)/(range_point_B - range_point_A)
+        slope = (mtow - acft_weight_point_B) / (range_point_B - range_point_A)
         intercept = mtow - slope * range_point_B
         m_f = (slope * d + intercept) - acft_weight_point_B
         m_pld = payload_point_B
     elif range_point_B <= d < range_point_C:
-        slope = (acft_weight_point_B - acft_weight_point_C) / (range_point_C - range_point_B)
+        slope = (acft_weight_point_B - acft_weight_point_C) / (
+            range_point_C - range_point_B
+        )
         intercept = range_point_B * slope + acft_weight_point_B
         m_f = mtow - (-1 * slope * d + intercept)
         m_pld = (mtow - oew) - m_f
     elif range_point_C <= d < range_point_D:
-        m_f = mtow - acft_weight_point_C # max fuel
-        slope = (acft_weight_point_C - acft_weight_point_D) / (range_point_D - range_point_C)
+        m_f = mtow - acft_weight_point_C  # max fuel
+        slope = (acft_weight_point_C - acft_weight_point_D) / (
+            range_point_D - range_point_C
+        )
         intercept = range_point_C * slope + acft_weight_point_C
         m_pld = (-1 * slope * d + intercept) - oew
     else:
-        raise ValueError("Distance exceeds maximum range of aircraft as per payload-range diagram.")
+        raise ValueError(
+            "Distance exceeds maximum range of aircraft as per payload-range diagram."
+        )
 
-    return {
-        'mass_fuel': m_f.to('kg'),
-        'mass_payload': m_pld.to('kg')
-    }
+    return {"mass_fuel": m_f.to("kg"), "mass_payload": m_pld.to("kg")}

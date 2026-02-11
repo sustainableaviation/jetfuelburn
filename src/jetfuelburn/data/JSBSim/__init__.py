@@ -2,7 +2,7 @@
 # https://github.com/JSBSim-Team/jsbsim
 
 # Licensing Note:
-# The licenses of these repositories do not apply to the re-use of basic aerodynamics data, since in Switzerland 
+# The licenses of these repositories do not apply to the re-use of basic aerodynamics data, since in Switzerland
 # only "intellectual creations with individual character" are protected by copyright law.
 # Only Swiss copyright law applies, since the United States and Switzerland are parties to the Berne Convention
 # which states that the extent of copyright protection is governed exclusively by the laws of the country where protection is claimed.

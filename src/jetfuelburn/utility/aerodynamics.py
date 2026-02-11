@@ -7,7 +7,7 @@ import functools
 from jetfuelburn.utility.math import _interpolate
 from jetfuelburn.utility.physics import (
     _calculate_dynamic_pressure,
-    _calculate_airspeed_from_mach
+    _calculate_airspeed_from_mach,
 )
 import pint
 from jetfuelburn import ureg
@@ -15,7 +15,7 @@ from jetfuelburn import ureg
 
 class jsbsim_drag_polars:
     r"""
-    The class implements a component-based drag polar model derived from open-source 
+    The class implements a component-based drag polar model derived from open-source
     [JSBSim](https://github.com/JSBSim-Team/jsbsim) flight dynamics data.
 
     ```python exec="true" html="true"
@@ -35,8 +35,8 @@ class jsbsim_drag_polars:
 
     References
     ----------
-    Berndt, J. S., & JSBSim Development Team. (2011). 
-    [JSBSim: An open source, platform-independent, flight dynamics model in C++]((https://jsbsim.sourceforge.net/JSBSimReferenceManual.pdf)). 
+    Berndt, J. S., & JSBSim Development Team. (2011).
+    [JSBSim: An open source, platform-independent, flight dynamics model in C++]((https://jsbsim.sourceforge.net/JSBSimReferenceManual.pdf)).
     """
 
     _aircraft_data = {}
@@ -53,9 +53,9 @@ class jsbsim_drag_polars:
     @staticmethod
     @ureg.check(
         None,
-        '[force]',
-        '[]',
-        '[length]',
+        "[force]",
+        "[]",
+        "[length]",
     )
     def calculate_drag(
         acft: str,
@@ -142,52 +142,50 @@ class jsbsim_drag_polars:
             If the Mach number, altitude, or lift force are out of expected ranges (e.g., Mach number <= 0, altitude < 0, lift <= 0).
         """
         if acft not in jsbsim_drag_polars._aircraft_data:
-            raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data.")
-        
+            raise ValueError(
+                f"ICAO Aircraft Designator '{acft}' not found in model data."
+            )
+
         data = jsbsim_drag_polars._aircraft_data[acft]
-        
+
         S = data["wing_area_sqft"] * ureg.square_feet
         q = _calculate_dynamic_pressure(
-            speed=_calculate_airspeed_from_mach(M, h),
-            altitude=h
+            speed=_calculate_airspeed_from_mach(M, h), altitude=h
         )
         C_L = L / (q * S)
-        
+
         lift_by_alpha: dict = data["lift_table"]
         alpha_rad = _interpolate(
             x_val=C_L.magnitude,
             x_list=lift_by_alpha["cl"],
-            y_list=lift_by_alpha["alpha"]
+            y_list=lift_by_alpha["alpha"],
         )
 
         c_D0_by_alpha: dict = data["cd0_table"]
         c_D_parasitic = _interpolate(
-            x_val=alpha_rad,
-            x_list=c_D0_by_alpha["alpha"],
-            y_list=c_D0_by_alpha["cd0"]
+            x_val=alpha_rad, x_list=c_D0_by_alpha["alpha"], y_list=c_D0_by_alpha["cd0"]
         )
 
         wave_drag_by_mach: dict = data["wave_drag_table"]
         c_D_wave = _interpolate(
             x_val=M,
             x_list=wave_drag_by_mach["mach"],
-            y_list=wave_drag_by_mach["cd_wave"]
+            y_list=wave_drag_by_mach["cd_wave"],
         )
 
-        c_D_induced = data["k_factor"] * (C_L ** 2)
+        c_D_induced = data["k_factor"] * (C_L**2)
         c_D_total = c_D_parasitic + c_D_induced + c_D_wave
-        
+
         D = q * S * c_D_total
-        
+
         return D
-    
 
     @staticmethod
     @ureg.check(
         None,
-        '[force]', # lift
-        '[]', # Mach number
-        '[length]', # altitude
+        "[force]",  # lift
+        "[]",  # Mach number
+        "[length]",  # altitude
     )
     def calculate_lift_to_drag(
         acft: str,
@@ -196,14 +194,14 @@ class jsbsim_drag_polars:
         h: pint.Quantity,
     ) -> pint.Quantity:
         r"""
-        Given lift, Mach number, and altitude, 
-        calculates the lift-to-drag ratio for a specified aircraft 
+        Given lift, Mach number, and altitude,
+        calculates the lift-to-drag ratio for a specified aircraft
         using the JSBSim-based drag polar model.
 
         See Also
         --------
-        - [`jetfuelburn.utility.aerodynamics.jsbsim_drag_polars.calculate_drag`][]  
-        - [`jetfuelburn.utility.aerodynamics.jsbsim_drag_polars.calculate_lift_to_drag_binder_function`][]  
+        - [`jetfuelburn.utility.aerodynamics.jsbsim_drag_polars.calculate_drag`][]
+        - [`jetfuelburn.utility.aerodynamics.jsbsim_drag_polars.calculate_lift_to_drag_binder_function`][]
 
         Parameters
         ----------
@@ -239,10 +237,12 @@ class jsbsim_drag_polars:
             h=35000*ureg.feet,
         )
         ```
-        """        
+        """
         if acft not in jsbsim_drag_polars._aircraft_data:
-            raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data.")
-        
+            raise ValueError(
+                f"ICAO Aircraft Designator '{acft}' not found in model data."
+            )
+
         drag = jsbsim_drag_polars.calculate_drag(
             acft=acft,
             L=L,
@@ -250,10 +250,10 @@ class jsbsim_drag_polars:
             h=h,
         )
         L_D_ratio = L / drag
-        L_D_ratio = L_D_ratio.to('dimensionless')
+        L_D_ratio = L_D_ratio.to("dimensionless")
 
         return L_D_ratio
-    
+
     @staticmethod
     def calculate_lift_to_drag_binder_function(
         acft: str,
@@ -263,8 +263,8 @@ class jsbsim_drag_polars:
     ):
         r"""
         Serves as a binder for the `_calculate_lift_to_drag` method.
-        If parameters `L`, `M`, or `h` are omitted, returns a 
-        [Callable (partial)](https://docs.python.org/3/library/functools.html#functools.partial) 
+        If parameters `L`, `M`, or `h` are omitted, returns a
+        [Callable (partial)](https://docs.python.org/3/library/functools.html#functools.partial)
         with `acft` pre-bound.
         If all arguments are provided, performs the calculation immediately.
 
@@ -276,7 +276,7 @@ class jsbsim_drag_polars:
 
         ```pyodide install='jetfuelburn'
         from jetfuelburn.utility.aerodynamics import jsbsim_drag_polars
-        a320_lift_to_drag = jsbsim_drag_polars.calculate_lift_to_drag_binder_function(acft='A320')  
+        a320_lift_to_drag = jsbsim_drag_polars.calculate_lift_to_drag_binder_function(acft='A320')
         a320_lift_to_drag(L=60000*ureg.newton, M=0.78, h=35000*ureg.feet)
         ```
 
@@ -285,14 +285,16 @@ class jsbsim_drag_polars:
         [`jetfuelburn.utility.aerodynamics.jsbsim_drag_polars._calculate_lift_to_drag`][]
         """
         if L is None or M is None or h is None:
-            return functools.partial(jsbsim_drag_polars._calculate_lift_to_drag, acft=acft)
+            return functools.partial(
+                jsbsim_drag_polars._calculate_lift_to_drag, acft=acft
+            )
         else:
             return jsbsim_drag_polars._calculate_lift_to_drag(acft, L, M, h)
 
 
 class openap_drag_polars:
     r"""
-    The class implements a low-speed drag polar model based on data published with 
+    The class implements a low-speed drag polar model based on data published with
     the [OpenAP model](https://openap.dev/).
 
     ```python exec="true" html="true"
@@ -304,23 +306,23 @@ class openap_drag_polars:
 
     Warning
     -------
-    The data used in this model is based on a stochastic model derived from aggregated ADS-B 
-    flight data. Parameters were estimated using data mining statistical methods 
+    The data used in this model is based on a stochastic model derived from aggregated ADS-B
+    flight data. Parameters were estimated using data mining statistical methods
     to fit probability density functions to observed trajectories.
-    
+
     See Also
     --------
     [`jetfuelburn.utility.aerodynamics.jsbsim_drag_polars`][]
 
     References
     ----------
-    - Sun, J., Hoekstra, J. M., & Ellerbroek, J. (2020). 
-      OpenAP: An open-source aircraft performance model for air transportation studies and simulations. 
+    - Sun, J., Hoekstra, J. M., & Ellerbroek, J. (2020).
+      OpenAP: An open-source aircraft performance model for air transportation studies and simulations.
       _Aerospace_, 7(8), 104.
       doi:[10.3390/aerospace7080104](https://doi.org/10.3390/aerospace7080104)
     - Sun, J., Hoekstra, J. M., & Ellerbroek, J. (2020).
       Estimating aircraft drag polar using open flight surveillance data and a stochastic total energy model.
-      _Transportation Research Part C: Emerging Technologies_, 114, 391-404. 
+      _Transportation Research Part C: Emerging Technologies_, 114, 391-404.
       doi:[10.1016/j.trc.2020.01.026](https://doi.org/10.1016/j.trc.2020.01.026)
     """
 
@@ -334,7 +336,6 @@ class openap_drag_polars:
                 "CD0": float(row["CD0"]),
                 "K": float(row["K"]),
             }
-    
 
     @staticmethod
     def available_aircraft() -> list[str]:
@@ -342,7 +343,6 @@ class openap_drag_polars:
         Returns a sorted list of available ICAO aircraft designators included in the model.
         """
         return sorted(openap_drag_polars._aircraft_data.keys())
-
 
     @staticmethod
     def get_basic_drag_parameters(acft: str) -> dict:
@@ -357,7 +357,7 @@ class openap_drag_polars:
         ----------
         acft : str
             ICAO Aircraft Designator (e.g., 'A320', 'B737', etc.)
-        
+
         Returns
         -------
         dict
@@ -382,18 +382,19 @@ class openap_drag_polars:
         ```
         """
         if acft not in openap_drag_polars._aircraft_data:
-            raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data.")
+            raise ValueError(
+                f"ICAO Aircraft Designator '{acft}' not found in model data."
+            )
         data: dict = openap_drag_polars._aircraft_data[acft].copy()
-        data['S'] = data.pop('wing_area_m2') * ureg('m^2')
+        data["S"] = data.pop("wing_area_m2") * ureg("m^2")
         return data
-
 
     @staticmethod
     @ureg.check(
         None,
-        '[force]', # lift
-        '[]', # Mach number
-        '[length]', # altitude
+        "[force]",  # lift
+        "[]",  # Mach number
+        "[length]",  # altitude
     )
     def calculate_drag(
         acft: str,
@@ -480,7 +481,9 @@ class openap_drag_polars:
         ```
         """
         if acft not in openap_drag_polars._aircraft_data:
-            raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data.")
+            raise ValueError(
+                f"ICAO Aircraft Designator '{acft}' not found in model data."
+            )
         if M <= 0:
             raise ValueError("Mach number must be greater than zero.")
         if h < 0 * ureg.meter:
@@ -489,30 +492,28 @@ class openap_drag_polars:
             raise ValueError("Lift force must be greater than zero.")
 
         data = openap_drag_polars._aircraft_data[acft]
-        
-        S = data["wing_area_m2"] * ureg('m^2')
+
+        S = data["wing_area_m2"] * ureg("m^2")
         q = _calculate_dynamic_pressure(
-            speed=_calculate_airspeed_from_mach(M, h),
-            altitude=h
+            speed=_calculate_airspeed_from_mach(M, h), altitude=h
         )
         C_L = L / (q * S)
         CD0 = data["CD0"]
         K = data["K"]
 
-        C_D_total = CD0 + K * (C_L ** 2)
+        C_D_total = CD0 + K * (C_L**2)
 
         D = q * S * C_D_total
-        D = D.to('N')
+        D = D.to("N")
 
         return D
-    
 
     @staticmethod
     @ureg.check(
         None,
-        '[force]', # lift
-        '[]', # Mach number
-        '[length]', # altitude
+        "[force]",  # lift
+        "[]",  # Mach number
+        "[length]",  # altitude
     )
     def calculate_lift_to_drag(
         acft: str,
@@ -521,8 +522,8 @@ class openap_drag_polars:
         h: pint.Quantity,
     ) -> pint.Quantity:
         r"""
-        Given lift, Mach number, and altitude, 
-        calculates the lift-to-drag ratio for a specified aircraft 
+        Given lift, Mach number, and altitude,
+        calculates the lift-to-drag ratio for a specified aircraft
         using the OpenAP-based drag polar model.
 
         See Also
@@ -540,10 +541,12 @@ class openap_drag_polars:
             Mach number
         h : pint.Quantity (length)
             Altitude
-        """        
+        """
         if acft not in openap_drag_polars._aircraft_data:
-            raise ValueError(f"ICAO Aircraft Designator '{acft}' not found in model data.")
-        
+            raise ValueError(
+                f"ICAO Aircraft Designator '{acft}' not found in model data."
+            )
+
         drag = openap_drag_polars.calculate_drag(
             acft=acft,
             L=L,
@@ -551,9 +554,9 @@ class openap_drag_polars:
             h=h,
         )
         L_D_ratio = L / drag
-        L_D_ratio = L_D_ratio.to('dimensionless')
+        L_D_ratio = L_D_ratio.to("dimensionless")
         return L_D_ratio
-    
+
     @staticmethod
     def calculate_lift_to_drag_binder_function(
         acft: str,
@@ -563,8 +566,8 @@ class openap_drag_polars:
     ) -> Callable | pint.Quantity:
         r"""
         Serves as a binder for the `calculate_lift_to_drag` method.
-        If parameters `L`, `M`, or `h` are omitted, returns a 
-        [Callable (partial)](https://docs.python.org/3/library/functools.html#functools.partial) 
+        If parameters `L`, `M`, or `h` are omitted, returns a
+        [Callable (partial)](https://docs.python.org/3/library/functools.html#functools.partial)
         with `acft` pre-bound.
         If all arguments are provided, performs the calculation immediately.
 
@@ -576,7 +579,7 @@ class openap_drag_polars:
 
         ```pyodide install='jetfuelburn'
         from jetfuelburn.utility.aerodynamics import openap_drag_polars
-        a320_lift_to_drag = openap_drag_polars.calculate_lift_to_drag_binder_function(acft='A320')  
+        a320_lift_to_drag = openap_drag_polars.calculate_lift_to_drag_binder_function(acft='A320')
         a320_lift_to_drag(L=60000*ureg.newton, M=0.78, h=35000*ureg.feet)
         ```
 
@@ -585,6 +588,8 @@ class openap_drag_polars:
         [`jetfuelburn.utility.aerodynamics.openap_drag_polars.calculate_lift_to_drag`][]
         """
         if L is None or M is None or h is None:
-            return functools.partial(openap_drag_polars.calculate_lift_to_drag, acft=acft)
+            return functools.partial(
+                openap_drag_polars.calculate_lift_to_drag, acft=acft
+            )
         else:
             return openap_drag_polars.calculate_lift_to_drag(acft, L, M, h)
