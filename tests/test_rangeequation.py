@@ -3,9 +3,13 @@ from jetfuelburn import ureg
 import pint
 from jetfuelburn.rangeequation import (
     calculate_fuel_consumption_breguet,
-    calculate_fuel_consumption_breguet_improved
+    calculate_fuel_consumption_breguet_improved,
+    calculate_fuel_consumption_stepclimb_arctan,
+    calculate_fuel_consumption_stepclimb_integration
 )
 from jetfuelburn.utility.tests import approx_with_units
+from jetfuelburn.utility.physics import _calculate_mach_from_airspeed
+from jetfuelburn.utility.aerodynamics import openap_drag_polars
 
 from .fixtures.rangeequation import breguet_range_fuel_calculation_data_1
 
@@ -181,3 +185,206 @@ class TestCalculateFuelConsumptionBreguetImproved:
                 V_headwind=50 * ureg.gram, # Invalid: Mass instead of Speed
                 TSFC=17 * (ureg.mg / ureg.N / ureg.s)
             )
+
+
+class TestCalculateFuelConsumptionStepclimbArctan:
+
+    def test_valid_input_units(self):
+        """Test valid calculation for the arctan method."""
+        result = calculate_fuel_consumption_stepclimb_arctan(
+            R=2000 * ureg.nmi,
+            h=35000 * ureg.feet,
+            K=0.045,
+            C_D0=0.02,
+            m_after_cruise=100 * ureg.metric_ton,
+            S=122.6 * ureg.meter**2,
+            V=800 * ureg.kph,
+            TSFC=17 * (ureg.mg / ureg.N / ureg.s),
+        )
+        assert result.check('[mass]')
+        assert result.units == ureg.kg
+        assert result.magnitude > 0
+
+    def test_zero_range(self):
+        """Test zero range returns zero mass."""
+        result = calculate_fuel_consumption_stepclimb_arctan(
+            R=0 * ureg.nmi,
+            h=35000 * ureg.feet,
+            K=0.045,
+            C_D0=0.02,
+            m_after_cruise=100 * ureg.metric_ton,
+            S=122.6 * ureg.meter**2,
+            V=800 * ureg.kph,
+            TSFC=17 * (ureg.mg / ureg.N / ureg.s),
+        )
+        assert result.magnitude == 0
+
+    @pytest.mark.parametrize("invalid_input", [
+        {"R": -100 * ureg.km, "msg": "Range must be greater than zero"},
+        {"h": -100 * ureg.ft, "msg": "Altitude must be greater than zero"},
+        {"m_after_cruise": -50 * ureg.kg, "msg": "Mass after cruise must be greater than zero"},
+        {"S": 1.0 * ureg.m**2, "msg": "Lift-to-Drag ratio must be greater than 1"}, # Error msg corresponds to check S<=1 in source
+        {"V": 0 * ureg.kph, "msg": "Cruise speed must be greater than zero"},
+        {"TSFC": -5 * (ureg.mg / ureg.N / ureg.s), "msg": "Thrust Specific Fuel Consumption must be greater than zero"},
+    ])
+    def test_raises_value_error_on_invalid_magnitudes(self, invalid_input):
+        params = {
+            "R": 2000 * ureg.nmi,
+            "h": 35000 * ureg.feet,
+            "K": 0.045,
+            "C_D0": 0.02,
+            "m_after_cruise": 100 * ureg.metric_ton,
+            "S": 122.6 * ureg.meter**2,
+            "V": 800 * ureg.kph,
+            "TSFC": 17 * (ureg.mg / ureg.N / ureg.s),
+        }
+        
+        expected_msg = invalid_input.pop("msg")
+        params.update(invalid_input)
+
+        with pytest.raises(ValueError, match=expected_msg):
+            calculate_fuel_consumption_stepclimb_arctan(**params)
+
+
+
+class TestCalculateFuelConsumptionStepclimbIntegration:
+
+    def test_valid_input_scalar(self):
+        """Test integration method with scalar TSFC and LD inputs."""
+        result = calculate_fuel_consumption_stepclimb_integration(
+            m_after_cruise=100 * ureg.metric_ton,
+            R=2000 * ureg.nmi,
+            h=35000 * ureg.feet,
+            M=0.78,
+            TSFC=17 * (ureg.mg / ureg.N / ureg.s),
+            LD=18,
+        )
+        assert result.check('[mass]')
+        assert result.units == ureg.kg
+        assert result.magnitude > 0
+
+    def test_valid_input_callable(self):
+        """Test integration method with Callable TSFC and LD inputs."""
+        
+        # Define callables that accept specific arguments as required by _validate_physics_function_parameters
+        def mock_tsfc(M, h):
+            return 17 * (ureg.mg / ureg.N / ureg.s)
+
+        def mock_ld(L, M, h):
+            return 18
+
+        result = calculate_fuel_consumption_stepclimb_integration(
+            m_after_cruise=100 * ureg.metric_ton,
+            R=2000 * ureg.nmi,
+            h=35000 * ureg.feet,
+            M=0.78,
+            TSFC=mock_tsfc,
+            LD=mock_ld,
+        )
+        assert result.check('[mass]')
+        assert result.units == ureg.kg
+        assert result.magnitude > 0
+
+    @pytest.mark.parametrize("invalid_input", [
+        {"integration_mass_step": 0.5 * ureg.kg, "msg": "integration_mass_step must be at least 1 kg"},
+        {"m_after_cruise": 0 * ureg.kg, "msg": "m_after_cruise must be greater than zero"},
+        {"M": 0, "msg": "Mach number must be greater than zero"},
+        {"h": -100 * ureg.ft, "msg": "Altitude must be non-negative"},
+    ])
+    def test_raises_value_error_on_invalid_magnitudes(self, invalid_input):
+        params = {
+            "m_after_cruise": 100 * ureg.metric_ton,
+            "R": 2000 * ureg.nmi,
+            "h": 35000 * ureg.feet,
+            "M": 0.78,
+            "TSFC": 17 * (ureg.mg / ureg.N / ureg.s),
+            "LD": 18,
+            "integration_mass_step": 100 * ureg.kg
+        }
+        
+        expected_msg = invalid_input.pop("msg")
+        params.update(invalid_input)
+
+        with pytest.raises(ValueError, match=expected_msg):
+            calculate_fuel_consumption_stepclimb_integration(**params)
+
+    def test_zero_range(self):
+        """Test zero range integration returns zero fuel mass."""
+        result = calculate_fuel_consumption_stepclimb_integration(
+            m_after_cruise=100 * ureg.metric_ton,
+            R=0 * ureg.nmi,
+            h=35000 * ureg.feet,
+            M=0.78,
+            TSFC=17 * (ureg.mg / ureg.N / ureg.s),
+            LD=18,
+        )
+        assert result.magnitude == 0
+
+    def test_raises_dimensionality_error(self):
+        """Test dimensionality checks on arguments."""
+        with pytest.raises((ValueError, pint.errors.DimensionalityError)):
+            calculate_fuel_consumption_stepclimb_integration(
+                m_after_cruise=100 * ureg.meter, # Invalid: Length instead of Mass
+                R=2000 * ureg.nmi,
+                h=35000 * ureg.feet,
+                M=0.78,
+                TSFC=17 * (ureg.mg / ureg.N / ureg.s),
+                LD=18,
+            )
+
+    def test_integration_convergence(self):
+        """Test that the integration method converges to a reasonable value as integration_mass_step decreases."""
+        base_result = calculate_fuel_consumption_stepclimb_integration(
+            m_after_cruise=100 * ureg.metric_ton,
+            R=2000 * ureg.nmi,
+            h=35000 * ureg.feet,
+            M=0.78,
+            TSFC=17 * (ureg.mg / ureg.N / ureg.s),
+            LD=18,
+            integration_mass_step=100 * ureg.kg
+        )
+
+        finer_result = calculate_fuel_consumption_stepclimb_integration(
+            m_after_cruise=100 * ureg.metric_ton,
+            R=2000 * ureg.nmi,
+            h=35000 * ureg.feet,
+            M=0.78,
+            TSFC=17 * (ureg.mg / ureg.N / ureg.s),
+            LD=18,
+            integration_mass_step=10 * ureg.kg
+        )
+
+        assert approx_with_units(finer_result, base_result, rel=0.01)
+
+
+    def test_equivalence_to_arctan_method(self):
+        """Test that the integration method gives a similar result to the arctan method for the same inputs."""
+        range = 2000 * ureg.nmi
+        airspeed = 600 * ureg.kph
+        altitude = 35000 * ureg.ft
+        mach = _calculate_mach_from_airspeed(airspeed, altitude)
+        m_after_cruise = 100 * ureg.metric_ton
+        TSFC = 17 * (ureg.mg / ureg.N / ureg.s)
+
+        arctan_result = calculate_fuel_consumption_stepclimb_arctan(
+            R=range,
+            h=altitude,
+            K=openap_drag_polars.get_basic_drag_parameters('A320').get('K'),
+            C_D0=openap_drag_polars.get_basic_drag_parameters('A320').get('CD0'),
+            m_after_cruise=m_after_cruise,
+            S=openap_drag_polars.get_basic_drag_parameters('A320').get('S'),
+            V=airspeed,
+            TSFC=TSFC,
+        )
+
+        integration_result = calculate_fuel_consumption_stepclimb_integration(
+            m_after_cruise=m_after_cruise,
+            R=range,
+            h=altitude,
+            M=mach,
+            TSFC=TSFC,
+            LD=openap_drag_polars.calculate_lift_to_drag_binder_function(acft='A320'),
+            integration_mass_step=100 * ureg.kg
+        )
+
+        assert approx_with_units(integration_result, arctan_result, rel=0.05)
