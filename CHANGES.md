@@ -1,7 +1,31 @@
 # `jetfuelburn` Changelog
 
-The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## `2.0.0` (11. February 2026)
+
+### Breaking Changes
+
+- Renamed the `breguet` module to `rangeequation`, since non-Breguet ("cruise-climb") range equation solutions have been added.
+- Removed the `combined` module (which was not included in the documentation) for re-integration at a later stage.
+- Renamed the `_calculate_aircraft_velocity` function in the `utility.physics` module to `_calculate_airspeed_from_mach`.
+
+### Improvements
+
+- Added an analytical solution ("arctan solution") to the range equation for constant altitude/airspeed flight profiles to the `rangeequation` module.
+- Added a numerical solution ("integrated solution") to the range equation for variable altitude/airspeed flight profiles to the `rangeequation` module.
+- Added a new `aerodynamics` utility module with functions for calculating aerodynamic properties.
+    - Added a new `JSBSim` data module with aerodynamic data for the JSBSim flight dynamics model.
+    - Added a new `OpenAP` data module with aerodynamic data for the OpenAP flight dynamics model.
+- Added a new `engines` utility module for engine-related calculations.
+    - Added a function to calculate altitude/speed-dependent engine thrust-specific fuel consumption (TSFC) based on manufacturer information.
+- Added a new `math` utility module for mathematical functions.
+- Added a new `code` utility module for code-related utilities.
+
+### Fixes
+
+- Various minor bug fixes and documentation improvements.
 
 ## `1.6.0` (01. February 2026)
 

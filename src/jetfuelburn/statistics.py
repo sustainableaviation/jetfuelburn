@@ -10,13 +10,13 @@ class aeromaps:
     r"""
     This class implements the the reduced-order fuel burn model of the AeroMaps software tool by Planès et al. (2023).
 
-    In this model, fuel burn calculations are based on statistical average values in MJ/ASK (megajoule per available seat-kilometer) for three representative aircraft types, 
+    In this model, fuel burn calculations are based on statistical average values in MJ/ASK (megajoule per available seat-kilometer) for three representative aircraft types,
     with future efficiency improvements modelled over time:
 
-    > The corresponding historical fleet was calibrated using mean fuel consumption per market and representative aircraft.  
+    > The corresponding historical fleet was calibrated using mean fuel consumption per market and representative aircraft.
     > - [Planès et al. (2023), P.5](https://doi.org/10.59490/joas.2023.7147)
 
-    > The future aircraft fleet can be modelled using two solutions: a top-down approach  based on annual efficiency gains, and a bottom-up approach in which aircraft data (performance,  entry-into-service...) are coupled with fleet renewal models.  
+    > The future aircraft fleet can be modelled using two solutions: a top-down approach  based on annual efficiency gains, and a bottom-up approach in which aircraft data (performance,  entry-into-service...) are coupled with fleet renewal models.
     > - [Planès et al. (2023), P.5](https://doi.org/10.59490/joas.2023.7147)
 
     Here, the `drop_in` (fuel) data is used, although the model also data on future `hydrogen` aircraft.
@@ -61,12 +61,13 @@ class aeromaps:
     """
 
     _statistical_data = {}
-    with resources.open_text("jetfuelburn.data.AeroMaps", "aeromaps_data.csv", encoding='utf-8-sig') as file:
+    with resources.open_text(
+        "jetfuelburn.data.AeroMaps", "aeromaps_data.csv", encoding="utf-8-sig"
+    ) as file:
         csv_reader = csv.DictReader(file)
         for row in csv_reader:
-            year = int(row.pop('year'))
+            year = int(row.pop("year"))
             _statistical_data[year] = {k: float(v) for k, v in row.items()}
-
 
     @staticmethod
     def available_years() -> list[int]:
@@ -75,23 +76,21 @@ class aeromaps:
         """
         return sorted(aeromaps._statistical_data.keys())
 
-
     @staticmethod
     def available_aircraft(year: int) -> list[str]:
         """
-        Given a year, returns a sorted list of available aircraft types 
+        Given a year, returns a sorted list of available aircraft types
         (e.g., ['long_range', 'medium_range', 'short_range']).
         """
         if year not in aeromaps._statistical_data:
             return []
         return sorted(aeromaps._statistical_data[year].keys())
 
-
     @staticmethod
     @ureg.check(
-        None, # acft_type
-        None, # year
-        '[length]',
+        None,  # acft_type
+        None,  # year
+        "[length]",
     )
     def calculate_fuel_consumption(
         acft_type: str,
@@ -120,7 +119,7 @@ class aeromaps:
 
         Warnings
         --------
-        This model does not 
+        This model does not
 
         Parameters
         ----------
@@ -139,27 +138,35 @@ class aeromaps:
         Raises
         ------
         ValueError
-            If the range is negative.  
-            If the year is not available in the model.  
+            If the range is negative.
+            If the year is not available in the model.
             If the aircraft type (short/medium/long-haul) is not available in the model for the given year.
 
         """
         if R.magnitude < 0:
             raise ValueError(f"Range must not be negative.")
         else:
-            R = R.to('km')
+            R = R.to("km")
         if year not in aeromaps._statistical_data:
-            raise ValueError(f"Year '{year}' not found in model data. Please select one of the following: {aeromaps.available_years()}")
+            raise ValueError(
+                f"Year '{year}' not found in model data. Please select one of the following: {aeromaps.available_years()}"
+            )
         if acft_type not in aeromaps._statistical_data[year]:
-            raise ValueError(f"Aircraft type '{acft_type}' not found in model data for year '{year}'. Please select one of the following: {aeromaps.available_aircraft(year)}")
-        
-        specific_energy = 43.15 * ureg('MJ/kg')  # https://en.wikipedia.org/wiki/Jet_fuel#Types
-        fuel_burn_MJ = aeromaps._statistical_data[year][acft_type] * R.magnitude  # in MJ
-        fuel_burn_kg = fuel_burn_MJ * ureg('MJ') / specific_energy  # in kg
-        return fuel_burn_kg.to('kg')
+            raise ValueError(
+                f"Aircraft type '{acft_type}' not found in model data for year '{year}'. Please select one of the following: {aeromaps.available_aircraft(year)}"
+            )
+
+        specific_energy = 43.15 * ureg(
+            "MJ/kg"
+        )  # https://en.wikipedia.org/wiki/Jet_fuel#Types
+        fuel_burn_MJ = (
+            aeromaps._statistical_data[year][acft_type] * R.magnitude
+        )  # in MJ
+        fuel_burn_kg = fuel_burn_MJ * ureg("MJ") / specific_energy  # in kg
+        return fuel_burn_kg.to("kg")
 
 
-class usdot():
+class usdot:
     """
     This class contains methods to access statistical data on aircraft fuel consumption
     reported by "large certified air carriers" to the US Department of Transport (US DOT).
@@ -170,7 +177,7 @@ class usdot():
     Terminology
     -----
     - **Form 41**
-    
+
         Form 41 is a report that the U.S. Department of Transportation (DOT) generates
         based on data which large certified air carriers are required to provide.
 
@@ -180,7 +187,7 @@ class usdot():
         passengers, freight and mail transported.
         It also includes aircraft type, service class, available capacity and seats, and aircraft hours ramp-to-ramp and airborne.
 
-        The reporting requirements of Schedule T-100 of Form 41 are defined in federal law: 
+        The reporting requirements of Schedule T-100 of Form 41 are defined in federal law:
 
         | Reglation | Scope |
         | --------- | ----- |
@@ -206,7 +213,7 @@ class usdot():
         > or its territories as defined in this part."
 
         [Appendix A to Part 217, Title 14](https://www.ecfr.gov/current/title-14/part-217/appendix-Appendix A to Part 217)
-    
+
     - (table) **T2**
 
         > This table summarizes the T-100 traffic data reported by U.S. air carriers. The quarterly summary (...)
@@ -214,13 +221,13 @@ class usdot():
     - (table) **T1**
 
         > This table summarizes the T-100 traffic data reported by U.S. air carriers. The monthly summary (...)
-        
+
     Warning
     -------
     Form 41 Schedule T-100 data can be downloaded from the US Department of Transportation website.
     Unfortunately, there are no permalinks to the data files, and even regular URLs are
     generated dynamically based on some JavaScript magic.
-    
+
     The best way to obtain the correct files is to search by name, according to the following hierarchy:
 
     ```
@@ -243,7 +250,7 @@ class usdot():
     See Also
     --------
     Working links to the relevant files (05-2025):
-    
+
     - [US DOT: BTS: Air Carrier Summary Data (Form 41 and 298C Summary Data)](https://www.transtats.bts.gov/Tables.asp?QO_VQ=EGD&QO)
     - [US DOT: BTS: Air Carrier Summary Data: T2 (U.S. Air Carrier Traffic And Capacity Statistics by Aircraft Type)](https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FIH)
 
@@ -267,7 +274,9 @@ class usdot():
     _years = [2013, 2018, 2024]
     _aircraft_data = {}
     for year in _years:
-        with resources.open_text("jetfuelburn.data.USDOT", f"USDOT_data_{year}.json") as file:
+        with resources.open_text(
+            "jetfuelburn.data.USDOT", f"USDOT_data_{year}.json"
+        ) as file:
             _aircraft_data[year] = json.load(file)
 
     @staticmethod
@@ -276,19 +285,20 @@ class usdot():
         Returns a sorted list of available years included in the model.
         """
         return sorted(usdot._years)
+
     @staticmethod
     def available_aircraft(year: int) -> list[str]:
         """
         Given a year, returns a sorted list of available ICAO aircraft designators included in the model.
         """
         return sorted(usdot._aircraft_data[year].keys())
-    
+
     @staticmethod
     @ureg.check(
         None,
         None,
-        '[length]',
-        '[mass]',
+        "[length]",
+        "[mass]",
     )
     def calculate_fuel_consumption_per_weight(
         year: int,
@@ -340,34 +350,37 @@ class usdot():
         Raises
         ------
         ValueError
-            If the range or weight is negative.  
-            If the year is not available in the model.  
+            If the range or weight is negative.
+            If the year is not available in the model.
             If the aircraft type is not available in the model for the given year.
         """
         if R.magnitude < 0 or W.magnitude < 0:
             raise ValueError(f"Range and/or weight must not be negative.")
         else:
-            R = R.to('km')
-            W = W.to('kg')
+            R = R.to("km")
+            W = W.to("kg")
 
         if year not in usdot._years:
             raise ValueError(f"No data available for year '{year}'.")
         if acft not in usdot._aircraft_data[year]:
-            raise ValueError(f"US DOT Aircraft Designator '{acft}' not found in model data.")
+            raise ValueError(
+                f"US DOT Aircraft Designator '{acft}' not found in model data."
+            )
         else:
             aircraft_data = usdot._aircraft_data[year][acft]
 
-        fuelburn = (aircraft_data['Fuel/Revenue Weight Distance'] * ureg('1/km')) * R * W
-        fuelburn = fuelburn.to('kg')
+        fuelburn = (
+            (aircraft_data["Fuel/Revenue Weight Distance"] * ureg("1/km")) * R * W
+        )
+        fuelburn = fuelburn.to("kg")
 
         return fuelburn
-    
 
     @staticmethod
     @ureg.check(
         None,
         None,
-        '[length]',
+        "[length]",
     )
     def calculate_fuel_consumption_per_seat(
         year: int,
@@ -415,22 +428,24 @@ class usdot():
         Raises
         ------
         ValueError
-            If the range is negative.  
-            If the year is not available in the model.  
+            If the range is negative.
+            If the year is not available in the model.
             If the aircraft type is not available in the model for the given year.
         """
         if R.magnitude < 0:
             raise ValueError(f"Range must not be negative.")
         else:
-            R = R.to('km')
+            R = R.to("km")
 
         if year not in usdot._years:
             raise ValueError(f"No data available for year '{year}'.")
         if acft not in usdot._aircraft_data[year]:
-            raise ValueError(f"US DOT Aircraft Designator '{acft}' not found in model data.")
+            raise ValueError(
+                f"US DOT Aircraft Designator '{acft}' not found in model data."
+            )
         else:
             aircraft_data = usdot._aircraft_data[year][acft]
 
-        fuelburn = (aircraft_data['Fuel/Revenue Seat Distance'] * ureg('kg/km')) * R
-        fuelburn = fuelburn.to('kg')
+        fuelburn = (aircraft_data["Fuel/Revenue Seat Distance"] * ureg("kg/km")) * R
+        fuelburn = fuelburn.to("kg")
         return fuelburn

@@ -4,7 +4,7 @@
     This page lists a selection of the fuel burn calculations available in the `jetfuelburn` package.  
     For a full list, see the **API Reference (Public)**.
 
-## Breguet Range Equation
+## Range Equation
 
 Using the Breguet range equation is perhaps the most well-known approach to computing the range of an aircraft.
 Of course, the equation can also be solved for the fuel required to fly a given distance.
@@ -19,9 +19,9 @@ the lift-to-drag ratio (L/D) and specific fuel consumption (TSFC) are often more
 ```pyodide session='fuel' install='jetfuelburn'
 import jetfuelburn
 from jetfuelburn import ureg
-from jetfuelburn.breguet import calculate_fuel_consumption_range_equation
+from jetfuelburn.rangeequation import calculate_fuel_consumption_breguet
 
-calculate_fuel_consumption_range_equation(
+calculate_fuel_consumption_breguet(
     R=2000*ureg.nmi,
     LD=18,
     m_after_cruise=100*ureg.metric_ton,
@@ -32,7 +32,7 @@ calculate_fuel_consumption_range_equation(
 
 !!! note
     For additional information, compare the function documentation:
-    [`jetfuelburn.breguet.calculate_fuel_consumption_range_equation`][]
+    [`jetfuelburn.rangeequation.calculate_fuel_consumption_breguet`][]
 
 
 ## Payload/Range Diagrams
@@ -164,8 +164,8 @@ The `jetfuelburn` package also includes helper functions for basic atmospheric p
 Some reduced-order models call these internally - but they can also be used independently.
 
 ```pyodide session='fuel'
-from jetfuelburn.utility.physics import _calculate_aircraft_velocity
-_calculate_aircraft_velocity(
+from jetfuelburn.utility.physics import _calculate_airspeed_from_mach
+_calculate_airspeed_from_mach(
     mach_number=0.8,
     altitude=10000*ureg.m
 )

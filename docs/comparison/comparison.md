@@ -13,7 +13,7 @@ The following table shows which aircraft types are supported by each model in th
 | **[myclimate][jetfuelburn.reducedorder.myclimate]**                                              | ✗        | ✗       | ✓**        | ✗        | ✓**        | ** exact subtype not specified             |
 | **[Seymour et al][jetfuelburn.reducedorder.seymour_etal]**                                       | ✓        | ✓       | ✓          | ✓        | ✓          |                                            |
 | **[Yanto et al][jetfuelburn.reducedorder.yanto_etal]**                                           | ✗        | ✗       | ✓          | ✓        | ✓          |                                            |
-| **[Breguet Range Equation][jetfuelburn.breguet]**                                                | ✓        | ✓       | ✓          | ✓        | ✓          | requires values for L/D, TSFC, etc. as input|
+| **[(Breguet) Range Equation][jetfuelburn.rangeequation]**                                                | ✓        | ✓       | ✓          | ✓        | ✓          | requires values for L/D, TSFC, etc. as input|
 | **[Google's Travel Impact Model](https://github.com/google/travel-impact-model)**        | ✓        | ✓       | ✓          | ✓        | ✓          |                                            |
 | **[Poll-Schumann (pycontrails)](https://py.contrails.org/notebooks/AircraftPerformance.html)**   | ✓        | ✓       | ✓          | ✓        | ✓          |                                            |
 

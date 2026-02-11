@@ -2,7 +2,7 @@
 site_name: JetFuelBurn Documentation
 repo_url: https://github.com/sustainableaviation/jetfuelburn
 copyright: © Paul Scherrer Institute (PSI) and Contributors | Code under MIT License
-nav: 
+nav:
   - Home: 'index.md'
   - About: 'about.md'
   - Comparing Models:
@@ -14,14 +14,18 @@ nav:
     - Cabin Class Fuel Allocation: 'interactive/allocation.md'
   - API Reference:
     - PL/R-Diagrams: 'api/diagrams.md'
-    - Range Equation: 'api/breguet.md'
+    - Range Equation: 'api/rangeequation.md'
     - Statistics Models: 'api/statistics.md'
     - Reduced Order Models: 'api/reducedorder.md'
     #- Combined Models: 'api/combined.md'
     #- Closed Form Models: 'api/closedform.md' 
     - Cabin Class Fuel Allocation: 'api/allocation.md'
-    - Physics Utility Functions: 'api/physics.md'
-    - Geography Utility Functions: 'api/geography.md'
+  - API Reference (Utility):
+    - Aerodynamics: 'api/aerodynamics.md'
+    - Engines: 'api/engines.md'
+    - Physics: 'api/physics.md'
+    - Geography: 'api/geography.md'
+    - Math: 'api/math.md'
   - API Reference (External):
     - EU Flight Emissions Label: 'api/eu_fel.md'
     - Reduced Order Models: 'api/reducedorder_external.md'
@@ -73,6 +77,8 @@ plugins:
       execute: False
       show_input: True
       include_source: True
+  - mkdocs-pdf
+  
 markdown_extensions:
   - admonition
   - pymdownx.superfences
@@ -84,6 +90,7 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.highlight:
       use_pygments: false
+  - attr_list
 
 extra_javascript:
   - _javascripts/katex.js
