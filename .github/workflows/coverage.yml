@@ -1,0 +1,55 @@
+name: Coverage Badge
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-badge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install & Test
+        run: |
+          pip install pytest pytest-cov genbadge[coverage]
+          pip install -e .
+          pytest --cov=./ --cov-report=xml
+
+      - name: Generate Badge
+        run: |
+          genbadge coverage \
+            -i coverage.xml \
+            -o coverage.svg \
+            -n "Coverage" \
+
+      - name: Publish to Clean Branch
+        run: |
+          mv coverage.svg /tmp/coverage.svg
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+          # Switch to a temp branch to start fresh
+          git checkout --orphan temp_badge_branch
+          
+          # Delete all files (cleaning the workspace)
+          git rm -rf .
+          
+          # Retrieve the badge
+          mv /tmp/coverage.svg .
+
+          # Commit & Force Push
+          git add coverage.svg
+          git commit -m "Update coverage badge"
+          git push origin HEAD:badges --force

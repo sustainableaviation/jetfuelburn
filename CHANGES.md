@@ -27,7 +27,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 - Various minor bug fixes and documentation improvements.
 
-
 ## `1.6.0` (01. February 2026)
 
 ## Improvements
