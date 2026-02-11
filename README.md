@@ -1,5 +1,11 @@
 # JetFuelBurn
 
+[![PyPI Downloads](https://img.shields.io/pypi/dm/jetfuelburn?label=PyPI%20Downloads&logo=pypi&logoColor=white)](h[ttps://pypi.org/project/jetfuelburn/](https://pypistats.org/packages/jetfuelburn))
+[![License: MIT](https://img.shields.io/pypi/l/jetfuelburn?label=License&logo=open-source-initiative&logoColor=white)](https://pypi.org/project/jetfuelburn/)
+![Coverage](https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/badges/coverage.svg)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/jetfuelburn?logo=python&logoColor=white)](https://pypi.org/project/jetfuelburn/)
+[![Code style: black](https://img.shields.io/badge/Code%20Style-Black-000000.svg)](https://github.com/psf/black)
+
 A Python package for calculating fuel burn of commercial aircraft.  
 Maintainance Team: [@michaelweinold](https://github.com/michaelweinold)
 

@@ -5,6 +5,7 @@ pymdown-extensions
 markdown-exec
 mkdocs-jupyter
 mkdocs-include-markdown-plugin
+mkdocs-pdf
 # requirements for interactive figures
 plotly-express
 pandas

@@ -2,12 +2,7 @@ from jetfuelburn import ureg
 import pytest
 
 
-def approx_with_units(
-    value_check,
-    value_expected,
-    rel=None,
-    abs=None
-) -> bool:
+def approx_with_units(value_check, value_expected, rel=None, abs=None) -> bool:
     """
     Given two Pint quantities, check if the values are approximately equal.
 
@@ -31,19 +26,14 @@ def approx_with_units(
     bool
         True if the values are approximately equal, False otherwise.
     """
-    if not pytest.approx(value_check.magnitude, rel=rel, abs=abs) == value_expected.magnitude:
+    if value_check.units != value_expected.units:
         return False
-    if not value_check.units == value_expected.units:
-        return False
-    return True
+    return value_check.magnitude == pytest.approx(
+        value_expected.magnitude, rel=rel, abs=abs
+    )
 
 
-def approx_dict(
-    dict_check: dict,
-    dict_expected: dict,
-    rel=None,
-    abs=None
-) -> bool:
+def approx_dict(dict_check: dict, dict_expected: dict, rel=None, abs=None) -> bool:
     """
     Given two dictionaries, check if the values in the first dictionary are approximately equal to the values in the second dictionary.
 
@@ -69,29 +59,31 @@ def approx_dict(
     bool
         True if the values in the first dictionary are approximately equal to the values in the second dictionary, False otherwise.
     """
+    if dict_check.keys() != dict_expected.keys():
+        return False
+
     for key in dict_expected.keys():
-        if key not in dict_check:
-            return False
         if type(dict_expected[key]) != type(dict_check[key]):
             return False
-        if isinstance(dict_expected[key], ureg.Quantity) == True:
-            if not pytest.approx(dict_check[key].magnitude, rel=rel, abs=abs) == dict_expected[key].magnitude:
+
+        expected_val = dict_expected[key]
+        check_val = dict_check[key]
+
+        if isinstance(expected_val, ureg.Quantity):
+            if check_val.units != expected_val.units:
                 return False
-            if not dict_check[key].units == dict_expected[key].units:
+            if check_val.magnitude != pytest.approx(
+                expected_val.magnitude, rel=rel, abs=abs
+            ):
                 return False
-        elif isinstance(dict_expected[key], ureg.Quantity) == False:
-            if not pytest.approx(dict_check[key], rel=rel, abs=abs) == dict_expected[key]:
+        else:  # not a quantity
+            if check_val != pytest.approx(expected_val, rel=rel, abs=abs):
                 return False
-        else:
-            pass
     return True
 
 
 def approx_dict_of_dict(
-    dict_of_dict_check: dict,
-    dict_of_dict_expected: dict,
-    rel=None,
-    abs=None
+    dict_of_dict_check: dict, dict_of_dict_expected: dict, rel=None, abs=None
 ) -> bool:
     """
     Given two dictionaries of dictionaries, check if the values in the first dictionary of dictionaries are approximately equal to the values in the second dictionary of dictionaries.
@@ -116,14 +108,15 @@ def approx_dict_of_dict(
     bool
         True if the values in the first dictionary of dictionaries are approximately equal to the values in the second dictionary of dictionaries, False otherwise.
     """
+    if dict_of_dict_check.keys() != dict_of_dict_expected.keys():
+        return False
+
     for key in dict_of_dict_expected.keys():
-        if key not in dict_of_dict_check:
-            return False
         if not approx_dict(
             dict_check=dict_of_dict_check[key],
             dict_expected=dict_of_dict_expected[key],
             rel=rel,
-            abs=abs
+            abs=abs,
         ):
             return False
     return True
