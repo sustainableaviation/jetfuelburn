@@ -22,6 +22,7 @@ jobs:
       - name: Install & Test
         run: |
           pip install pytest pytest-cov
+          pip install -e .
           pytest --cov=./ 
 
       # 1. Generate the badge
