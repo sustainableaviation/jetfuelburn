@@ -12,12 +12,12 @@ jobs:
   update-badge:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: '3.14'
 
@@ -29,33 +29,29 @@ jobs:
 
       - name: Generate Badge
         run: |
-          # The -l flag sets the text on the left side of the badge
-          genbadge coverage -i coverage.xml -o coverage.svg -l "Coverage"
+          genbadge coverage \
+            -i coverage.xml \
+            -o coverage.svg \
+            -n "Coverage" \
+            -t 100,90,80,70,60 \
+            -c brightgreen,green,yellowgreen,yellow,orange,red
 
       - name: Publish to Clean Branch
         run: |
-          # 1. Move the badge to a temporary place (out of the repo)
           mv coverage.svg /tmp/coverage.svg
-
-          # 2. Configure Git
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-          # 3. Create a NEW orphan branch named 'utility'
-          # (We use a temp name to avoid conflicts with your existing messy 'badges' branch)
-          git checkout --orphan utility
-
-          # 4. NUCLEAR OPTION: Remove ALL files from the staging area
-          # This empties the branch completely.
+          # Switch to a temp branch to start fresh
+          git checkout --orphan temp_badge_branch
+          
+          # Delete all files (cleaning the workspace)
           git rm -rf .
-
-          # 5. Retrieve the badge from the temp folder
+          
+          # Retrieve the badge
           mv /tmp/coverage.svg .
 
-          # 6. Commit ONLY the badge
+          # Commit & Force Push
           git add coverage.svg
           git commit -m "Update coverage badge"
-
-          # 7. Force push this temp branch to the 'badges' branch on GitHub
-          # This overwrites the remote 'badges' branch with this new clean history
           git push origin HEAD:badges --force
