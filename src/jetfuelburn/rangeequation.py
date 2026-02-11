@@ -99,7 +99,6 @@ def calculate_fuel_consumption_stepclimb_integration(
         R \approx \sum_{i=0}^{n-1} \frac{r_a(m_i) + r_a(m_{i+1})}{2} \cdot (m_{i+1} - m_i)
         \end{equation}
 
-
     See Also
     --------
     [`jetfuelburn.rangeequation.calculate_fuel_consumption_stepclimb_arctan`][]
@@ -111,7 +110,36 @@ def calculate_fuel_consumption_stepclimb_integration(
     Performance of the Jet Transport Airplane. 
     _John Wiley & Sons_. 
     doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
+
+    Parameters
+    ----------
+    m_after_cruise : float
+        Mass of the aircraft after cruise segment (eg. OEW + Payload + Crew + Reserves) [mass]
+    R : float
+        Range of the aircraft (=mission distance) [distance]
+    h : float
+        Cruise altitude of the aircraft [length]
+    M : float
+        Mach number during cruise [dimensionless]
+    TSFC : float or Callable
+        Thrust Specific Fuel Consumption of the aircraft during cruise, either as a constant value [time/distance] or as a function of Mach number and altitude.  
+    LD : float or Callable
+        Lift-to-drag ratio of the aircraft during cruise, either as a constant value [dimensionless] or as a function of lift, Mach number and altitude.  
+    integration_mass_step : float
+        Mass step for numerical integration [mass]. A smaller step will yield a more accurate result, but will also increase computation time. Default is 100 kg.
     
+    Returns
+    -------
+    pint.Quantity [mass]
+        Required fuel mass [kg]
+
+    Raises
+    ------
+    ValueError
+        If the dimensions of the inputs are invalid.
+    ValueError
+        If the magnitude of the inputs are invalid (eg. negative).
+
     Example
     -------
     ```pyodide install='jetfuelburn'
@@ -210,8 +238,9 @@ def calculate_fuel_consumption_stepclimb_arctan(
     with
 
     \begin{align*}
-    \theta &= \frac{R g TSFC}{2 E_{max} V} \\
-    B &= \left( \frac{C_{D_0}}{K} \right) \left( \frac{\rho V^2 S}{2g} \right)^2
+        \theta &= \frac{R \cdot g \cdot TSFC}{2 E_{max} V} \\
+        B &= \left( \frac{C_{D_0}}{K} \right) \left( \frac{\rho V^2 S}{2g} \right)^2 \\
+        E_{max} &= \frac{1}{2 \sqrt{C_{D_0} K}}
     \end{align*}
 
     where:
@@ -229,9 +258,43 @@ def calculate_fuel_consumption_stepclimb_arctan(
     | $\rho$     | [mass/volume]     | Air density at cruise altitude                                         |
     | $S$        | [area]            | Wing reference area of the aircraft                                    |
 
+
+    ??? info "Derivation"
+
+        Eqn. 7.43 in Young (2018) expresses the range $R$ of an aircraft as a function of the takeoff mass $m_1$ 
+        and landing mass $m_2$ after cruise, as well as the aircraft performance parameters. 
+        However, in practical applications, the fuel mass $m_f$ should be calculated based on the landing mass after cruise $m_2$.
+
+        Starting from the definition of aircraft masses:
+
+        \begin{align*}
+        m_f &= m_1 - m_2 \\
+        m_1 &= m_f + m_2 \\
+        \end{align*}
+
+        The expression for range can be rearranged:
+
+        \begin{align*}
+        R &= \frac{2E_{max}V}{g\bar{c}} \arctan\left\{ \frac{\sqrt{B_3}(m_1 - m_2)}{B_3 + m_1 m_2} \right\} \\
+        \Theta &:= \frac{R g \bar{c}}{2 E_{max} V} \\
+        \tan(\Theta) &= \frac{\sqrt{B_3}(m_1 - m_2)}{B_3 + m_1 m_2} \\
+        \tan(\Theta) &= \frac{\sqrt{B_3} m_f}{B_3 + (m_f + m_2)m_2} \\
+        \tan(\Theta)(B_3 + m_f m_2 + m_2^2) &= \sqrt{B_3} m_f \\
+        B_3 \tan(\Theta) + m_f m_2 \tan(\Theta) + m_2^2 \tan(\Theta) &= \sqrt{B_3} m_f \\
+        \tan(\Theta)(B_3 + m_2^2) &= m_f (\sqrt{B_3} - m_2 \tan(\Theta)) \\
+        m_f &= \frac{(B_3 + m_2^2) \tan(\Theta)}{\sqrt{B_3} - m_2 \tan(\Theta)} \\
+        \end{align*}
+
+        where:
+
+        \begin{equation*}
+        B_3 = \left(\frac{C_{D_0}}{K}\right) \left(\frac{\rho V^2 S}{2g}\right)^2
+        \end{equation*}
+        
+
     References
     ----------
-    Eqn. 13.25a ff. in 
+    Eqn. 7.43 and Eqn. 13.25a ff. in 
     Young, T. M. (2018). 
     Performance of the Jet Transport Airplane. 
     _John Wiley & Sons_. 
