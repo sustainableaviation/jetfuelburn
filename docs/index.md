@@ -1,5 +1,10 @@
 # JetFuelBurn
 
+[![PyPI Downloads](https://img.shields.io/pypi/dm/jetfuelburn?label=PyPI%20Downloads&logo=pypi&logoColor=white)](https://pypistats.org/packages/jetfuelburn)
+[![License: MIT](https://img.shields.io/pypi/l/jetfuelburn?label=License&logo=open-source-initiative&logoColor=white)](https://pypi.org/project/jetfuelburn/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/jetfuelburn?logo=python&logoColor=white)](https://pypi.org/project/jetfuelburn/)
+[![Code style: black](https://img.shields.io/badge/Code%20Style-Black-000000.svg)](https://github.com/psf/black)
+
 `jetfuelburn` is a Python package for calculating fuel burn in aircraft. It is designed to be used in the context of environmental impact assessment of air travel. It includes helper function for basic atmospheric physics and the allocation of fuel burn to different cabin classes.
 
 The package implements models from textbooks and scientific publications. Some are based on basic aerodynamic equations like the [Breguet range equation](https://en.wikipedia.org/wiki/Range_(aeronautics)), while others are more complex and ultimately based on [EUROCONTROL BADA](https://www.eurocontrol.int/model/bada) or [Piano X](https://www.lissys.uk/index2.html) simulation data.
