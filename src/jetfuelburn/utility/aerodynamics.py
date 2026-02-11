@@ -36,7 +36,7 @@ class jsbsim_drag_polars:
     References
     ----------
     Berndt, J. S., & JSBSim Development Team. (2011).
-    [JSBSim: An open source, platform-independent, flight dynamics model in C++]((https://jsbsim.sourceforge.net/JSBSimReferenceManual.pdf)).
+    [JSBSim: An open source, platform-independent, flight dynamics model in C++](https://jsbsim.sourceforge.net/JSBSimReferenceManual.pdf).
     """
 
     _aircraft_data = {}
@@ -230,7 +230,7 @@ class jsbsim_drag_polars:
         import jetfuelburn
         from jetfuelburn import ureg
         from jetfuelburn.utility.aerodynamics import jsbsim_drag_polars
-        L_D = jsbsim_drag_polars._calculate_lift_to_drag(
+        L_D = jsbsim_drag_polars.calculate_lift_to_drag(
             acft='A320',
             L=60000*ureg.newton,
             M=0.78,
@@ -262,7 +262,7 @@ class jsbsim_drag_polars:
         h: pint.Quantity | None = None,
     ):
         r"""
-        Serves as a binder for the `_calculate_lift_to_drag` method.
+        Serves as a binder for the `calculate_lift_to_drag` method.
         If parameters `L`, `M`, or `h` are omitted, returns a
         [Callable (partial)](https://docs.python.org/3/library/functools.html#functools.partial)
         with `acft` pre-bound.
@@ -282,14 +282,14 @@ class jsbsim_drag_polars:
 
         See Also
         --------
-        [`jetfuelburn.utility.aerodynamics.jsbsim_drag_polars._calculate_lift_to_drag`][]
+        [`jetfuelburn.utility.aerodynamics.jsbsim_drag_polars.calculate_lift_to_drag`][]
         """
         if L is None or M is None or h is None:
             return functools.partial(
-                jsbsim_drag_polars._calculate_lift_to_drag, acft=acft
+                jsbsim_drag_polars.calculate_lift_to_drag, acft=acft
             )
         else:
-            return jsbsim_drag_polars._calculate_lift_to_drag(acft, L, M, h)
+            return jsbsim_drag_polars.calculate_lift_to_drag(acft, L, M, h)
 
 
 class openap_drag_polars:
