@@ -2,16 +2,16 @@ import math
 from jetfuelburn import ureg
 
 
-@ureg.check('[length]')
+@ureg.check("[length]")
 def _calculate_atmospheric_temperature(altitude):
     r"""
-    Computes the air temperature as a function of altitude up to 20,000 meters 
+    Computes the air temperature as a function of altitude up to 20,000 meters
     based on the International Standard Atmosphere (ISA):
 
     <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/International_Standard_Atmosphere.svg" width="250">
-    
+
     Temperature in the Troposphere (<= 11,000 m) is calculated according to
-    
+
     $$
     T = T_0 - L \cdot h
     $$
@@ -59,9 +59,9 @@ def _calculate_atmospheric_temperature(altitude):
     elif altitude > 20000 * ureg.m:
         raise ValueError("Altitude must not be > 20000 m.")
 
-    temperature_0 = 288.15 * ureg.K            # Sea-level standard temperature
-    lapse_rate = 0.0065 * (ureg.K / ureg.m)    # Temperature lapse rate
-    temperature_stratosphere = 216.65 * ureg.K # Constant temp in lower stratosphere
+    temperature_0 = 288.15 * ureg.K  # Sea-level standard temperature
+    lapse_rate = 0.0065 * (ureg.K / ureg.m)  # Temperature lapse rate
+    temperature_stratosphere = 216.65 * ureg.K  # Constant temp in lower stratosphere
 
     if altitude <= 11000 * ureg.m:
         temperature = temperature_0 - lapse_rate * altitude
@@ -71,10 +71,10 @@ def _calculate_atmospheric_temperature(altitude):
     return temperature.to(ureg.celsius)
 
 
-@ureg.check('[length]')
+@ureg.check("[length]")
 def _calculate_atmospheric_density(altitude):
     r"""
-    Computes the air density as a function of altitude up to 20,000 meters 
+    Computes the air density as a function of altitude up to 20,000 meters
     based on the International Standard Atmosphere (ISA):
 
     <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/International_Standard_Atmosphere.svg" width="250">
@@ -142,14 +142,16 @@ def _calculate_atmospheric_density(altitude):
     elif altitude > 20000 * ureg.m:
         raise ValueError("Altitude must not be > 20000 m.")
 
-    rho_0 = 1.225 * (ureg.kg / ureg.m**3)                     # Sea-level density
-    rho_1 = 0.36391 * (ureg.kg / ureg.m**3)                   # Density at 11,000 m (Tropopause)
-    g = 9.80665 * (ureg.m / ureg.s**2)                        # Gravity
-    R = 8.3144598 * ((ureg.N * ureg.m) / (ureg.mol * ureg.K)) # Universal gas constant
-    M = 0.0289644 * (ureg.kg / ureg.mol)                      # Molar mass of dry air
-    temperature_0 = 288.15 * ureg.K                           # Sea-level standard temperature
-    lapse_rate = 0.0065 * (ureg.K / ureg.m)                   # Temperature lapse rate
-    temperature_stratosphere = 216.65 * ureg.K                # Constant temperature in the lower Stratosphere
+    rho_0 = 1.225 * (ureg.kg / ureg.m**3)  # Sea-level density
+    rho_1 = 0.36391 * (ureg.kg / ureg.m**3)  # Density at 11,000 m (Tropopause)
+    g = 9.80665 * (ureg.m / ureg.s**2)  # Gravity
+    R = 8.3144598 * ((ureg.N * ureg.m) / (ureg.mol * ureg.K))  # Universal gas constant
+    M = 0.0289644 * (ureg.kg / ureg.mol)  # Molar mass of dry air
+    temperature_0 = 288.15 * ureg.K  # Sea-level standard temperature
+    lapse_rate = 0.0065 * (ureg.K / ureg.m)  # Temperature lapse rate
+    temperature_stratosphere = (
+        216.65 * ureg.K
+    )  # Constant temperature in the lower Stratosphere
 
     if altitude <= 11000 * ureg.m:
         current_temp = _calculate_atmospheric_temperature(altitude).to(ureg.K)
@@ -164,14 +166,8 @@ def _calculate_atmospheric_density(altitude):
     return rho.to(ureg.kg / ureg.m**3)
 
 
-@ureg.check(
-    '[speed]',
-    '[length]'
-)
-def _calculate_dynamic_pressure(
-    speed: float,
-    altitude: float
-) -> float:
+@ureg.check("[speed]", "[length]")
+def _calculate_dynamic_pressure(speed: float, altitude: float) -> float:
     r"""
     Computes the dynamic pressure $q$ at a given speed and altitude.
 
@@ -221,18 +217,12 @@ def _calculate_dynamic_pressure(
     ```
     """
     air_density = _calculate_atmospheric_density(altitude)
-    dynamic_pressure = 0.5 * air_density * speed ** 2
+    dynamic_pressure = 0.5 * air_density * speed**2
     return dynamic_pressure.to(ureg.Pa)
 
 
-@ureg.check(
-    '[]', # mach number is dimensionless
-    '[length]' # altitude
-)
-def _calculate_airspeed_from_mach(
-    mach_number: float,
-    altitude: float
-) -> float:
+@ureg.check("[]", "[length]")  # mach number is dimensionless  # altitude
+def _calculate_airspeed_from_mach(mach_number: float, altitude: float) -> float:
     r"""
     Converts aircraft speed from mach number $M$ to airspeed $V$,
     depending on the flight altitude $h$.
@@ -289,21 +279,15 @@ def _calculate_airspeed_from_mach(
     """
     temperature = _calculate_atmospheric_temperature(altitude)
 
-    R = 287.052874 * (ureg.J/(ureg.kg*ureg.K)) # specific gas constant for air 
-    gamma = 1.4 * ureg.dimensionless # ratio of specific heat for air
+    R = 287.052874 * (ureg.J / (ureg.kg * ureg.K))  # specific gas constant for air
+    gamma = 1.4 * ureg.dimensionless  # ratio of specific heat for air
     velocity = mach_number * (gamma * R * temperature.to(ureg.K)) ** 0.5
 
     return velocity.to(ureg.kph)
 
 
-@ureg.check(
-    '[speed]', # airspeed
-    '[length]' # altitude
-)
-def _calculate_mach_from_airspeed(
-    airspeed: float,
-    altitude: float
-) -> float:
+@ureg.check("[speed]", "[length]")  # airspeed  # altitude
+def _calculate_mach_from_airspeed(airspeed: float, altitude: float) -> float:
     r"""
     Converts aircraft airspeed $V$ to Mach number $M$,
     depending on the flight altitude $h$.
@@ -355,18 +339,18 @@ def _calculate_mach_from_airspeed(
     """
     temperature = _calculate_atmospheric_temperature(altitude)
 
-    R = 287.052874 * (ureg.J/(ureg.kg*ureg.K)) # specific gas constant for air 
-    gamma = 1.4 * ureg.dimensionless # ratio of specific heat for air
-    
+    R = 287.052874 * (ureg.J / (ureg.kg * ureg.K))  # specific gas constant for air
+    gamma = 1.4 * ureg.dimensionless  # ratio of specific heat for air
+
     # Calculate the speed of sound at the given altitude
     speed_of_sound = (gamma * R * temperature.to(ureg.K)) ** 0.5
-    
+
     mach_number = airspeed / speed_of_sound
 
     return mach_number.to(ureg.dimensionless)
 
 
-@ureg.check('[temperature]')
+@ureg.check("[temperature]")
 def _calculate_speed_of_sound(temperature):
     r"""
     Computes the speed of sound in air as a function of temperature uses the relationship for an ideal gas:
@@ -374,15 +358,15 @@ def _calculate_speed_of_sound(temperature):
     $$
     a = a_0 \sqrt{\frac{T}{T_0}}
     $$
-    
+
     Or equivalently:
-    
+
     $$
     a = \sqrt{\gamma R T}
     $$
 
     where:
-    
+
     | Symbol   | Dimension                | Description                     | Value             |
     |----------|--------------------------|---------------------------------|-------------------|
     | $a$      | [velocity]               | speed of sound                  | N/A               |
@@ -417,11 +401,13 @@ def _calculate_speed_of_sound(temperature):
     """
     T_val = temperature.to(ureg.kelvin)
     if T_val.magnitude < 0:
-        raise ValueError("Temperature must be above absolute zero. If you really did manage to measure a temperature below absolute zero, please contact the JetFuelBurn developers.")
-    
-    a0 = 661.479 * ureg.knot   # Standard speed of sound at sea level
-    T0 = 288.15 * ureg.kelvin  # Standard sea level temperature    
-    
+        raise ValueError(
+            "Temperature must be above absolute zero. If you really did manage to measure a temperature below absolute zero, please contact the JetFuelBurn developers."
+        )
+
+    a0 = 661.479 * ureg.knot  # Standard speed of sound at sea level
+    T0 = 288.15 * ureg.kelvin  # Standard sea level temperature
+
     speed_of_sound = a0 * math.sqrt((T_val / T0).magnitude)
-    
+
     return speed_of_sound.to(ureg.kph)

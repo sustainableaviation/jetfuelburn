@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 
+
 def get_all_distances(sheets):
     """
     Determine the complete set of distance headers across all sheets.
@@ -14,11 +15,20 @@ def get_all_distances(sheets):
     """
     all_distances = set()
     for df in sheets.values():
-        label_location = df[df == "Standard flight distances (nm) [1nm = 1.852 km]"].stack().index[0]
+        label_location = (
+            df[df == "Standard flight distances (nm) [1nm = 1.852 km]"].stack().index[0]
+        )
         label_row, label_col = label_location
-        distances = df.iloc[label_row + 1, label_col:].dropna().astype(float).astype(int).tolist()
+        distances = (
+            df.iloc[label_row + 1, label_col:]
+            .dropna()
+            .astype(float)
+            .astype(int)
+            .tolist()
+        )
         all_distances.update(distances)
     return sorted(all_distances)
+
 
 def extract_fuel_data(file_path):
     """
@@ -42,17 +52,27 @@ def extract_fuel_data(file_path):
 
     for sheet_name, df in sheets.items():
         # Find the location of the distance label
-        label_location = df[df == "Standard flight distances (nm) [1nm = 1.852 km]"].stack().index[0]
+        label_location = (
+            df[df == "Standard flight distances (nm) [1nm = 1.852 km]"].stack().index[0]
+        )
         label_row, label_col = label_location
 
         # Extract sheet-specific distances
-        sheet_distances = df.iloc[label_row + 1, label_col:].dropna().astype(float).astype(int).tolist()
+        sheet_distances = (
+            df.iloc[label_row + 1, label_col:]
+            .dropna()
+            .astype(float)
+            .astype(int)
+            .tolist()
+        )
 
         # Find the start of the fuel section
         fuel_row = df[df.iloc[:, 0] == "Fuel (kg)"].index[0]
 
         # Find the end of the fuel section
-        end_row_candidates = df.iloc[fuel_row + 1:].index[df.iloc[fuel_row + 1:, 0].notna()]
+        end_row_candidates = df.iloc[fuel_row + 1 :].index[
+            df.iloc[fuel_row + 1 :, 0].notna()
+        ]
         end_row = end_row_candidates[0] if len(end_row_candidates) > 0 else df.shape[0]
 
         # Initialize dictionary for this aircraft
@@ -62,14 +82,20 @@ def extract_fuel_data(file_path):
         for idx in range(fuel_row + 1, end_row):
             subcategory = str(df.iloc[idx, 1]).strip()  # e.g., "Take off"
             # Extract fuel values aligned with sheet-specific distances
-            fuel_values = df.iloc[idx, label_col:label_col + len(sheet_distances)].values
+            fuel_values = df.iloc[
+                idx, label_col : label_col + len(sheet_distances)
+            ].values
 
             # Map sheet-specific distances to fuel values
             sheet_dict = {dist: val for dist, val in zip(sheet_distances, fuel_values)}
 
             # Create standardized dictionary with all distances
             subcategory_dict = {
-                dist: (sheet_dict[dist] if dist in sheet_dict and pd.notna(sheet_dict[dist]) else np.nan)
+                dist: (
+                    sheet_dict[dist]
+                    if dist in sheet_dict and pd.notna(sheet_dict[dist])
+                    else np.nan
+                )
                 for dist in standard_distances
             }
 
@@ -80,6 +106,7 @@ def extract_fuel_data(file_path):
 
     return fuel_data
 
+
 # Example usage:
 # fuel_info = extract_fuel_data("path/to/your/excel_file.xls")
 # print(fuel_info)
@@ -88,42 +115,52 @@ def extract_fuel_data(file_path):
 import numpy as np
 import pandas as pd
 
+
 def clean_nan_entries(data):
     """
     Remove all NaN-related entries from a nested dictionary of aircraft fuel data for multiple aircraft.
-    
+
     Parameters:
     data (dict): Nested dictionary with structure {aircraft: {subcategory: {distance: fuel_value}}}.
-    
+
     Returns:
     dict: Cleaned dictionary with no NaN keys, values, or invalid subcategories for all aircraft.
     """
     cleaned_data = {}
-    
+
     for aircraft, subcategories in data.items():
         cleaned_subcategories = {}
-        
+
         for subcategory, distance_dict in subcategories.items():
             # Skip subcategories that are 'nan' or NaN
-            if subcategory == 'nan' or pd.isna(subcategory):
+            if subcategory == "nan" or pd.isna(subcategory):
                 continue
-                
+
             cleaned_distances = {}
             for distance, fuel in distance_dict.items():
                 # Check if distance is not NaN and fuel is not NaN
-                if not (isinstance(distance, (float, np.floating)) and pd.isna(distance)) and not pd.isna(fuel):
+                if not (
+                    isinstance(distance, (float, np.floating)) and pd.isna(distance)
+                ) and not pd.isna(fuel):
                     # Convert distance to int if numeric, otherwise keep as is
-                    cleaned_key = int(distance) if isinstance(distance, (int, float, np.floating)) else distance
-                    cleaned_distances[cleaned_key] = float(fuel)  # Ensure fuel is a float
-                
+                    cleaned_key = (
+                        int(distance)
+                        if isinstance(distance, (int, float, np.floating))
+                        else distance
+                    )
+                    cleaned_distances[cleaned_key] = float(
+                        fuel
+                    )  # Ensure fuel is a float
+
             # Only add subcategory if it has valid entries
             if cleaned_distances:
                 cleaned_subcategories[subcategory] = cleaned_distances
-        
+
         # Only add aircraft if it has valid subcategories
         if cleaned_subcategories:
             cleaned_data[aircraft] = cleaned_subcategories
-    
+
     return cleaned_data
+
 
 # %%

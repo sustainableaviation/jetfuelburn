@@ -1,9 +1,8 @@
 import bisect
 
+
 def _interpolate(
-    x_val: float | int,
-    x_list: list[float | int],
-    y_list: list[float | int]
+    x_val: float | int, x_list: list[float | int], y_list: list[float | int]
 ):
     r"""
     Given two sorted lists of x/y-pairs, performs one-dimensional linear interpolation for a given x-value:
@@ -37,12 +36,12 @@ def _interpolate(
     -------
     float | int
         The interpolated y value.
-    
+
     Raises
     ------
     ValueError
         If x_val is out of bounds of x_list.
-    
+
     Example
     -------
     ```pyodide install='jetfuelburn'
@@ -61,13 +60,13 @@ def _interpolate(
         raise ValueError("x_val is out of bounds (greater than maximum x_list value)")
 
     i = bisect.bisect_right(x_list, x_val)
-    x0, x1 = x_list[i-1], x_list[i]
-    y0, y1 = y_list[i-1], y_list[i]
+    x0, x1 = x_list[i - 1], x_list[i]
+    y0, y1 = y_list[i - 1], y_list[i]
 
     """
     x0=x[i-1]   x_val        x1=x[i]                x[i+1]
     ----X---------X-------------X----------------------X----
     """
-    
+
     k = (y1 - y0) / (x1 - x0)
     return y0 + k * (x_val - x0)

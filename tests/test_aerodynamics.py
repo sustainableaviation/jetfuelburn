@@ -5,6 +5,7 @@ from jetfuelburn.utility.aerodynamics import (
     openap_drag_polars,
 )
 
+
 class TestJsbsimDragPolarsIntegration:
     """
     Integration tests for JSBSim drag polars.
@@ -19,64 +20,59 @@ class TestJsbsimDragPolarsIntegration:
 
     def test_drag_calculation_sanity(self):
         """
-        Picks the first available aircraft and ensures the drag calculation 
+        Picks the first available aircraft and ensures the drag calculation
         runs without error and returns a positive Force.
         """
         # Dynamically pick an aircraft that actually exists in the file
         acft = jsbsim_drag_polars.available_aircraft()[0]
-        
+
         L = 50000 * ureg.newton
         M = 0.78
         h = 30000 * ureg.feet
 
         drag = jsbsim_drag_polars.calculate_drag(acft, L, M, h)
 
-        assert drag.check('[force]')
+        assert drag.check("[force]")
         assert drag.magnitude > 0
         assert drag.units == ureg.newton or drag.units == ureg.force
 
     def test_lift_to_drag_sanity(self):
         """
-        Verifies that L/D ratio is dimensionless and falls within a 
+        Verifies that L/D ratio is dimensionless and falls within a
         physically reasonable range (e.g., 5 to 30 for fixed-wing aircraft).
         """
         acft = jsbsim_drag_polars.available_aircraft()[0]
-        
+
         L = 60000 * ureg.newton
         M = 0.75
         h = 32000 * ureg.feet
 
         l_d = jsbsim_drag_polars.calculate_lift_to_drag(acft, L, M, h)
 
-        assert l_d.check('[]') # Dimensionless
+        assert l_d.check("[]")  # Dimensionless
         # Sanity check: L/D for a jet should typically be between 5 and 25
-        assert 1.0 < l_d.magnitude < 50.0 
+        assert 1.0 < l_d.magnitude < 50.0
 
     def test_binder_function_integration(self):
         """Verifies the binder function works with real data."""
         acft = jsbsim_drag_polars.available_aircraft()[0]
-        
+
         # Create the bound function
-        calculate_for_acft = jsbsim_drag_polars.calculate_lift_to_drag_binder_function(acft=acft)
-        
-        # Execute it
-        result = calculate_for_acft(
-            L=50000*ureg.newton, 
-            M=0.78, 
-            h=30000*ureg.feet
+        calculate_for_acft = jsbsim_drag_polars.calculate_lift_to_drag_binder_function(
+            acft=acft
         )
-        
-        assert result.check('[]')
+
+        # Execute it
+        result = calculate_for_acft(L=50000 * ureg.newton, M=0.78, h=30000 * ureg.feet)
+
+        assert result.check("[]")
         assert result.magnitude > 0
 
     def test_invalid_aircraft_lookup(self):
         """Ensures looking up a non-existent aircraft still raises ValueError."""
         with pytest.raises(ValueError, match="not found"):
             jsbsim_drag_polars.calculate_drag(
-                "NON_EXISTENT_CRAFT_XYZ", 
-                10000*ureg.N, 
-                0.5, 
-                10000*ureg.ft
+                "NON_EXISTENT_CRAFT_XYZ", 10000 * ureg.N, 0.5, 10000 * ureg.ft
             )
 
 
@@ -95,15 +91,15 @@ class TestOpenApDragPolarsIntegration:
     def test_parameter_retrieval(self):
         """Verifies we can retrieve basic parameters and they have correct units."""
         acft = openap_drag_polars.available_aircraft()[0]
-        
+
         params = openap_drag_polars.get_basic_drag_parameters(acft)
-        
+
         assert "S" in params
         assert "CD0" in params
         assert "K" in params
-        
+
         # S must be an Area quantity
-        assert params["S"].check('[area]')
+        assert params["S"].check("[area]")
         # CD0 and K should be floats (dimensionless coefficients)
         assert isinstance(params["CD0"], float)
         assert isinstance(params["K"], float)
@@ -113,7 +109,7 @@ class TestOpenApDragPolarsIntegration:
         Picks an aircraft and ensures the drag calculation returns a valid Force.
         """
         acft = openap_drag_polars.available_aircraft()[0]
-        
+
         # Use typical values to ensure we don't hit edge cases (like stall)
         L = 40000 * ureg.newton
         M = 0.7
@@ -133,15 +129,17 @@ class TestOpenApDragPolarsIntegration:
         acft = openap_drag_polars.available_aircraft()[0]
         M = 0.75
         h = 30000 * ureg.feet
-        
-        drag_low_lift = openap_drag_polars.calculate_drag(acft, 40000*ureg.N, M, h)
-        drag_high_lift = openap_drag_polars.calculate_drag(acft, 80000*ureg.N, M, h)
-        
+
+        drag_low_lift = openap_drag_polars.calculate_drag(acft, 40000 * ureg.N, M, h)
+        drag_high_lift = openap_drag_polars.calculate_drag(acft, 80000 * ureg.N, M, h)
+
         assert drag_high_lift > drag_low_lift
 
     def test_invalid_inputs(self):
         """Checks validation logic works (even with real data loaded)."""
         acft = openap_drag_polars.available_aircraft()[0]
-        
+
         with pytest.raises(ValueError, match="Mach number"):
-            openap_drag_polars.calculate_drag(acft, 10000*ureg.N, -0.5, 10000*ureg.ft)
+            openap_drag_polars.calculate_drag(
+                acft, 10000 * ureg.N, -0.5, 10000 * ureg.ft
+            )

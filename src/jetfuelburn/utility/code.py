@@ -34,46 +34,50 @@ def _validate_physics_function_parameters(
         )
 
 
-def _normalize_physics_function_or_scalar(function_or_scalar: int | float | pint.Quantity | Callable) -> Callable:
-        r"""
-        Given a scalar or Callable, wraps scalars in a lambda function. 
-        Callables are returned as-is. 
+def _normalize_physics_function_or_scalar(
+    function_or_scalar: int | float | pint.Quantity | Callable,
+) -> Callable:
+    r"""
+    Given a scalar or Callable, wraps scalars in a lambda function.
+    Callables are returned as-is.
 
-        See Also
-        --------
-        [`jetfuelburn.rangeequation.IntegratedRangeCalculator`][]
+    See Also
+    --------
+    [`jetfuelburn.rangeequation.IntegratedRangeCalculator`][]
 
-        Notes
-        -----
-        For scalars, the resulting lambda function will accept any arguments and ignore them, returning the constant value.  
-        For instance, for:
+    Notes
+    -----
+    For scalars, the resulting lambda function will accept any arguments and ignore them, returning the constant value.
+    For instance, for:
 
-        ```python
-        const_func = _normalize_physics_function(42)
-        ```
+    ```python
+    const_func = _normalize_physics_function(42)
+    ```
 
-        Calling `const_func(x, y, z)` for any `x`, `y`, `z` will return `42`.
+    Calling `const_func(x, y, z)` for any `x`, `y`, `z` will return `42`.
 
-        Parameters
-        ----------
-        function_or_scalar: int | float | pint.Quantity | Callable
-            A scalar value or a function that computes a physics parameter.
+    Parameters
+    ----------
+    function_or_scalar: int | float | pint.Quantity | Callable
+        A scalar value or a function that computes a physics parameter.
 
-        Returns
-        -------
-        Callable
-            A function that returns the scalar value or the original Callable.
+    Returns
+    -------
+    Callable
+        A function that returns the scalar value or the original Callable.
 
-        Raises
-        ------
-        TypeError
-            If the input is neither a scalar nor a Callable.
-        """
-        if isinstance(function_or_scalar, (pint.Quantity, float, int)):
-            return lambda *args, **kwargs: function_or_scalar
-        
-        elif callable(function_or_scalar):
-            return function_or_scalar
-            
-        else:
-            raise TypeError(f"Input must be Quantity, scalar, or Callable. Got {type(function_or_scalar)}")
+    Raises
+    ------
+    TypeError
+        If the input is neither a scalar nor a Callable.
+    """
+    if isinstance(function_or_scalar, (pint.Quantity, float, int)):
+        return lambda *args, **kwargs: function_or_scalar
+
+    elif callable(function_or_scalar):
+        return function_or_scalar
+
+    else:
+        raise TypeError(
+            f"Input must be Quantity, scalar, or Callable. Got {type(function_or_scalar)}"
+        )

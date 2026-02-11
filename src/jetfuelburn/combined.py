@@ -3,21 +3,21 @@ from jetfuelburn.rangeequation import calculate_fuel_consumption_range_equation
 
 
 @ureg.check(
-    '[mass]', # payload
-    '[mass]', # oew
-    '[]', # number_of_engines
-    '[mass]/[time]', # fuel_flow_per_engine_idle
-    '[mass]/[time]', # fuel_flow_per_engine_takeoff
-    '[speed]', # speed_cruise
-    '[time]/[length]', # tsfc_cruise, [mg/Ns] = s/m
-    '[]', # lift_to_drag
-    None, # dict_climb_segments_origin_to_destination
-    None, # dict_descent_segments_origin_to_destination
-    '[length]', # R_cruise_origin_to_destination
-    '[time]', # time_taxi
-    None, # dict_climb_segments_destination_to_alternate
-    None, # dict_descent_segments_destination_to_alternate
-    '[length]', # R_cruise_destination_to_alternate
+    "[mass]",  # payload
+    "[mass]",  # oew
+    "[]",  # number_of_engines
+    "[mass]/[time]",  # fuel_flow_per_engine_idle
+    "[mass]/[time]",  # fuel_flow_per_engine_takeoff
+    "[speed]",  # speed_cruise
+    "[time]/[length]",  # tsfc_cruise, [mg/Ns] = s/m
+    "[]",  # lift_to_drag
+    None,  # dict_climb_segments_origin_to_destination
+    None,  # dict_descent_segments_origin_to_destination
+    "[length]",  # R_cruise_origin_to_destination
+    "[time]",  # time_taxi
+    None,  # dict_climb_segments_destination_to_alternate
+    None,  # dict_descent_segments_destination_to_alternate
+    "[length]",  # R_cruise_destination_to_alternate
 )
 def calculate_fuel_consumption_combined_model(
     payload: float,
@@ -31,10 +31,10 @@ def calculate_fuel_consumption_combined_model(
     dict_climb_segments_origin_to_destination: dict,
     dict_descent_segments_origin_to_destination: dict,
     R_cruise_origin_to_destination: float,
-    time_taxi: float=26*ureg.min,
-    dict_climb_segments_destination_to_alternate: dict=None,
-    dict_descent_segments_destination_to_alternate: dict=None,
-    R_cruise_destination_to_alternate: float=0*ureg.km,
+    time_taxi: float = 26 * ureg.min,
+    dict_climb_segments_destination_to_alternate: dict = None,
+    dict_descent_segments_destination_to_alternate: dict = None,
+    R_cruise_destination_to_alternate: float = 0 * ureg.km,
 ) -> dict:
     r"""
     Given aircraft performance parameters, payload, climb/descent segment information and a flight distances,
@@ -90,7 +90,7 @@ def calculate_fuel_consumption_combined_model(
     References
     ----------
     - Setion 2.1.3.4 "Reference emissions landing and take-off (LTO) cycle"
-    in Annex 16 to the Convention on Civil Aviation, "Environmental Protection", Volume II - Aircraft Engine Emissions, 
+    in Annex 16 to the Convention on Civil Aviation, "Environmental Protection", Volume II - Aircraft Engine Emissions,
     Fourth Edition, July 2017
 
     Parameters
@@ -154,25 +154,40 @@ def calculate_fuel_consumption_combined_model(
     if lift_to_drag < 0:
         raise ValueError("Lift-to-drag ratio must be greater than zero.")
     if R_cruise_origin_to_destination < 0:
-        raise ValueError("Cruise distance from origin to destination must be greater than zero.")
+        raise ValueError(
+            "Cruise distance from origin to destination must be greater than zero."
+        )
     if R_cruise_destination_to_alternate < 0:
-        raise ValueError("Cruise distance from destination to alternate must be greater than zero.")
-    
+        raise ValueError(
+            "Cruise distance from destination to alternate must be greater than zero."
+        )
+
     if not dict_climb_segments_origin_to_destination:
-        raise ValueError("Climb segments dictionary (origin to destination) must not be empty.")
+        raise ValueError(
+            "Climb segments dictionary (origin to destination) must not be empty."
+        )
     if not dict_descent_segments_origin_to_destination:
-        raise ValueError("Descent segments dictionary (origin to destination) must not be empty.")
+        raise ValueError(
+            "Descent segments dictionary (origin to destination) must not be empty."
+        )
 
     def check_segments(dict_segments: dict):
         if dict_segments is None:
             return
         for segment in dict_segments.keys():
-            if 'time' not in dict_segments[segment]:
+            if "time" not in dict_segments[segment]:
                 raise ValueError("Each segment must have a 'time' key-value-pair.")
-            if 'fuel_flow_per_engine_relative_to_takeoff' not in dict_segments[segment] and 'fuel_flow_per_engine' not in dict_segments[segment]:
-                raise ValueError("Each segment must have either a 'fuel_flow_per_engine_relative_to_takeoff' or 'fuel_flow_per_engine' key-value-pair.")
+            if (
+                "fuel_flow_per_engine_relative_to_takeoff" not in dict_segments[segment]
+                and "fuel_flow_per_engine" not in dict_segments[segment]
+            ):
+                raise ValueError(
+                    "Each segment must have either a 'fuel_flow_per_engine_relative_to_takeoff' or 'fuel_flow_per_engine' key-value-pair."
+                )
             if not all(value > 0 for value in dict_segments[segment].values()):
-                raise ValueError("All values in the segment dictionary must be greater than 0")
+                raise ValueError(
+                    "All values in the segment dictionary must be greater than 0"
+                )
 
     check_segments(dict_climb_segments_origin_to_destination)
     check_segments(dict_descent_segments_origin_to_destination)
@@ -180,111 +195,133 @@ def calculate_fuel_consumption_combined_model(
     check_segments(dict_descent_segments_destination_to_alternate)
 
     def return_correct_fuel_burn_value_from_dict(dict_segment) -> ureg.Quantity:
-        if 'fuel_flow_per_engine' in dict_segment:
-            return dict_segment['fuel_flow_per_engine']
-        return dict_segment['fuel_flow_per_engine_relative_to_takeoff'] * fuel_flow_per_engine_takeoff
+        if "fuel_flow_per_engine" in dict_segment:
+            return dict_segment["fuel_flow_per_engine"]
+        return (
+            dict_segment["fuel_flow_per_engine_relative_to_takeoff"]
+            * fuel_flow_per_engine_takeoff
+        )
 
     m_f_taxi = fuel_flow_per_engine_idle * number_of_engines * time_taxi
 
     m_f_final_reserve = calculate_fuel_consumption_range_equation(
-        R=(speed_cruise * 30 * ureg.min).to('km'),
+        R=(speed_cruise * 30 * ureg.min).to("km"),
         LD=lift_to_drag,
         m_after_cruise=(oew + payload),
         v_cruise=speed_cruise,
-        TSFC_cruise=tsfc_cruise
+        TSFC_cruise=tsfc_cruise,
     )
 
-    if dict_climb_segments_destination_to_alternate is None and dict_descent_segments_destination_to_alternate is None:
-        m_f_takeoff_destination_to_alternate = 0*ureg.kg
-        m_f_climb_destination_to_alternate = 0*ureg.kg
-        m_f_descent_destination_to_alternate = 0*ureg.kg
-        m_f_approach_destination_to_alternate = 0*ureg.kg
+    if (
+        dict_climb_segments_destination_to_alternate is None
+        and dict_descent_segments_destination_to_alternate is None
+    ):
+        m_f_takeoff_destination_to_alternate = 0 * ureg.kg
+        m_f_climb_destination_to_alternate = 0 * ureg.kg
+        m_f_descent_destination_to_alternate = 0 * ureg.kg
+        m_f_approach_destination_to_alternate = 0 * ureg.kg
     else:
         m_f_takeoff_destination_to_alternate = (
-            return_correct_fuel_burn_value_from_dict(dict_climb_segments_destination_to_alternate['takeoff']) *
-            dict_climb_segments_destination_to_alternate['takeoff']['time'] *
-            number_of_engines
+            return_correct_fuel_burn_value_from_dict(
+                dict_climb_segments_destination_to_alternate["takeoff"]
+            )
+            * dict_climb_segments_destination_to_alternate["takeoff"]["time"]
+            * number_of_engines
         )
         m_f_climb_destination_to_alternate = sum(
-            return_correct_fuel_burn_value_from_dict(dict_segment) *
-            dict_segment['time'] *
-            number_of_engines
-            for str_segment, dict_segment in dict_climb_segments_destination_to_alternate.items() 
-            if str_segment != 'takeoff'
+            return_correct_fuel_burn_value_from_dict(dict_segment)
+            * dict_segment["time"]
+            * number_of_engines
+            for str_segment, dict_segment in dict_climb_segments_destination_to_alternate.items()
+            if str_segment != "takeoff"
         )
         m_f_descent_destination_to_alternate = sum(
-            return_correct_fuel_burn_value_from_dict(dict_segment) *
-            dict_segment['time'] *
-            number_of_engines
-            for str_segment, dict_segment in dict_descent_segments_destination_to_alternate.items() 
-            if str_segment != 'approach'
+            return_correct_fuel_burn_value_from_dict(dict_segment)
+            * dict_segment["time"]
+            * number_of_engines
+            for str_segment, dict_segment in dict_descent_segments_destination_to_alternate.items()
+            if str_segment != "approach"
         )
         m_f_approach_destination_to_alternate = (
-            return_correct_fuel_burn_value_from_dict(dict_descent_segments_destination_to_alternate['approach']) *
-            dict_descent_segments_destination_to_alternate['approach']['time'] *
-            number_of_engines
+            return_correct_fuel_burn_value_from_dict(
+                dict_descent_segments_destination_to_alternate["approach"]
+            )
+            * dict_descent_segments_destination_to_alternate["approach"]["time"]
+            * number_of_engines
         )
 
     m_f_cruise_destination_to_alternate = calculate_fuel_consumption_range_equation(
         R=R_cruise_destination_to_alternate,
         LD=lift_to_drag,
         m_after_cruise=(
-            oew + payload + m_f_descent_destination_to_alternate + 
-            m_f_approach_destination_to_alternate + m_f_final_reserve + (m_f_taxi / 2)
+            oew
+            + payload
+            + m_f_descent_destination_to_alternate
+            + m_f_approach_destination_to_alternate
+            + m_f_final_reserve
+            + (m_f_taxi / 2)
         ),
         v_cruise=speed_cruise,
-        TSFC_cruise=tsfc_cruise
+        TSFC_cruise=tsfc_cruise,
     )
 
     m_f_destination_to_alternate = (
-        m_f_takeoff_destination_to_alternate +
-        m_f_climb_destination_to_alternate +
-        m_f_descent_destination_to_alternate +
-        m_f_cruise_destination_to_alternate
+        m_f_takeoff_destination_to_alternate
+        + m_f_climb_destination_to_alternate
+        + m_f_descent_destination_to_alternate
+        + m_f_cruise_destination_to_alternate
     )
 
     m_f_takeoff_origin_to_destination = (
-        return_correct_fuel_burn_value_from_dict(dict_climb_segments_origin_to_destination['takeoff']) *
-        dict_climb_segments_origin_to_destination['takeoff']['time'] *
-        number_of_engines
+        return_correct_fuel_burn_value_from_dict(
+            dict_climb_segments_origin_to_destination["takeoff"]
+        )
+        * dict_climb_segments_origin_to_destination["takeoff"]["time"]
+        * number_of_engines
     )
     m_f_climb_origin_to_destination = sum(
-        return_correct_fuel_burn_value_from_dict(dict_segment) *
-        dict_segment['time'] *
-        number_of_engines
-        for str_segment, dict_segment in dict_climb_segments_origin_to_destination.items() 
-        if str_segment != 'takeoff'
+        return_correct_fuel_burn_value_from_dict(dict_segment)
+        * dict_segment["time"]
+        * number_of_engines
+        for str_segment, dict_segment in dict_climb_segments_origin_to_destination.items()
+        if str_segment != "takeoff"
     )
     m_f_descent_origin_to_destination = sum(
-        return_correct_fuel_burn_value_from_dict(dict_segment) *
-        dict_segment['time'] *
-        number_of_engines
-        for str_segment, dict_segment in dict_descent_segments_origin_to_destination.items() 
-        if 'landing' not in str_segment.lower()
+        return_correct_fuel_burn_value_from_dict(dict_segment)
+        * dict_segment["time"]
+        * number_of_engines
+        for str_segment, dict_segment in dict_descent_segments_origin_to_destination.items()
+        if "landing" not in str_segment.lower()
     )
     m_f_approach_origin_to_destination = (
-        return_correct_fuel_burn_value_from_dict(dict_descent_segments_origin_to_destination['approach']) *
-        dict_descent_segments_origin_to_destination['approach']['time'] *
-        number_of_engines
+        return_correct_fuel_burn_value_from_dict(
+            dict_descent_segments_origin_to_destination["approach"]
+        )
+        * dict_descent_segments_origin_to_destination["approach"]["time"]
+        * number_of_engines
     )
 
     m_f_cruise_origin_to_destination = calculate_fuel_consumption_range_equation(
         R=R_cruise_origin_to_destination,
         LD=lift_to_drag,
         m_after_cruise=(
-            oew + payload + m_f_descent_origin_to_destination + 
-            m_f_approach_origin_to_destination + m_f_destination_to_alternate + 
-            m_f_final_reserve + (m_f_taxi / 2)
+            oew
+            + payload
+            + m_f_descent_origin_to_destination
+            + m_f_approach_origin_to_destination
+            + m_f_destination_to_alternate
+            + m_f_final_reserve
+            + (m_f_taxi / 2)
         ),
         v_cruise=speed_cruise,
-        TSFC_cruise=tsfc_cruise
+        TSFC_cruise=tsfc_cruise,
     )
 
     return {
-        'mass_fuel_taxi': m_f_taxi.to('kg'),
-        'mass_fuel_takeoff': m_f_takeoff_origin_to_destination.to('kg'),
-        'mass_fuel_climb': m_f_climb_origin_to_destination.to('kg'),
-        'mass_fuel_cruise': m_f_cruise_origin_to_destination.to('kg'),
-        'mass_fuel_descent': m_f_descent_origin_to_destination.to('kg'),
-        'mass_fuel_approach': m_f_approach_origin_to_destination.to('kg'),
+        "mass_fuel_taxi": m_f_taxi.to("kg"),
+        "mass_fuel_takeoff": m_f_takeoff_origin_to_destination.to("kg"),
+        "mass_fuel_climb": m_f_climb_origin_to_destination.to("kg"),
+        "mass_fuel_cruise": m_f_cruise_origin_to_destination.to("kg"),
+        "mass_fuel_descent": m_f_descent_origin_to_destination.to("kg"),
+        "mass_fuel_approach": m_f_approach_origin_to_destination.to("kg"),
     }
