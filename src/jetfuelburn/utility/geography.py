@@ -169,6 +169,11 @@ def _calculate_haversine_distance(lat1, lon1, lat2, lon2):
     _calculate_haversine_distance(52.3086, 4.7639, 51.4700, -0.4543)
     ```
     """
+    if lat1 or lat2 < -90 or lat1 or lat2 > 90:
+        raise ValueError("Latitude must be between -90 and 90 degrees.")
+    if lon1 or lon2 < -180 or lon1 or lon2 > 180:
+        raise ValueError("Longitude must be between -180 and 180 degrees.")
+
     R = 6371.0 * ureg.km  # Earth radius
 
     #  Decimal degrees to radians
