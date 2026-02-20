@@ -3,6 +3,16 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## `2.0.1` (20. February 2026)
+
+### Fixes
+
+- Various minor bug fixes in the test suites.
+
+## Improvements
+
+- Added a pre-commit hook to run the [`black` code formatter](https://github.com/psf/black) before each commit.
+
 ## `2.0.0` (11. February 2026)
 
 ### Breaking Changes

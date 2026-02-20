@@ -1,8 +1,5 @@
 import pytest
-from contextlib import nullcontext as does_not_raise
-
-# Assuming the function is imported from your module
-# from your_module import _interpolate
+from jetfuelburn.utility.math import _interpolate
 
 
 def test_interpolate_basic_logic():

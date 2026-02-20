@@ -180,7 +180,7 @@ class jsbsim_drag_polars:
 
         D = q * S * c_D_total
 
-        return D
+        return D.to(ureg.newton)
 
     @staticmethod
     @ureg.check(

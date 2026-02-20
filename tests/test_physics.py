@@ -15,9 +15,60 @@ from jetfuelburn.utility.tests import approx_with_units
 
 def load_isa_csv():
     r"""
-    Helper function to load a CSV file containing 
+    Helper function to load a CSV file containing
     parameters of the International Standard Atmosphere (ISA).
     Returns a list of dictionaries where values are float-converted.
+
+    References
+    ----------
+    "International Standard Atmosphere (ISA) Table" in Young, T. M. (2017).
+    _Performance of the Jet Transport Airplane: Analysis Methods, Flight Operations, and Regulations._
+    John Wiley & Sons.
+    doi:[10.1002/9781118534786.app1](https://doi.org/10.1002/9781118534786.app1)
+
+    See Also
+    --------
+    [International Standard Atmosphere (ISA) entry on Wikipedia](https://en.wikipedia.org/wiki/International_Standard_Atmosphere)
+
+    Returns
+    -------
+    List[Dict[str, float]]
+        A list of dictionaries with ISA parameters, where each dictionary corresponds to a row in the CSV file.
+        Of the form:
+        ```
+        [
+            {
+                'H_ft': 0.0,
+                'H_m': 0.0,
+                'theta': 1.0,
+                'T_K': 288.15,
+                'T_C': 15.0,
+                'delta': 1.0,
+                'P_N/m^2': 101325.0,
+                'P_lb/ft^2': 2116.21,
+                'sigma': 1.0,
+                'rho_kg/m^3': 1.225,
+                'rho_slug/ft^3': 0.002377,
+                'a_m/s': 340.3,
+                'a_ft/s': 1116.0,
+                'a_kt': 661.5
+            },
+            ...
+        ]
+        ```
+    """
+    csv_path = Path(__file__).parent / "data" / "isa.csv"
+    data = []
+    with open(csv_path, mode="r") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            clean_row = {k: float(v) for k, v in row.items()}
+            data.append(clean_row)
+    return data
+
+
+ISA_DATA = load_isa_csv()
+
 
 def load_isa_csv():
     r"""

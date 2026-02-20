@@ -2,10 +2,17 @@ import pytest
 import jetfuelburn
 
 
-def test_breguet():
-    from jetfuelburn.rangeequation import calculate_fuel_consumption_range_equation
+def test_rangeequation():
+    from jetfuelburn.rangeequation import calculate_fuel_consumption_stepclimb_integration
+    from jetfuelburn.rangeequation import calculate_fuel_consumption_stepclimb_arctan
+    from jetfuelburn.rangeequation import calculate_fuel_consumption_breguet_improved
+    from jetfuelburn.rangeequation import calculate_fuel_consumption_breguet
 
-    assert callable(calculate_fuel_consumption_range_equation)
+
+    assert callable(calculate_fuel_consumption_stepclimb_integration)
+    assert callable(calculate_fuel_consumption_stepclimb_arctan)
+    assert callable(calculate_fuel_consumption_breguet_improved)
+    assert callable(calculate_fuel_consumption_breguet)
 
 
 def test_diagrams():
@@ -52,12 +59,6 @@ def test_reducedorder():
 
     assert callable(myclimate.available_aircraft)
     assert callable(myclimate.calculate_fuel_consumption)
-
-
-def test_combined():
-    from jetfuelburn.combined import calculate_fuel_consumption_combined_model
-
-    assert callable(calculate_fuel_consumption_combined_model)
 
 
 def test_aux_physics():
