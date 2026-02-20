@@ -3,11 +3,12 @@ import jetfuelburn
 
 
 def test_rangeequation():
-    from jetfuelburn.rangeequation import calculate_fuel_consumption_stepclimb_integration
+    from jetfuelburn.rangeequation import (
+        calculate_fuel_consumption_stepclimb_integration,
+    )
     from jetfuelburn.rangeequation import calculate_fuel_consumption_stepclimb_arctan
     from jetfuelburn.rangeequation import calculate_fuel_consumption_breguet_improved
     from jetfuelburn.rangeequation import calculate_fuel_consumption_breguet
-
 
     assert callable(calculate_fuel_consumption_stepclimb_integration)
     assert callable(calculate_fuel_consumption_stepclimb_arctan)
