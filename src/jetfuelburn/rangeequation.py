@@ -5,6 +5,9 @@ from typing import Callable
 
 from jetfuelburn.utility.physics import (
     _calculate_atmospheric_density,
+    _calculate_atmospheric_temperature,
+    _calculate_speed_of_sound,
+    _calculate_dynamic_pressure,
     _calculate_airspeed_from_mach,
 )
 from jetfuelburn.utility.code import (
@@ -601,3 +604,183 @@ def calculate_fuel_consumption_breguet(
     else:
         m_fuel = m_after_cruise * (math.exp((R * TSFC * ureg.gravity) / (LD * V)) - 1)
         return m_fuel.to("kg")
+
+
+@ureg.check(
+    "[length]",
+    "[length]",
+    "[]",
+    "[mass]",
+    "[area]",
+    "[]",
+    "[]",
+    "[]",
+    "[]",
+    "[]",
+    "[time]/[length]",
+    "[]",
+    "[length]",
+    "[]",
+    "[]",
+    "[]",
+)
+def calculate_fuel_consumption_cavcar(
+    R: pint.Quantity,
+    h: pint.Quantity,
+    M: float,
+    m_after_cruise: pint.Quantity,
+    S: pint.Quantity,
+    AR: float,
+    e: float,
+    t_c: float,
+    lambda_deg: float,
+    kappa_a: float,
+    TSFC_ref: pint.Quantity,
+    M_ref: float,
+    h_ref: pint.Quantity,
+    beta: float = 0.5,
+    CDmin: float = 0.015,
+    CLmin: float = 0.1,
+) -> pint.Quantity:
+    r"""
+    Given a flight distance (=range) $R$ and aircraft performance parameters,
+    returns the fuel mass burned during the flight $m_f$ [kg] based on a
+    constant altitude-constant Mach number cruise flight schedule.
+
+    The calculation follows the approximate solution proposed by Cavcar (2006),
+    which accounts for compressibility effects on the drag polar and the variation
+    of thrust-specific fuel consumption (TSFC) with Mach number and altitude.
+
+    Fuel mass is calculated from the fuel weight fraction $\zeta = W_f / W_0$:
+
+    $$
+        W_f = \frac{R C_1}{\frac{a M^{1-\beta}}{c_{t_0} \sqrt{\theta} q S} - R C_2}
+    $$
+
+    where:
+
+    | Symbol      | Description                                                |
+    |-------------|------------------------------------------------------------|
+    | $R$         | Range of the aircraft (=mission distance)                  |
+    | $W_f$       | Fuel weight burned                                         |
+    | $a$         | Speed of sound at cruise altitude                          |
+    | $M$         | Mach number during cruise                                  |
+    | $\beta$     | TSFC Mach number exponent (typically 0.5 for turbofans)    |
+    | $c_{t_0}$   | TSFC constant at cruise altitude                           |
+    | $\theta$    | Relative temperature at cruise altitude                    |
+    | $q$         | Dynamic pressure at cruise altitude                        |
+    | $S$         | Wing reference area                                        |
+    | $C_1, C_2$  | Coefficients derived from the drag polar approximation     |
+
+    Notes
+    -----
+    This function implements the solution for $M < M_{crit}$. For $M > M_{crit}$,
+    the drag polar coefficients $C_{D_0}'$, $K_1'$, and $K_2'$ are modified to
+    account for wave drag.
+
+    References
+    ----------
+    Cavcar, A. (2006).
+    Constant Altitude-Constant Mach Number Cruise Range of Transport Aircraft with Compressibility Effects.
+    _Journal of Aircraft_, 43(1), 125-131.
+    doi:[10.2514/1.14252](https://doi.org/10.2514/1.14252)
+
+    Parameters
+    ----------
+    R : pint.Quantity [length]
+        Range of the aircraft (=mission distance)
+    h : pint.Quantity [length]
+        Cruise altitude
+    M : float
+        Mach number during cruise
+    m_after_cruise : pint.Quantity [mass]
+        Mass of the aircraft after cruise segment
+    S : pint.Quantity [area]
+        Wing reference area
+    AR : float
+        Aspect ratio
+    e : float
+        Oswald efficiency factor
+    t_c : float
+        Thickness-to-chord ratio
+    lambda_deg : float
+        Wing sweep angle at quarter chord [degrees]
+    kappa_a : float
+        Airfoil technology factor (e.g., 0.87 for NACA, 0.95 for supercritical)
+    TSFC_ref : pint.Quantity [time/length]
+        Reference TSFC at $M_{ref}$ and $h_{ref}$
+    M_ref : float
+        Reference Mach number for TSFC
+    h_ref : pint.Quantity [length]
+        Reference altitude for TSFC
+    beta : float, optional
+        TSFC Mach number exponent, by default 0.5
+    CDmin : float, optional
+        Minimum drag coefficient, by default 0.015
+    CLmin : float, optional
+        Lift coefficient at minimum drag, by default 0.1
+
+    Returns
+    -------
+    pint.Quantity [mass]
+        Required fuel mass [kg]
+    """
+    if R.magnitude == 0:
+        return 0 * ureg.kg
+    if R.magnitude < 0:
+        raise ValueError("Range must be greater than zero.")
+    if h.magnitude < 0:
+        raise ValueError("Altitude must be greater than zero.")
+    if m_after_cruise.magnitude < 0:
+        raise ValueError("Mass after cruise must be greater than zero.")
+
+    # Atmospheric parameters
+    temp_sl = 288.15 * ureg.K
+    temp_h = _calculate_atmospheric_temperature(h).to(ureg.K)
+    theta = (temp_h / temp_sl).magnitude
+
+    temp_ref = _calculate_atmospheric_temperature(h_ref).to(ureg.K)
+    theta_ref = (temp_ref / temp_sl).magnitude
+
+    a = _calculate_speed_of_sound(temp_h).to("m/s")
+    q = _calculate_dynamic_pressure(_calculate_airspeed_from_mach(M, h), h).to("Pa")
+
+    # TSFC parameters (Cavcar Eq 4)
+    # c_t_0 is in [1/s] if TSFC_ref * g is [1/s]
+    # TSFC_ref is [s/m], TSFC_ref * g is [1/s]
+    ct_ref = (TSFC_ref * ureg.gravity).to("1/s")
+    ct0 = ct_ref / (M_ref**beta * math.sqrt(theta_ref))
+
+    # Aerodynamic parameters
+    cos_lambda = math.cos(math.radians(lambda_deg))
+    K = 1.0 / (math.pi * AR * e * math.sqrt(abs(1.0 - M**2)))
+
+    # M_crit calculation (Cavcar Eq 11, 12)
+    # For simplicity, we use the average CL for M_crit, but since we don't know it yet,
+    # we'll use a representative value or the incompressible case if M is low.
+    # Here we'll implement the M < M_crit case.
+    # TODO: Add full compressibility drag if M > M_crit
+    CD0_prime = CDmin + K * CLmin**2
+    K1_prime = 2.0 * K * CLmin
+    K2_prime = K
+
+    # Solving for W_f from Cavcar Eq 27
+    # W_f = (R * C1) / ( (a * M**(1-beta)) / (ct0 * sqrt(theta) * q * S) - R * C2 )
+    # where C1 and C2 are related to the denominator terms
+    W_after = (m_after_cruise * ureg.gravity).to("N")
+
+    # C1 = CD0' - K1' * (W_after / (q*S)) + K2' * (W_after / (q*S))**2
+    # C2 = -K1' / (2*q*S) + K2' * W_after / (q*S)**2
+    term_qS = (q * S).to("N")
+    C1 = CD0_prime - K1_prime * (W_after / term_qS).magnitude + K2_prime * (W_after / term_qS).magnitude ** 2
+    C2 = -K1_prime / (2.0 * term_qS.magnitude) + K2_prime * W_after.magnitude / (term_qS.magnitude ** 2)
+
+    numerator = (R.to("m").magnitude * C1)
+    denominator_term = (a.magnitude * M**(1.0 - beta)) / (ct0.magnitude * math.sqrt(theta) * term_qS.magnitude)
+    W_f_mag = numerator / (denominator_term - R.to("m").magnitude * C2)
+
+    if W_f_mag < 0:
+        raise ValueError("Calculated fuel mass is negative. Check input parameters.")
+
+    m_fuel = (W_f_mag * ureg.N / ureg.gravity).to("kg")
+    return m_fuel

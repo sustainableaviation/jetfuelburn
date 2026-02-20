@@ -6,6 +6,7 @@ from jetfuelburn.rangeequation import (
     calculate_fuel_consumption_breguet_improved,
     calculate_fuel_consumption_stepclimb_arctan,
     calculate_fuel_consumption_stepclimb_integration,
+    calculate_fuel_consumption_cavcar,
 )
 from jetfuelburn.utility.tests import approx_with_units
 from jetfuelburn.utility.physics import _calculate_mach_from_airspeed
@@ -418,3 +419,131 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
         )
 
         assert approx_with_units(integration_result, arctan_result, rel=0.05)
+
+
+class TestCalculateFuelConsumptionCavcar:
+
+    def test_valid_input_units(self):
+        """
+        Test that the function accepts valid units and returns a mass in kg.
+        """
+        R = 3000 * ureg.kilometer
+        h = 35000 * ureg.feet
+        M = 0.8
+        m_after = 60 * ureg.metric_ton
+        S = 122.6 * ureg.meter**2
+        AR = 9.5
+        e = 0.8
+        t_c = 0.12
+        lambda_deg = 25
+        kappa_a = 0.95
+        TSFC_ref = 0.6 * (ureg.lb / ureg.lbf / ureg.hour)
+        M_ref = 0.8
+        h_ref = 35000 * ureg.feet
+
+        result = calculate_fuel_consumption_cavcar(
+            R=R,
+            h=h,
+            M=M,
+            m_after_cruise=m_after,
+            S=S,
+            AR=AR,
+            e=e,
+            t_c=t_c,
+            lambda_deg=lambda_deg,
+            kappa_a=kappa_a,
+            TSFC_ref=TSFC_ref,
+            M_ref=M_ref,
+            h_ref=h_ref
+        )
+
+        assert result.check("[mass]")
+        assert result.units == ureg.kg
+        assert result.magnitude > 0
+
+    def test_zero_range(self):
+        """
+        Test that zero range results in zero fuel consumption.
+        """
+        result = calculate_fuel_consumption_cavcar(
+            R=0 * ureg.km,
+            h=35000 * ureg.feet,
+            M=0.8,
+            m_after_cruise=60000 * ureg.kg,
+            S=122.6 * ureg.m**2,
+            AR=9.5,
+            e=0.8,
+            t_c=0.12,
+            lambda_deg=25,
+            kappa_a=0.95,
+            TSFC_ref=0.6 * (ureg.lb / ureg.lbf / ureg.hour),
+            M_ref=0.8,
+            h_ref=35000 * ureg.feet
+        )
+        assert result.magnitude == 0
+        assert result.units == ureg.kg
+
+    def test_b747_case(self):
+        """
+        Test case based on B747-100 parameters from Cavcar (2006) Table 1.
+        We check if the result is physically plausible.
+        """
+        S = 510.97 * ureg.meter**2
+        AR = 6.98
+        e = 0.7
+        t_c = 0.094
+        lambda_deg = 37.5
+        kappa_a = 0.89
+        MTOW = 333400 * ureg.kg
+        m_after = 215655 * ureg.kg
+        
+        h = 37000 * ureg.feet
+        M = 0.86
+        
+        TSFC_ref = 0.68 * (ureg.lb / ureg.lbf / ureg.hour)
+        M_ref = 0.806
+        h_ref = 35000 * ureg.feet 
+
+        R = 5000 * ureg.nmi
+
+        result = calculate_fuel_consumption_cavcar(
+            R=R,
+            h=h,
+            M=M,
+            m_after_cruise=m_after,
+            S=S,
+            AR=AR,
+            e=e,
+            t_c=t_c,
+            lambda_deg=lambda_deg,
+            kappa_a=kappa_a,
+            TSFC_ref=TSFC_ref,
+            M_ref=M_ref,
+            h_ref=h_ref,
+            beta=0.5
+        )
+
+        assert result.magnitude > 0
+        assert result.magnitude < MTOW.magnitude
+        assert result.magnitude > 50000 
+
+    def test_raises_value_error_on_invalid_magnitudes(self):
+        """
+        Test that specific value errors are raised for invalid inputs.
+        """
+        with pytest.raises(ValueError, match="Range must be greater than zero"):
+            calculate_fuel_consumption_cavcar(
+                R=-100 * ureg.km,
+                h=35000 * ureg.feet,
+                M=0.8,
+                m_after_cruise=60000 * ureg.kg,
+                S=122.6 * ureg.m**2,
+                AR=9.5,
+                e=0.8,
+                t_c=0.12,
+                lambda_deg=25,
+                kappa_a=0.95,
+                TSFC_ref=0.6 * (ureg.lb / ureg.lbf / ureg.hour),
+                M_ref=0.8,
+                h_ref=35000 * ureg.feet
+            )
