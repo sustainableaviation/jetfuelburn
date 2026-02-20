@@ -87,8 +87,8 @@ class TestCalculateCorrectedTSFC:
             ("M_actual", -0.5 * ureg.dimensionless),
             (
                 "h_reported",
-                0 * ureg.ft,
-            ),  # Function strictly requires > 0, though physics allows 0
+                -1 * ureg.ft,
+            ),  # Function requires >= 0
             ("h_actual", -100 * ureg.ft),
             ("beta", -0.5),
         ],

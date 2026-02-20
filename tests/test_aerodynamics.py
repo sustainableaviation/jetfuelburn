@@ -26,7 +26,7 @@ class TestJsbsimDragPolarsIntegration:
         # Dynamically pick an aircraft that actually exists in the file
         acft = jsbsim_drag_polars.available_aircraft()[0]
 
-        L = 50000 * ureg.newton
+        L = 50 * ureg.metric_ton * ureg.gravity
         M = 0.78
         h = 30000 * ureg.feet
 
@@ -34,7 +34,7 @@ class TestJsbsimDragPolarsIntegration:
 
         assert drag.check("[force]")
         assert drag.magnitude > 0
-        assert drag.units == ureg.newton or drag.units == ureg.force
+        assert drag.units == ureg.newton
 
     def test_lift_to_drag_sanity(self):
         """
@@ -43,7 +43,7 @@ class TestJsbsimDragPolarsIntegration:
         """
         acft = jsbsim_drag_polars.available_aircraft()[0]
 
-        L = 60000 * ureg.newton
+        L = 60 * ureg.metric_ton * ureg.gravity  # Convert 60 metric tons to Newtons
         M = 0.75
         h = 32000 * ureg.feet
 
@@ -51,7 +51,7 @@ class TestJsbsimDragPolarsIntegration:
 
         assert l_d.check("[]")  # Dimensionless
         # Sanity check: L/D for a jet should typically be between 5 and 25
-        assert 1.0 < l_d.magnitude < 50.0
+        assert 5.0 < l_d.magnitude < 25
 
     def test_binder_function_integration(self):
         """Verifies the binder function works with real data."""

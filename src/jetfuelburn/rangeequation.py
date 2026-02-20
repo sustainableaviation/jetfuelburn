@@ -1,4 +1,3 @@
-# %%
 import pint
 from jetfuelburn import ureg
 import math
