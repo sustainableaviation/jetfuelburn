@@ -13,6 +13,7 @@ from jetfuelburn.utility.physics import (
 
 from jetfuelburn.utility.tests import approx_with_units
 
+
 def load_isa_csv():
     r"""
     Helper function to load a CSV file containing
