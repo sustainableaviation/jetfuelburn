@@ -1,0 +1,111 @@
+[project]
+site_name = "JetFuelBurn Documentation"
+site_url = "https://jetfuelburn.readthedocs.io"
+repo_url = "https://github.com/sustainableaviation/jetfuelburn"
+copyright = "© Paul Scherrer Institute (PSI) and Contributors | Code under MIT License"
+
+nav = [
+    { Home = "index.md" },
+    { About = "about.md" },
+    { "Comparing Models" = [
+        { "Aircraft Type Matrix" = "comparison/comparison.md" }
+    ]},
+    { "Getting Started" = [
+        { Installation = "installation.md" },
+        { "Working with Physical Units" = "interactive/units.md" },
+        { "Fuel Burn Calculations" = "interactive/fuel.md" },
+        { "Cabin Class Fuel Allocation" = "interactive/allocation.md" }
+    ]},
+    { "API Reference" = [
+        { "PL/R-Diagrams" = "api/diagrams.md" },
+        { "Range Equation" = "api/rangeequation.md" },
+        { "Statistics Models" = "api/statistics.md" },
+        { "Reduced Order Models" = "api/reducedorder.md" },
+        { "Cabin Class Fuel Allocation" = "api/allocation.md" }
+    ]},
+    { "API Reference (Utility)" = [
+        { Aerodynamics = "api/aerodynamics.md" },
+        { Engines = "api/engines.md" },
+        { Physics = "api/physics.md" },
+        { Geography = "api/geography.md" },
+        { Math = "api/math.md" }
+    ]},
+    { "API Reference (External)" = [
+        { "EU Flight Emissions Label" = "api/eu_fel.md" },
+        { "Reduced Order Models" = "api/reducedorder_external.md" },
+        { "Closed Form Models" = "api/closedform_external.md" }
+    ]},
+    { FAQ = "faq.md" },
+    { Changelog = "changelog.md" }
+]
+
+[project.theme]
+name = "material"
+custom_dir = "docs/_overrides"
+logo = "_static/logos/jetfuelburn_logo.svg"
+favicon = "_static/logos/jetfuelburn_logo.svg"
+highlightjs = true
+navigation_depth = 4
+features = [
+    "navigation.instant",
+    "navigation.instant.progress",
+    "navigation.expand",
+    "navigation.path",
+    "navigation.indexes",
+    "navigation.top",
+    "content.footnote.tooltips"
+]
+
+[[project.theme.palette]]
+scheme = "default"
+toggle = { icon = "material/brightness-7", name = "Switch to dark mode" }
+
+[[project.theme.palette]]
+scheme = "slate"
+toggle = { icon = "material/brightness-4", name = "Switch to light mode" }
+
+[project.plugins]
+search = {}
+mkdocstrings = { handlers = { python = { options = { docstring_style = "numpy", show_root_toc_entry = true, show_root_heading = true, heading_level = 2, show_source = true, filters = [], separate_signature = true } } } }
+markdown-exec = {}
+autorefs = {}
+include-markdown = {}
+mkdocs-jupyter = { include = ["*.ipynb"], execute = false, show_input = true, include_source = true }
+mkdocs-pdf = {}
+
+[project.markdown_extensions]
+admonition = {}
+pymdownx.superfences = {}
+pymdownx.details = {}
+toc = { permalink = true }
+pymdownx.arithmatex = { generic = true }
+pymdownx.snippets = {}
+pymdownx.highlight = { use_pygments = false }
+attr_list = {}
+
+[[project.extra_javascript]]
+path = "_javascripts/katex.js"
+
+[[project.extra_javascript]]
+path = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"
+
+[[project.extra_javascript]]
+path = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+
+[[project.extra_javascript]]
+path = "https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.js"
+
+[[project.extra_javascript]]
+path = "_javascripts/tablesort.js"
+
+[[project.extra_css]]
+path = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css"
+
+[[project.extra_css]]
+path = "_css/extra.css"
+
+[project.extra]
+generator = false
+
+[project.watch]
+paths = ["docs", "src/jetfuelburn"]

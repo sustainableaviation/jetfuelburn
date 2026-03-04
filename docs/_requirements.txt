@@ -1,3 +1,4 @@
+zensical
 mkdocs-material
 mkdocstrings-python
 ruff

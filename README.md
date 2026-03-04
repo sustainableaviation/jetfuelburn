@@ -17,10 +17,10 @@ See [the package documentation](https://jetfuelburn.readthedocs.io/) for install
 
 ### Documentation
 
-The package documentation is based on [`mkdocs`](https://www.mkdocs.org). To build the documentation locally, install required packages from the `docs/_requirements.txt` file and navigate to the package root directory to execute:
+The package documentation is based on [`zensical`](https://zensical.org). To build the documentation locally, install required packages from the `docs/_requirements.txt` file and navigate to the package root directory to execute:
 
 ```bash
-mkdocs serve
+zensical serve
 ```
 
 ### Testing
