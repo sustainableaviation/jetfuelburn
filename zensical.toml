@@ -4,6 +4,19 @@ site_url = "https://jetfuelburn.readthedocs.io"
 repo_url = "https://github.com/sustainableaviation/jetfuelburn"
 copyright = "© Paul Scherrer Institute (PSI) and Contributors | Code under MIT License"
 
+extra_javascript = [
+    "_javascripts/katex.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.js",
+    "_javascripts/tablesort.js"
+]
+
+extra_css = [
+    "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css",
+    "_css/extra.css"
+]
+
 nav = [
     { Home = "index.md" },
     { About = "about.md" },
@@ -82,27 +95,6 @@ pymdownx.arithmatex = { generic = true }
 pymdownx.snippets = {}
 pymdownx.highlight = { use_pygments = false }
 attr_list = {}
-
-[[project.extra_javascript]]
-path = "_javascripts/katex.js"
-
-[[project.extra_javascript]]
-path = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"
-
-[[project.extra_javascript]]
-path = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
-
-[[project.extra_javascript]]
-path = "https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.js"
-
-[[project.extra_javascript]]
-path = "_javascripts/tablesort.js"
-
-[[project.extra_css]]
-path = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css"
-
-[[project.extra_css]]
-path = "_css/extra.css"
 
 [project.extra]
 generator = false
