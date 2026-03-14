@@ -25,6 +25,7 @@ nav:
     - Engines: 'api/engines.md'
     - Physics: 'api/physics.md'
     - Geography: 'api/geography.md'
+    - Mapping: 'api/mapping.md'
     - Math: 'api/math.md'
   - API Reference (External):
     - EU Flight Emissions Label: 'api/eu_fel.md'
