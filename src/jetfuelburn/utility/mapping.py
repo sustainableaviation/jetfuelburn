@@ -1,6 +1,8 @@
-# %%
 import csv
-from ipyleaflet import Map, Polyline, Marker, CircleMarker
+import io
+import urllib.request
+from ipyleaflet import Map, Polyline, CircleMarker
+from ipywidgets import HTML
 
 
 def plot_ofp(
@@ -9,13 +11,14 @@ def plot_ofp(
     output_html: str | None = None,
 ) -> Map:
     r"""
-    Reads a CSV file containing flight trajectory data from operational flight plans 
+    Reads a CSV file containing flight trajectory data from operational flight plans
     (OFP) and plots it on an interactive [ipyleaflet](https://ipyleaflet.readthedocs.io/) map.
 
     Parameters
     ----------
     csv_path : str
-        Path to the CSV file containing trajectory data. The CSV must contain at least the following columns:
+        Path to the CSV file or URL containing trajectory data.
+        The CSV must contain at least the following columns:
 
         | Column    | Type    | Description                                      |
         |-----------|---------|--------------------------------------------------|
@@ -61,8 +64,15 @@ def plot_ofp(
     )
     ```
     """
-    rows = []
-    with open(csv_path, mode="r", encoding="utf-8") as f:
+    if csv_path.startswith(("http://", "https://")):
+        with urllib.request.urlopen(csv_path) as response:
+            content = response.read().decode("utf-8")
+        f = io.StringIO(content)
+    else:
+        f = open(csv_path, mode="r", encoding="utf-8")
+
+    try:
+        rows = []
         reader = csv.DictReader(f)
         for row in reader:
             lat_str = row.get("lat")
@@ -74,6 +84,8 @@ def plot_ofp(
                     rows.append(row)
                 except ValueError:
                     continue
+    finally:
+        f.close()
 
     coords = [(r["lat"], r["lon"]) for r in rows]
 
@@ -89,6 +101,7 @@ def plot_ofp(
     m.add(polyline)
 
     for r in rows:
+        label = str(r.get(label_column, ""))
         circle = CircleMarker(
             location=(r["lat"], r["lon"]),
             radius=3,
@@ -96,7 +109,8 @@ def plot_ofp(
             fill_color="blue",
             fill_opacity=0.6,
             weight=1,
-            name=str(r.get(label_column, "")),
+            name=label,
+            tooltip=HTML(value=label),
         )
         m.add(circle)
 

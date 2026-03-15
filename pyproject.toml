@@ -32,14 +32,13 @@ classifiers = [
 
 requires-python = ">=3.11"
 
+dependencies = ["pint"]
+
 [project.urls]
 source = "https://github.com/sustainableaviation/jetfuelburn"
 homepage = "https://jetfuelburn.readthedocs.io"
 tracker = "https://github.com/sustainableaviation/jetfuelburn/issues"
 
-dependencies = [
-    "pint",
-]
 
 [project.optional-dependencies]
 testing = [
@@ -47,9 +46,9 @@ testing = [
     "pytest-cov",
     "python-coveralls",
 ]
-plotting = [
-    "folium",
-    "pandas",
+optionaldependencies = [
+    "ipyleaflet",
+    "polars",
 ]
 
 [tool.setuptools]
