@@ -6,8 +6,54 @@ except ImportError as e:
         f"Optional dependency missing: {e}. "
         "Install all required packages with: pip install jetfuelburn[optionaldependencies]"
     ) from e
-import math
 
+import math
+import yaml
+from pathlib import Path
+import pandas as pd
+
+
+def _get_aircraft_performance(
+    filepath_perf_data: Path,
+    aircraft_type: str,
+    phase: str,
+    alt: float
+):
+    with open(filepath_perf_data, "r") as f:
+        data = yaml.safe_load(f)
+
+    if phase not in ("climb", "descent"):
+        raise ValueError(f"Unknown flight phase: {phase!r}. Use 'climb' or 'descent'.")
+
+    try:
+        regimes = data[aircraft_type][phase]
+    except KeyError as e:
+        raise KeyError(f"Missing aircraft/phase in YAML: {aircraft_type}/{phase}") from e
+
+    df = pd.DataFrame(regimes)
+    required = {"regime", "min_alt", "max_alt", "rate"}
+    missing = required.difference(df.columns)
+    if missing:
+        raise KeyError(f"YAML missing keys for {aircraft_type}/{phase}: {sorted(missing)}")
+
+    # Normalize bounds so IntervalIndex is always increasing [low, high)
+    low = df[["min_alt", "max_alt"]].min(axis=1)
+    high = df[["min_alt", "max_alt"]].max(axis=1)
+
+    if (low == high).any():
+        bad = df.loc[low == high, ["regime", "min_alt", "max_alt"]]
+        raise ValueError(f"Degenerate altitude band(s) where min==max:\n{bad}")
+
+    idx = pd.IntervalIndex.from_arrays(low, high, closed="left")
+
+    # Basic overlap check (after normalization)
+    order = pd.DataFrame({"low": low, "high": high}).sort_values(["low", "high"]).reset_index(drop=True)
+    if (order["low"].iloc[1:].to_numpy() < order["high"].iloc[:-1].to_numpy()).any():
+        raise ValueError(f"Overlapping altitude bands detected in {aircraft_type}/{phase_key}")
+
+    rates = pd.Series(df["rate"].to_numpy(), index=idx)
+    names = pd.Series(df["regime"].to_numpy(), index=idx)
+    return rates, names
 
 def generate_4d_trajectory(
     df_ofp: pl.DataFrame,
@@ -62,6 +108,11 @@ def generate_4d_trajectory(
         |-------------------|---------|---------|------|
         | initial climb     | 0       | 5000    | 2000 |
         | final climb       | 5000    | 15000   | 1000 |
+
+        | descent regime    | min_alt | max_alt | rate  |
+        |-------------------|---------|---------|-------|
+        | initial descent   | 15000   | 5000    | -2000 |
+        | final descent     | 5000    | 0       | -1000 |
 
         The function determines first performs a linear interpolation between the waypoint:
 
@@ -202,5 +253,8 @@ def generate_4d_trajectory(
     df_merged['alt_max'] = next_num.fillna(col_alt)
 
     # df_merged.remove_columns(['timecum', 'alt_min', 'alt_max'])
+
+    #for idx, row in df_merged.iterrows():
+        
 
     return df_merged
