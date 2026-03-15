@@ -92,3 +92,21 @@ class TestMapping:
         finally:
             if os.path.exists(output_html):
                 os.remove(output_html)
+
+    def test_plot_ofp_url(self):
+        """Test that plot_ofp handles URLs."""
+        from unittest.mock import patch, MagicMock
+        
+        url = "https://example.com/test.csv"
+        csv_content = "waypoint,lat,lon\nTEST,0.0,0.0\n"
+        
+        mock_response = MagicMock()
+        mock_response.read.return_value = csv_content.encode("utf-8")
+        mock_response.__enter__.return_value = mock_response
+        
+        with patch("urllib.request.urlopen", return_value=mock_response) as mock_urlopen:
+            m = plot_ofp(url)
+            mock_urlopen.assert_called_once_with(url)
+            assert isinstance(m, Map)
+            # 1 TileLayer + 1 Polyline + 1 CircleMarker = 3
+            assert len(m.layers) == 3
