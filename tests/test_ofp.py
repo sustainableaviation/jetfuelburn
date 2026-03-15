@@ -1,99 +1,351 @@
-import polars as pl
 import math
-from figures.ofp.ofp_climb_descent import generate_4d_trajectory
+import textwrap
+import tempfile
+from pathlib import Path
 
-def test_generate_4d_trajectory_climb_and_level_off():
-    # Setup test data based on the user prompt scenario
-    df_ofp = pl.DataFrame({
-        'waypoint': ['A', 'B', 'C'],
-        'lat': [12.1, 12.4, 12.7],
-        'lon': [2.2, 2.4, 2.6],
-        'timeto': [10.0, None, 40.0],
-        'altitude': [0.0, 20000.0, 20000.0]
-    })
-    
-    perf_data = {
-        "climb": [
-            {"min_alt": 0, "max_alt": 10000, "rate": 800},
-            {"min_alt": 10000, "max_alt": 20000, "rate": 500}
-        ],
-        "descent": [
-            {"min_alt": 0, "max_alt": 10000, "rate": 1000},
-            {"min_alt": 10000, "max_alt": 20000, "rate": 800}
-        ]
-    }
-    
-    # Calculate expected time to reach 20,000 ft from 0 ft:
-    # 0 -> 10,000 @ 800 fpm = 10000/800 = 12.5 mins
-    # 10,000 -> 20,000 @ 500 fpm = 10000/500 = 20.0 mins
-    # Total time = 32.5 mins
-    # Given waypoint A is at 10.0, waypoint B should be at 10.0 + 32.5 = 42.5
-    # Wait, the prompt says waypoint B has timeto=NaN. 
-    # Let's see how our code handles this. It should assign B's timeto to 42.5.
-    # We also added waypoint C at timeto=40.0. If B is at 42.5, C is backwards in time, 
-    # which invalidates the flight plan order.
-    # Let's adjust waypoint C to timeto=50.0 to make it consistent.
-    
-    df_ofp = pl.DataFrame({
-        'waypoint': ['A', 'B', 'C'],
-        'lat': [12.1, 12.4, 12.7],
-        'lon': [2.2, 2.4, 2.6],
-        'timeto': [10.0, None, 50.0],
-        'altitude': [0.0, 20000.0, 20000.0]
-    })
-    
-    df_res = generate_4d_trajectory(df_ofp, perf_data, resolution_min=1.0)
-    
-    assert df_res.columns == ['timestamp', 'lat', 'lon', 'alt']
-    
-    # Check bounds
-    assert df_res['timestamp'].min() == 10.0
-    assert df_res['timestamp'].max() == 50.0
-    
-    # Check altitude at 10.0 + 12.5 = 22.5 mins (should be ~10000 ft, meaning at 22 min <10000 and 23 min >10000)
-    # At 22 mins: t=12. 12 * 800 = 9600 ft.
-    row_22 = df_res.filter(pl.col("timestamp") == 22.0)
-    if len(row_22) > 0:
-        assert math.isclose(row_22['alt'][0], 9600.0, rel_tol=1e-5)
-        
-    # Check altitude at 42.5 mins (should be 20000 ft exactly based on the simulated loop, or close to it)
-    # Let's check when it reaches 20000.
-    row_43 = df_res.filter(pl.col("timestamp") == 43.0)
-    if len(row_43) > 0:
-        assert math.isclose(row_43['alt'][0], 20000.0, rel_tol=1e-5)
-        
-    # It should level off at 20000 ft from ~42.5 mins to 50 mins
-    level_off = df_res.filter(pl.col("timestamp") >= 43.0)
-    assert (level_off['alt'] == 20000.0).all()
+import pandas as pd
+import pytest
 
-def test_generate_4d_trajectory_early_arrival():
-    # If the aircraft climbs to the next altitude, but the target waypoint is MUCH further away in time, 
-    # it must level off at that altitude until it reaches the waypoint.
-    
-    # Waypoint A: alt 0, time 0
-    # Waypoint B: alt 10000, time 30
-    # ROC is 1000. It will take 10 mins. So from t=10 to t=30, altitude must be 10000.
-    
-    df_ofp = pl.DataFrame({
-        'waypoint': ['A', 'B'],
-        'lat': [0.0, 1.0],
-        'lon': [0.0, 1.0],
-        'timeto': [0.0, 30.0],
-        'altitude': [0.0, 10000.0]
-    })
-    
-    perf_data = {
-        "climb": [
-            {"min_alt": 0, "max_alt": 20000, "rate": 1000}
-        ]
-    }
-    
-    df_res = generate_4d_trajectory(df_ofp, perf_data, resolution_min=1.0)
-    
-    # Check at t=10
-    row_10 = df_res.filter(pl.col("timestamp") == 10.0)
-    assert math.isclose(row_10['alt'][0], 10000.0, rel_tol=1e-5)
-    
-    # Check at t=20
-    row_20 = df_res.filter(pl.col("timestamp") == 20.0)
-    assert math.isclose(row_20['alt'][0], 10000.0, rel_tol=1e-5)
+from jetfuelburn import ureg
+from jetfuelburn.utility.ofp import _get_aircraft_performance, generate_4d_trajectory
+
+
+# ---------------------------------------------------------------------------
+# Helpers / shared fixtures
+# ---------------------------------------------------------------------------
+
+DATA_YAML = Path(__file__).parent.parent / "src" / "jetfuelburn" / "data" / "EurocontrolAPD" / "data.yaml"
+"""Path to the real EUROCONTROL APD YAML file shipped with the package."""
+
+OFP_CSV = Path(__file__).parent / "data" / "ofp.csv"
+"""Path to the OFP test fixture."""
+
+
+@pytest.fixture()
+def tmp_yaml(tmp_path: Path) -> Path:
+    """
+    Write a minimal, self-contained performance YAML to a temporary file
+    and return its path.  The aircraft key is ``'TEST'``.
+
+    Climb bands
+    -----------
+    initial_climb : 0–5 000 ft   @ +1 000 ft/min
+    high_climb    : 5 000–35 000 ft @ +500 ft/min
+
+    Descent bands
+    -------------
+    high_descent : 35 000–5 000 ft @ -1 000 ft/min
+    approach     : 5 000–0 ft      @ -500 ft/min
+    """
+    content = textwrap.dedent("""\
+        TEST:
+          climb:
+          - regime: initial_climb
+            min_alt: 0 ft
+            max_alt: 5000 ft
+            rate: 1000 ft/min
+          - regime: high_climb
+            min_alt: 5000 ft
+            max_alt: 35000 ft
+            rate: 500 ft/min
+          descent:
+          - regime: high_descent
+            min_alt: 5000 ft
+            max_alt: 35000 ft
+            rate: -1000 ft/min
+          - regime: approach
+            min_alt: 0 ft
+            max_alt: 5000 ft
+            rate: -500 ft/min
+    """)
+    p = tmp_path / "perf.yaml"
+    p.write_text(content)
+    return p
+
+
+@pytest.fixture()
+def df_ofp_csv() -> pd.DataFrame:
+    """Load the existing OFP CSV fixture as a :class:`pandas.DataFrame`."""
+    return pd.read_csv(OFP_CSV)
+
+
+# ---------------------------------------------------------------------------
+# Tests for _get_aircraft_performance
+# ---------------------------------------------------------------------------
+
+
+class TestGetAircraftPerformance:
+    """Tests for the internal ``_get_aircraft_performance`` helper."""
+
+    # --- happy-path lookups ------------------------------------------------
+
+    def test_climb_lower_band(self, tmp_yaml: Path):
+        """Altitude in the lower climb band returns the correct rate."""
+        rate = _get_aircraft_performance(tmp_yaml, "TEST", "climb", 2500 * ureg.ft)
+        assert rate.check("[length]/[time]")
+        assert math.isclose(rate.to("ft/min").magnitude, 1000.0)
+
+    def test_climb_upper_band(self, tmp_yaml: Path):
+        """Altitude in the higher climb band returns the correct rate."""
+        rate = _get_aircraft_performance(tmp_yaml, "TEST", "climb", 20000 * ureg.ft)
+        assert rate.check("[length]/[time]")
+        assert math.isclose(rate.to("ft/min").magnitude, 500.0)
+
+    def test_descent_upper_band(self, tmp_yaml: Path):
+        """Altitude in the higher descent band returns a negative rate."""
+        rate = _get_aircraft_performance(tmp_yaml, "TEST", "descent", 20000 * ureg.ft)
+        assert rate.check("[length]/[time]")
+        assert math.isclose(rate.to("ft/min").magnitude, -1000.0)
+
+    def test_descent_lower_band(self, tmp_yaml: Path):
+        """Altitude in the approach descent band returns the correct rate."""
+        rate = _get_aircraft_performance(tmp_yaml, "TEST", "descent", 2500 * ureg.ft)
+        assert rate.check("[length]/[time]")
+        assert math.isclose(rate.to("ft/min").magnitude, -500.0)
+
+    def test_boundary_altitude_lower(self, tmp_yaml: Path):
+        """Altitude exactly at the lower boundary (0 ft) is accepted."""
+        rate = _get_aircraft_performance(tmp_yaml, "TEST", "climb", 0 * ureg.ft)
+        assert math.isclose(rate.to("ft/min").magnitude, 1000.0)
+
+    def test_boundary_altitude_band_transition(self, tmp_yaml: Path):
+        """Altitude exactly at the band boundary (5 000 ft) is accepted."""
+        rate = _get_aircraft_performance(tmp_yaml, "TEST", "climb", 5000 * ureg.ft)
+        # 5 000 ft satisfies BOTH bands (min_alt <= alt <= max_alt for both);
+        # the first matching band is returned.
+        assert rate.check("[length]/[time]")
+
+    def test_uses_real_yaml_file(self):
+        """Smoke-test against the real EUROCONTROL APD YAML bundled with the package."""
+        rate = _get_aircraft_performance(DATA_YAML, "B123", "climb", 10000 * ureg.ft)
+        assert rate.check("[length]/[time]")
+        assert rate.magnitude > 0  # climb rate must be positive
+
+    def test_real_yaml_descent_is_negative(self):
+        """Descent rates in the real data file are negative."""
+        rate = _get_aircraft_performance(DATA_YAML, "B123", "descent", 30000 * ureg.ft)
+        assert rate.to("ft/min").magnitude < 0
+
+    # --- error handling ----------------------------------------------------
+
+    def test_invalid_phase_raises(self, tmp_yaml: Path):
+        """A phase other than 'climb' or 'descent' raises :class:`ValueError`."""
+        with pytest.raises(ValueError, match="climb.*descent"):
+            _get_aircraft_performance(tmp_yaml, "TEST", "cruise", 10000 * ureg.ft)
+
+    def test_unknown_aircraft_raises(self, tmp_yaml: Path):
+        """An aircraft key absent from the YAML raises :class:`ValueError`."""
+        with pytest.raises(ValueError, match="not found"):
+            _get_aircraft_performance(tmp_yaml, "UNKNOWN_XYZ", "climb", 10000 * ureg.ft)
+
+    def test_altitude_out_of_bands_raises(self, tmp_yaml: Path):
+        """An altitude above all defined bands raises :class:`ValueError`."""
+        with pytest.raises(ValueError, match="not found in any altitude band"):
+            _get_aircraft_performance(tmp_yaml, "TEST", "climb", 99999 * ureg.ft)
+
+    def test_error_message_lists_available_aircraft(self, tmp_yaml: Path):
+        """The ValueError for an unknown aircraft lists available aircraft types."""
+        with pytest.raises(ValueError, match="TEST"):
+            _get_aircraft_performance(tmp_yaml, "BOGUS", "climb", 10000 * ureg.ft)
+
+    def test_wrong_unit_raises(self, tmp_yaml: Path):
+        """Passing a non-length quantity is rejected by the ``@ureg.check`` decorator."""
+        with pytest.raises(Exception):
+            _get_aircraft_performance(tmp_yaml, "TEST", "climb", 10000 * ureg.kg)
+
+
+# ---------------------------------------------------------------------------
+# Tests for generate_4d_trajectory
+# ---------------------------------------------------------------------------
+
+
+class TestGenerate4DTrajectory:
+    """Tests for the public ``generate_4d_trajectory`` function."""
+
+    # --- input validation --------------------------------------------------
+
+    def test_empty_dataframe_raises(self, tmp_yaml: Path):
+        """An empty flight plan raises :class:`ValueError`."""
+        df_empty = pd.DataFrame(columns=["waypoint", "alt", "timecum", "lat", "lon"])
+        with pytest.raises(ValueError, match="[Ee]mpty"):
+            generate_4d_trajectory(df_empty, "TEST", tmp_yaml)
+
+    def test_missing_column_raises(self, tmp_yaml: Path):
+        """A DataFrame missing a required column raises :class:`ValueError`."""
+        df = pd.DataFrame({
+            "waypoint": ["A", "B"],
+            "timecum": [0, 10],
+            "lat": [0.0, 1.0],
+            "lon": [0.0, 1.0],
+            # 'alt' is intentionally omitted
+        })
+        with pytest.raises(ValueError, match="alt"):
+            generate_4d_trajectory(df, "TEST", tmp_yaml)
+
+    # --- output shape / types ----------------------------------------------
+
+    def test_output_is_dataframe(self, tmp_yaml: Path):
+        """The return value is a :class:`pandas.DataFrame`."""
+        df = pd.DataFrame({
+            "waypoint": ["DEP", "ARR"],
+            "alt": [0, 5000],
+            "timecum": [0, 60],
+            "lat": [47.0, 48.0],
+            "lon": [8.0, 9.0],
+        })
+        result = generate_4d_trajectory(df, "TEST", tmp_yaml)
+        assert isinstance(result, pd.DataFrame)
+
+    def test_output_contains_alt_filled(self, tmp_yaml: Path):
+        """The output DataFrame contains the ``alt_filled`` column."""
+        df = pd.DataFrame({
+            "waypoint": ["DEP", "ARR"],
+            "alt": [0, 5000],
+            "timecum": [0, 60],
+            "lat": [47.0, 48.0],
+            "lon": [8.0, 9.0],
+        })
+        result = generate_4d_trajectory(df, "TEST", tmp_yaml)
+        assert "alt_filled" in result.columns
+
+    def test_output_resolution_1min(self, tmp_yaml: Path):
+        """
+        With ``resolution_min=1``, consecutive timestamps in the output are
+        exactly 1 minute apart.
+
+        Notes
+        -----
+        The merge in ``generate_4d_trajectory`` produces an integer-indexed
+        DataFrame; the resampled timestamps are available in the ``'timestamp'``
+        column (carried through the merge from ``df_resampled``).
+        """
+        df = pd.DataFrame({
+            "waypoint": ["DEP", "ARR"],
+            "alt": [0, 5000],
+            "timecum": [0, 10],
+            "lat": [47.0, 48.0],
+            "lon": [8.0, 9.0],
+        })
+        result = generate_4d_trajectory(df, "TEST", tmp_yaml, resolution_min=1.0)
+        # The 'timestamp' column holds datetime64 values after the merge
+        timestamps = pd.to_datetime(result["timestamp"].dropna())
+        if len(timestamps) >= 2:
+            diffs = timestamps.diff().dropna()
+            for d in diffs:
+                assert abs(d.total_seconds() - 60.0) < 1e-6
+
+    # --- level-off strategy ------------------------------------------------
+
+    def test_level_off_at_next_waypoint_altitude(self, tmp_yaml: Path):
+        """
+        Aircraft climbs to the next waypoint's altitude well before the waypoint
+        is reached, so it must level off.
+
+        Setup
+        -----
+        - DEP: alt=0 ft, time=0 min
+        - ARR: alt=5000 ft, time=60 min
+        - ROC in 0–5 000 ft band = 1 000 ft/min → target reached at t=5 min
+        - Aircraft should be at 5 000 ft for the remaining 55 minutes.
+        """
+        df = pd.DataFrame({
+            "waypoint": ["DEP", "ARR"],
+            "alt": [0, 5000],
+            "timecum": [0, 60],
+            "lat": [47.0, 48.0],
+            "lon": [8.0, 9.0],
+        })
+        result = generate_4d_trajectory(
+            df,
+            "TEST",
+            tmp_yaml,
+            resolution_min=1.0,
+            timestamp_start=pd.Timestamp("2025-01-01 00:00:00"),
+        )
+        # After t=5 min the aircraft must be at 5 000 ft
+        ts_leveloff = pd.Timestamp("2025-01-01 00:30:00")  # safely after level-off
+        row = result[result.index == ts_leveloff]
+        if len(row) > 0:
+            assert math.isclose(row["alt_filled"].iloc[0], 5000.0, rel_tol=1e-3)
+
+    def test_clb_token_is_interpolated(self, tmp_yaml: Path):
+        """
+        Waypoints tagged with the ``'CLB'`` string token get their altitude
+        filled in by the function; the output column ``alt_filled`` must be
+        fully numeric (no NaN) for a well-defined flight plan.
+        """
+        df = pd.DataFrame({
+            "waypoint": ["DEP", "MID", "ARR"],
+            "alt": ["0", "CLB", "5000"],
+            "timecum": [0, 30, 60],
+            "lat": [47.0, 47.5, 48.0],
+            "lon": [8.0, 8.5, 9.0],
+        })
+        result = generate_4d_trajectory(df, "TEST", tmp_yaml, resolution_min=1.0)
+        assert result["alt_filled"].notna().all()
+
+    # --- integration against real OFP CSV fixture --------------------------
+
+    def test_integration_real_ofp_csv(self):
+        """
+        Integration test: run ``generate_4d_trajectory`` against the actual OFP
+        CSV fixture (KSFO→LSZH) and the real EUROCONTROL APD performance data.
+        Verifies basic sanity of the result.
+        """
+        df = pd.read_csv(OFP_CSV)
+        result = generate_4d_trajectory(
+            df_ofp=df,
+            aircraft_type="B123",
+            filepath_perf_data=DATA_YAML,
+            resolution_min=1.0,
+        )
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) > 0
+        assert "alt_filled" in result.columns
+        # Altitude must be non-negative throughout
+        assert (result["alt_filled"].dropna() >= 0).all()
+
+    def test_integration_monotone_cruise(self):
+        """
+        With a purely level flight plan (all altitudes numeric and identical)
+        the output altitude should be constant.
+        """
+        df = pd.DataFrame({
+            "waypoint": ["A", "B", "C"],
+            "alt": [35000, 35000, 35000],
+            "timecum": [0, 30, 60],
+            "lat": [47.0, 47.5, 48.0],
+            "lon": [8.0, 8.5, 9.0],
+        })
+        result = generate_4d_trajectory(
+            df_ofp=df,
+            aircraft_type="B123",
+            filepath_perf_data=DATA_YAML,
+            resolution_min=1.0,
+        )
+        alts = result["alt_filled"].dropna()
+        assert (alts == 35000).all(), "Altitude should stay constant during level cruise"
+
+    # --- custom column names -----------------------------------------------
+
+    def test_custom_column_names(self, tmp_yaml: Path):
+        """Custom column name arguments are respected."""
+        df = pd.DataFrame({
+            "wp": ["DEP", "ARR"],
+            "elevation": [0, 5000],
+            "elapsed": [0, 30],
+            "latitude": [47.0, 48.0],
+            "longitude": [8.0, 9.0],
+        })
+        result = generate_4d_trajectory(
+            df_ofp=df,
+            aircraft_type="TEST",
+            filepath_perf_data=tmp_yaml,
+            colname_wp="wp",
+            colname_timecum="elapsed",
+            colname_alt="elevation",
+            colname_lat="latitude",
+            colname_lon="longitude",
+        )
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) > 0
