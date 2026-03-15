@@ -48,7 +48,8 @@ testing = [
 ]
 optionaldependencies = [
     "ipyleaflet",
-    "polars",
+    "pandas",
+    "pint-pandas",
 ]
 
 [tool.setuptools]

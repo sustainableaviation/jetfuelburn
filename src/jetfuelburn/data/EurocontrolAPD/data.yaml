@@ -7,32 +7,32 @@ B123:
     rate: 2979 ft/min
   - regime: climb_to_fl150
     description: Climb to FL150 (15000 ft)
-    min_alt: 5154 ft
+    min_alt: 4639 ft
     max_alt: 15157 ft
     rate: 2385 ft/min
   - regime: climb_to_fl240
     description: Climb to FL240 (24000 ft)
-    min_alt: 13701 ft
+    min_alt: 15157 ft
     max_alt: 25557 ft
     rate: 1944 ft/min
   - regime: mach_climb
     description: Mach climb segment
-    min_alt: 24933 ft
+    min_alt: 25557 ft
     max_alt: 43056 ft
     rate: 1371 ft/min
   descent:
   - regime: initial_descent
     description: Initial descent to FL240
-    min_alt: 40489 ft
-    max_alt: 26118 ft
+    max_alt: 40489 ft
+    min_alt: 25323 ft
     rate: -1059 ft/min
   - regime: descent_to_fl100
     description: Descent to FL100
-    min_alt: 25323 ft
-    max_alt: 10649 ft
+    max_alt: 25323 ft
+    min_alt: 10649 ft
     rate: -2720 ft/min
   - regime: approach
     description: Approach segment
-    min_alt: 9582 ft
-    max_alt: 0 ft
+    max_alt: 10649 ft
+    min_alt: 0 ft
     rate: -1379 ft/min
