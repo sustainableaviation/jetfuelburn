@@ -6,4 +6,4 @@
     pip install jetfuelburn[optionaldependencies]
     ```
 
-::: jetfuelburn.utility.mapping
+::: jetfuelburn.utility.ofp
