@@ -11,13 +11,14 @@ import math
 import yaml
 from pathlib import Path
 import pandas as pd
+from jetfuelburn import ureg
 
 
 def _get_aircraft_performance(
     filepath_perf_data: Path,
     aircraft_type: str,
     phase: str,
-    alt: float
+    alt: float | ureg.Quantity,
 ):
     with open(filepath_perf_data, "r") as f:
         data = yaml.safe_load(f)
@@ -25,34 +26,44 @@ def _get_aircraft_performance(
     if phase not in ("climb", "descent"):
         raise ValueError(f"Unknown flight phase: {phase!r}. Use 'climb' or 'descent'.")
 
-    try:
-        regimes = data[aircraft_type][phase]
-    except KeyError as e:
-        raise KeyError(f"Missing aircraft/phase in YAML: {aircraft_type}/{phase}") from e
+    if data[aircraft_type] is None:
+        raise ValueError(f"Aircraft type {aircraft_type!r} not found in {filepath_perf_data}")
 
-    df = pd.DataFrame(regimes)
-    required = {"regime", "min_alt", "max_alt", "rate"}
-    missing = required.difference(df.columns)
-    if missing:
-        raise KeyError(f"YAML missing keys for {aircraft_type}/{phase}: {sorted(missing)}")
+    if data[aircraft_type][phase] is None:
+        raise ValueError(f"Flight phase {phase!r} not found for aircraft type {aircraft_type!r} in {filepath_perf_data}")
 
-    # Normalize bounds so IntervalIndex is always increasing [low, high)
-    low = df[["min_alt", "max_alt"]].min(axis=1)
-    high = df[["min_alt", "max_alt"]].max(axis=1)
+    regimes = data[aircraft_type][phase]
 
-    if (low == high).any():
-        bad = df.loc[low == high, ["regime", "min_alt", "max_alt"]]
+    processed = []
+    for regime in regimes:
+        min_alt = ureg(str(regime["min_alt"])).to("ft")
+        max_alt = ureg(str(regime["max_alt"])).to("ft")
+        rate = ureg(str(regime["rate"])).to("ft/min")
+        
+        processed.append({
+            "regime": regime["regime"],
+            "min_alt": min(min_alt, max_alt),
+            "max_alt": max(min_alt, max_alt),
+            "rate": rate
+        })
+
+    df = pd.DataFrame(processed)
+
+    if (df["min_alt_ft"] == df["max_alt_ft"]).any():
+        bad = df.loc[df["min_alt_ft"] == df["max_alt_ft"], ["regime", "min_alt_ft", "max_alt_ft"]]
         raise ValueError(f"Degenerate altitude band(s) where min==max:\n{bad}")
 
-    idx = pd.IntervalIndex.from_arrays(low, high, closed="left")
+    idx = pd.IntervalIndex.from_arrays(df["min_alt_ft"], df["max_alt_ft"], closed="both")
 
-    # Basic overlap check (after normalization)
-    order = pd.DataFrame({"low": low, "high": high}).sort_values(["low", "high"]).reset_index(drop=True)
-    if (order["low"].iloc[1:].to_numpy() < order["high"].iloc[:-1].to_numpy()).any():
-        raise ValueError(f"Overlapping altitude bands detected in {aircraft_type}/{phase_key}")
+    mask = (df["min_alt_ft"] <= alt) & (alt <= df["max_alt_ft"])
+    if mask.any():
+        res_rate = df.loc[mask, "rate"].iloc[0]
+    else:
+            res_rate = 0 * ureg("ft/min")
+        return res_rate.to("ft/min")
 
-    rates = pd.Series(df["rate"].to_numpy(), index=idx)
-    names = pd.Series(df["regime"].to_numpy(), index=idx)
+    rates = pd.Series(df["rate"].tolist(), index=idx)
+    names = pd.Series(df["regime"].tolist(), index=idx)
     return rates, names
 
 def generate_4d_trajectory(
