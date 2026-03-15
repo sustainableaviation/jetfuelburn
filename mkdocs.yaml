@@ -26,7 +26,7 @@ nav:
     - Geography: 'api/geography.md'
     - Mapping: 'api/mapping.md'
     - OFP: 'api/ofp.md'
-    - Math: 'api/math.md'
+    - Math: 'api/mathematics.md'
   - API Reference (External):
     - EU Flight Emissions Label: 'api/eu_fel.md'
     - Reduced Order Models: 'api/reducedorder_external.md'
@@ -74,11 +74,11 @@ plugins:
   - markdown-exec
   - autorefs
   - include-markdown
-  - mkdocs-jupyter:
-      include: ["*.ipynb"]
-      execute: False
-      show_input: True
-      include_source: True
+#  - mkdocs-jupyter:
+#      include: ["docs/**/*.ipynb"]
+#      execute: False
+#      show_input: True
+#      include_source: True
   - mkdocs-pdf
   
 markdown_extensions:
