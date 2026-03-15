@@ -10,15 +10,16 @@ import math
 
 
 def generate_4d_trajectory(
-    df_ofp: pl.DataFrame, 
-    perf_data: dict, 
-    resolution_min: float = 1.0, 
-    strategy: str = "leveloff", 
+    df_ofp: pl.DataFrame,
+    perf_data: pl.DataFrame = None,
+    resolution_min: float = 1.0,
+    strategy: str = "leveloff",
     colname_wp: str = "waypoint",
     colname_timeto: str = "timeto",
     colname_alt: str = "alt",
     colname_lat: str = "lat",
     colname_lon: str = "lon",
+    timestamp_start: pd.Timestamp = pd.Timestamp('2025-01-01 00:00:00'),
 ) -> pl.DataFrame:
     r"""
     Generate a four-dimensional (4D) trajectory from a flight plan.
@@ -103,10 +104,27 @@ def generate_4d_trajectory(
 
     Parameters
     ----------
+    df_ofp : polars.DataFrame
+        Flight plan dataframe with columns corresponding to `colname_wp`, `colname_timeto`, corresponding
+        to time to navigate to the *next* waypoint, `colname_alt`, `colname_lat`, and `colname_lon`.
+    perf_data : polars.DataFrame
+        Aircraft performance dataframe with columns `state` (e.g., 'CLB', 'DES'), `min_alt`, `max_alt`, 
+        and `rate`.
+    resolution_min : float, default 1.0
+        The minimum time resolution in minutes for the generated trajectory.
+    strategy : str, default 'leveloff'
+        The altitude strategy to employ when arriving at altitude early.
+    colname_wp : str, default 'waypoint'
+    colname_timeto : str, default 'timeto'
+    colname_alt : str, default 'alt'
+    colname_lat : str, default 'lat'
+    colname_lon : str, default 'lon'
 
     Returns
     -------
     polars.DataFrame
+        A DataFrame with columns ``["timestamp", "lat", "lon", "alt"]`` at the requested
+        time resolution, with all null rows dropped.
 
     Warnings
     --------
@@ -129,176 +147,60 @@ def generate_4d_trajectory(
     If the rate of climb is such that the aircraft would reach the altitude defined at the next waypoint 
     before reaching the actual waypoint, the aircraft will level off at that altitude until the waypoint is reached.
     """
-    if strategy != "leveloff":
-        raise ValueError(f"Only strategy 'leveloff' implemented at the moment.")
+    if len(df_ofp) == 0:
+        raise ValueError("Empty flight plan provided.")
     for col in [colname_wp, colname_timeto, colname_alt, colname_lat, colname_lon]:
         if col not in df_ofp.columns:
-            raise ValueError(f"DataFrame is missing required column: {col}")
+            raise ValueError(f"Flight plan must contain column {col}.")
 
+    df = df_ofp.copy()
 
-    # Extract lists to iterate and mutate missing times
-    lats = df_ofp[colname_lat].to_list()
-    lons = df_ofp[colname_lon].to_list()
-    times = df_ofp[colname_timeto].to_list()
-    alts = df_ofp[colname_alt].to_list()
-    
-    # Helper to calculate time required to traverse from start_alt to end_alt
-    def calculate_transit_time(start_alt, end_alt):
-        if start_alt == end_alt:
-            return 0.0
-            
-        is_climb = end_alt > start_alt
-        brackets = perf_data.get('climb', []) if is_climb else perf_data.get('descent', [])
-        
-        # Sort brackets by min_alt ascending for climb, descending max_alt for descent
-        if is_climb:
-            brackets = sorted(brackets, key=lambda x: x['min_alt'])
-        else:
-            brackets = sorted(brackets, key=lambda x: x['max_alt'], reverse=True)
-            
-        total_time = 0.0
-        current_alt = start_alt
-        
-        for bracket in brackets:
-            b_min = bracket['min_alt']
-            b_max = bracket['max_alt']
-            rate = bracket['rate']
-            
-            if is_climb:
-                if current_alt >= end_alt:
-                    break
-                if current_alt < b_max and end_alt > b_min:
-                    # Segment within this bracket
-                    seg_start = max(current_alt, b_min)
-                    seg_end = min(end_alt, b_max)
-                    if seg_end > seg_start:
-                        total_time += (seg_end - seg_start) / rate
-                        current_alt = seg_end
-            else:
-                if current_alt <= end_alt:
-                    break
-                if current_alt > b_min and end_alt < b_max:
-                    # Segment within this bracket
-                    seg_start = min(current_alt, b_max)
-                    seg_end = max(end_alt, b_min)
-                    if seg_start > seg_end:
-                        total_time += (seg_start - seg_end) / rate
-                        current_alt = seg_end
-                        
-        # If we couldn't cover the full altitude difference (missing brackets), use last bracket's rate
-        if is_climb and current_alt < end_alt and len(brackets) > 0:
-            total_time += (end_alt - current_alt) / brackets[-1]['rate']
-        elif not is_climb and current_alt > end_alt and len(brackets) > 0:
-            total_time += (current_alt - end_alt) / brackets[-1]['rate']
-            
-        return total_time
+    """
+    add example here later    
+    """
 
-    # First pass: fill missing `timeto` values based on altitude changes
-    n = len(times)
-    # Ensure first point has time 0 if missing
-    if times[0] is None or (isinstance(times[0], float) and math.isnan(times[0])):
-        times[0] = 0.0
+    df['timecum'] = df['timeto'].cumsum()
+    df['timestamp'] = timestamp_start + pd.to_timedelta(df['timecum'], unit="min")
+    
+    df_resampled = df[['timestamp', colname_lat, colname_lon]].set_index("timestamp").resample("1min").mean()
+    df_resampled[[colname_lat, colname_lon]] = df_resampled[[colname_lat, colname_lon]].interpolate(method="time")
+    
+    df_merged = df_resampled.merge(
+        right = df,
+        left_on = df_resampled.index,
+        right_on = "timestamp",
+        how = "left"
+    )
 
-    # Fill forwards
-    for i in range(1, n):
-        if times[i] is None or (isinstance(times[i], float) and math.isnan(times[i])):
-            prev_time = times[i-1]
-            prev_alt = alts[i-1]
-            curr_alt = alts[i]
-            
-            # Use ROC/ROD to determine time needed
-            transit_time = calculate_transit_time(prev_alt, curr_alt)
-            times[i] = prev_time + transit_time
+    """
+    | alt  |
+    |------|
+    | 0    |
+    | CLB  |
+    | 1000 |
+    | 1000 |
+    | NaN  |
+    | DSC  |
+    | 500  |
 
-    # Now define the high resolution time axis
-    min_time = min(times)
-    max_time = max(times)
+    | alt | alt_min | alt_max |
+    |-----|---------|---------|
+    | 0   | 0       | 1000    |
+    | CLB | 0       | 1000    |
+    | 1000| 0       | 1000    |
+    | 1000| 1000    | 1000    |
+    | NaN | 1000    | 500     |
+    | DSC | 500     | 500     |
+    | 500 | 500     | 500     |
     
-    # generate high-res timestamps
-    high_res_time = []
-    curr_t = min_time
-    while curr_t <= max_time:
-        high_res_time.append(curr_t)
-        curr_t += resolution_min
-        
-    if not math.isclose(high_res_time[-1], max_time, abs_tol=1e-9) and high_res_time[-1] < max_time:
-        high_res_time.append(max_time)
-        
-    df_high_res = pl.DataFrame({"timestamp": high_res_time})
-    df_waypoints = pl.DataFrame({
-        "timestamp": times,
-        "lat": lats,
-        "lon": lons,
-        "wp_alt": alts
-    })
-    
-    # Outer join to align waypoints with high-res grid
-    df_merged = df_high_res.join(df_waypoints, on="timestamp", how="full", coalesce=True).sort("timestamp")
-    
-    # Interpolate lat and lon linearly
-    df_merged = df_merged.with_columns([
-        pl.col('lat').interpolate(),
-        pl.col('lon').interpolate()
-    ])
-    
-    # Second pass: compute altitude ensuring level-off behavior
-    # Instead of linearly interpolating alt from waypoint to waypoint over time,
-    # we simulate the climb/descent at each timestamp.
-    
-    merged_times = df_merged['timestamp'].to_list()
-    merged_alts = [None] * len(merged_times)
-    
-    wp_idx = 0
-    current_alt = alts[0]
-    merged_alts[0] = current_alt
-    
-    # Iterate through high-res grid and simulate aircraft vertical state
-    for i in range(1, len(merged_times)):
-        t_curr = merged_times[i]
-        dt = t_curr - merged_times[i-1]
-        
-        # Advance to next target waypoint
-        while wp_idx < len(times) - 1 and t_curr > times[wp_idx + 1] + 1e-9:
-            wp_idx += 1
-            
-        if wp_idx >= len(times) - 1:
-            merged_alts[i] = alts[-1]
-            continue
-            
-        target_alt = alts[wp_idx + 1]
-        
-        if current_alt == target_alt:
-             merged_alts[i] = current_alt
-             continue
-             
-        is_climb = target_alt > current_alt
-        brackets = perf_data.get('climb', []) if is_climb else perf_data.get('descent', [])
-        
-        # Find applicable rate for current_alt
-        applicable_rate = 0
-        for bracket in brackets:
-            if bracket['min_alt'] <= current_alt <= bracket['max_alt']:
-                applicable_rate = bracket['rate']
-                break
-                
-        if applicable_rate == 0 and len(brackets) > 0:
-             # Fallback
-             applicable_rate = brackets[-1]['rate'] if is_climb else brackets[0]['rate']
-             
-        # Calculate altitude change
-        alt_change = applicable_rate * dt
-        
-        if is_climb:
-            proposed_alt = current_alt + alt_change
-            current_alt = min(proposed_alt, target_alt) # clamp at target
-        else:
-            proposed_alt = current_alt - alt_change
-            current_alt = max(proposed_alt, target_alt) # clamp at target
-            
-        merged_alts[i] = current_alt
+    """
 
-    df_merged = df_merged.with_columns(pl.Series("alt", merged_alts))
-    
-    # Return correct schema
-    return df_merged.select(['timestamp', 'lat', 'lon', 'alt']).drop_nulls()
+    col_alt = pd.to_numeric(df_merged[colname_alt], errors='coerce')
+    prev_num = col_alt.ffill().shift(1)
+    next_num = col_alt.bfill().shift(-1)
+    df_merged['alt_min'] = prev_num.fillna(col_alt)
+    df_merged['alt_max'] = next_num.fillna(col_alt)
 
+    # df_merged.remove_columns(['timecum', 'alt_min', 'alt_max'])
+
+    return df_merged
