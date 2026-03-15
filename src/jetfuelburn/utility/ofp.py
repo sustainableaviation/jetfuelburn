@@ -13,7 +13,12 @@ def generate_4d_trajectory(
     df_ofp: pl.DataFrame, 
     perf_data: dict, 
     resolution_min: float = 1.0, 
-    strategy: str = "leveloff" 
+    strategy: str = "leveloff", 
+    colname_wp: str = "waypoint",
+    colname_timeto: str = "timeto",
+    colname_alt: str = "alt",
+    colname_lat: str = "lat",
+    colname_lon: str = "lon",
 ) -> pl.DataFrame:
     r"""
     Generate a four-dimensional (4D) trajectory from a flight plan.
@@ -26,33 +31,82 @@ def generate_4d_trajectory(
     If an aircraft climbs or descends and reaches the altitude of the next waypoint before arriving at the waypoint's
     target time (inferred or given), it will level off at that target altitude until the waypoint is reached.
 
+    ??? info "Data Pipeline"
+
+        | waypoint | timeto | alt    | ...   |
+        |----------|--------|--------|-------|
+        | WP1      | 5      | 0      | ...   |
+        | WP2      | 5      | CLB    | ...   |
+        | WP3      | 3      | 10000  | ...   |
+        | WP4      | ...    | 10000  | ...   |
+
+        gives two separate flight segments, one with a climb:
+
+        | flight segment | waypoint | timeto | alt    | ... |
+        |----------------|----------|--------|--------|-----|
+        | segment 1      | WP1      | 5      | 0      | ... |
+        | segment 1      | WP2      | 5      | CLB    | ... |
+        | segment 1      | WP3      | ...    | 10000  | ... |
+
+        and one with constant altitude:
+
+        | flight segment | waypoint | timeto | alt    | ... |
+        |----------------|----------|--------|--------|-----|
+        | segment 2      | WP3      | 3      | 10000  | ... |
+        | segment 2      | WP4      | ...    | 10000  | ... |
+
+        With the aircraft performance data:
+
+        | climb regime      | min_alt | max_alt | rate |
+        |-------------------|---------|---------|------|
+        | initial climb     | 0       | 5000    | 2000 |
+        | final climb       | 5000    | 15000   | 1000 |
+
+        The function determines first performs a linear interpolation between the waypoint:
+
+        | timestamp           | alt    | flight segment | ... |
+        |---------------------|--------|----------------|-----|
+        | 2025-01-01 00:00:00 | 0      | segment 1      | ... |
+        | 2025-01-01 00:01:00 | CLB    | segment 1      | ... |
+        | 2025-01-01 00:02:00 | CLB    | segment 1      | ... |
+        | 2025-01-01 00:03:00 | CLB    | segment 1      | ... |
+        | 2025-01-01 00:04:00 | CLB    | segment 1      | ... |
+        | 2025-01-01 00:05:00 | CLB    | segment 1      | ... |
+        | 2025-01-01 00:06:00 | CLB    | segment 1      | ... |
+        | 2025-01-01 00:07:00 | CLB    | segment 1      | ... |
+        | 2025-01-01 00:08:00 | CLB    | segment 1      | ... |
+        | 2025-01-01 00:09:00 | CLB    | segment 1      | ... |
+        | 2025-01-01 00:10:00 | 10000  | segment 1      | ... |
+        | 2025-01-01 00:11:00 | 10000  | segment 2      | ... |
+        | 2025-01-01 00:12:00 | 10000  | segment 2      | ... |
+        | 2025-01-01 00:13:00 | 10000  | segment 2      | ... |
+        
+        Next, the function determines the rate of climb (ROC) or rate of descent (ROD) for each segment
+        based on the aircraft performance data and the altitude change between the waypoints.
+
+        | timestamp           | alt    | flight segment | ... | comment                             |
+        |---------------------|--------|----------------|-----|-------------------------------------|
+        | 2025-01-01 00:00:00 | 0      | segment 1      | ... | initial altitude                    |
+        | 2025-01-01 00:01:00 | 2000   | segment 1      | ... | initial climb regime (2000 ft/min)  |
+        | 2025-01-01 00:02:00 | 4000   | segment 1      | ... | initial climb regime (2000 ft/min)  |
+        | 2025-01-01 00:03:00 | 6000   | segment 1      | ... | initial climb regime (2000 ft/min)  |
+        | 2025-01-01 00:04:00 | 7000   | segment 1      | ... | final climb regime (1000 ft/min)    |
+        | 2025-01-01 00:05:00 | 8000   | segment 1      | ... | final climb regime (1000 ft/min)    |
+        | 2025-01-01 00:06:00 | 9000   | segment 1      | ... | final climb regime (1000 ft/min)    |
+        | 2025-01-01 00:07:00 | 1000   | segment 1      | ... | level-off (reached target altitude) |
+        | 2025-01-01 00:08:00 | 10000  | segment 1      | ... | level-off (reached target altitude) |
+        | 2025-01-01 00:09:00 | 10000  | segment 1      | ... | level-off (reached target altitude) |
+        | 2025-01-01 00:10:00 | 10000  | segment 1      | ... | level-off (reached target altitude) |
+        | 2025-01-01 00:11:00 | 10000  | segment 2      | ... | level cruise                        |
+        | 2025-01-01 00:12:00 | 10000  | segment 2      | ... | level cruise                        | 
+        | 2025-01-01 00:13:00 | 10000  | segment 2      | ... | level cruise                        |
+
     Parameters
     ----------
-    df_ofp : polars.DataFrame
-        A flight plan containing at least the columns:
-        ['waypoint', 'lat', 'lon', 'timeto', 'altitude'] or ['waypoint', 'lat', 'lon', 'timeto', 'alt'].
-        'timeto' is the cumulative flight time in minutes from the origin.
-    perf_data : dict
-        A dictionary describing the rate of climb (ROC) and rate of descent (ROD)
-        (in feet per minute) for different altitude brackets. Example:
-        {
-            "climb": [
-                {"min_alt": 0, "max_alt": 10000, "rate": 800},
-                {"min_alt": 10000, "max_alt": 20000, "rate": 500}
-            ],
-            "descent": [
-                {"min_alt": 0, "max_alt": 10000, "rate": 1000},
-                {"min_alt": 10000, "max_alt": 20000, "rate": 800}
-            ]
-        }
-    resolution_min : float, optional
-        The time resolution in minutes for the output trajectory. Defaults to 1.0.
 
     Returns
     -------
     polars.DataFrame
-        A high-resolution trajectory DataFrame containing the columns:
-        ['timestamp', 'lat', 'lon', 'alt'].
 
     Warnings
     --------
@@ -75,25 +129,18 @@ def generate_4d_trajectory(
     If the rate of climb is such that the aircraft would reach the altitude defined at the next waypoint 
     before reaching the actual waypoint, the aircraft will level off at that altitude until the waypoint is reached.
     """
-
     if strategy != "leveloff":
         raise ValueError(f"Only strategy 'leveloff' implemented at the moment.")
-    
-    # Standardize altitude column name
-    alt_col = 'alt' if 'alt' in df_ofp.columns else 'altitude'
-    if alt_col not in df_ofp.columns:
-        raise ValueError("DataFrame must contain either an 'alt' or 'altitude' column.")
-        
-    req_cols = ['lat', 'lon', 'timeto', alt_col]
-    for col in req_cols:
+    for col in [colname_wp, colname_timeto, colname_alt, colname_lat, colname_lon]:
         if col not in df_ofp.columns:
             raise ValueError(f"DataFrame is missing required column: {col}")
-            
+
+
     # Extract lists to iterate and mutate missing times
-    lats = df_ofp['lat'].to_list()
-    lons = df_ofp['lon'].to_list()
-    times = df_ofp['timeto'].to_list()
-    alts = df_ofp[alt_col].to_list()
+    lats = df_ofp[colname_lat].to_list()
+    lons = df_ofp[colname_lon].to_list()
+    times = df_ofp[colname_timeto].to_list()
+    alts = df_ofp[colname_alt].to_list()
     
     # Helper to calculate time required to traverse from start_alt to end_alt
     def calculate_transit_time(start_alt, end_alt):
