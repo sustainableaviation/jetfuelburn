@@ -14,6 +14,12 @@ import pandas as pd
 from jetfuelburn import ureg
 
 
+@ureg.check(
+    None,
+    None,
+    None,
+    "[length]",
+)    
 def _get_aircraft_performance(
     filepath_perf_data: Path,
     aircraft_type: str,
@@ -26,45 +32,37 @@ def _get_aircraft_performance(
     if phase not in ("climb", "descent"):
         raise ValueError(f"Unknown flight phase: {phase!r}. Use 'climb' or 'descent'.")
 
-    if data[aircraft_type] is None:
-        raise ValueError(f"Aircraft type {aircraft_type!r} not found in {filepath_perf_data}")
-
-    if data[aircraft_type][phase] is None:
+    if aircraft_type not in data:
+        available = sorted(data.keys()) if data else []
+        raise ValueError(f"Aircraft type {aircraft_type!r} not found in {filepath_perf_data}. Available: {available}")
+    
+    aircraft_info = data[aircraft_type]
+    if aircraft_info is None or phase not in aircraft_info or aircraft_info[phase] is None:
         raise ValueError(f"Flight phase {phase!r} not found for aircraft type {aircraft_type!r} in {filepath_perf_data}")
 
-    regimes = data[aircraft_type][phase]
+    regimes = aircraft_info[phase]
 
     processed = []
-    for regime in regimes:
-        min_alt = ureg(str(regime["min_alt"])).to("ft")
-        max_alt = ureg(str(regime["max_alt"])).to("ft")
-        rate = ureg(str(regime["rate"])).to("ft/min")
+    for r in regimes:
+        min_alt = ureg(str(r["min_alt"])).to("ft")
+        max_alt = ureg(str(r["max_alt"])).to("ft")
+        rate = ureg(str(r["rate"])).to("ft/min")
         
+        if min_alt ==  max_alt:
+            raise ValueError(f"Degenerate altitude band (min == max) in regime {r.get('regime')!r}: {min_alt}")
+
         processed.append({
-            "regime": regime["regime"],
+            "regime": r.get("regime"),
             "min_alt": min(min_alt, max_alt),
             "max_alt": max(min_alt, max_alt),
             "rate": rate
         })
+        
+    for p in processed:
+        if p["min_alt"] <= alt <= p["max_alt"]:
+            return p["rate"]
+    raise ValueError(f"Altitude {alt} not found in any altitude band for aircraft type {aircraft_type!r} in {filepath_perf_data}")
 
-    df = pd.DataFrame(processed)
-
-    if (df["min_alt_ft"] == df["max_alt_ft"]).any():
-        bad = df.loc[df["min_alt_ft"] == df["max_alt_ft"], ["regime", "min_alt_ft", "max_alt_ft"]]
-        raise ValueError(f"Degenerate altitude band(s) where min==max:\n{bad}")
-
-    idx = pd.IntervalIndex.from_arrays(df["min_alt_ft"], df["max_alt_ft"], closed="both")
-
-    mask = (df["min_alt_ft"] <= alt) & (alt <= df["max_alt_ft"])
-    if mask.any():
-        res_rate = df.loc[mask, "rate"].iloc[0]
-    else:
-            res_rate = 0 * ureg("ft/min")
-        return res_rate.to("ft/min")
-
-    rates = pd.Series(df["rate"].tolist(), index=idx)
-    names = pd.Series(df["regime"].tolist(), index=idx)
-    return rates, names
 
 def generate_4d_trajectory(
     df_ofp: pl.DataFrame,
