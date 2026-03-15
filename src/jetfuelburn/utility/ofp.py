@@ -1,40 +1,83 @@
-import polars as pl
+# %%
+try:
+    import polars as pl
+except ImportError as e:
+    raise ImportError(
+        f"Optional dependency missing: {e}. "
+        "Install all required packages with: pip install jetfuelburn[optionaldependencies]"
+    ) from e
 import math
 
-def generate_4d_trajectory(df_ofp: pl.DataFrame, perf_data: dict, resolution_min: float = 1.0) -> pl.DataFrame:
-    """
-    Generate a four-dimensional (4D) trajectory from a flight plan using aircraft climb/descent performance data.
-    
+
+def generate_4d_trajectory(
+    df_ofp: pl.DataFrame, 
+    perf_data: dict, 
+    resolution_min: float = 1.0, 
+    strategy: str = "leveloff" 
+) -> pl.DataFrame:
+    r"""
+    Generate a four-dimensional (4D) trajectory from a flight plan.
+
     The function interpolates positions (lat/lon) and altitudes (alt) mapping to a high-resolution timestamp
     given the times to arrive at specific waypoints. Missing `timeto` values are inferred primarily by utilizing
     the vertical rates defined in `perf_data` to calculate the required time to bridge altitude changes between
     known points.
-    
+
     If an aircraft climbs or descends and reaches the altitude of the next waypoint before arriving at the waypoint's
     target time (inferred or given), it will level off at that target altitude until the waypoint is reached.
 
-    Args:
-        df_ofp (pl.DataFrame): A Polars DataFrame flight plan containing at least the columns: 
-            ['waypoint', 'lat', 'lon', 'timeto', 'altitude'] or ['waypoint', 'lat', 'lon', 'timeto', 'alt'].
-            'timeto' is the cumulative flight time in minutes from the origin. 
-        perf_data (dict): A dictionary describing the rate of climb (ROC) and rate of descent (ROD)
-            (in feet per minute) for different altitude brackets. Example:
-            {
-                "climb": [
-                    {"min_alt": 0, "max_alt": 10000, "rate": 800},
-                    {"min_alt": 10000, "max_alt": 20000, "rate": 500}
-                ],
-                "descent": [
-                    {"min_alt": 0, "max_alt": 10000, "rate": 1000},
-                    {"min_alt": 10000, "max_alt": 20000, "rate": 800}
-                ]
-            }
-        resolution_min (float, optional): The time resolution in minutes for the output trajectory. Defaults to 1.0.
+    Parameters
+    ----------
+    df_ofp : polars.DataFrame
+        A flight plan containing at least the columns:
+        ['waypoint', 'lat', 'lon', 'timeto', 'altitude'] or ['waypoint', 'lat', 'lon', 'timeto', 'alt'].
+        'timeto' is the cumulative flight time in minutes from the origin.
+    perf_data : dict
+        A dictionary describing the rate of climb (ROC) and rate of descent (ROD)
+        (in feet per minute) for different altitude brackets. Example:
+        {
+            "climb": [
+                {"min_alt": 0, "max_alt": 10000, "rate": 800},
+                {"min_alt": 10000, "max_alt": 20000, "rate": 500}
+            ],
+            "descent": [
+                {"min_alt": 0, "max_alt": 10000, "rate": 1000},
+                {"min_alt": 10000, "max_alt": 20000, "rate": 800}
+            ]
+        }
+    resolution_min : float, optional
+        The time resolution in minutes for the output trajectory. Defaults to 1.0.
 
-    Returns:
-        pl.DataFrame: A high-resolution trajectory DataFrame containing the columns:
-            ['timestamp', 'lat', 'lon', 'alt']
+    Returns
+    -------
+    polars.DataFrame
+        A high-resolution trajectory DataFrame containing the columns:
+        ['timestamp', 'lat', 'lon', 'alt'].
+
+    Warnings
+    --------
+    This utility function is not intended for production use.
+    The four-dimensional trajectory generated is a very crude approximation of the actual trajectory.
+
+    Notes
+    -----
+    The function implements a `leveloff` strategy by default:
+    If the aircraft reaches the altitude of the next waypoint before arriving at the waypoint's
+    target time (or distance), it will level off at that target altitude until the waypoint is reached.
+
+    ![Flight Plan Diagram](../_static/ofp_1.svg)
+
+    **Figure 1:** Diagrammatic representation of the `leveloff` strategy. 
+    Shown are two different _climb regimes_, which describe the altitude-dependent 
+    rate of climb (ROC) and rate of descent (ROD) of an aircraft. This could, for instance, 
+    be infered from the [EUROCONTROL Aircraft Performance Database](https://learningzone.eurocontrol.int/ilp/customs/ATCPFDB/details.aspx?ICAO=A359). 
+    In this representation, the angle of the trajectory corresponds to the rate of climb (ROC). 
+    If the rate of climb is such that the aircraft would reach the altitude defined at the next waypoint 
+    before reaching the actual waypoint, the aircraft will level off at that altitude until the waypoint is reached.
     """
+
+    if strategy != "leveloff":
+        raise ValueError(f"Only strategy 'leveloff' implemented at the moment.")
     
     # Standardize altitude column name
     alt_col = 'alt' if 'alt' in df_ofp.columns else 'altitude'
