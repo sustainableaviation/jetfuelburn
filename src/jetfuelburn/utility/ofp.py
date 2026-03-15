@@ -1,6 +1,7 @@
 # %%
 try:
-    import polars as pl
+    import pandas as pd
+    import pint_pandas
 except ImportError as e:
     raise ImportError(
         f"Optional dependency missing: {e}. "
@@ -10,7 +11,6 @@ except ImportError as e:
 import math
 import yaml
 from pathlib import Path
-import pandas as pd
 from jetfuelburn import ureg
 
 
