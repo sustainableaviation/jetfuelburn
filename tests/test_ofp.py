@@ -226,7 +226,7 @@ class TestGenerate4DTrajectory:
             "lat": [47.0, 48.0],
             "lon": [8.0, 9.0],
         })
-        result = generate_4d_trajectory(df, "TEST", tmp_yaml, resolution_min=1.0)
+        result = generate_4d_trajectory(df, "TEST", tmp_yaml, time_resolution=1 * ureg.minute)
         # The 'timestamp' column holds datetime64 values after the merge
         timestamps = pd.to_datetime(result["timestamp"].dropna())
         if len(timestamps) >= 2:
@@ -239,32 +239,35 @@ class TestGenerate4DTrajectory:
     def test_level_off_at_next_waypoint_altitude(self, tmp_yaml: Path):
         """
         Aircraft climbs to the next waypoint's altitude well before the waypoint
-        is reached, so it must level off.
+        is reached (CLB waypoint), so it must level off.
 
         Setup
         -----
-        - DEP: alt=0 ft, time=0 min
-        - ARR: alt=5000 ft, time=60 min
-        - ROC in 0–5 000 ft band = 1 000 ft/min → target reached at t=5 min
-        - Aircraft should be at 5 000 ft for the remaining 55 minutes.
+        - DEP  : alt=0 ft,    time=0 min  (known)
+        - MID  : alt=CLB,     time=60 min (unknown → filled by level-off logic)
+        - ARR  : alt=5000 ft, time=120 min (known)
+
+        ROC in the 0–5 000 ft band = 1 000 ft/min → the aircraft reaches
+        5 000 ft after 5 minutes. The MID waypoint is 60 minutes away, so
+        the filled altitude at MID must be 5 000 ft (level-off cap).
         """
         df = pd.DataFrame({
-            "waypoint": ["DEP", "ARR"],
-            "alt": [0, 5000],
-            "timecum": [0, 60],
-            "lat": [47.0, 48.0],
-            "lon": [8.0, 9.0],
+            "waypoint": ["DEP", "MID", "ARR"],
+            "alt": ["0", "CLB", "5000"],
+            "timecum": [0, 60, 120],
+            "lat": [47.0, 47.5, 48.0],
+            "lon": [8.0, 8.5, 9.0],
         })
         result = generate_4d_trajectory(
             df,
             "TEST",
             tmp_yaml,
-            resolution_min=1.0,
+            time_resolution=1 * ureg.minute,
             timestamp_start=pd.Timestamp("2025-01-01 00:00:00"),
         )
-        # After t=5 min the aircraft must be at 5 000 ft
-        ts_leveloff = pd.Timestamp("2025-01-01 00:30:00")  # safely after level-off
-        row = result[result.index == ts_leveloff]
+        # At t=30 min (well after the 5-min level-off point) altitude must be 5 000 ft
+        ts_check = pd.Timestamp("2025-01-01 00:30:00")
+        row = result[result["timestamp"] == ts_check]
         if len(row) > 0:
             assert math.isclose(row["alt_filled"].iloc[0], 5000.0, rel_tol=1e-3)
 
@@ -281,7 +284,7 @@ class TestGenerate4DTrajectory:
             "lat": [47.0, 47.5, 48.0],
             "lon": [8.0, 8.5, 9.0],
         })
-        result = generate_4d_trajectory(df, "TEST", tmp_yaml, resolution_min=1.0)
+        result = generate_4d_trajectory(df, "TEST", tmp_yaml, time_resolution=1 * ureg.minute)
         assert result["alt_filled"].notna().all()
 
     # --- integration against real OFP CSV fixture --------------------------
@@ -297,7 +300,7 @@ class TestGenerate4DTrajectory:
             df_ofp=df,
             aircraft_type="B123",
             filepath_perf_data=DATA_YAML,
-            resolution_min=1.0,
+            time_resolution=1 * ureg.minute,
         )
         assert isinstance(result, pd.DataFrame)
         assert len(result) > 0
@@ -321,7 +324,7 @@ class TestGenerate4DTrajectory:
             df_ofp=df,
             aircraft_type="B123",
             filepath_perf_data=DATA_YAML,
-            resolution_min=1.0,
+            time_resolution=1 * ureg.minute,
         )
         alts = result["alt_filled"].dropna()
         assert (alts == 35000).all(), "Altitude should stay constant during level cruise"

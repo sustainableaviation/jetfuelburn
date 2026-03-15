@@ -66,6 +66,20 @@ def _get_aircraft_performance(
     ValueError
         If *alt* does not fall within any altitude band defined for the aircraft
         and flight phase.
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    
+    jetfuelburn._get_aircraft_performance(
+        jetfuelburn.data.EurocontrolAPD.data.yaml,
+        "B123",
+        "climb",
+        30000 * ureg.ft,
+    )
+    ```
     """
     with open(filepath_perf_data, "r") as f:
         data = yaml.safe_load(f)
@@ -140,9 +154,10 @@ def generate_4d_trajectory(
     filepath_perf_data : Path
         Path to the YAML performance data file; forwarded to
         :func:`_get_aircraft_performance`.
-    time_resolution : float, optional
-        Resampling resolution in minutes. The output trajectory is resampled
-        to this time resolution using linear interpolation. Default is ``1.0``.
+    time_resolution : pint.Quantity, optional
+        Resampling resolution as a Pint time quantity (e.g. ``1 * ureg.minute``).
+        The output trajectory is resampled to this resolution using linear
+        interpolation. Default is ``1 * ureg.minute``.
     strategy : str, optional
         Altitude interpolation strategy. Currently only ``'leveloff'`` is
         implemented (default). With this strategy the aircraft levels off at
@@ -160,6 +175,10 @@ def generate_4d_trajectory(
         Name of the latitude column in *df_ofp*. Default ``'lat'``.
     colname_lon : str, optional
         Name of the longitude column in *df_ofp*. Default ``'lon'``.
+    unit_alt : str, optional
+        Pint-compatible unit string for altitude values in *df_ofp* and in the
+        output (e.g. ``'ft'``, ``'m'``). Altitude columns are read and written
+        as plain :class:`float` in this unit. Default is ``'ft'``.
     timestamp_start : pd.Timestamp, optional
         UTC departure timestamp. Cumulative flight times from *colname_timecum*
         are added as :class:`pandas.Timedelta` offsets to this value to produce
@@ -201,6 +220,27 @@ def generate_4d_trajectory(
     In this representation, the angle of the trajectory corresponds to the rate of climb (ROC). 
     If the rate of climb is such that the aircraft would reach the altitude defined at the next waypoint 
     before reaching the actual waypoint, the aircraft will level off at that altitude until the waypoint is reached.
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    df_ofp = pd.DataFrame({
+        "waypoint": ["DEP", "MID", "ARR"],
+        "alt": [0, "CLB", 5000],
+        "timecum": [0, 60, 120],
+        "lat": [47.0, 47.5, 48.0],
+        "lon": [8.0, 8.5, 9.0],
+    })
+    result = jetfuelburn.generate_4d_trajectory(
+        df_ofp,
+        "B123",
+        jetfuelburn.DATA_YAML,
+        time_resolution=1 * ureg.minute,
+        timestamp_start=pd.Timestamp("2025-01-01 00:00:00"),
+    )
+    ```
     """
     if len(df_ofp) == 0:
         raise ValueError("Empty flight plan provided.")
@@ -209,10 +249,6 @@ def generate_4d_trajectory(
             raise ValueError(f"Flight plan must contain column {col}.")
 
     df = df_ofp.copy()
-
-    """
-    add example here later
-    """
 
     df['timestamp'] = timestamp_start + pd.to_timedelta(df[colname_timecum], unit="min")
 
@@ -236,8 +272,7 @@ def generate_4d_trajectory(
     | DSC  | 500      |
     | 500  | 500      |
     """
-    df['alt_filled'] = pd.to_numeric(df[colname_alt], errors='coerce')
-    df['alt_filled'] = df['alt_filled'].astype(f'pint[{unit_alt}]')
+    df['alt_filled'] = pd.to_numeric(df[colname_alt], errors='coerce').astype('float64')
     next_num = df['alt_filled'].bfill().shift(-1)
     df['next_alt'] = next_num.fillna(df['alt_filled'].ffill())
 
@@ -246,8 +281,7 @@ def generate_4d_trajectory(
             continue
 
         segment_initial_alt = df.at[idx - 1, 'alt_filled']
-        segment_time = (df.at[idx, 'timestamp'] - df.at[idx - 1, 'timestamp']).total_seconds() / 60
-        segment_time = segment_time * ureg.minute
+        segment_time = (df.at[idx, 'timestamp'] - df.at[idx - 1, 'timestamp']).total_seconds() / 60 * ureg.minute
 
         if pd.isnull(row['alt_filled']):
             if segment_initial_alt < row['next_alt']: # climb segment
@@ -258,9 +292,9 @@ def generate_4d_trajectory(
                         filepath_perf_data=filepath_perf_data,
                         aircraft_type=aircraft_type,
                         phase="climb",
-                        alt=segment_initial_alt,
+                        alt=segment_initial_alt * ureg(unit_alt),
                     )
-                    segment_final_alt = segment_initial_alt + rate_of_climb * segment_time
+                    segment_final_alt = (segment_initial_alt * ureg(unit_alt) + rate_of_climb * segment_time).to(unit_alt).magnitude
                     if segment_final_alt > row['next_alt']: # level-off
                         df.at[idx, 'alt_filled'] = row['next_alt']
                     else:
@@ -273,9 +307,9 @@ def generate_4d_trajectory(
                         filepath_perf_data=filepath_perf_data,
                         aircraft_type=aircraft_type,
                         phase="descent",
-                        alt=segment_initial_alt,
+                        alt=segment_initial_alt * ureg(unit_alt),
                     )
-                    segment_final_alt = segment_initial_alt + rate_of_descent * segment_time
+                    segment_final_alt = (segment_initial_alt * ureg(unit_alt) + rate_of_descent * segment_time).to(unit_alt).magnitude
                     if segment_final_alt < row['next_alt']: # level-off
                         df.at[idx, 'alt_filled'] = row['next_alt']
                     else:
@@ -284,10 +318,11 @@ def generate_4d_trajectory(
                 df.at[idx, 'alt_filled'] = row['next_alt']
     
     list_interpolation_columns = ['alt_filled', colname_lat, colname_lon]
-    df_resampled = df[['timestamp'] + list_interpolation_columns].set_index("timestamp").resample("1min").mean()
+    resample_rule = f"{int(time_resolution.to('min').magnitude)}min"
+    df_resampled = df[['timestamp'] + list_interpolation_columns].set_index("timestamp").resample(resample_rule).mean()
     df_resampled[list_interpolation_columns] = df_resampled[list_interpolation_columns].interpolate(method="time")
     
-    df.drop(columns=list_interpolation_columns, inplace=True)
+    df.drop(columns=list_interpolation_columns + ['next_alt'], inplace=True)
     df_merged = df_resampled.merge(
         right = df,
         left_on = df_resampled.index,

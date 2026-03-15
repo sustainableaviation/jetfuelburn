@@ -8,7 +8,7 @@ def _calculate_atmospheric_temperature(altitude):
     Computes the air temperature as a function of altitude up to 20,000 meters
     based on the International Standard Atmosphere (ISA):
 
-    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/International_Standard_Atmosphere.svg" width="250">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/International_Standard_Atmosphere.svg" width="250" />
 
     Temperature in the Troposphere (<= 11,000 m) is calculated according to
 
@@ -77,7 +77,7 @@ def _calculate_atmospheric_density(altitude):
     Computes the air density as a function of altitude up to 20,000 meters
     based on the International Standard Atmosphere (ISA):
 
-    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/International_Standard_Atmosphere.svg" width="250">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/International_Standard_Atmosphere.svg" width="250" />
 
     Density in the Troposphere (<= 11,000 m) is calculated according to
 
