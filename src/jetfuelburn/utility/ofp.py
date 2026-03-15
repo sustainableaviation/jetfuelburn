@@ -25,6 +25,48 @@ def _get_aircraft_performance(
     phase: str,
     alt: float | ureg.Quantity,
 ):
+    """
+    Look up the climb or descent rate for a given aircraft type and altitude.
+
+    Reads a YAML performance data file and returns the rate of climb (positive)
+    or rate of descent (negative) applicable to the supplied altitude, according
+    to the altitude-band regime defined for the aircraft and flight phase.
+
+    Parameters
+    ----------
+    filepath_perf_data : Path
+        Path to the YAML file containing aircraft performance data.
+        The file must follow the schema used by the EUROCONTROL APD dataset
+        (see `src/jetfuelburn/data/EurocontrolAPD/data.yaml`).
+    aircraft_type : str
+        ICAO aircraft type designator (e.g. ``'B123'``), matching a top-level
+        key in the YAML file.
+    phase : str
+        Flight phase; must be either ``'climb'`` or ``'descent'``.
+    alt : pint.Quantity
+        Current altitude with a length dimension (e.g. ``30000 * ureg.ft``).
+        The ``@ureg.check`` decorator enforces dimensional correctness.
+
+    Returns
+    -------
+    pint.Quantity
+        Rate of climb or descent in ``ft/min``.  Climb rates are positive;
+        descent rates are negative.
+
+    Raises
+    ------
+    ValueError
+        If *phase* is not ``'climb'`` or ``'descent'``.
+    ValueError
+        If *aircraft_type* is not present in the YAML file.
+    ValueError
+        If the flight phase is missing for the given *aircraft_type*.
+    ValueError
+        If a regime in the YAML file has ``min_alt == max_alt`` (degenerate band).
+    ValueError
+        If *alt* does not fall within any altitude band defined for the aircraft
+        and flight phase.
+    """
     with open(filepath_perf_data, "r") as f:
         data = yaml.safe_load(f)
 
@@ -67,13 +109,14 @@ def generate_4d_trajectory(
     df_ofp: pd.DataFrame,
     aircraft_type: str,
     filepath_perf_data: Path,
-    resolution_min: float = 1.0,
+    time_resolution: ureg.Quantity = 1.0 * ureg.minute,
     strategy: str = "leveloff",
     colname_wp: str = "waypoint",
     colname_timecum: str = "timecum",
-    colname_alt: str = "alt",
     colname_lat: str = "lat",
     colname_lon: str = "lon",
+    colname_alt: str = "alt",
+    unit_alt: str = "ft",
     timestamp_start: pd.Timestamp = pd.Timestamp('2025-01-01 00:00:00'),
 ) -> pd.DataFrame:
     r"""
@@ -81,6 +124,62 @@ def generate_4d_trajectory(
 
     If an aircraft climbs or descends and reaches the altitude of the next waypoint before arriving at the waypoint's
     target time (inferred or given), it will level off at that target altitude until the waypoint is reached.
+
+    Parameters
+    ----------
+    df_ofp : pd.DataFrame
+        Operational flight plan (OFP) as a :class:`pandas.DataFrame`.
+        Must contain at minimum the columns named by *colname_wp*,
+        *colname_timecum*, *colname_alt*, *colname_lat*, and *colname_lon*.
+        The altitude column may contain numeric values (in feet) **or** the
+        string tokens ``'CLB'`` / ``'DSC'`` for climb/descent waypoints whose
+        exact altitude is not yet known.
+    aircraft_type : str
+        ICAO aircraft type designator (e.g. ``'B123'``), passed directly to
+        :func:`_get_aircraft_performance`.
+    filepath_perf_data : Path
+        Path to the YAML performance data file; forwarded to
+        :func:`_get_aircraft_performance`.
+    time_resolution : float, optional
+        Resampling resolution in minutes. The output trajectory is resampled
+        to this time resolution using linear interpolation. Default is ``1.0``.
+    strategy : str, optional
+        Altitude interpolation strategy. Currently only ``'leveloff'`` is
+        implemented (default). With this strategy the aircraft levels off at
+        the target altitude of the next waypoint if it would otherwise
+        overshoot.
+    colname_wp : str, optional
+        Name of the waypoint-identifier column in *df_ofp*. Default ``'waypoint'``.
+    colname_timecum : str, optional
+        Name of the cumulative flight time column (in minutes) in *df_ofp*.
+        Default ``'timecum'``.
+    colname_alt : str, optional
+        Name of the altitude column (in feet, or ``'CLB'``/``'DSC'`` tokens)
+        in *df_ofp*. Default ``'alt'``.
+    colname_lat : str, optional
+        Name of the latitude column in *df_ofp*. Default ``'lat'``.
+    colname_lon : str, optional
+        Name of the longitude column in *df_ofp*. Default ``'lon'``.
+    timestamp_start : pd.Timestamp, optional
+        UTC departure timestamp. Cumulative flight times from *colname_timecum*
+        are added as :class:`pandas.Timedelta` offsets to this value to produce
+        absolute timestamps. Default is ``pd.Timestamp('2025-01-01 00:00:00')``.
+
+    Returns
+    -------
+    pd.DataFrame
+        Resampled 4-D trajectory merged with the original OFP data.
+        The DataFrame is indexed by the resampling timestamps and contains
+        (at minimum) the interpolated columns ``alt_filled``, *colname_lat*,
+        and *colname_lon*.
+
+    Raises
+    ------
+    ValueError
+        If *df_ofp* is empty.
+    ValueError
+        If any of the required columns (*colname_wp*, *colname_timecum*,
+        *colname_alt*, *colname_lat*, *colname_lon*) is missing from *df_ofp*.
 
     Warnings
     --------
@@ -138,6 +237,7 @@ def generate_4d_trajectory(
     | 500  | 500      |
     """
     df['alt_filled'] = pd.to_numeric(df[colname_alt], errors='coerce')
+    df['alt_filled'] = df['alt_filled'].astype(f'pint[{unit_alt}]')
     next_num = df['alt_filled'].bfill().shift(-1)
     df['next_alt'] = next_num.fillna(df['alt_filled'].ffill())
 
@@ -147,6 +247,7 @@ def generate_4d_trajectory(
 
         segment_initial_alt = df.at[idx - 1, 'alt_filled']
         segment_time = (df.at[idx, 'timestamp'] - df.at[idx - 1, 'timestamp']).total_seconds() / 60
+        segment_time = segment_time * ureg.minute
 
         if pd.isnull(row['alt_filled']):
             if segment_initial_alt < row['next_alt']: # climb segment
@@ -157,8 +258,8 @@ def generate_4d_trajectory(
                         filepath_perf_data=filepath_perf_data,
                         aircraft_type=aircraft_type,
                         phase="climb",
-                        alt=segment_initial_alt * ureg.ft,
-                    ).magnitude
+                        alt=segment_initial_alt,
+                    )
                     segment_final_alt = segment_initial_alt + rate_of_climb * segment_time
                     if segment_final_alt > row['next_alt']: # level-off
                         df.at[idx, 'alt_filled'] = row['next_alt']
@@ -172,8 +273,8 @@ def generate_4d_trajectory(
                         filepath_perf_data=filepath_perf_data,
                         aircraft_type=aircraft_type,
                         phase="descent",
-                        alt=segment_initial_alt * ureg.ft,
-                    ).magnitude
+                        alt=segment_initial_alt,
+                    )
                     segment_final_alt = segment_initial_alt + rate_of_descent * segment_time
                     if segment_final_alt < row['next_alt']: # level-off
                         df.at[idx, 'alt_filled'] = row['next_alt']
