@@ -46,7 +46,7 @@ def _interpolate(
     -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
-    from jetfuelburn.utility.math import _interpolate
+    from jetfuelburn.utility.mathematics import _interpolate
     _interpolate(
         x_val=5,
         x_list=[0, 10, 20],
