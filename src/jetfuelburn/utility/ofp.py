@@ -1,7 +1,6 @@
 # %%
 try:
     import pandas as pd
-    import pint_pandas
 except ImportError as e:
     raise ImportError(
         f"Optional dependency missing: {e}. "
@@ -66,7 +65,8 @@ def _get_aircraft_performance(
 
 def generate_4d_trajectory(
     df_ofp: pl.DataFrame,
-    perf_data: pl.DataFrame = None,
+    aircraft_type: str,
+    filepath_perf_data: Path,
     resolution_min: float = 1.0,
     strategy: str = "leveloff",
     colname_wp: str = "waypoint",
@@ -263,7 +263,41 @@ def generate_4d_trajectory(
 
     # df_merged.remove_columns(['timecum', 'alt_min', 'alt_max'])
 
-    #for idx, row in df_merged.iterrows():
-        
-
+    for idx, row in df_merged.iterrows():
+        if idx == 0 or idx == len(df_merged) - 1:
+            pass
+        elif pd.api.types.is_number(row[col_alt]):
+            last_alt = df_merged.loc[idx - 1, col_alt]
+            if row['alt_min'] < row['alt_max']: # climb segment
+                if last_alt == row['alt_max']: # level-off
+                    row[col_alt] = row['alt_max']
+                else:
+                    rate_of_climb = _get_aircraft_performance(
+                        filepath_perf_data=filepath_perf_data,
+                        aircraft_type=aircraft_type,
+                        state="climb",
+                        alt=last_alt,
+                    )
+                    current_alt = rate_of_climb * resolution_min
+                    if current_alt > row['alt_max']: # level-off
+                        row[col_alt] = row['alt_max']
+                    else:
+                        row[col_alt] = last_alt + current_alt
+            elif row['alt_min'] > row['alt_max']: # descent segment
+                if last_alt == row['alt_min']: # level-off
+                    row[col_alt] = row['alt_min']
+                else:
+                    rate_of_descent = _get_aircraft_performance(
+                        filepath_perf_data=filepath_perf_data,
+                        aircraft_type=aircraft_type,
+                        state="descent",
+                        alt=last_alt,
+                    )
+                    current_alt = rate_of_descent * resolution_min
+                    if current_alt < row['alt_min']: # level-off
+                        row[col_alt] = row['alt_min']
+                    else:
+                        row[col_alt] = last_alt + current_alt
+                        
+                        
     return df_merged
