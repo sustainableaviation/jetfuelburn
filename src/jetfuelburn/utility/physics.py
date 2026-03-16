@@ -1,14 +1,17 @@
 import math
+import pint
 from jetfuelburn import ureg
 
 
 @ureg.check("[length]")
-def _calculate_atmospheric_temperature(altitude):
+def _calculate_atmospheric_temperature(
+    altitude,
+) -> pint.Quantity:
     r"""
     Computes the air temperature as a function of altitude up to 20,000 meters
     based on the International Standard Atmosphere (ISA):
 
-    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/International_Standard_Atmosphere.svg" width="250">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/International_Standard_Atmosphere.svg" width="250" />
 
     Temperature in the Troposphere (<= 11,000 m) is calculated according to
 
@@ -72,12 +75,14 @@ def _calculate_atmospheric_temperature(altitude):
 
 
 @ureg.check("[length]")
-def _calculate_atmospheric_density(altitude):
+def _calculate_atmospheric_density(
+    altitude,
+) -> pint.Quantity:
     r"""
     Computes the air density as a function of altitude up to 20,000 meters
     based on the International Standard Atmosphere (ISA):
 
-    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/International_Standard_Atmosphere.svg" width="250">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/International_Standard_Atmosphere.svg" width="250" />
 
     Density in the Troposphere (<= 11,000 m) is calculated according to
 
@@ -166,8 +171,14 @@ def _calculate_atmospheric_density(altitude):
     return rho.to(ureg.kg / ureg.m**3)
 
 
-@ureg.check("[speed]", "[length]")
-def _calculate_dynamic_pressure(speed: float, altitude: float) -> float:
+@ureg.check(
+    "[speed]",
+    "[length]",
+)
+def _calculate_dynamic_pressure(
+    speed: float,
+    altitude: float,
+) -> pint.Quantity:
     r"""
     Computes the dynamic pressure $q$ at a given speed and altitude.
 
@@ -221,8 +232,14 @@ def _calculate_dynamic_pressure(speed: float, altitude: float) -> float:
     return dynamic_pressure.to(ureg.Pa)
 
 
-@ureg.check("[]", "[length]")  # mach number is dimensionless  # altitude
-def _calculate_airspeed_from_mach(mach_number: float, altitude: float) -> float:
+@ureg.check(
+    "[]",
+    "[length]",
+)
+def _calculate_airspeed_from_mach(
+    mach_number: float,
+    altitude: float,
+) -> pint.Quantity:
     r"""
     Converts aircraft speed from mach number $M$ to airspeed $V$,
     depending on the flight altitude $h$.
@@ -286,8 +303,14 @@ def _calculate_airspeed_from_mach(mach_number: float, altitude: float) -> float:
     return velocity.to(ureg.kph)
 
 
-@ureg.check("[speed]", "[length]")  # airspeed  # altitude
-def _calculate_mach_from_airspeed(airspeed: float, altitude: float) -> float:
+@ureg.check(
+    "[speed]",
+    "[length]",
+)
+def _calculate_mach_from_airspeed(
+    airspeed: float,
+    altitude: float,
+) -> float:
     r"""
     Converts aircraft airspeed $V$ to Mach number $M$,
     depending on the flight altitude $h$.
@@ -351,7 +374,9 @@ def _calculate_mach_from_airspeed(airspeed: float, altitude: float) -> float:
 
 
 @ureg.check("[temperature]")
-def _calculate_speed_of_sound(temperature):
+def _calculate_speed_of_sound(
+    temperature,
+):
     r"""
     Computes the speed of sound in air as a function of temperature uses the relationship for an ideal gas:
 
