@@ -1,3 +1,4 @@
+# %%
 try:
     import pandas as pd
 except ImportError as e:
@@ -141,9 +142,9 @@ def _get_aircraft_performance(
 
 
 def generate_4d_trajectory(
-    df_ofp: pd.DataFrame,
+    df_ofp: pd.DataFrame | str | Path,
     aircraft_type: str,
-    perf_data_path: Path,
+    perf_data_path: Path | str,
     time_resolution: ureg.Quantity = 1.0 * ureg.minute,
     strategy: str = "leveloff",
     colname_wp: str = "waypoint",
@@ -263,6 +264,9 @@ def generate_4d_trajectory(
     )
     ```
     """
+    if isinstance(df_ofp, (str, Path)):
+        df_ofp = pd.read_csv(df_ofp)
+
     if len(df_ofp) == 0:
         raise ValueError("Empty flight plan provided.")
     for col in [colname_wp, colname_timecum, colname_alt, colname_lat, colname_lon]:
@@ -297,58 +301,90 @@ def generate_4d_trajectory(
     next_num = df['alt_filled'].bfill().shift(-1)
     df['next_alt'] = next_num.fillna(df['alt_filled'].ffill())
 
-    for idx, row in df.iterrows():
-        if idx == 0:
-            continue
-
-        segment_initial_alt = df.at[idx - 1, 'alt_filled']
-        segment_time = (df.at[idx, 'timestamp'] - df.at[idx - 1, 'timestamp']).total_seconds() / 60 * ureg.minute
-
-        if pd.isnull(row['alt_filled']):
-            if segment_initial_alt < row['next_alt']: # climb segment
-                if segment_initial_alt >= row['next_alt']: # level-off
-                    df.at[idx, 'alt_filled'] = row['next_alt']
-                else: # continued climb
-                    rate_of_climb = _get_aircraft_performance(
-                        perf_data_path=perf_data_path,
-                        aircraft_type=aircraft_type,
-                        phase="climb",
-                        alt=segment_initial_alt * ureg(unit_alt),
-                    )
-                    segment_final_alt = (segment_initial_alt * ureg(unit_alt) + rate_of_climb * segment_time).to(unit_alt).magnitude
-                    if segment_final_alt > row['next_alt']: # level-off
-                        df.at[idx, 'alt_filled'] = row['next_alt']
-                    else:
-                        df.at[idx, 'alt_filled'] = segment_final_alt
-            elif segment_initial_alt > row['next_alt']: # descent segment
-                if segment_initial_alt <= row['next_alt']: # level-off
-                    df.at[idx, 'alt_filled'] = row['next_alt']
-                else: # continued descent
-                    rate_of_descent = _get_aircraft_performance(
-                        perf_data_path=perf_data_path,
-                        aircraft_type=aircraft_type,
-                        phase="descent",
-                        alt=segment_initial_alt * ureg(unit_alt),
-                    )
-                    segment_final_alt = (segment_initial_alt * ureg(unit_alt) + rate_of_descent * segment_time).to(unit_alt).magnitude
-                    if segment_final_alt < row['next_alt']: # level-off
-                        df.at[idx, 'alt_filled'] = row['next_alt']
-                    else:
-                        df.at[idx, 'alt_filled'] = segment_final_alt
-            else: # level flight
-                df.at[idx, 'alt_filled'] = row['next_alt']
+    # Simulation logic to generate high-resolution 4D trajectory
+    trajectory_points = []
     
-    list_interpolation_columns = ['alt_filled', colname_lat, colname_lon]
+    curr_t = df.at[0, 'timestamp']
+    curr_alt = float(df.at[0, 'alt_filled']) if not pd.isna(df.at[0, 'alt_filled']) else 0.0
+    curr_lat = df.at[0, colname_lat]
+    curr_lon = df.at[0, colname_lon]
+    
+    dt_min = time_resolution.to('min').magnitude
+    
+    for idx in range(1, len(df)):
+        target_t = df.at[idx, 'timestamp']
+        leveloff_target = df.at[idx, 'next_alt']
+        
+        target_lat = df.at[idx, colname_lat]
+        target_lon = df.at[idx, colname_lon]
+        
+        seg_start_t = curr_t
+        seg_start_lat = curr_lat
+        seg_start_lon = curr_lon
+        duration_s = (target_t - seg_start_t).total_seconds()
+        
+        while curr_t < target_t:
+            trajectory_points.append({
+                'timestamp': curr_t,
+                'alt_filled': float(curr_alt),
+                colname_lat: float(curr_lat),
+                colname_lon: float(curr_lon),
+            })
+            
+            rem_s = (target_t - curr_t).total_seconds()
+            step_s = min(dt_min * 60.0, rem_s)
+            
+            if strategy == "leveloff":
+                if not math.isclose(curr_alt, leveloff_target, abs_tol=1e-3):
+                    if curr_alt < leveloff_target:
+                        rate = _get_aircraft_performance(
+                            perf_data_path=perf_data_path,
+                            aircraft_type=aircraft_type,
+                            phase="climb",
+                            alt=curr_alt * ureg(unit_alt),
+                        )
+                        r_val = rate.to(f"{unit_alt}/min").magnitude
+                        curr_alt += r_val * (step_s / 60.0)
+                        if curr_alt > leveloff_target:
+                            curr_alt = leveloff_target
+                    else: # descent
+                        rate = _get_aircraft_performance(
+                            perf_data_path=perf_data_path,
+                            aircraft_type=aircraft_type,
+                            phase="descent",
+                            alt=curr_alt * ureg(unit_alt),
+                        )
+                        r_val = rate.to(f"{unit_alt}/min").magnitude
+                        curr_alt += r_val * (step_s / 60.0)
+                        if curr_alt < leveloff_target:
+                            curr_alt = leveloff_target
+            
+            curr_t += pd.Timedelta(seconds=step_s)
+            if duration_s > 0:
+                frac = (curr_t - seg_start_t).total_seconds() / duration_s
+                curr_lat = seg_start_lat + (target_lat - seg_start_lat) * frac
+                curr_lon = seg_start_lon + (target_lon - seg_start_lon) * frac
+
+    trajectory_points.append({
+        'timestamp': curr_t,
+        'alt_filled': float(curr_alt),
+        colname_lat: float(curr_lat),
+        colname_lon: float(curr_lon),
+    })
+
+    df_res = pd.DataFrame(trajectory_points)
+    
+    # Final resampling to ensure perfectly regular grid and include waypoint names
     resample_rule = f"{int(time_resolution.to('min').magnitude)}min"
-    df_resampled = df[['timestamp'] + list_interpolation_columns].set_index("timestamp").resample(resample_rule).mean()
-    df_resampled[list_interpolation_columns] = df_resampled[list_interpolation_columns].interpolate(method="time")
+    df_resampled = df_res.set_index("timestamp").resample(resample_rule).mean()
+    df_resampled = df_resampled.interpolate(method="time")
     
-    df.drop(columns=list_interpolation_columns + ['next_alt'], inplace=True)
-    df_merged = df_resampled.merge(
-        right = df,
-        left_on = df_resampled.index,
-        right_on = "timestamp",
-        how = "left"
+    # Merge back waypoint names and other original metadata
+    df_waypoint_labels = df[[colname_wp, 'timestamp']].drop_duplicates(subset='timestamp')
+    df_merged = df_resampled.reset_index().merge(
+        df_waypoint_labels,
+        on='timestamp',
+        how='left'
     )
-
+    
     return df_merged

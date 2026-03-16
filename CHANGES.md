@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Breaking Changes
 
 - Renamed the `utility.math` module to `utility.mathematics` to avoid namespace conflicts with the Python built-in `math` module.
+- Renamed all variables pointing to file names to use `_path` suffix (e.g. `data.yaml` > `data_path`).
 
 ## `2.0.1` (20. February 2026)
 
