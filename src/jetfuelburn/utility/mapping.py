@@ -70,9 +70,11 @@ def plot_ofp_1d(
         text = df[label_col]
 
     fig = go.Figure()
-    
+
     if text is not None:
-        hovertemplate = "<b>%{text}</b><br>" + f"{x_col}: %{{x}}<br>{y_col}: %{{y}}<extra></extra>"
+        hovertemplate = (
+            "<b>%{text}</b><br>" + f"{x_col}: %{{x}}<br>{y_col}: %{{y}}<extra></extra>"
+        )
     else:
         hovertemplate = f"{x_col}: %{{x}}<br>{y_col}: %{{y}}<extra></extra>"
 
@@ -193,16 +195,13 @@ def plot_ofp_2d(
     else:
         min_lat, max_lat = df[lat_col].min(), df[lat_col].max()
         min_lon, max_lon = df[lon_col].min(), df[lon_col].max()
-        
-        center = dict(
-            lat=(min_lat + max_lat) / 2,
-            lon=(min_lon + max_lon) / 2
-        )
-        
+
+        center = dict(lat=(min_lat + max_lat) / 2, lon=(min_lon + max_lon) / 2)
+
         lat_span = max_lat - min_lat
         lon_span = max_lon - min_lon
         max_span = max(lat_span, lon_span, 0.1)
-        
+
         zoom = max(0, min(18, math.log2(360 / max_span) - 0.5))
 
         bounds = dict(
@@ -251,7 +250,11 @@ def plot_ofp_2d(
                 lon=[df.iloc[0][lon_col]],
                 mode="markers",
                 marker=dict(size=14, color="green", symbol="circle"),
-                text=[str(df.iloc[0][label_col])] if label_col in df.columns else ["Start"],
+                text=(
+                    [str(df.iloc[0][label_col])]
+                    if label_col in df.columns
+                    else ["Start"]
+                ),
                 textposition="top right",
                 name="Start",
                 hoverinfo="text",
@@ -267,7 +270,11 @@ def plot_ofp_2d(
                     lon=[df.iloc[-1][lon_col]],
                     mode="markers",
                     marker=dict(size=14, color="red", symbol="circle"),
-                    text=[str(df.iloc[-1][label_col])] if label_col in df.columns else ["End"],
+                    text=(
+                        [str(df.iloc[-1][label_col])]
+                        if label_col in df.columns
+                        else ["End"]
+                    ),
                     textposition="top right",
                     name="End",
                     hoverinfo="text",
