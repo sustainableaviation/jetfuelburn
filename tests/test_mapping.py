@@ -19,7 +19,9 @@ class TestMapping:
             ["Invalid", "not_a_float", 0.0, "Skip me"],
             ["Missing", 0.0, "", "Skip me too"],
         ]
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False, newline="") as f:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".csv", delete=False, newline=""
+        ) as f:
             writer = csv.writer(f)
             writer.writerows(content)
             temp_path = f.name
@@ -37,7 +39,9 @@ class TestMapping:
             ["ZRH", 47.4582, 8.5555],
             ["SFO", 37.6188, -122.3751],
         ]
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False, newline="") as f:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".csv", delete=False, newline=""
+        ) as f:
             writer = csv.writer(f)
             writer.writerows(content)
             temp_path = f.name
@@ -85,13 +89,17 @@ class TestMapping:
         sample_csv_custom_cols,
     ):
         """Test that lat_col and lon_col parameters are respected."""
-        fig = plot_ofp_2d(sample_csv_custom_cols, lat_col="latitude", lon_col="longitude")
+        fig = plot_ofp_2d(
+            sample_csv_custom_cols, lat_col="latitude", lon_col="longitude"
+        )
         assert isinstance(fig, go.Figure)
         assert len(fig.data) == 3
 
     def test_plot_ofp_2d_empty_data(self):
         """Test plot_ofp_2d with a header-only CSV."""
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False, newline="") as f:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".csv", delete=False, newline=""
+        ) as f:
             writer = csv.writer(f)
             writer.writerow(["waypoint", "lat", "lon"])
             temp_path = f.name
@@ -123,21 +131,25 @@ class TestMapping:
 
     def test_plot_ofp_2d_dataframe_input(self):
         """Test that plot_ofp_2d accepts a pandas DataFrame directly."""
-        df = pd.DataFrame({
-            "waypoint": ["ZRH", "SFO"],
-            "lat": [47.4582, 37.6188],
-            "lon": [8.5555, -122.3751],
-        })
+        df = pd.DataFrame(
+            {
+                "waypoint": ["ZRH", "SFO"],
+                "lat": [47.4582, 37.6188],
+                "lon": [8.5555, -122.3751],
+            }
+        )
         fig = plot_ofp_2d(df)
         assert isinstance(fig, go.Figure)
         assert len(fig.data) == 3
 
     def test_plot_ofp_1d_returns_figure(self):
         """Test that plot_ofp_1d returns a Plotly Figure."""
-        df = pd.DataFrame({
-            "timestamp": [0, 10, 20],
-            "alt": [0, 5000, 10000],
-        })
+        df = pd.DataFrame(
+            {
+                "timestamp": [0, 10, 20],
+                "alt": [0, 5000, 10000],
+            }
+        )
         fig = plot_ofp_1d(df)
         assert isinstance(fig, go.Figure)
         assert len(fig.data) == 1
@@ -145,11 +157,13 @@ class TestMapping:
 
     def test_plot_ofp_1d_with_labels(self):
         """Test that plot_ofp_1d correctly displays labels."""
-        df = pd.DataFrame({
-            "timestamp": [0, 10, 20],
-            "alt": [0, 5000, 10000],
-            "waypoint": ["A", "B", "C"],
-        })
+        df = pd.DataFrame(
+            {
+                "timestamp": [0, 10, 20],
+                "alt": [0, 5000, 10000],
+                "waypoint": ["A", "B", "C"],
+            }
+        )
         fig = plot_ofp_1d(df, label_col="waypoint")
         assert isinstance(fig, go.Figure)
         assert "text" in fig.data[0].mode

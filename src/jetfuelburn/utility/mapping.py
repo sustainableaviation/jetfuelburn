@@ -19,7 +19,7 @@ def plot_ofp_1d(
     output_html: str | None = None,
 ) -> go.Figure:
     r"""
-    Given an operational flight plan (OFP), 
+    Given an operational flight plan (OFP),
     plots a one-dimensional altitude profile using [Plotly](https://plotly.com/python/).
 
     Parameters
@@ -49,7 +49,7 @@ def plot_ofp_1d(
         ofp_path_or_df="../tests/data/ofp_with_altitude.csv",
     )
     ```
-    
+
     ```python exec="true" html="true"
     from jetfuelburn.utility.mapping import plot_ofp_1d
     fig = plot_ofp_1d(

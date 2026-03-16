@@ -18,7 +18,7 @@ from jetfuelburn import ureg
     None,
     None,
     "[length]",
-)    
+)
 def _get_aircraft_performance(
     perf_data_path: Path,
     aircraft_type: str,
@@ -33,7 +33,7 @@ def _get_aircraft_performance(
     to the altitude-band regime defined for the aircraft and flight phase.
 
     Performance data must be provided in the following format:
-    
+
     ```yaml
     B123:
         climb:
@@ -94,7 +94,7 @@ def _get_aircraft_performance(
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
-    
+
     jetfuelburn._get_aircraft_performance(
         jetfuelburn.data.EurocontrolAPD.data.yaml,
         "B123",
@@ -111,11 +111,19 @@ def _get_aircraft_performance(
 
     if aircraft_type not in data:
         available = sorted(data.keys()) if data else []
-        raise ValueError(f"Aircraft type {aircraft_type!r} not found in {perf_data_path}. Available: {available}")
-    
+        raise ValueError(
+            f"Aircraft type {aircraft_type!r} not found in {perf_data_path}. Available: {available}"
+        )
+
     aircraft_info = data[aircraft_type]
-    if aircraft_info is None or phase not in aircraft_info or aircraft_info[phase] is None:
-        raise ValueError(f"Flight phase {phase!r} not found for aircraft type {aircraft_type!r} in {perf_data_path}")
+    if (
+        aircraft_info is None
+        or phase not in aircraft_info
+        or aircraft_info[phase] is None
+    ):
+        raise ValueError(
+            f"Flight phase {phase!r} not found for aircraft type {aircraft_type!r} in {perf_data_path}"
+        )
 
     regimes = aircraft_info[phase]
 
@@ -124,21 +132,27 @@ def _get_aircraft_performance(
         min_alt = ureg(str(r["min_alt"])).to("ft")
         max_alt = ureg(str(r["max_alt"])).to("ft")
         rate = ureg(str(r["rate"])).to("ft/min")
-        
-        if min_alt == max_alt:
-            raise ValueError(f"Degenerate altitude band (min == max) in regime {r.get('regime')!r}: {min_alt}")
 
-        processed.append({
-            "regime": r.get("regime"),
-            "min_alt": min(min_alt, max_alt).to("ft"),
-            "max_alt": max(min_alt, max_alt).to("ft"),
-            "rate": rate.to("ft/min")
-        })
-        
+        if min_alt == max_alt:
+            raise ValueError(
+                f"Degenerate altitude band (min == max) in regime {r.get('regime')!r}: {min_alt}"
+            )
+
+        processed.append(
+            {
+                "regime": r.get("regime"),
+                "min_alt": min(min_alt, max_alt).to("ft"),
+                "max_alt": max(min_alt, max_alt).to("ft"),
+                "rate": rate.to("ft/min"),
+            }
+        )
+
     for p in processed:
         if p["min_alt"] <= alt <= p["max_alt"]:
             return p["rate"]
-    raise ValueError(f"Altitude {alt} not found in any altitude band for aircraft type {aircraft_type!r} in {perf_data_path}")
+    raise ValueError(
+        f"Altitude {alt} not found in any altitude band for aircraft type {aircraft_type!r} in {perf_data_path}"
+    )
 
 
 def generate_4d_trajectory(
@@ -153,7 +167,7 @@ def generate_4d_trajectory(
     colname_lon: str = "lon",
     colname_alt: str = "alt",
     unit_alt: str = "ft",
-    timestamp_start: pd.Timestamp = pd.Timestamp('2025-01-01 00:00:00'),
+    timestamp_start: pd.Timestamp = pd.Timestamp("2025-01-01 00:00:00"),
 ) -> pd.DataFrame:
     r"""
     Generate a four-dimensional (4D) trajectory from a flight plan.
@@ -235,12 +249,12 @@ def generate_4d_trajectory(
 
     ![Flight Plan Diagram](../_static/ofp_1.svg)
 
-    **Figure 1:** Diagrammatic representation of the `leveloff` strategy. 
-    Shown are two different _climb regimes_, which describe the altitude-dependent 
-    rate of climb (ROC) and rate of descent (ROD) of an aircraft. This could, for instance, 
-    be infered from the [EUROCONTROL Aircraft Performance Database](https://learningzone.eurocontrol.int/ilp/customs/ATCPFDB/details.aspx?ICAO=A359). 
-    In this representation, the angle of the trajectory corresponds to the rate of climb (ROC). 
-    If the rate of climb is such that the aircraft would reach the altitude defined at the next waypoint 
+    **Figure 1:** Diagrammatic representation of the `leveloff` strategy.
+    Shown are two different _climb regimes_, which describe the altitude-dependent
+    rate of climb (ROC) and rate of descent (ROD) of an aircraft. This could, for instance,
+    be infered from the [EUROCONTROL Aircraft Performance Database](https://learningzone.eurocontrol.int/ilp/customs/ATCPFDB/details.aspx?ICAO=A359).
+    In this representation, the angle of the trajectory corresponds to the rate of climb (ROC).
+    If the rate of climb is such that the aircraft would reach the altitude defined at the next waypoint
     before reaching the actual waypoint, the aircraft will level off at that altitude until the waypoint is reached.
 
     Example
@@ -275,7 +289,7 @@ def generate_4d_trajectory(
 
     df = df_ofp.copy()
 
-    df['timestamp'] = timestamp_start + pd.to_timedelta(df[colname_timecum], unit="min")
+    df["timestamp"] = timestamp_start + pd.to_timedelta(df[colname_timecum], unit="min")
 
     """
     | alt  |
@@ -297,43 +311,47 @@ def generate_4d_trajectory(
     | DSC  | 500      |
     | 500  | 500      |
     """
-    df['alt_filled'] = pd.to_numeric(df[colname_alt], errors='coerce').astype('float64')
-    next_num = df['alt_filled'].bfill().shift(-1)
-    df['next_alt'] = next_num.fillna(df['alt_filled'].ffill())
+    df["alt_filled"] = pd.to_numeric(df[colname_alt], errors="coerce").astype("float64")
+    next_num = df["alt_filled"].bfill().shift(-1)
+    df["next_alt"] = next_num.fillna(df["alt_filled"].ffill())
 
     # Simulation logic to generate high-resolution 4D trajectory
     trajectory_points = []
-    
-    curr_t = df.at[0, 'timestamp']
-    curr_alt = float(df.at[0, 'alt_filled']) if not pd.isna(df.at[0, 'alt_filled']) else 0.0
+
+    curr_t = df.at[0, "timestamp"]
+    curr_alt = (
+        float(df.at[0, "alt_filled"]) if not pd.isna(df.at[0, "alt_filled"]) else 0.0
+    )
     curr_lat = df.at[0, colname_lat]
     curr_lon = df.at[0, colname_lon]
-    
-    dt_min = time_resolution.to('min').magnitude
-    
+
+    dt_min = time_resolution.to("min").magnitude
+
     for idx in range(1, len(df)):
-        target_t = df.at[idx, 'timestamp']
-        leveloff_target = df.at[idx, 'next_alt']
-        
+        target_t = df.at[idx, "timestamp"]
+        leveloff_target = df.at[idx, "next_alt"]
+
         target_lat = df.at[idx, colname_lat]
         target_lon = df.at[idx, colname_lon]
-        
+
         seg_start_t = curr_t
         seg_start_lat = curr_lat
         seg_start_lon = curr_lon
         duration_s = (target_t - seg_start_t).total_seconds()
-        
+
         while curr_t < target_t:
-            trajectory_points.append({
-                'timestamp': curr_t,
-                'alt_filled': float(curr_alt),
-                colname_lat: float(curr_lat),
-                colname_lon: float(curr_lon),
-            })
-            
+            trajectory_points.append(
+                {
+                    "timestamp": curr_t,
+                    "alt_filled": float(curr_alt),
+                    colname_lat: float(curr_lat),
+                    colname_lon: float(curr_lon),
+                }
+            )
+
             rem_s = (target_t - curr_t).total_seconds()
             step_s = min(dt_min * 60.0, rem_s)
-            
+
             if strategy == "leveloff":
                 if not math.isclose(curr_alt, leveloff_target, abs_tol=1e-3):
                     if curr_alt < leveloff_target:
@@ -347,7 +365,7 @@ def generate_4d_trajectory(
                         curr_alt += r_val * (step_s / 60.0)
                         if curr_alt > leveloff_target:
                             curr_alt = leveloff_target
-                    else: # descent
+                    else:  # descent
                         rate = _get_aircraft_performance(
                             perf_data_path=perf_data_path,
                             aircraft_type=aircraft_type,
@@ -358,33 +376,35 @@ def generate_4d_trajectory(
                         curr_alt += r_val * (step_s / 60.0)
                         if curr_alt < leveloff_target:
                             curr_alt = leveloff_target
-            
+
             curr_t += pd.Timedelta(seconds=step_s)
             if duration_s > 0:
                 frac = (curr_t - seg_start_t).total_seconds() / duration_s
                 curr_lat = seg_start_lat + (target_lat - seg_start_lat) * frac
                 curr_lon = seg_start_lon + (target_lon - seg_start_lon) * frac
 
-    trajectory_points.append({
-        'timestamp': curr_t,
-        'alt_filled': float(curr_alt),
-        colname_lat: float(curr_lat),
-        colname_lon: float(curr_lon),
-    })
+    trajectory_points.append(
+        {
+            "timestamp": curr_t,
+            "alt_filled": float(curr_alt),
+            colname_lat: float(curr_lat),
+            colname_lon: float(curr_lon),
+        }
+    )
 
     df_res = pd.DataFrame(trajectory_points)
-    
+
     # Final resampling to ensure perfectly regular grid and include waypoint names
     resample_rule = f"{int(time_resolution.to('min').magnitude)}min"
     df_resampled = df_res.set_index("timestamp").resample(resample_rule).mean()
     df_resampled = df_resampled.interpolate(method="time")
-    
+
     # Merge back waypoint names and other original metadata
-    df_waypoint_labels = df[[colname_wp, 'timestamp']].drop_duplicates(subset='timestamp')
-    df_merged = df_resampled.reset_index().merge(
-        df_waypoint_labels,
-        on='timestamp',
-        how='left'
+    df_waypoint_labels = df[[colname_wp, "timestamp"]].drop_duplicates(
+        subset="timestamp"
     )
-    
+    df_merged = df_resampled.reset_index().merge(
+        df_waypoint_labels, on="timestamp", how="left"
+    )
+
     return df_merged
