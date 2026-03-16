@@ -4,7 +4,7 @@ import csv
 from importlib import resources
 from typing import Callable
 import functools
-from jetfuelburn.utility.math import _interpolate
+from jetfuelburn.utility.mathematics import _interpolate
 from jetfuelburn.utility.physics import (
     _calculate_dynamic_pressure,
     _calculate_airspeed_from_mach,

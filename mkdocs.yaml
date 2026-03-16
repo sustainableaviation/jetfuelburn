@@ -5,13 +5,12 @@ copyright: © Paul Scherrer Institute (PSI) and Contributors | Code under MIT Li
 nav:
   - Home: 'index.md'
   - About: 'about.md'
-  - Comparing Models:
-    - Aircraft Type Matrix: 'comparison/comparison.md'
   - Getting Started:
     - Installation: 'installation.md'
     - Working with Physical Units: 'interactive/units.md'
     - Fuel Burn Calculations: 'interactive/fuel.md'
     - Cabin Class Fuel Allocation: 'interactive/allocation.md'
+    - Aircraft Type Matrix: 'comparison/comparison.md'
   - API Reference:
     - PL/R-Diagrams: 'api/diagrams.md'
     - Range Equation: 'api/rangeequation.md'
@@ -25,7 +24,9 @@ nav:
     - Engines: 'api/engines.md'
     - Physics: 'api/physics.md'
     - Geography: 'api/geography.md'
-    - Math: 'api/math.md'
+    - Mapping: 'api/mapping.md'
+    - OFP: 'api/ofp.md'
+    - Math: 'api/mathematics.md'
   - API Reference (External):
     - EU Flight Emissions Label: 'api/eu_fel.md'
     - Reduced Order Models: 'api/reducedorder_external.md'
@@ -47,6 +48,7 @@ theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
     - navigation.indexes
     - navigation.top
     - content.footnote.tooltips
+    - content.code.copy
   palette:
     - scheme: default
       toggle:
@@ -72,11 +74,11 @@ plugins:
   - markdown-exec
   - autorefs
   - include-markdown
-  - mkdocs-jupyter:
-      include: ["*.ipynb"]
-      execute: False
-      show_input: True
-      include_source: True
+#  - mkdocs-jupyter:
+#      include: ["docs/**/*.ipynb"]
+#      execute: False
+#      show_input: True
+#      include_source: True
   - mkdocs-pdf
   
 markdown_extensions:

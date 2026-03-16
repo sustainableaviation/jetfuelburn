@@ -290,7 +290,11 @@ class sacchi_etal:
 
     @staticmethod
     @ureg.check(None, "[mass]", "[length]")  # year  # TOW  # R
-    def _calculate_single_pass(year: int, TOW: float, R: float) -> float:
+    def _calculate_single_pass(
+        year: int,
+        TOW: float,
+        R: float,
+    ) -> float:
         """
         Helper function to calculate fuel for a specific given takeoff weight $TOW$ (including fuel).
         """
