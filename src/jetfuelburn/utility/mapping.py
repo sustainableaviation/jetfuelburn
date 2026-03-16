@@ -8,6 +8,7 @@ except ImportError as e:
         "Install all required packages with: pip install jetfuelburn[optionaldependencies]"
     ) from e
 
+import math
 from pathlib import Path
 
 
@@ -46,7 +47,7 @@ def plot_ofp_1d(
     import jetfuelburn
     from jetfuelburn.utility.mapping import plot_ofp_1d
     fig = plot_ofp_1d(
-        ofp_path_or_df="../tests/data/ofp_with_altitude.csv",
+        ofp_path_or_df="https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/tests/data/ofp/ofp_with_altitude.csv",
     )
     ```
 
@@ -66,10 +67,15 @@ def plot_ofp_1d(
     mode = "lines+markers"
     text = None
     if label_col and label_col in df.columns:
-        mode = "lines+markers+text"
         text = df[label_col]
 
     fig = go.Figure()
+    
+    if text is not None:
+        hovertemplate = "<b>%{text}</b><br>" + f"{x_col}: %{{x}}<br>{y_col}: %{{y}}<extra></extra>"
+    else:
+        hovertemplate = f"{x_col}: %{{x}}<br>{y_col}: %{{y}}<extra></extra>"
+
     fig.add_trace(
         go.Scatter(
             x=df[x_col] if x_col in df.columns else df.index,
@@ -77,15 +83,17 @@ def plot_ofp_1d(
             mode=mode,
             text=text,
             textposition="top center",
-            name="Altitude",
+            name="Trace",
             line=dict(color="blue"),
             marker=dict(size=6),
+            hovertemplate=hovertemplate,
         )
     )
 
     fig.update_layout(
         template="plotly_white",
         hovermode="x unified",
+        showlegend=False,
     )
 
     if output_html:
@@ -161,7 +169,7 @@ def plot_ofp_2d(
     ```python exec="true" html="true"
     from jetfuelburn.utility.mapping import plot_ofp_2d
     fig = plot_ofp_2d(
-        ofp_path_or_df="../tests/data/ofp.csv",
+        ofp_path_or_df="https://raw.githubusercontent.com/sustainableaviation/jetfuelburn/refs/heads/main/tests/data/ofp/ofp_basic.csv",
     )
     print(fig.to_html(full_html=False, include_plotlyjs="cdn"))
     ```
@@ -179,60 +187,103 @@ def plot_ofp_2d(
         df = pd.DataFrame(columns=[lat_col, lon_col])
 
     if df.empty:
-        mean_lat, mean_lon = 0, 0
+        center = dict(lat=0, lon=0)
+        zoom = 1
+        bounds = None
     else:
-        mean_lat = df[lat_col].mean()
-        mean_lon = df[lon_col].mean()
+        min_lat, max_lat = df[lat_col].min(), df[lat_col].max()
+        min_lon, max_lon = df[lon_col].min(), df[lon_col].max()
+        
+        center = dict(
+            lat=(min_lat + max_lat) / 2,
+            lon=(min_lon + max_lon) / 2
+        )
+        
+        lat_span = max_lat - min_lat
+        lon_span = max_lon - min_lon
+        max_span = max(lat_span, lon_span, 0.1)
+        
+        zoom = max(0, min(18, math.log2(360 / max_span) - 0.5))
+
+        bounds = dict(
+            west=min_lon - lon_span * 0.2,
+            east=max_lon + lon_span * 0.2,
+            south=min_lat - lat_span * 0.2,
+            north=max_lat + lat_span * 0.2,
+        )
 
     fig = go.Figure()
 
+    # 1. Background Path Line
     fig.add_trace(
         go.Scattermap(
             lat=df[lat_col],
             lon=df[lon_col],
             mode="lines",
             line=dict(width=3, color="blue"),
-            name="Flight Path",
             hoverinfo="none",
+            showlegend=False,
         )
     )
 
-    for idx, row in df.reset_index(drop=True).iterrows():
-        is_start = idx == 0
-        is_end = idx == len(df) - 1
-        label = str(row[label_col]) if label_col in df.columns else ""
+    if not df.empty:
+        # 2. Intermediate Waypoints
+        if len(df) > 2:
+            intermediate = df.iloc[1:-1]
+            fig.add_trace(
+                go.Scattermap(
+                    lat=intermediate[lat_col],
+                    lon=intermediate[lon_col],
+                    mode="markers",
+                    marker=dict(size=8, color="blue"),
+                    text=intermediate[label_col] if label_col in df.columns else None,
+                    textposition="top right",
+                    name="Waypoints",
+                    hoverinfo="text",
+                    showlegend=False,
+                )
+            )
 
-        if is_start or is_end:
-            marker_symbol = "marker"
-            marker_size = 12
-            marker_color = "red"
-        else:
-            marker_symbol = "circle"
-            marker_size = 8
-            marker_color = "blue"
-
+        # 3. Start Point
         fig.add_trace(
             go.Scattermap(
-                lat=[row[lat_col]],
-                lon=[row[lon_col]],
-                mode="markers+text",
-                marker=dict(size=marker_size, color=marker_color),
-                text=[label],
+                lat=[df.iloc[0][lat_col]],
+                lon=[df.iloc[0][lon_col]],
+                mode="markers",
+                marker=dict(size=14, color="green", symbol="circle"),
+                text=[str(df.iloc[0][label_col])] if label_col in df.columns else ["Start"],
                 textposition="top right",
-                name=label if label else ("Start" if is_start else "End"),
+                name="Start",
                 hoverinfo="text",
                 showlegend=False,
             )
         )
 
+        # 4. End Point
+        if len(df) > 1:
+            fig.add_trace(
+                go.Scattermap(
+                    lat=[df.iloc[-1][lat_col]],
+                    lon=[df.iloc[-1][lon_col]],
+                    mode="markers",
+                    marker=dict(size=14, color="red", symbol="circle"),
+                    text=[str(df.iloc[-1][label_col])] if label_col in df.columns else ["End"],
+                    textposition="top right",
+                    name="End",
+                    hoverinfo="text",
+                    showlegend=False,
+                )
+            )
+
     fig.update_layout(
         map=dict(
             style="open-street-map",
-            center=dict(lat=mean_lat, lon=mean_lon),
-            zoom=3,
+            center=center,
+            zoom=zoom,
+            bounds=bounds,
         ),
         margin={"r": 0, "t": 30, "l": 0, "b": 0},
-        title="Flight Trajectory",
+        showlegend=False,
     )
 
     if output_html:
