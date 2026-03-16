@@ -17,7 +17,7 @@ from jetfuelburn.utility.ofp import _get_aircraft_performance, generate_4d_traje
 DATA_YAML = Path(__file__).parent.parent / "src" / "jetfuelburn" / "data" / "EurocontrolAPD" / "data.yaml"
 """Path to the real EUROCONTROL APD YAML file shipped with the package."""
 
-OFP_CSV = Path(__file__).parent / "data" / "ofp.csv"
+OFP_CSV = Path(__file__).parent / "data" / "ofp" / "ofp_basic.csv"
 """Path to the OFP test fixture."""
 
 
@@ -299,7 +299,7 @@ class TestGenerate4DTrajectory:
         result = generate_4d_trajectory(
             df_ofp=df,
             aircraft_type="B123",
-            filepath_perf_data=DATA_YAML,
+            perf_data_path=DATA_YAML,
             time_resolution=1 * ureg.minute,
         )
         assert isinstance(result, pd.DataFrame)
@@ -323,7 +323,7 @@ class TestGenerate4DTrajectory:
         result = generate_4d_trajectory(
             df_ofp=df,
             aircraft_type="B123",
-            filepath_perf_data=DATA_YAML,
+            perf_data_path=DATA_YAML,
             time_resolution=1 * ureg.minute,
         )
         alts = result["alt_filled"].dropna()
@@ -343,7 +343,7 @@ class TestGenerate4DTrajectory:
         result = generate_4d_trajectory(
             df_ofp=df,
             aircraft_type="TEST",
-            filepath_perf_data=tmp_yaml,
+            perf_data_path=tmp_yaml,
             colname_wp="wp",
             colname_timecum="elapsed",
             colname_alt="elevation",
