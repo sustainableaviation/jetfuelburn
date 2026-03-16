@@ -10,12 +10,18 @@ import pytest
 from jetfuelburn import ureg
 from jetfuelburn.utility.ofp import _get_aircraft_performance, generate_4d_trajectory
 
-
 # ---------------------------------------------------------------------------
 # Helpers / shared fixtures
 # ---------------------------------------------------------------------------
 
-DATA_YAML = Path(__file__).parent.parent / "src" / "jetfuelburn" / "data" / "EurocontrolAPD" / "data.yaml"
+DATA_YAML = (
+    Path(__file__).parent.parent
+    / "src"
+    / "jetfuelburn"
+    / "data"
+    / "EurocontrolAPD"
+    / "data.yaml"
+)
 """Path to the real EUROCONTROL APD YAML file shipped with the package."""
 
 OFP_CSV = Path(__file__).parent / "data" / "ofp" / "ofp_basic.csv"
@@ -179,13 +185,15 @@ class TestGenerate4DTrajectory:
         tmp_yaml: Path,
     ):
         """A DataFrame missing a required column raises :class:`ValueError`."""
-        df = pd.DataFrame({
-            "waypoint": ["A", "B"],
-            "timecum": [0, 10],
-            "lat": [0.0, 1.0],
-            "lon": [0.0, 1.0],
-            # 'alt' is intentionally omitted
-        })
+        df = pd.DataFrame(
+            {
+                "waypoint": ["A", "B"],
+                "timecum": [0, 10],
+                "lat": [0.0, 1.0],
+                "lon": [0.0, 1.0],
+                # 'alt' is intentionally omitted
+            }
+        )
         with pytest.raises(ValueError, match="alt"):
             generate_4d_trajectory(df, "TEST", tmp_yaml)
 
@@ -196,13 +204,15 @@ class TestGenerate4DTrajectory:
         tmp_yaml: Path,
     ):
         """The return value is a :class:`pandas.DataFrame`."""
-        df = pd.DataFrame({
-            "waypoint": ["DEP", "ARR"],
-            "alt": [0, 5000],
-            "timecum": [0, 60],
-            "lat": [47.0, 48.0],
-            "lon": [8.0, 9.0],
-        })
+        df = pd.DataFrame(
+            {
+                "waypoint": ["DEP", "ARR"],
+                "alt": [0, 5000],
+                "timecum": [0, 60],
+                "lat": [47.0, 48.0],
+                "lon": [8.0, 9.0],
+            }
+        )
         result = generate_4d_trajectory(df, "TEST", tmp_yaml)
         assert isinstance(result, pd.DataFrame)
 
@@ -211,13 +221,15 @@ class TestGenerate4DTrajectory:
         tmp_yaml: Path,
     ):
         """The output DataFrame contains the ``alt_filled`` column."""
-        df = pd.DataFrame({
-            "waypoint": ["DEP", "ARR"],
-            "alt": [0, 5000],
-            "timecum": [0, 60],
-            "lat": [47.0, 48.0],
-            "lon": [8.0, 9.0],
-        })
+        df = pd.DataFrame(
+            {
+                "waypoint": ["DEP", "ARR"],
+                "alt": [0, 5000],
+                "timecum": [0, 60],
+                "lat": [47.0, 48.0],
+                "lon": [8.0, 9.0],
+            }
+        )
         result = generate_4d_trajectory(df, "TEST", tmp_yaml)
         assert "alt_filled" in result.columns
 
@@ -235,14 +247,18 @@ class TestGenerate4DTrajectory:
         DataFrame; the resampled timestamps are available in the ``'timestamp'``
         column (carried through the merge from ``df_resampled``).
         """
-        df = pd.DataFrame({
-            "waypoint": ["DEP", "ARR"],
-            "alt": [0, 5000],
-            "timecum": [0, 10],
-            "lat": [47.0, 48.0],
-            "lon": [8.0, 9.0],
-        })
-        result = generate_4d_trajectory(df, "TEST", tmp_yaml, time_resolution=1 * ureg.minute)
+        df = pd.DataFrame(
+            {
+                "waypoint": ["DEP", "ARR"],
+                "alt": [0, 5000],
+                "timecum": [0, 10],
+                "lat": [47.0, 48.0],
+                "lon": [8.0, 9.0],
+            }
+        )
+        result = generate_4d_trajectory(
+            df, "TEST", tmp_yaml, time_resolution=1 * ureg.minute
+        )
         # The 'timestamp' column holds datetime64 values after the merge
         timestamps = pd.to_datetime(result["timestamp"].dropna())
         if len(timestamps) >= 2:
@@ -270,13 +286,15 @@ class TestGenerate4DTrajectory:
         5 000 ft after 5 minutes. The MID waypoint is 60 minutes away, so
         the filled altitude at MID must be 5 000 ft (level-off cap).
         """
-        df = pd.DataFrame({
-            "waypoint": ["DEP", "MID", "ARR"],
-            "alt": ["0", "CLB", "5000"],
-            "timecum": [0, 60, 120],
-            "lat": [47.0, 47.5, 48.0],
-            "lon": [8.0, 8.5, 9.0],
-        })
+        df = pd.DataFrame(
+            {
+                "waypoint": ["DEP", "MID", "ARR"],
+                "alt": ["0", "CLB", "5000"],
+                "timecum": [0, 60, 120],
+                "lat": [47.0, 47.5, 48.0],
+                "lon": [8.0, 8.5, 9.0],
+            }
+        )
         result = generate_4d_trajectory(
             df,
             "TEST",
@@ -299,14 +317,18 @@ class TestGenerate4DTrajectory:
         filled in by the function; the output column ``alt_filled`` must be
         fully numeric (no NaN) for a well-defined flight plan.
         """
-        df = pd.DataFrame({
-            "waypoint": ["DEP", "MID", "ARR"],
-            "alt": ["0", "CLB", "5000"],
-            "timecum": [0, 30, 60],
-            "lat": [47.0, 47.5, 48.0],
-            "lon": [8.0, 8.5, 9.0],
-        })
-        result = generate_4d_trajectory(df, "TEST", tmp_yaml, time_resolution=1 * ureg.minute)
+        df = pd.DataFrame(
+            {
+                "waypoint": ["DEP", "MID", "ARR"],
+                "alt": ["0", "CLB", "5000"],
+                "timecum": [0, 30, 60],
+                "lat": [47.0, 47.5, 48.0],
+                "lon": [8.0, 8.5, 9.0],
+            }
+        )
+        result = generate_4d_trajectory(
+            df, "TEST", tmp_yaml, time_resolution=1 * ureg.minute
+        )
         assert result["alt_filled"].notna().all()
 
     # --- integration against real OFP CSV fixture --------------------------
@@ -335,13 +357,15 @@ class TestGenerate4DTrajectory:
         With a purely level flight plan (all altitudes numeric and identical)
         the output altitude should be constant.
         """
-        df = pd.DataFrame({
-            "waypoint": ["A", "B", "C"],
-            "alt": [35000, 35000, 35000],
-            "timecum": [0, 30, 60],
-            "lat": [47.0, 47.5, 48.0],
-            "lon": [8.0, 8.5, 9.0],
-        })
+        df = pd.DataFrame(
+            {
+                "waypoint": ["A", "B", "C"],
+                "alt": [35000, 35000, 35000],
+                "timecum": [0, 30, 60],
+                "lat": [47.0, 47.5, 48.0],
+                "lon": [8.0, 8.5, 9.0],
+            }
+        )
         result = generate_4d_trajectory(
             df_ofp=df,
             aircraft_type="B123",
@@ -349,7 +373,9 @@ class TestGenerate4DTrajectory:
             time_resolution=1 * ureg.minute,
         )
         alts = result["alt_filled"].dropna()
-        assert (alts == 35000).all(), "Altitude should stay constant during level cruise"
+        assert (
+            alts == 35000
+        ).all(), "Altitude should stay constant during level cruise"
 
     # --- custom column names -----------------------------------------------
 
@@ -358,13 +384,15 @@ class TestGenerate4DTrajectory:
         tmp_yaml: Path,
     ):
         """Custom column name arguments are respected."""
-        df = pd.DataFrame({
-            "wp": ["DEP", "ARR"],
-            "elevation": [0, 5000],
-            "elapsed": [0, 30],
-            "latitude": [47.0, 48.0],
-            "longitude": [8.0, 9.0],
-        })
+        df = pd.DataFrame(
+            {
+                "wp": ["DEP", "ARR"],
+                "elevation": [0, 5000],
+                "elapsed": [0, 30],
+                "latitude": [47.0, 48.0],
+                "longitude": [8.0, 9.0],
+            }
+        )
         result = generate_4d_trajectory(
             df_ofp=df,
             aircraft_type="TEST",

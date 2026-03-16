@@ -68,10 +68,10 @@ ax.yaxis.set_label_coords(-0.02, 0.5)
 # PLOTTING ###################
 
 # Lower third background: light orange
-ax.axhspan(0, y_max / 3, facecolor='moccasin', alpha=0.6, label="Climb Regime 1")
+ax.axhspan(0, y_max / 3, facecolor="moccasin", alpha=0.6, label="Climb Regime 1")
 
 # Upper two thirds background: light red
-ax.axhspan(y_max / 3, y_max, facecolor='mistyrose', alpha=0.6, label="Climb Regime 2")
+ax.axhspan(y_max / 3, y_max, facecolor="mistyrose", alpha=0.6, label="Climb Regime 2")
 
 # TRAJECTORY ARROWS ##########
 
@@ -98,12 +98,12 @@ ax.annotate(
 # STEEPER TRAJECTORY (BLACK) ####
 
 # First steeper segment (from 0,0)
-mid_x_steep = 150 # Reaches border earlier than mid_x (205)
+mid_x_steep = 150  # Reaches border earlier than mid_x (205)
 ax.annotate(
     "",
     xy=(mid_x_steep, border_y),
     xytext=(0, 0),
-    arrowprops=dict(arrowstyle="->", color="black", lw=2, linestyle='--'),
+    arrowprops=dict(arrowstyle="->", color="black", lw=2, linestyle="--"),
 )
 
 # Second steeper segment (to 30000 alt)
@@ -113,17 +113,34 @@ ax.annotate(
     "",
     xy=(target_x_steep, 30000),
     xytext=(mid_x_steep, border_y),
-    arrowprops=dict(arrowstyle="->", color="black", lw=2, linestyle='--'),
+    arrowprops=dict(arrowstyle="->", color="black", lw=2, linestyle="--"),
 )
 # Single Level-Off label for the steeper profile
-ax.text((mid_x_steep + target_x_steep)/2 + 200, (border_y + 30000)/2 + 5500, "Level-Off", color="black", fontsize=11, ha="right", va="bottom", rotation=29)
+ax.text(
+    (mid_x_steep + target_x_steep) / 2 + 200,
+    (border_y + 30000) / 2 + 5500,
+    "Level-Off",
+    color="black",
+    fontsize=11,
+    ha="right",
+    va="bottom",
+    rotation=29,
+)
 
 # Level off segment for steeper profile
-ax.plot([target_x_steep, 800], [30000, 30000], color='black', linestyle='--', linewidth=2, zorder=6)
+ax.plot(
+    [target_x_steep, 800],
+    [30000, 30000],
+    color="black",
+    linestyle="--",
+    linewidth=2,
+    zorder=6,
+)
 
 # ANGLE ANNOTATIONS (ROC) ####
 
 import numpy as np
+
 
 def draw_arc_as_points(ax, center, rx, ry, theta1, theta2, **kwargs):
     """Draws an arc by plotting points, more reliable for SVG export than Patches.Arc."""
@@ -131,6 +148,7 @@ def draw_arc_as_points(ax, center, rx, ry, theta1, theta2, **kwargs):
     x = center[0] + rx * np.cos(t)
     y = center[1] + ry * np.sin(t)
     ax.plot(x, y, **kwargs)
+
 
 def get_visual_slope_angle(dx, dy, ax, fig):
     xlim = ax.get_xlim()
@@ -140,8 +158,9 @@ def get_visual_slope_angle(dx, dy, ax, fig):
     dy_norm = dy / (ylim[1] - ylim[0]) * height
     return np.degrees(np.arctan2(dy_norm, dx_norm))
 
+
 # Setup dimensions
-rx = 180 # increased radius slightly for better label clearance
+rx = 180  # increased radius slightly for better label clearance
 xlim = ax.get_xlim()
 ylim = ax.get_ylim()
 width, height = fig.get_size_inches()
@@ -151,12 +170,32 @@ angle1 = get_visual_slope_angle(mid_x, border_y, ax, fig)
 angle2 = get_visual_slope_angle(800 - mid_x, 30000 - border_y, ax, fig)
 
 # Draw Horizontal Reference Lines
-ax.hlines(y=0, xmin=0, xmax=rx, color="black", linestyle="--", linewidth=1, alpha=0.3, zorder=10)
-ax.hlines(y=border_y, xmin=mid_x, xmax=mid_x + rx, color="black", linestyle="--", linewidth=1, alpha=0.3, zorder=10)
+ax.hlines(
+    y=0,
+    xmin=0,
+    xmax=rx,
+    color="black",
+    linestyle="--",
+    linewidth=1,
+    alpha=0.3,
+    zorder=10,
+)
+ax.hlines(
+    y=border_y,
+    xmin=mid_x,
+    xmax=mid_x + rx,
+    color="black",
+    linestyle="--",
+    linewidth=1,
+    alpha=0.3,
+    zorder=10,
+)
 
 # Draw the Arcs (matching arrow colors)
 draw_arc_as_points(ax, (0, 0), rx, ry, 0, angle1, color="orange", lw=2.5, zorder=12)
-draw_arc_as_points(ax, (mid_x, border_y), rx, ry, 0, angle2, color="red", lw=2.5, zorder=12)
+draw_arc_as_points(
+    ax, (mid_x, border_y), rx, ry, 0, angle2, color="red", lw=2.5, zorder=12
+)
 
 # ROC labels moved inside the arcs
 # We position them at roughly midpoint of the arc angle
@@ -164,45 +203,63 @@ label_r_x = rx * 0.7  # Moved inside
 label_r_y = ry * 0.7  # Moved inside
 
 t1 = np.radians(angle1 / 2)
-ax.text(label_r_x * np.cos(t1), label_r_y * np.sin(t1), "ROC1", color="orange", fontweight="bold", ha="center", va="center", zorder=11, fontsize=11)
+ax.text(
+    label_r_x * np.cos(t1),
+    label_r_y * np.sin(t1),
+    "ROC1",
+    color="orange",
+    fontweight="bold",
+    ha="center",
+    va="center",
+    zorder=11,
+    fontsize=11,
+)
 
 t2 = np.radians(angle2 / 2)
-ax.text(mid_x + label_r_x * np.cos(t2), border_y + label_r_y * np.sin(t2) - 500, "ROC2", color="red", fontweight="bold", ha="center", va="center", zorder=11, fontsize=11)
+ax.text(
+    mid_x + label_r_x * np.cos(t2),
+    border_y + label_r_y * np.sin(t2) - 500,
+    "ROC2",
+    color="red",
+    fontweight="bold",
+    ha="center",
+    va="center",
+    zorder=11,
+    fontsize=11,
+)
 
 # WAYPOINTS ##################
 
 # Grey dashed line between WP2 points (Thicker)
-ax.plot([800, 800], [0, 30000], color='grey', linestyle='--', linewidth=2.5, alpha=0.6, zorder=5)
+ax.plot(
+    [800, 800],
+    [0, 30000],
+    color="grey",
+    linestyle="--",
+    linewidth=2.5,
+    alpha=0.6,
+    zorder=5,
+)
 
-waypoints = [
-    (0, 0, "WP1"),
-    (800, 0, "WP2"),
-    (800, 30000, "WP2")
-]
+waypoints = [(0, 0, "WP1"), (800, 0, "WP2"), (800, 30000, "WP2")]
 
 for x, y, label in waypoints:
-    ax.plot(x, y, marker='o', color='black', markersize=4)
+    ax.plot(x, y, marker="o", color="black", markersize=4)
     # Move WP1 and lower WP2 below the axis, others above
     y_offset = -15 if (label == "WP1" or (label == "WP2" and y == 0)) else 5
     ax.annotate(
-        label, 
-        (x, y), 
-        textcoords="offset points", 
-        xytext=(0, y_offset), 
-        ha='center', 
+        label,
+        (x, y),
+        textcoords="offset points",
+        xytext=(0, y_offset),
+        ha="center",
         fontsize=11,
-        fontweight='bold'
+        fontweight="bold",
     )
 
 # LEGEND ####################
 
-ax.legend(
-    loc="upper left",
-    ncol=1,
-    fontsize=11,
-    frameon=True,
-    framealpha=0.8
-)
+ax.legend(loc="upper left", ncol=1, fontsize=11, frameon=True, framealpha=0.8)
 
 # EXPORT #########################################
 

@@ -5,12 +5,7 @@ from jetfuelburn.utility.physics import _calculate_atmospheric_temperature
 
 
 @ureg.check(
-    "[time]/[length]",  
-    "[]",  
-    "[]",  
-    "[length]",  
-    "[length]",  
-    None # [mg/Ns] = s/m
+    "[time]/[length]", "[]", "[]", "[length]", "[length]", None  # [mg/Ns] = s/m
 )
 def calculate_corrected_tsfc(
     tsfc_reported: pint.Quantity[float | int],
