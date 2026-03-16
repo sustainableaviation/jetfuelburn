@@ -103,7 +103,7 @@ def plot_ofp_2d(
 ) -> go.Figure:
     r"""
     Plots flight trajectory data from operational flight plans (OFP) on an
-    interactive [Plotly Mapbox](https://plotly.com/python/mapbox-layers/) map.
+    interactive [Plotly Map](https://plotly.com/python/map-layers/) map.
 
     Parameters
     ----------
@@ -187,7 +187,7 @@ def plot_ofp_2d(
     fig = go.Figure()
 
     fig.add_trace(
-        go.Scattermapbox(
+        go.Scattermap(
             lat=df[lat_col],
             lon=df[lon_col],
             mode="lines",
@@ -212,7 +212,7 @@ def plot_ofp_2d(
             marker_color = "blue"
 
         fig.add_trace(
-            go.Scattermapbox(
+            go.Scattermap(
                 lat=[row[lat_col]],
                 lon=[row[lon_col]],
                 mode="markers+text",
@@ -226,7 +226,7 @@ def plot_ofp_2d(
         )
 
     fig.update_layout(
-        mapbox=dict(
+        map=dict(
             style="open-street-map",
             center=dict(lat=mean_lat, lon=mean_lon),
             zoom=3,

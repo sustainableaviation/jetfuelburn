@@ -2,7 +2,9 @@ import bisect
 
 
 def _interpolate(
-    x_val: float | int, x_list: list[float | int], y_list: list[float | int]
+    x_val: float | int,
+    x_list: list[float | int],
+    y_list: list[float | int],
 ):
     r"""
     Given two sorted lists of x/y-pairs, performs one-dimensional linear interpolation for a given x-value:

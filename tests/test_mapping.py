@@ -47,12 +47,18 @@ class TestMapping:
         if os.path.exists(temp_path):
             os.remove(temp_path)
 
-    def test_plot_ofp_2d_returns_figure(self, sample_csv):
+    def test_plot_ofp_2d_returns_figure(
+        self,
+        sample_csv,
+    ):
         """Test that plot_ofp_2d returns a Plotly Figure."""
         fig = plot_ofp_2d(sample_csv)
         assert isinstance(fig, go.Figure)
 
-    def test_plot_ofp_2d_trace_counts(self, sample_csv):
+    def test_plot_ofp_2d_trace_counts(
+        self,
+        sample_csv,
+    ):
         """Test that the correct number of traces are added to the figure.
 
         With 2 valid rows (ZRH, SFO):
@@ -63,15 +69,21 @@ class TestMapping:
         """
         fig = plot_ofp_2d(sample_csv)
         assert len(fig.data) == 3
-        # Check that we have Scattermapbox traces
-        assert all(isinstance(t, go.Scattermapbox) for t in fig.data)
+        # Check that we have Scattermap traces
+        assert all(isinstance(t, go.Scattermap) for t in fig.data)
 
-    def test_plot_ofp_2d_custom_label(self, sample_csv):
+    def test_plot_ofp_2d_custom_label(
+        self,
+        sample_csv,
+    ):
         """Test that custom label_column is accepted and does not raise."""
         fig = plot_ofp_2d(sample_csv, label_col="custom_label")
         assert isinstance(fig, go.Figure)
 
-    def test_plot_ofp_2d_custom_lat_lon_cols(self, sample_csv_custom_cols):
+    def test_plot_ofp_2d_custom_lat_lon_cols(
+        self,
+        sample_csv_custom_cols,
+    ):
         """Test that lat_col and lon_col parameters are respected."""
         fig = plot_ofp_2d(sample_csv_custom_cols, lat_col="latitude", lon_col="longitude")
         assert isinstance(fig, go.Figure)
@@ -93,7 +105,10 @@ class TestMapping:
             if os.path.exists(temp_path):
                 os.remove(temp_path)
 
-    def test_plot_ofp_2d_output_html(self, sample_csv):
+    def test_plot_ofp_2d_output_html(
+        self,
+        sample_csv,
+    ):
         """Test that the figure is saved to HTML when output_html is provided."""
         with tempfile.NamedTemporaryFile(mode="w", suffix=".html", delete=False) as f:
             output_html = f.name

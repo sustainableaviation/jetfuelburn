@@ -3,7 +3,9 @@ import pandas as pd
 import numpy as np
 
 
-def get_all_distances(sheets):
+def get_all_distances(
+    sheets,
+):
     """
     Determine the complete set of distance headers across all sheets.
 
@@ -30,7 +32,9 @@ def get_all_distances(sheets):
     return sorted(all_distances)
 
 
-def extract_fuel_data(xlsx_path):
+def extract_fuel_data(
+    xlsx_path,
+):
     """
     Extract fuel consumption data from an Excel file with standardized distance headers.
 
@@ -116,7 +120,9 @@ import numpy as np
 import pandas as pd
 
 
-def clean_nan_entries(data):
+def clean_nan_entries(
+    data,
+):
     """
     Remove all NaN-related entries from a nested dictionary of aircraft fuel data for multiple aircraft.
 
