@@ -30,19 +30,19 @@ def get_all_distances(sheets):
     return sorted(all_distances)
 
 
-def extract_fuel_data(file_path):
+def extract_fuel_data(xlsx_path):
     """
     Extract fuel consumption data from an Excel file with standardized distance headers.
 
     Parameters:
-    file_path (str): Path to the Excel file.
+    xlsx_path (str): Path to the Excel file.
 
     Returns:
     dict: Structure {aircraft_type: {subcategory: {distance: fuel_value}}}.
           Distances are standardized across all sheets, with NaN for missing values.
     """
     # Read all sheets from the Excel file without headers
-    sheets = pd.read_excel(file_path, sheet_name=None, header=None)
+    sheets = pd.read_excel(xlsx_path, sheet_name=None, header=None)
 
     # Get the standardized set of distances from all sheets
     standard_distances = get_all_distances(sheets)

@@ -1,4 +1,3 @@
-# %%
 try:
     import pandas as pd
 except ImportError as e:
@@ -20,7 +19,7 @@ from jetfuelburn import ureg
     "[length]",
 )    
 def _get_aircraft_performance(
-    filepath_perf_data: Path,
+    perf_data_path: Path,
     aircraft_type: str,
     phase: str,
     alt: float | ureg.Quantity,
@@ -28,13 +27,31 @@ def _get_aircraft_performance(
     """
     Look up the climb or descent rate for a given aircraft type and altitude.
 
-    Reads a YAML performance data file and returns the rate of climb (positive)
+    Given a YAML performance data file, returns the rate of climb (positive)
     or rate of descent (negative) applicable to the supplied altitude, according
     to the altitude-band regime defined for the aircraft and flight phase.
 
+    Performance data must be provided in the following format:
+    
+    ```yaml
+    B123:
+        climb:
+            - regime: initial_climb
+                description: Initial climb to 5000 ft
+                min_alt: 0 ft
+                max_alt: 4639 ft
+                rate: 2979 ft/min
+        descent:
+            - regime: initial_descent
+                description: Initial descent to FL240
+                max_alt: 40489 ft
+                min_alt: 25323 ft
+                rate: -1059 ft/min
+    ```
+
     Parameters
     ----------
-    filepath_perf_data : Path
+    perf_data_path : Path
         Path to the YAML file containing aircraft performance data.
         The file must follow the schema used by the EUROCONTROL APD dataset
         (see `src/jetfuelburn/data/EurocontrolAPD/data.yaml`).
@@ -67,6 +84,10 @@ def _get_aircraft_performance(
         If *alt* does not fall within any altitude band defined for the aircraft
         and flight phase.
 
+    Warning
+    -------
+    Climb rates are positive and descent rates are negative numbers!
+
     Example
     -------
     ```pyodide install='jetfuelburn'
@@ -81,7 +102,7 @@ def _get_aircraft_performance(
     )
     ```
     """
-    with open(filepath_perf_data, "r") as f:
+    with open(perf_data_path, "r") as f:
         data = yaml.safe_load(f)
 
     if phase not in ("climb", "descent"):
@@ -89,11 +110,11 @@ def _get_aircraft_performance(
 
     if aircraft_type not in data:
         available = sorted(data.keys()) if data else []
-        raise ValueError(f"Aircraft type {aircraft_type!r} not found in {filepath_perf_data}. Available: {available}")
+        raise ValueError(f"Aircraft type {aircraft_type!r} not found in {perf_data_path}. Available: {available}")
     
     aircraft_info = data[aircraft_type]
     if aircraft_info is None or phase not in aircraft_info or aircraft_info[phase] is None:
-        raise ValueError(f"Flight phase {phase!r} not found for aircraft type {aircraft_type!r} in {filepath_perf_data}")
+        raise ValueError(f"Flight phase {phase!r} not found for aircraft type {aircraft_type!r} in {perf_data_path}")
 
     regimes = aircraft_info[phase]
 
@@ -116,13 +137,13 @@ def _get_aircraft_performance(
     for p in processed:
         if p["min_alt"] <= alt <= p["max_alt"]:
             return p["rate"]
-    raise ValueError(f"Altitude {alt} not found in any altitude band for aircraft type {aircraft_type!r} in {filepath_perf_data}")
+    raise ValueError(f"Altitude {alt} not found in any altitude band for aircraft type {aircraft_type!r} in {perf_data_path}")
 
 
 def generate_4d_trajectory(
     df_ofp: pd.DataFrame,
     aircraft_type: str,
-    filepath_perf_data: Path,
+    perf_data_path: Path,
     time_resolution: ureg.Quantity = 1.0 * ureg.minute,
     strategy: str = "leveloff",
     colname_wp: str = "waypoint",
@@ -151,7 +172,7 @@ def generate_4d_trajectory(
     aircraft_type : str
         ICAO aircraft type designator (e.g. ``'B123'``), passed directly to
         :func:`_get_aircraft_performance`.
-    filepath_perf_data : Path
+    perf_data_path : Path
         Path to the YAML performance data file; forwarded to
         :func:`_get_aircraft_performance`.
     time_resolution : pint.Quantity, optional
@@ -289,7 +310,7 @@ def generate_4d_trajectory(
                     df.at[idx, 'alt_filled'] = row['next_alt']
                 else: # continued climb
                     rate_of_climb = _get_aircraft_performance(
-                        filepath_perf_data=filepath_perf_data,
+                        perf_data_path=perf_data_path,
                         aircraft_type=aircraft_type,
                         phase="climb",
                         alt=segment_initial_alt * ureg(unit_alt),
@@ -304,7 +325,7 @@ def generate_4d_trajectory(
                     df.at[idx, 'alt_filled'] = row['next_alt']
                 else: # continued descent
                     rate_of_descent = _get_aircraft_performance(
-                        filepath_perf_data=filepath_perf_data,
+                        perf_data_path=perf_data_path,
                         aircraft_type=aircraft_type,
                         phase="descent",
                         alt=segment_initial_alt * ureg(unit_alt),

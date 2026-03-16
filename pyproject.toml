@@ -47,9 +47,8 @@ testing = [
     "python-coveralls",
 ]
 optionaldependencies = [
-    "ipyleaflet",
     "pandas",
-    "pint-pandas",
+    "plotly",
 ]
 
 [tool.setuptools]
