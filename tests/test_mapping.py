@@ -166,5 +166,7 @@ class TestMapping:
         )
         fig = plot_ofp_1d(df, label_col="waypoint")
         assert isinstance(fig, go.Figure)
-        assert "text" in fig.data[0].mode
+        # Labels should only be in hover, so mode should not contain 'text'
+        assert "text" not in fig.data[0].mode
         assert list(fig.data[0].text) == ["A", "B", "C"]
+        assert "%{text}" in fig.data[0].hovertemplate
