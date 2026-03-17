@@ -61,6 +61,7 @@ def process_data_usdot_t2(
         'CARRIER_GROUP': 'CARRIER_GROUP',
         'AIRCRAFT_CONFIG': 'AIRCRAFT_CONFIG',
         'AIRCRAFT_TYPE': 'AIRCRAFT_TYPE',
+        'REV_ACRFT_DEP_PERF_510' _ 'REV_ACRFT_DEP_PERF',
     }
     """
 
@@ -73,6 +74,7 @@ def process_data_usdot_t2(
         "CARRIER_GROUP": "pint[]",
         "AIRCRAFT_CONFIG": "pint[]",
         "AIRCRAFT_TYPE": "pint[]",
+        "REV_ACRFT_DEP_PERF": "pint[]",
     }
     dict_columns_for_renaming = {
         df_t2.filter(like=column_name).columns[0]: column_name
@@ -87,6 +89,7 @@ def process_data_usdot_t2(
     df_t2["REV_TON_MILES"] = df_t2["REV_TON_MILES"].pint.to(ureg("km*kg"))
     df_t2["AVL_TON_MILES"] = df_t2["AVL_TON_MILES"].pint.to(ureg("km*kg"))
 
+
     # DATA FILTERING
 
     df_t2 = df_t2.loc[df_t2["CARRIER_GROUP"] == 3]  # major carriers only
@@ -98,6 +101,7 @@ def process_data_usdot_t2(
         "REV_TON_MILES",
         "AVL_TON_MILES",
         "AIRCRAFT_FUELS",
+        "REV_ACRFT_DEP_PERF",
     ]
     df_t2[list_numeric_columns] = df_t2[list_numeric_columns].replace(
         to_replace=0, value=pd.NA
@@ -117,6 +121,9 @@ def process_data_usdot_t2(
     df_t2["Fuel/Revenue Weight Distance"] = (
         df_t2["AIRCRAFT_FUELS"] / df_t2["REV_TON_MILES"]
     )
+    df_t2["Number of flights performed"] = (
+        df_t2["REV_ACRFT_DEP_PERF"]
+    )
 
     # SANITY CHECKS
 
@@ -130,6 +137,7 @@ def process_data_usdot_t2(
         "Fuel/Revenue Seat Distance",
         "Fuel/Available Weight Distance",
         "Fuel/Revenue Weight Distance",
+        "Number of flights performed",
     ]
     df_t2 = df_t2[list_return_columns]
 
@@ -140,6 +148,7 @@ def process_data_usdot_t2(
         "Fuel/Revenue Seat Distance": "mean",
         "Fuel/Available Weight Distance": "mean",
         "Fuel/Revenue Weight Distance": "mean",
+        "Number of flights performed": "sum",
     }
     df_t2 = df_t2.groupby(
         by="Aircraft Designation (US DOT Schedule T2)",
