@@ -579,7 +579,7 @@ class lee_etal:
 
     ![Payload/Range Diagram](../_static/reduced_order_lee_etal.svg)
 
-    In this model, fuel burn calculations are based on a regression model.
+    In this model, fuel burn calculations are basede on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
     from a combination of Eurocontrol BADA flight trajectory simulation model and the Breguet range equation.
     Climb segment fuel burn is calculated using the [Eurocontrol BADA](https://www.eurocontrol.int/model/bada) model.
