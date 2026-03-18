@@ -223,9 +223,10 @@ df_dequantified.to_json(
     indent=4,
 )
 
+
 import plotly.graph_objects as go
 
-# Schritt 1: Jedes Jahr separat laden und speichern
+# Jedes Jahr separat laden und speichern
 df24 = process_data_usdot_t2(
     path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
     path_csv_t2="data/T_SCHEDULE_T2_2024.csv",
@@ -244,7 +245,8 @@ df13 = process_data_usdot_t2(
 ).pint.dequantify()
 df13.columns = df13.columns.droplevel(1)
 
-# Schritt 2: Top 15 Flugzeugtypen aus 2024 als Referenz
+
+# Top 15 Flugzeugtypen aus 2024 als Referenz
 top_types = (
     df24["Number of flights performed"]
     .sort_values(ascending=False)
@@ -252,12 +254,21 @@ top_types = (
     .index.tolist()
 )
 
-# Schritt 3: Diagramm erstellen
+# Gesamtsumme über alle Jahre berechnen und danach sortieren
+total = (
+    df24["Number of flights performed"].reindex(top_types).fillna(0)
+    + df18["Number of flights performed"].reindex(top_types).fillna(0)
+    + df13["Number of flights performed"].reindex(top_types).fillna(0)
+)
+sorted_types = total.sort_values(ascending=False).index.tolist()
+
+# Diagramm erstellen
 datasets = {"2013": df13, "2018": df18, "2024": df24}
 
 fig = go.Figure()
 for year, df in datasets.items():
     df_filtered = df.loc[df.index.isin(top_types), "Number of flights performed"]
+    df_filtered = df_filtered.reindex(sorted_types)  # Reihenfolge anwenden
     fig.add_trace(go.Bar(name=year, x=df_filtered.index, y=df_filtered.values))
 
 fig.update_layout(
