@@ -186,7 +186,34 @@ df_dequantified = df.pint.dequantify()
 df_dequantified.columns = df_dequantified.columns.droplevel(1)
 
 df_dequantified.to_json(
-    path_or_buf="out.json",
+    path_or_buf="out24.json",
+    orient="index",
+    indent=4,
+)
+
+df = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2018.csv",
+)
+df_dequantified = df.pint.dequantify()
+df_dequantified.columns = df_dequantified.columns.droplevel(1)
+
+df_dequantified.to_json(
+    path_or_buf="out18.json",
+    orient="index",
+    indent=4,
+)
+
+
+df = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2013.csv",
+)
+df_dequantified = df.pint.dequantify()
+df_dequantified.columns = df_dequantified.columns.droplevel(1)
+
+df_dequantified.to_json(
+    path_or_buf="out13.json",
     orient="index",
     indent=4,
 )
