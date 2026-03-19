@@ -449,9 +449,10 @@ class usdot:
         fuelburn = (aircraft_data["Fuel/Revenue Seat Distance"] * ureg("kg/km")) * R
         fuelburn = fuelburn.to("kg")
         return fuelburn
+
     def calculate_movements(
-            year: int,
-            acft: str,
+        year: int,
+        acft: str,
     ) -> dict:
         if year not in usdot._years:
             raise ValueError(f"No data available for year '{year}'.")
@@ -462,5 +463,5 @@ class usdot:
         else:
             aircraft_data = usdot._aircraft_data[year][acft]
 
-        movements = (aircraft_data["Number of flights performed"])
+        movements = aircraft_data["Number of flights performed"]
         return movements
