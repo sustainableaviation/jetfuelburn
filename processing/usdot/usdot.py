@@ -182,6 +182,18 @@ def process_data_usdot_t2(
 
     return df_t2
 
+df = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2025.csv",
+)
+df_dequantified = df.pint.dequantify()
+df_dequantified.columns = df_dequantified.columns.droplevel(1)
+
+df_dequantified.to_json(
+    path_or_buf="USDOT_data_2025.json",
+    orient="index",
+    indent=4,
+)
 
 df = process_data_usdot_t2(
     path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
@@ -191,7 +203,7 @@ df_dequantified = df.pint.dequantify()
 df_dequantified.columns = df_dequantified.columns.droplevel(1)
 
 df_dequantified.to_json(
-    path_or_buf="out24.json",
+    path_or_buf="USDOT_data_2024.json",
     orient="index",
     indent=4,
 )
@@ -204,7 +216,7 @@ df_dequantified = df.pint.dequantify()
 df_dequantified.columns = df_dequantified.columns.droplevel(1)
 
 df_dequantified.to_json(
-    path_or_buf="out18.json",
+    path_or_buf="USDOT_data_2018.json",
     orient="index",
     indent=4,
 )
@@ -218,7 +230,7 @@ df_dequantified = df.pint.dequantify()
 df_dequantified.columns = df_dequantified.columns.droplevel(1)
 
 df_dequantified.to_json(
-    path_or_buf="out13.json",
+    path_or_buf="USDOT_data_2013.json",
     orient="index",
     indent=4,
 )
@@ -227,6 +239,12 @@ df_dequantified.to_json(
 import plotly.graph_objects as go
 
 # Jedes Jahr separat laden und speichern
+df25 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2025.csv",
+).pint.dequantify()
+df25.columns = df25.columns.droplevel(1)
+
 df24 = process_data_usdot_t2(
     path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
     path_csv_t2="data/T_SCHEDULE_T2_2024.csv",
@@ -248,22 +266,23 @@ df13.columns = df13.columns.droplevel(1)
 
 # Top 15 Flugzeugtypen aus 2024 als Referenz
 top_types = (
-    df24["Number of flights performed"]
+    df25["Number of flights performed"]
     .sort_values(ascending=False)
-    .head(15)
+    .head(20)
     .index.tolist()
 )
 
 # Gesamtsumme über alle Jahre berechnen und danach sortieren
 total = (
-    df24["Number of flights performed"].reindex(top_types).fillna(0)
+    df25["Number of flights performed"].reindex(top_types).fillna(0)
+    + df24["Number of flights performed"].reindex(top_types).fillna(0)
     + df18["Number of flights performed"].reindex(top_types).fillna(0)
     + df13["Number of flights performed"].reindex(top_types).fillna(0)
 )
 sorted_types = total.sort_values(ascending=False).index.tolist()
 
 # Diagramm erstellen
-datasets = {"2013": df13, "2018": df18, "2024": df24}
+datasets = {"2013": df13, "2018": df18, "2024": df24, "2025": df25}
 
 fig = go.Figure()
 for year, df in datasets.items():
