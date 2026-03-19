@@ -268,7 +268,7 @@ df13.columns = df13.columns.droplevel(1)
 top_types = (
     df25["Number of flights performed"]
     .sort_values(ascending=False)
-    .head(15)
+    .head(20)
     .index.tolist()
 )
 
