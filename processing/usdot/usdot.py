@@ -89,7 +89,6 @@ def process_data_usdot_t2(
     df_t2["REV_TON_MILES"] = df_t2["REV_TON_MILES"].pint.to(ureg("km*kg"))
     df_t2["AVL_TON_MILES"] = df_t2["AVL_TON_MILES"].pint.to(ureg("km*kg"))
 
-
     # DATA FILTERING
 
     df_t2 = df_t2.loc[df_t2["CARRIER_GROUP"] == 3]  # major carriers only
@@ -121,12 +120,8 @@ def process_data_usdot_t2(
     df_t2["Fuel/Revenue Weight Distance"] = (
         df_t2["AIRCRAFT_FUELS"] / df_t2["REV_TON_MILES"]
     )
-    df_t2["Number of flights performed"] = (
-        df_t2["REV_ACRFT_DEP_PERF"]
-    )
-    df_t2["Revenue PAX Miles"] = (
-        df_t2["REV_PAX_MILES"]
-    )
+    df_t2["Number of flights performed"] = df_t2["REV_ACRFT_DEP_PERF"]
+    df_t2["Revenue PAX Miles"] = df_t2["REV_PAX_MILES"]
 
     # SANITY CHECKS
 
@@ -181,6 +176,7 @@ def process_data_usdot_t2(
     df_t2 = df_t2.set_index("Aircraft Designation (US DOT Schedule T2)")
 
     return df_t2
+
 
 df = process_data_usdot_t2(
     path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
