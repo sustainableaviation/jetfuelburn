@@ -121,7 +121,8 @@ def process_data_usdot_t2(
         df_t2["AIRCRAFT_FUELS"] / df_t2["REV_TON_MILES"]
     )
     df_t2["Number of flights performed"] = df_t2["REV_ACRFT_DEP_PERF"]
-    df_t2["Revenue PAX Miles"] = df_t2["REV_PAX_MILES"]
+
+    df_t2["Revenue PAX km"] = df_t2["REV_PAX_MILES"]
 
     # SANITY CHECKS
 
@@ -136,7 +137,7 @@ def process_data_usdot_t2(
         "Fuel/Available Weight Distance",
         "Fuel/Revenue Weight Distance",
         "Number of flights performed",
-        "Revenue PAX Miles",
+        "Revenue PAX km",
     ]
     df_t2 = df_t2[list_return_columns]
 
@@ -148,7 +149,7 @@ def process_data_usdot_t2(
         "Fuel/Available Weight Distance": "mean",
         "Fuel/Revenue Weight Distance": "mean",
         "Number of flights performed": "sum",
-        "Revenue PAX Miles": "sum",
+        "Revenue PAX km": "sum",
     }
     df_t2 = df_t2.groupby(
         by="Aircraft Designation (US DOT Schedule T2)",
@@ -231,6 +232,9 @@ df_dequantified.to_json(
     indent=4,
 )
 
+#-----------------------------------------------------------------------------------------------------------------------
+
+#Plots
 
 import plotly.graph_objects as go
 
@@ -289,6 +293,68 @@ for year, df in datasets.items():
 fig.update_layout(
     barmode="group",
     title="Flight Movements by Aircraft Type",
+    xaxis_tickangle=-45,
+    yaxis_title="Movements",
+)
+fig.show()
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+# Jedes Jahr separat laden und speichern
+df25 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2025.csv",
+).pint.dequantify()
+df25.columns = df25.columns.droplevel(1)
+
+df24 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2024.csv",
+).pint.dequantify()
+df24.columns = df24.columns.droplevel(1)
+
+df18 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2018.csv",
+).pint.dequantify()
+df18.columns = df18.columns.droplevel(1)
+
+df13 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2013.csv",
+).pint.dequantify()
+df13.columns = df13.columns.droplevel(1)
+
+
+# Top 15 Flugzeugtypen aus 2024 als Referenz
+top_types = (
+    df25["Revenue PAX km"]
+    .sort_values(ascending=False)
+    .head(15)
+    .index.tolist()
+)
+
+# Gesamtsumme über alle Jahre berechnen und danach sortieren
+total = (
+    df25["Revenue PAX km"].reindex(top_types).fillna(0)
+    + df24["Revenue PAX km"].reindex(top_types).fillna(0)
+    + df18["Revenue PAX km"].reindex(top_types).fillna(0)
+    + df13["Revenue PAX km"].reindex(top_types).fillna(0)
+)
+sorted_types = total.sort_values(ascending=False).index.tolist()
+
+# Diagramm erstellen
+datasets = {"2013": df13, "2018": df18, "2024": df24, "2025": df25}
+
+fig = go.Figure()
+for year, df in datasets.items():
+    df_filtered = df.loc[df.index.isin(top_types), "Revenue PAX km"]
+    df_filtered = df_filtered.reindex(sorted_types)  # Reihenfolge anwenden
+    fig.add_trace(go.Bar(name=year, x=df_filtered.index, y=df_filtered.values))
+
+fig.update_layout(
+    barmode="group",
+    title="Revenue PAX km by Aircraft Type",
     xaxis_tickangle=-45,
     yaxis_title="Movements",
 )
