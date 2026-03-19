@@ -5,7 +5,7 @@
         "Fuel\/Available Weight Distance":0.0002628625,
         "Fuel\/Revenue Weight Distance":0.0003643492,
         "Number of flights performed":1443951.0,
-        "Revenue PAX Miles":235765496843.3825378418
+        "Revenue PAX km":235765496843.3825378418
     },
     "Airbus Industrie A320-100\/200":{
         "Fuel\/Available Seat Distance":0.0273164687,
@@ -13,7 +13,7 @@
         "Fuel\/Available Weight Distance":0.0002582758,
         "Fuel\/Revenue Weight Distance":0.0003595984,
         "Number of flights performed":2065767.0,
-        "Revenue PAX Miles":466634666956.4490356445
+        "Revenue PAX km":466634666956.4490356445
     },
     "Airbus Industrie A320-200n":{
         "Fuel\/Available Seat Distance":0.0248513568,
@@ -21,7 +21,7 @@
         "Fuel\/Available Weight Distance":0.0002739393,
         "Fuel\/Revenue Weight Distance":0.0003414406,
         "Number of flights performed":84393.0,
-        "Revenue PAX Miles":22709278632.9404144287
+        "Revenue PAX km":22709278632.9404144287
     },
     "Airbus Industrie A321-200n":{
         "Fuel\/Available Seat Distance":0.1303318554,
@@ -29,7 +29,7 @@
         "Fuel\/Available Weight Distance":0.0010637634,
         "Fuel\/Revenue Weight Distance":0.0021143804,
         "Number of flights performed":29193.0,
-        "Revenue PAX Miles":13847322871.565568924
+        "Revenue PAX km":13847322871.565568924
     },
     "Airbus Industrie A321\/Lr":{
         "Fuel\/Available Seat Distance":0.0216330751,
@@ -37,7 +37,7 @@
         "Fuel\/Available Weight Distance":0.0002011108,
         "Fuel\/Revenue Weight Distance":0.000280792,
         "Number of flights performed":1430554.0,
-        "Revenue PAX Miles":474657308387.6532592773
+        "Revenue PAX km":474657308387.6532592773
     },
     "Airbus Industrie A330-200":{
         "Fuel\/Available Seat Distance":0.0299646616,
@@ -45,7 +45,7 @@
         "Fuel\/Available Weight Distance":0.0001642642,
         "Fuel\/Revenue Weight Distance":0.0003236263,
         "Number of flights performed":93295.0,
-        "Revenue PAX Miles":111476443055.8648376465
+        "Revenue PAX km":111476443055.8648376465
     },
     "Airbus Industrie A330-300\/333":{
         "Fuel\/Available Seat Distance":0.0297743551,
@@ -53,7 +53,7 @@
         "Fuel\/Available Weight Distance":0.0001931658,
         "Fuel\/Revenue Weight Distance":0.0003492401,
         "Number of flights performed":68945.0,
-        "Revenue PAX Miles":110939107368.0003967285
+        "Revenue PAX km":110939107368.0003967285
     },
     "Airbus Industrie A350-900":{
         "Fuel\/Available Seat Distance":0.027059602,
@@ -61,7 +61,7 @@
         "Fuel\/Available Weight Distance":0.0001945493,
         "Fuel\/Revenue Weight Distance":0.0002859505,
         "Number of flights performed":11763.0,
-        "Revenue PAX Miles":31877843206.2140197754
+        "Revenue PAX km":31877843206.2140197754
     },
     "B787-800 Dreamliner":{
         "Fuel\/Available Seat Distance":0.0289471962,
@@ -69,7 +69,7 @@
         "Fuel\/Available Weight Distance":0.0001683745,
         "Fuel\/Revenue Weight Distance":0.0002758392,
         "Number of flights performed":47489.0,
-        "Revenue PAX Miles":62481155801.9109191895
+        "Revenue PAX km":62481155801.9109191895
     },
     "B787-900 Dreamliner":{
         "Fuel\/Available Seat Distance":0.0262780182,
@@ -77,7 +77,7 @@
         "Fuel\/Available Weight Distance":0.0001441541,
         "Fuel\/Revenue Weight Distance":0.0002517433,
         "Number of flights performed":54288.0,
-        "Revenue PAX Miles":110555671006.6490936279
+        "Revenue PAX km":110555671006.6490936279
     },
     "Boeing 717-200":{
         "Fuel\/Available Seat Distance":0.0409777529,
@@ -85,7 +85,7 @@
         "Fuel\/Available Weight Distance":0.0003404246,
         "Fuel\/Revenue Weight Distance":0.0005692142,
         "Number of flights performed":679954.0,
-        "Revenue PAX Miles":46265803418.5459213257
+        "Revenue PAX km":46265803418.5459213257
     },
     "Boeing 737-700\/700LR\/Max 7":{
         "Fuel\/Available Seat Distance":0.0539964455,
@@ -93,7 +93,7 @@
         "Fuel\/Available Weight Distance":0.0004508362,
         "Fuel\/Revenue Weight Distance":0.0006986369,
         "Number of flights performed":3380714.0,
-        "Revenue PAX Miles":435153122330.0152587891
+        "Revenue PAX km":435153122330.0152587891
     },
     "Boeing 737-800":{
         "Fuel\/Available Seat Distance":0.0225537834,
@@ -101,7 +101,7 @@
         "Fuel\/Available Weight Distance":0.0002013872,
         "Fuel\/Revenue Weight Distance":0.0002945562,
         "Number of flights performed":3139853.0,
-        "Revenue PAX Miles":780276067292.8236083984
+        "Revenue PAX km":780276067292.8236083984
     },
     "Boeing 737-900":{
         "Fuel\/Available Seat Distance":0.0563620609,
@@ -109,7 +109,7 @@
         "Fuel\/Available Weight Distance":0.0005670147,
         "Fuel\/Revenue Weight Distance":0.000735425,
         "Number of flights performed":138612.0,
-        "Revenue PAX Miles":36378462983.7911071777
+        "Revenue PAX km":36378462983.7911071777
     },
     "Boeing 737-900ER":{
         "Fuel\/Available Seat Distance":0.0243301889,
@@ -117,7 +117,7 @@
         "Fuel\/Available Weight Distance":0.0002058084,
         "Fuel\/Revenue Weight Distance":0.0003017399,
         "Number of flights performed":1126132.0,
-        "Revenue PAX Miles":364989740344.0865478516
+        "Revenue PAX km":364989740344.0865478516
     },
     "Boeing 747-400":{
         "Fuel\/Available Seat Distance":10.1588080832,
@@ -125,7 +125,7 @@
         "Fuel\/Available Weight Distance":0.0001017135,
         "Fuel\/Revenue Weight Distance":0.0004150789,
         "Number of flights performed":22708.0,
-        "Revenue PAX Miles":1028052376.7120640278
+        "Revenue PAX km":1028052376.7120640278
     },
     "Boeing 757-200":{
         "Fuel\/Available Seat Distance":0.0273798223,
@@ -133,7 +133,7 @@
         "Fuel\/Available Weight Distance":0.0002185568,
         "Fuel\/Revenue Weight Distance":0.0003469351,
         "Number of flights performed":535421.0,
-        "Revenue PAX Miles":229723123247.8491210938
+        "Revenue PAX km":229723123247.8491210938
     },
     "Boeing 757-300":{
         "Fuel\/Available Seat Distance":0.0368964529,
@@ -141,7 +141,7 @@
         "Fuel\/Available Weight Distance":0.000323444,
         "Fuel\/Revenue Weight Distance":0.0005629661,
         "Number of flights performed":101091.0,
-        "Revenue PAX Miles":52523403469.1688995361
+        "Revenue PAX km":52523403469.1688995361
     },
     "Boeing 767-200\/ER\/EM":{
         "Fuel\/Available Seat Distance":0.1868159367,
@@ -149,7 +149,7 @@
         "Fuel\/Available Weight Distance":0.0000960142,
         "Fuel\/Revenue Weight Distance":0.0007860483,
         "Number of flights performed":12294.0,
-        "Revenue PAX Miles":18101986.6072320007
+        "Revenue PAX km":18101986.6072320007
     },
     "Boeing 767-300\/300ER":{
         "Fuel\/Available Seat Distance":0.0313165478,
@@ -157,7 +157,7 @@
         "Fuel\/Available Weight Distance":0.0001720002,
         "Fuel\/Revenue Weight Distance":0.000338769,
         "Number of flights performed":210475.0,
-        "Revenue PAX Miles":205875651110.2283630371
+        "Revenue PAX km":205875651110.2283630371
     },
     "Boeing 767-400\/ER":{
         "Fuel\/Available Seat Distance":0.0295467777,
@@ -165,7 +165,7 @@
         "Fuel\/Available Weight Distance":0.0001837061,
         "Fuel\/Revenue Weight Distance":0.0003185571,
         "Number of flights performed":63239.0,
-        "Revenue PAX Miles":77268924677.8944091797
+        "Revenue PAX km":77268924677.8944091797
     },
     "Boeing 777-200ER\/200LR\/233LR":{
         "Fuel\/Available Seat Distance":0.0310588626,
@@ -173,7 +173,7 @@
         "Fuel\/Available Weight Distance":0.000191297,
         "Fuel\/Revenue Weight Distance":0.0003052989,
         "Number of flights performed":203055.0,
-        "Revenue PAX Miles":338038138903.246887207
+        "Revenue PAX km":338038138903.246887207
     },
     "Boeing 777-300\/300ER\/333ER":{
         "Fuel\/Available Seat Distance":0.0332504371,
@@ -181,7 +181,7 @@
         "Fuel\/Available Weight Distance":0.0001777444,
         "Fuel\/Revenue Weight Distance":0.0003267726,
         "Number of flights performed":48291.0,
-        "Revenue PAX Miles":109887831312.4627227783
+        "Revenue PAX km":109887831312.4627227783
     },
     "Boeing 787-10 Dreamliner":{
         "Fuel\/Available Seat Distance":0.0219745877,
@@ -189,7 +189,7 @@
         "Fuel\/Available Weight Distance":0.000118584,
         "Fuel\/Revenue Weight Distance":0.0003019676,
         "Number of flights performed":39.0,
-        "Revenue PAX Miles":27345316.6356479973
+        "Revenue PAX km":27345316.6356479973
     },
     "Boeing B737 Max 800":{
         "Fuel\/Available Seat Distance":0.0227311071,
@@ -197,7 +197,7 @@
         "Fuel\/Available Weight Distance":0.0002013722,
         "Fuel\/Revenue Weight Distance":0.0002880128,
         "Number of flights performed":74190.0,
-        "Revenue PAX Miles":19539843143.166721344
+        "Revenue PAX km":19539843143.166721344
     },
     "Boeing B737 Max 900":{
         "Fuel\/Available Seat Distance":0.0200474597,
@@ -205,7 +205,7 @@
         "Fuel\/Available Weight Distance":0.0001681359,
         "Fuel\/Revenue Weight Distance":0.0002438804,
         "Number of flights performed":14739.0,
-        "Revenue PAX Miles":4822854148.1134080887
+        "Revenue PAX km":4822854148.1134080887
     },
     "Canadair CRJ 900":{
         "Fuel\/Available Seat Distance":0.2106734506,
@@ -213,7 +213,7 @@
         "Fuel\/Available Weight Distance":0.0022755505,
         "Fuel\/Revenue Weight Distance":0.0029493937,
         "Number of flights performed":260295.0,
-        "Revenue PAX Miles":15279550042.8890895844
+        "Revenue PAX km":15279550042.8890895844
     },
     "Canadair RJ-200ER \/RJ-440":{
         "Fuel\/Available Seat Distance":0.0455374979,
@@ -221,7 +221,7 @@
         "Fuel\/Available Weight Distance":0.0003965274,
         "Fuel\/Revenue Weight Distance":0.0006348673,
         "Number of flights performed":1126509.0,
-        "Revenue PAX Miles":26004456199.2314910889
+        "Revenue PAX km":26004456199.2314910889
     },
     "Canadair RJ-700":{
         "Fuel\/Available Seat Distance":0.0477516927,
@@ -229,7 +229,7 @@
         "Fuel\/Available Weight Distance":0.0004050375,
         "Fuel\/Revenue Weight Distance":0.0006897462,
         "Number of flights performed":729498.0,
-        "Revenue PAX Miles":29554949980.6640663147
+        "Revenue PAX km":29554949980.6640663147
     },
     "Embraer 190":{
         "Fuel\/Available Seat Distance":0.0563176812,
@@ -237,7 +237,7 @@
         "Fuel\/Available Weight Distance":0.0004763827,
         "Fuel\/Revenue Weight Distance":0.000789761,
         "Number of flights performed":461927.0,
-        "Revenue PAX Miles":31060489388.8101119995
+        "Revenue PAX km":31060489388.8101119995
     },
     "Embraer ERJ-175":{
         "Fuel\/Available Seat Distance":0.0304235657,
@@ -245,7 +245,7 @@
         "Fuel\/Available Weight Distance":0.000306274,
         "Fuel\/Revenue Weight Distance":0.0004320883,
         "Number of flights performed":815853.0,
-        "Revenue PAX Miles":54980464367.828742981
+        "Revenue PAX km":54980464367.828742981
     },
     "Embraer-135":{
         "Fuel\/Available Seat Distance":0.2572237049,
@@ -253,7 +253,7 @@
         "Fuel\/Available Weight Distance":0.0028354149,
         "Fuel\/Revenue Weight Distance":0.0045150801,
         "Number of flights performed":3459.0,
-        "Revenue PAX Miles":39522912.0802560002
+        "Revenue PAX km":39522912.0802560002
     },
     "Embraer-140":{
         "Fuel\/Available Seat Distance":0.0507548172,
@@ -261,7 +261,7 @@
         "Fuel\/Available Weight Distance":0.0004879467,
         "Fuel\/Revenue Weight Distance":0.0007319238,
         "Number of flights performed":234420.0,
-        "Revenue PAX Miles":4535514518.870016098
+        "Revenue PAX km":4535514518.870016098
     },
     "Embraer-145":{
         "Fuel\/Available Seat Distance":0.1088972585,
@@ -269,7 +269,7 @@
         "Fuel\/Available Weight Distance":0.0011532449,
         "Fuel\/Revenue Weight Distance":0.0015217859,
         "Number of flights performed":821619.0,
-        "Revenue PAX Miles":23206795439.0976028442
+        "Revenue PAX km":23206795439.0976028442
     },
     "McDonnell Douglas DC9 Super 80\/MD81\/82\/83\/88":{
         "Fuel\/Available Seat Distance":0.037273961,
@@ -277,7 +277,7 @@
         "Fuel\/Available Weight Distance":0.0003593999,
         "Fuel\/Revenue Weight Distance":0.0004954166,
         "Number of flights performed":794236.0,
-        "Revenue PAX Miles":87104652650.7252502441
+        "Revenue PAX km":87104652650.7252502441
     },
     "McDonnell Douglas MD-90":{
         "Fuel\/Available Seat Distance":0.0315536167,
@@ -285,6 +285,6 @@
         "Fuel\/Available Weight Distance":0.0002876912,
         "Fuel\/Revenue Weight Distance":0.0004085992,
         "Number of flights performed":230213.0,
-        "Revenue PAX Miles":34592558104.6087722778
+        "Revenue PAX km":34592558104.6087722778
     }
 }
