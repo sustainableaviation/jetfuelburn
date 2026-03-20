@@ -207,6 +207,34 @@ df_dequantified.to_json(
 
 df = process_data_usdot_t2(
     path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2023.csv",
+)
+
+df_dequantified = df.pint.dequantify()
+df_dequantified.columns = df_dequantified.columns.droplevel(1)
+
+df_dequantified.to_json(
+    path_or_buf="USDOT_data_2023.json",
+    orient="index",
+    indent=4,
+)
+
+df_dequantified = df.pint.dequantify()
+df_dequantified.columns = df_dequantified.columns.droplevel(1)
+
+df = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2019.csv",
+)
+
+df_dequantified.to_json(
+    path_or_buf="USDOT_data_2019.json",
+    orient="index",
+    indent=4,
+)
+
+df = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
     path_csv_t2="data/T_SCHEDULE_T2_2018.csv",
 )
 df_dequantified = df.pint.dequantify()
@@ -232,9 +260,9 @@ df_dequantified.to_json(
     indent=4,
 )
 
-#-----------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------
 
-#Plots
+# Plot für Movements
 
 import plotly.graph_objects as go
 
@@ -250,6 +278,18 @@ df24 = process_data_usdot_t2(
     path_csv_t2="data/T_SCHEDULE_T2_2024.csv",
 ).pint.dequantify()
 df24.columns = df24.columns.droplevel(1)
+
+df23 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2023.csv",
+).pint.dequantify()
+df23.columns = df23.columns.droplevel(1)
+
+df19 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2019.csv",
+).pint.dequantify()
+df19.columns = df19.columns.droplevel(1)
 
 df18 = process_data_usdot_t2(
     path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
@@ -268,7 +308,7 @@ df13.columns = df13.columns.droplevel(1)
 top_types = (
     df25["Number of flights performed"]
     .sort_values(ascending=False)
-    .head(15)
+    .head(20)
     .index.tolist()
 )
 
@@ -276,13 +316,22 @@ top_types = (
 total = (
     df25["Number of flights performed"].reindex(top_types).fillna(0)
     + df24["Number of flights performed"].reindex(top_types).fillna(0)
+    + df23["Number of flights performed"].reindex(top_types).fillna(0)
+    + df19["Number of flights performed"].reindex(top_types).fillna(0)
     + df18["Number of flights performed"].reindex(top_types).fillna(0)
     + df13["Number of flights performed"].reindex(top_types).fillna(0)
 )
 sorted_types = total.sort_values(ascending=False).index.tolist()
 
 # Diagramm erstellen
-datasets = {"2013": df13, "2018": df18, "2024": df24, "2025": df25}
+datasets = {
+    "2013": df13,
+    "2018": df18,
+    "2019": df19,
+    "2023": df23,
+    "2024": df24,
+    "2025": df25,
+}
 
 fig = go.Figure()
 for year, df in datasets.items():
@@ -298,7 +347,9 @@ fig.update_layout(
 )
 fig.show()
 
-#-----------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------
+
+# Plots für PAX km
 
 # Jedes Jahr separat laden und speichern
 df25 = process_data_usdot_t2(
@@ -312,6 +363,18 @@ df24 = process_data_usdot_t2(
     path_csv_t2="data/T_SCHEDULE_T2_2024.csv",
 ).pint.dequantify()
 df24.columns = df24.columns.droplevel(1)
+
+df23 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2023.csv",
+).pint.dequantify()
+df23.columns = df23.columns.droplevel(1)
+
+df19 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2019.csv",
+).pint.dequantify()
+df19.columns = df19.columns.droplevel(1)
 
 df18 = process_data_usdot_t2(
     path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
@@ -327,24 +390,28 @@ df13.columns = df13.columns.droplevel(1)
 
 
 # Top 15 Flugzeugtypen aus 2024 als Referenz
-top_types = (
-    df25["Revenue PAX km"]
-    .sort_values(ascending=False)
-    .head(15)
-    .index.tolist()
-)
+top_types = df25["Revenue PAX km"].sort_values(ascending=False).head(15).index.tolist()
 
 # Gesamtsumme über alle Jahre berechnen und danach sortieren
 total = (
     df25["Revenue PAX km"].reindex(top_types).fillna(0)
     + df24["Revenue PAX km"].reindex(top_types).fillna(0)
+    + df23["Revenue PAX km"].reindex(top_types).fillna(0)
+    + df19["Revenue PAX km"].reindex(top_types).fillna(0)
     + df18["Revenue PAX km"].reindex(top_types).fillna(0)
     + df13["Revenue PAX km"].reindex(top_types).fillna(0)
 )
 sorted_types = total.sort_values(ascending=False).index.tolist()
 
 # Diagramm erstellen
-datasets = {"2013": df13, "2018": df18, "2024": df24, "2025": df25}
+datasets = {
+    "2013": df13,
+    "2018": df18,
+    "2019": df19,
+    "2023": df23,
+    "2024": df24,
+    "2025": df25,
+}
 
 fig = go.Figure()
 for year, df in datasets.items():
