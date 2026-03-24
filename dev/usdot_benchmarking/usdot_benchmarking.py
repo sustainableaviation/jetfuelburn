@@ -19,3 +19,11 @@ result2 = usdot.calculate_movements(
 )
 print(result)
 print(result2)
+
+import jetfuelburn
+from jetfuelburn import ureg
+from jetfuelburn.reducedorder import seymour_etal
+
+burn = seymour_etal.available_aircraft()[0:140]
+
+print(burn)

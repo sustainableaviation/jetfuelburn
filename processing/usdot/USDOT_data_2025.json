@@ -5,7 +5,10 @@
         "Fuel\/Available Weight Distance":0.0002350516,
         "Fuel\/Revenue Weight Distance":0.0003684659,
         "Number of flights performed":112008.0,
-        "Revenue PAX km":15148681426.809217453
+        "Revenue PAX km":15148681426.809217453,
+        "Average trip distance":1481.9424864086,
+        "Average trip flight time":2.1619031249,
+        "Freight and mail transported":13.0052572483
     },
     "A220-300 BD-500-1A11":{
         "Fuel\/Available Seat Distance":0.0286438035,
@@ -13,7 +16,10 @@
         "Fuel\/Available Weight Distance":0.0002364928,
         "Fuel\/Revenue Weight Distance":0.000381764,
         "Number of flights performed":219465.0,
-        "Revenue PAX km":38124345455.5772171021
+        "Revenue PAX km":38124345455.5772171021,
+        "Average trip distance":2095.0380351266,
+        "Average trip flight time":3.0385472536,
+        "Freight and mail transported":19.4653447297
     },
     "Airbus Industrie A319":{
         "Fuel\/Available Seat Distance":0.0315899405,
@@ -21,7 +27,10 @@
         "Fuel\/Available Weight Distance":0.000278259,
         "Fuel\/Revenue Weight Distance":0.000425457,
         "Number of flights performed":910489.0,
-        "Revenue PAX km":115565436666.6750793457
+        "Revenue PAX km":115565436666.6750793457,
+        "Average trip distance":1378.7583353604,
+        "Average trip flight time":1.9747422781,
+        "Freight and mail transported":48.5416633704
     },
     "Airbus Industrie A320-100\/200":{
         "Fuel\/Available Seat Distance":0.0266848947,
@@ -29,7 +38,10 @@
         "Fuel\/Available Weight Distance":0.00024813,
         "Fuel\/Revenue Weight Distance":0.0003658347,
         "Number of flights performed":1248668.0,
-        "Revenue PAX km":247164831177.6568603516
+        "Revenue PAX km":247164831177.6568603516,
+        "Average trip distance":1576.3359214893,
+        "Average trip flight time":2.2310204635,
+        "Freight and mail transported":55.026553142
     },
     "Airbus Industrie A320-200n":{
         "Fuel\/Available Seat Distance":0.0182657557,
@@ -37,7 +49,10 @@
         "Fuel\/Available Weight Distance":0.0002013455,
         "Fuel\/Revenue Weight Distance":0.0002585563,
         "Number of flights performed":428874.0,
-        "Revenue PAX km":93040936239.4744415283
+        "Revenue PAX km":93040936239.4744415283,
+        "Average trip distance":1711.356111057,
+        "Average trip flight time":2.4184747265,
+        "Freight and mail transported":null
     },
     "Airbus Industrie A321-200n":{
         "Fuel\/Available Seat Distance":0.0178166018,
@@ -45,7 +60,10 @@
         "Fuel\/Available Weight Distance":0.0001532931,
         "Fuel\/Revenue Weight Distance":0.0002449191,
         "Number of flights performed":788475.0,
-        "Revenue PAX km":326323512567.2713012695
+        "Revenue PAX km":326323512567.2713012695,
+        "Average trip distance":2876.3107045181,
+        "Average trip flight time":3.7892283303,
+        "Freight and mail transported":185.980685639
     },
     "Airbus Industrie A321\/Lr":{
         "Fuel\/Available Seat Distance":0.0221706826,
@@ -53,7 +71,10 @@
         "Fuel\/Available Weight Distance":0.0002021455,
         "Fuel\/Revenue Weight Distance":0.0002985747,
         "Number of flights performed":1259206.0,
-        "Revenue PAX km":370991226743.1786499023
+        "Revenue PAX km":370991226743.1786499023,
+        "Average trip distance":1918.0286018801,
+        "Average trip flight time":2.6454567359,
+        "Freight and mail transported":76.6353793854
     },
     "Airbus Industrie A330-200":{
         "Fuel\/Available Seat Distance":0.0314038067,
@@ -61,7 +82,10 @@
         "Fuel\/Available Weight Distance":0.0001770211,
         "Fuel\/Revenue Weight Distance":0.0003568856,
         "Number of flights performed":48939.0,
-        "Revenue PAX km":56832751165.7664031982
+        "Revenue PAX km":56832751165.7664031982,
+        "Average trip distance":5252.772818625,
+        "Average trip flight time":6.4669361465,
+        "Freight and mail transported":3594.438401306
     },
     "Airbus Industrie A330-300\/333":{
         "Fuel\/Available Seat Distance":0.0281373634,
@@ -69,7 +93,10 @@
         "Fuel\/Available Weight Distance":0.0001760053,
         "Fuel\/Revenue Weight Distance":0.0003173204,
         "Number of flights performed":40498.0,
-        "Revenue PAX km":64870014544.5496368408
+        "Revenue PAX km":64870014544.5496368408,
+        "Average trip distance":5883.9495512269,
+        "Average trip flight time":7.2115720704,
+        "Freight and mail transported":4292.7714277976
     },
     "Airbus Industrie A330-900":{
         "Fuel\/Available Seat Distance":0.0247308996,
@@ -77,7 +104,10 @@
         "Fuel\/Available Weight Distance":0.0001581082,
         "Fuel\/Revenue Weight Distance":0.0002742421,
         "Number of flights performed":44757.0,
-        "Revenue PAX km":75879706446.0483856201
+        "Revenue PAX km":75879706446.0483856201,
+        "Average trip distance":6261.4338956861,
+        "Average trip flight time":7.6490381006,
+        "Freight and mail transported":4024.1577262216
     },
     "Airbus Industrie A350-900":{
         "Fuel\/Available Seat Distance":0.0263880071,
@@ -85,7 +115,10 @@
         "Fuel\/Available Weight Distance":0.0001836388,
         "Fuel\/Revenue Weight Distance":0.0002766151,
         "Number of flights performed":36936.0,
-        "Revenue PAX km":82886206553.2131958008
+        "Revenue PAX km":82886206553.2131958008,
+        "Average trip distance":6963.0134799348,
+        "Average trip flight time":8.1591384974,
+        "Freight and mail transported":6950.7400421671
     },
     "B787-800 Dreamliner":{
         "Fuel\/Available Seat Distance":0.0276287257,
@@ -93,7 +126,10 @@
         "Fuel\/Available Weight Distance":0.000171471,
         "Fuel\/Revenue Weight Distance":0.0002862909,
         "Number of flights performed":55779.0,
-        "Revenue PAX km":76117047508.5926513672
+        "Revenue PAX km":76117047508.5926513672,
+        "Average trip distance":6161.3423881658,
+        "Average trip flight time":7.2604731,
+        "Freight and mail transported":4800.513426232
     },
     "B787-900 Dreamliner":{
         "Fuel\/Available Seat Distance":0.0265228463,
@@ -101,7 +137,10 @@
         "Fuel\/Available Weight Distance":0.0001522285,
         "Fuel\/Revenue Weight Distance":0.0002616975,
         "Number of flights performed":76567.0,
-        "Revenue PAX km":139667017393.44921875
+        "Revenue PAX km":139667017393.44921875,
+        "Average trip distance":7015.2183124034,
+        "Average trip flight time":8.2758043084,
+        "Freight and mail transported":6843.0580533973
     },
     "Boeing 717-200":{
         "Fuel\/Available Seat Distance":0.0462219626,
@@ -109,7 +148,10 @@
         "Fuel\/Available Weight Distance":0.0003951341,
         "Fuel\/Revenue Weight Distance":0.0006268654,
         "Number of flights performed":425184.0,
-        "Revenue PAX km":22026971147.0181121826
+        "Revenue PAX km":22026971147.0181121826,
+        "Average trip distance":520.6854183421,
+        "Average trip flight time":0.8654118726,
+        "Freight and mail transported":67.3351714504
     },
     "Boeing 737-700\/700LR\/Max 7":{
         "Fuel\/Available Seat Distance":0.0284158081,
@@ -117,7 +159,10 @@
         "Fuel\/Available Weight Distance":0.000253922,
         "Fuel\/Revenue Weight Distance":0.0003917191,
         "Number of flights performed":1533634.0,
-        "Revenue PAX km":192770687319.2939758301
+        "Revenue PAX km":192770687319.2939758301,
+        "Average trip distance":1280.8286354744,
+        "Average trip flight time":1.8468628334,
+        "Freight and mail transported":118.5594590138
     },
     "Boeing 737-800":{
         "Fuel\/Available Seat Distance":0.0227048157,
@@ -125,7 +170,10 @@
         "Fuel\/Available Weight Distance":0.0002048973,
         "Fuel\/Revenue Weight Distance":0.0003112148,
         "Number of flights performed":2474631.0,
-        "Revenue PAX km":513199419889.1029052734
+        "Revenue PAX km":513199419889.1029052734,
+        "Average trip distance":1703.7496193416,
+        "Average trip flight time":2.364845437,
+        "Freight and mail transported":107.2541788939
     },
     "Boeing 737-900":{
         "Fuel\/Available Seat Distance":0.0254135293,
@@ -133,7 +181,10 @@
         "Fuel\/Available Weight Distance":0.0002501553,
         "Fuel\/Revenue Weight Distance":0.0003602014,
         "Number of flights performed":40503.0,
-        "Revenue PAX km":8974012578.4108810425
+        "Revenue PAX km":8974012578.4108810425,
+        "Average trip distance":1531.0422313134,
+        "Average trip flight time":2.1360810142,
+        "Freight and mail transported":82.3997552927
     },
     "Boeing 737-900ER":{
         "Fuel\/Available Seat Distance":0.0227817202,
@@ -141,7 +192,10 @@
         "Fuel\/Available Weight Distance":0.0001937184,
         "Fuel\/Revenue Weight Distance":0.0002953534,
         "Number of flights performed":1058590.0,
-        "Revenue PAX km":279908502497.1164550781
+        "Revenue PAX km":279908502497.1164550781,
+        "Average trip distance":1825.4375246322,
+        "Average trip flight time":2.5166591621,
+        "Freight and mail transported":305.5593294223
     },
     "Boeing 747-400":{
         "Fuel\/Available Seat Distance":0.0318902258,
@@ -149,7 +203,10 @@
         "Fuel\/Available Weight Distance":0.0001838424,
         "Fuel\/Revenue Weight Distance":0.0003927035,
         "Number of flights performed":1967.0,
-        "Revenue PAX km":387512259.9955199957
+        "Revenue PAX km":387512259.9955199957,
+        "Average trip distance":3561.4847526326,
+        "Average trip flight time":4.3842318844,
+        "Freight and mail transported":null
     },
     "Boeing 757-200":{
         "Fuel\/Available Seat Distance":0.0265422981,
@@ -157,7 +214,10 @@
         "Fuel\/Available Weight Distance":0.0002241652,
         "Fuel\/Revenue Weight Distance":0.0003404599,
         "Number of flights performed":298866.0,
-        "Revenue PAX km":93651485192.724105835
+        "Revenue PAX km":93651485192.724105835,
+        "Average trip distance":3304.124050623,
+        "Average trip flight time":4.2681724213,
+        "Freight and mail transported":278.0207896301
     },
     "Boeing 757-300":{
         "Fuel\/Available Seat Distance":0.0245755227,
@@ -165,7 +225,10 @@
         "Fuel\/Available Weight Distance":0.0002233628,
         "Fuel\/Revenue Weight Distance":0.0003660638,
         "Number of flights performed":71763.0,
-        "Revenue PAX km":32767384649.2439079285
+        "Revenue PAX km":32767384649.2439079285,
+        "Average trip distance":2658.4263275742,
+        "Average trip flight time":3.4573694733,
+        "Freight and mail transported":481.242045103
     },
     "Boeing 767-300\/300ER":{
         "Fuel\/Available Seat Distance":0.0352254425,
@@ -173,7 +236,10 @@
         "Fuel\/Available Weight Distance":0.0001783676,
         "Fuel\/Revenue Weight Distance":0.0004062128,
         "Number of flights performed":103685.0,
-        "Revenue PAX km":88999435411.3497619629
+        "Revenue PAX km":88999435411.3497619629,
+        "Average trip distance":4837.4478708157,
+        "Average trip flight time":6.0190925404,
+        "Freight and mail transported":3022.8046792892
     },
     "Boeing 767-400\/ER":{
         "Fuel\/Available Seat Distance":0.0394298336,
@@ -181,7 +247,10 @@
         "Fuel\/Available Weight Distance":0.0001904692,
         "Fuel\/Revenue Weight Distance":0.0003726478,
         "Number of flights performed":47572.0,
-        "Revenue PAX km":56161166782.3683853149
+        "Revenue PAX km":56161166782.3683853149,
+        "Average trip distance":5281.4228840777,
+        "Average trip flight time":6.5007506144,
+        "Freight and mail transported":4268.8836608834
     },
     "Boeing 777-200ER\/200LR\/233LR":{
         "Fuel\/Available Seat Distance":0.0333350653,
@@ -189,7 +258,10 @@
         "Fuel\/Available Weight Distance":0.0002094145,
         "Fuel\/Revenue Weight Distance":0.0003345208,
         "Number of flights performed":141311.0,
-        "Revenue PAX km":217752015444.7714538574
+        "Revenue PAX km":217752015444.7714538574,
+        "Average trip distance":6403.8401289302,
+        "Average trip flight time":7.6209493886,
+        "Freight and mail transported":6583.9267257313
     },
     "Boeing 777-300\/300ER\/333ER":{
         "Fuel\/Available Seat Distance":0.0321879765,
@@ -197,7 +269,10 @@
         "Fuel\/Available Weight Distance":0.0001702399,
         "Fuel\/Revenue Weight Distance":0.0003066476,
         "Number of flights performed":44788.0,
-        "Revenue PAX km":91671278214.3966827393
+        "Revenue PAX km":91671278214.3966827393,
+        "Average trip distance":7091.5344173733,
+        "Average trip flight time":8.2800943467,
+        "Freight and mail transported":10326.5123107875
     },
     "Boeing 787-10 Dreamliner":{
         "Fuel\/Available Seat Distance":0.0218041643,
@@ -205,7 +280,10 @@
         "Fuel\/Available Weight Distance":0.0001403212,
         "Fuel\/Revenue Weight Distance":0.0002101141,
         "Number of flights performed":24617.0,
-        "Revenue PAX km":48101614948.3541793823
+        "Revenue PAX km":48101614948.3541793823,
+        "Average trip distance":7387.6249827769,
+        "Average trip flight time":8.5567209991,
+        "Freight and mail transported":8318.8668432527
     },
     "Boeing B737 Max 800":{
         "Fuel\/Available Seat Distance":0.0194850902,
@@ -213,7 +291,10 @@
         "Fuel\/Available Weight Distance":0.0001764401,
         "Fuel\/Revenue Weight Distance":0.0002603498,
         "Number of flights performed":1565987.0,
-        "Revenue PAX km":358744540121.6118164062
+        "Revenue PAX km":358744540121.6118164062,
+        "Average trip distance":2077.3084777913,
+        "Average trip flight time":2.8023900629,
+        "Freight and mail transported":125.7378798041
     },
     "Boeing B737 Max 900":{
         "Fuel\/Available Seat Distance":0.0195487561,
@@ -221,7 +302,10 @@
         "Fuel\/Available Weight Distance":0.0001661358,
         "Fuel\/Revenue Weight Distance":0.0002547241,
         "Number of flights performed":443431.0,
-        "Revenue PAX km":159779479427.6187133789
+        "Revenue PAX km":159779479427.6187133789,
+        "Average trip distance":2177.7707465828,
+        "Average trip flight time":2.9105223452,
+        "Freight and mail transported":121.4069402282
     },
     "Bombardier CRJ550":{
         "Fuel\/Available Seat Distance":0.0582156887,
@@ -229,7 +313,10 @@
         "Fuel\/Available Weight Distance":0.000582133,
         "Fuel\/Revenue Weight Distance":0.0008702655,
         "Number of flights performed":103233.0,
-        "Revenue PAX km":1819062859.8827521801
+        "Revenue PAX km":1819062859.8827521801,
+        "Average trip distance":475.2616463177,
+        "Average trip flight time":0.8470185234,
+        "Freight and mail transported":null
     },
     "Canadair CRJ 900":{
         "Fuel\/Available Seat Distance":0.0494205378,
@@ -237,7 +324,10 @@
         "Fuel\/Available Weight Distance":0.0004634142,
         "Fuel\/Revenue Weight Distance":0.0006723762,
         "Number of flights performed":150942.0,
-        "Revenue PAX km":5062268530.1422080994
+        "Revenue PAX km":5062268530.1422080994,
+        "Average trip distance":558.3511869869,
+        "Average trip flight time":0.9525324703,
+        "Freight and mail transported":null
     },
     "Canadair RJ-200ER \/RJ-440":{
         "Fuel\/Available Seat Distance":0.0553406722,
@@ -245,7 +335,10 @@
         "Fuel\/Available Weight Distance":0.0005544229,
         "Fuel\/Revenue Weight Distance":0.0008131181,
         "Number of flights performed":302055.0,
-        "Revenue PAX km":5916214117.9468803406
+        "Revenue PAX km":5916214117.9468803406,
+        "Average trip distance":520.6056299483,
+        "Average trip flight time":0.9320394836,
+        "Freight and mail transported":null
     },
     "Canadair RJ-700":{
         "Fuel\/Available Seat Distance":0.0521174565,
@@ -253,7 +346,10 @@
         "Fuel\/Available Weight Distance":0.0005403248,
         "Fuel\/Revenue Weight Distance":0.0007828481,
         "Number of flights performed":358407.0,
-        "Revenue PAX km":13874043184.9747200012
+        "Revenue PAX km":13874043184.9747200012,
+        "Average trip distance":607.1175083663,
+        "Average trip flight time":1.0226118622,
+        "Freight and mail transported":null
     },
     "Embraer 190":{
         "Fuel\/Available Seat Distance":0.0493817764,
@@ -261,7 +357,10 @@
         "Fuel\/Available Weight Distance":0.0004354727,
         "Fuel\/Revenue Weight Distance":0.0007091788,
         "Number of flights performed":39921.0,
-        "Revenue PAX km":2135956398.6562561989
+        "Revenue PAX km":2135956398.6562561989,
+        "Average trip distance":828.1035941963,
+        "Average trip flight time":1.3592931881,
+        "Freight and mail transported":null
     },
     "Embraer ERJ-175":{
         "Fuel\/Available Seat Distance":0.0374688618,
@@ -269,7 +368,10 @@
         "Fuel\/Available Weight Distance":0.0003251171,
         "Fuel\/Revenue Weight Distance":0.0005141717,
         "Number of flights performed":2369764.0,
-        "Revenue PAX km":119471048927.6198425293
+        "Revenue PAX km":119471048927.6198425293,
+        "Average trip distance":1083.0246919526,
+        "Average trip flight time":1.689741367,
+        "Freight and mail transported":null
     },
     "Embraer-Emb-170":{
         "Fuel\/Available Seat Distance":0.0480064657,
@@ -277,6 +379,9 @@
         "Fuel\/Available Weight Distance":0.0004002816,
         "Fuel\/Revenue Weight Distance":0.0006446693,
         "Number of flights performed":229593.0,
-        "Revenue PAX km":8432072929.1208972931
+        "Revenue PAX km":8432072929.1208972931,
+        "Average trip distance":817.0315337853,
+        "Average trip flight time":1.3114732208,
+        "Freight and mail transported":null
     }
 }

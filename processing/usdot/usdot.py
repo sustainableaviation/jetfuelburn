@@ -58,6 +58,10 @@ def process_data_usdot_t2(
         'REV_TON_MILES_240': 'REV_TON_MILES',
         'AVL_TON_MILES_280': 'AVL_TON_MILES',
         'AIRCRAFT_FUELS_921': 'AIRCRAFT_FUELS',
+        'REV_ACRFT_MILES_FLOWN_410': 'REV_ACRFT_MILES_FLOWN',
+        'REV_ACRFT_HRS_AIRBORNE_610': 'REV_ACRFT_HRS_AIRBORNE',
+        'REV_TON_MILES_FREIGHT_247': 'REV_TON_MILES_FREIGHT',
+        'REV_TON_MILES_MAIL_249': 'REV_TON_MILES_MAIL',
         'CARRIER_GROUP': 'CARRIER_GROUP',
         'AIRCRAFT_CONFIG': 'AIRCRAFT_CONFIG',
         'AIRCRAFT_TYPE': 'AIRCRAFT_TYPE',
@@ -71,6 +75,10 @@ def process_data_usdot_t2(
         "REV_TON_MILES": "pint[miles*short_ton]",
         "AVL_TON_MILES": "pint[miles*short_ton]",
         "AIRCRAFT_FUELS": "pint[gallons]",
+        "REV_ACRFT_MILES_FLOWN": "pint[miles]",
+        "REV_ACRFT_HRS_AIRBORNE": "pint[hours]",
+        "REV_TON_MILES_FREIGHT": "pint[miles*short_ton]",
+        "REV_TON_MILES_MAIL": "pint[miles*short_ton]",
         "CARRIER_GROUP": "pint[]",
         "AIRCRAFT_CONFIG": "pint[]",
         "AIRCRAFT_TYPE": "pint[]",
@@ -88,6 +96,9 @@ def process_data_usdot_t2(
     df_t2["REV_PAX_MILES"] = df_t2["REV_PAX_MILES"].pint.to(ureg("km"))
     df_t2["REV_TON_MILES"] = df_t2["REV_TON_MILES"].pint.to(ureg("km*kg"))
     df_t2["AVL_TON_MILES"] = df_t2["AVL_TON_MILES"].pint.to(ureg("km*kg"))
+    df_t2["REV_ACRFT_MILES_FLOWN"] = df_t2["REV_ACRFT_MILES_FLOWN"].pint.to(ureg("km"))
+    df_t2["REV_TON_MILES_FREIGHT"] = df_t2["REV_TON_MILES_FREIGHT"].pint.to(ureg("km*kg"))
+    df_t2["REV_TON_MILES_MAIL"] = df_t2["REV_TON_MILES_MAIL"].pint.to(ureg("km*kg"))
 
     # DATA FILTERING
 
@@ -101,6 +112,10 @@ def process_data_usdot_t2(
         "AVL_TON_MILES",
         "AIRCRAFT_FUELS",
         "REV_ACRFT_DEP_PERF",
+        "REV_ACRFT_MILES_FLOWN",
+        "REV_ACRFT_HRS_AIRBORNE",
+        "REV_TON_MILES_FREIGHT",
+        "REV_TON_MILES_MAIL",
     ]
     df_t2[list_numeric_columns] = df_t2[list_numeric_columns].replace(
         to_replace=0, value=pd.NA
@@ -124,6 +139,16 @@ def process_data_usdot_t2(
 
     df_t2["Revenue PAX km"] = df_t2["REV_PAX_MILES"]
 
+    df_t2["Average trip distance"] = (
+            df_t2["REV_ACRFT_MILES_FLOWN"] / df_t2["REV_ACRFT_DEP_PERF"]
+    )
+    df_t2["Average trip flight time"] = (
+            df_t2["REV_ACRFT_HRS_AIRBORNE"] / df_t2["REV_ACRFT_DEP_PERF"]
+    )
+    df_t2["Freight and mail transported"] = (
+        (df_t2["REV_TON_MILES_FREIGHT"] + df_t2["REV_TON_MILES_MAIL"]) / df_t2["REV_ACRFT_MILES_FLOWN"]
+    )
+
     # SANITY CHECKS
 
     df_t2 = df_t2.loc[df_t2["REV_PAX_MILES"] <= df_t2["AVL_SEAT_MILES"]]
@@ -138,6 +163,10 @@ def process_data_usdot_t2(
         "Fuel/Revenue Weight Distance",
         "Number of flights performed",
         "Revenue PAX km",
+        "Average trip distance",
+        "Average trip flight time",
+        "Freight and mail transported",
+
     ]
     df_t2 = df_t2[list_return_columns]
 
@@ -150,6 +179,9 @@ def process_data_usdot_t2(
         "Fuel/Revenue Weight Distance": "mean",
         "Number of flights performed": "sum",
         "Revenue PAX km": "sum",
+        "Average trip distance": "mean",
+        "Average trip flight time": "mean",
+        "Freight and mail transported": "mean",
     }
     df_t2 = df_t2.groupby(
         by="Aircraft Designation (US DOT Schedule T2)",
@@ -219,19 +251,19 @@ df_dequantified.to_json(
     indent=4,
 )
 
-df_dequantified = df.pint.dequantify()
-df_dequantified.columns = df_dequantified.columns.droplevel(1)
-
 df = process_data_usdot_t2(
     path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
     path_csv_t2="data/T_SCHEDULE_T2_2019.csv",
 )
+df_dequantified = df.pint.dequantify()
+df_dequantified.columns = df_dequantified.columns.droplevel(1)
 
 df_dequantified.to_json(
     path_or_buf="USDOT_data_2019.json",
     orient="index",
     indent=4,
 )
+
 
 df = process_data_usdot_t2(
     path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
@@ -390,7 +422,7 @@ df13.columns = df13.columns.droplevel(1)
 
 
 # Top 15 Flugzeugtypen aus 2024 als Referenz
-top_types = df25["Revenue PAX km"].sort_values(ascending=False).head(15).index.tolist()
+top_types = df25["Revenue PAX km"].sort_values(ascending=False).head(20).index.tolist()
 
 # Gesamtsumme über alle Jahre berechnen und danach sortieren
 total = (
@@ -423,6 +455,246 @@ fig.update_layout(
     barmode="group",
     title="Revenue PAX km by Aircraft Type",
     xaxis_tickangle=-45,
-    yaxis_title="Movements",
+    yaxis_title="Revenue PAX km",
+)
+fig.show()
+
+# -----------------------------------------------------------------------------------------------------------------------
+
+# Plots für Freight
+
+# Jedes Jahr separat laden und speichern
+df25 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2025.csv",
+).pint.dequantify()
+df25.columns = df25.columns.droplevel(1)
+
+df24 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2024.csv",
+).pint.dequantify()
+df24.columns = df24.columns.droplevel(1)
+
+df23 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2023.csv",
+).pint.dequantify()
+df23.columns = df23.columns.droplevel(1)
+
+df19 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2019.csv",
+).pint.dequantify()
+df19.columns = df19.columns.droplevel(1)
+
+df18 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2018.csv",
+).pint.dequantify()
+df18.columns = df18.columns.droplevel(1)
+
+df13 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2013.csv",
+).pint.dequantify()
+df13.columns = df13.columns.droplevel(1)
+
+
+# Top 15 Flugzeugtypen aus 2024 als Referenz
+top_types = df25["Freight and mail transported"].sort_values(ascending=False).head(20).index.tolist()
+
+# Gesamtsumme über alle Jahre berechnen und danach sortieren
+total = (
+    df25["Freight and mail transported"].reindex(top_types).fillna(0)
+    + df24["Freight and mail transported"].reindex(top_types).fillna(0)
+    + df23["Freight and mail transported"].reindex(top_types).fillna(0)
+    + df19["Freight and mail transported"].reindex(top_types).fillna(0)
+    + df18["Freight and mail transported"].reindex(top_types).fillna(0)
+    + df13["Freight and mail transported"].reindex(top_types).fillna(0)
+)
+sorted_types = total.sort_values(ascending=False).index.tolist()
+
+# Diagramm erstellen
+datasets = {
+    "2013": df13,
+    "2018": df18,
+    "2019": df19,
+    "2023": df23,
+    "2024": df24,
+    "2025": df25,
+}
+
+fig = go.Figure()
+for year, df in datasets.items():
+    df_filtered = df.loc[df.index.isin(top_types), "Freight and mail transported"]
+    df_filtered = df_filtered.reindex(sorted_types)  # Reihenfolge anwenden
+    fig.add_trace(go.Bar(name=year, x=df_filtered.index, y=df_filtered.values))
+
+fig.update_layout(
+    barmode="group",
+    title="Freight and mail transported by Aircraft Type",
+    xaxis_tickangle=-45,
+    yaxis_title="Average freight and mail transported [kg/km]",
+)
+fig.show()
+
+# -----------------------------------------------------------------------------------------------------------------------
+
+# Plots für Average Trip Distance
+
+# Jedes Jahr separat laden und speichern
+df25 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2025.csv",
+).pint.dequantify()
+df25.columns = df25.columns.droplevel(1)
+
+df24 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2024.csv",
+).pint.dequantify()
+df24.columns = df24.columns.droplevel(1)
+
+df23 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2023.csv",
+).pint.dequantify()
+df23.columns = df23.columns.droplevel(1)
+
+df19 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2019.csv",
+).pint.dequantify()
+df19.columns = df19.columns.droplevel(1)
+
+df18 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2018.csv",
+).pint.dequantify()
+df18.columns = df18.columns.droplevel(1)
+
+df13 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2013.csv",
+).pint.dequantify()
+df13.columns = df13.columns.droplevel(1)
+
+
+# Top 15 Flugzeugtypen aus 2024 als Referenz
+top_types = df25["Average trip distance"].sort_values(ascending=False).head(20).index.tolist()
+
+# Gesamtsumme über alle Jahre berechnen und danach sortieren
+total = (
+    df25["Average trip distance"].reindex(top_types).fillna(0)
+    + df24["Average trip distance"].reindex(top_types).fillna(0)
+    + df23["Average trip distance"].reindex(top_types).fillna(0)
+    + df19["Average trip distance"].reindex(top_types).fillna(0)
+    + df18["Average trip distance"].reindex(top_types).fillna(0)
+    + df13["Average trip distance"].reindex(top_types).fillna(0)
+)
+sorted_types = total.sort_values(ascending=False).index.tolist()
+
+# Diagramm erstellen
+datasets = {
+    "2013": df13,
+    "2018": df18,
+    "2019": df19,
+    "2023": df23,
+    "2024": df24,
+    "2025": df25,
+}
+
+fig = go.Figure()
+for year, df in datasets.items():
+    df_filtered = df.loc[df.index.isin(top_types), "Average trip distance"]
+    df_filtered = df_filtered.reindex(sorted_types)  # Reihenfolge anwenden
+    fig.add_trace(go.Bar(name=year, x=df_filtered.index, y=df_filtered.values))
+
+fig.update_layout(
+    barmode="group",
+    title="Average trip distance by Aircraft Type",
+    xaxis_tickangle=-45,
+    yaxis_title="Average trip distance [km]",
+)
+fig.show()
+
+# -----------------------------------------------------------------------------------------------------------------------
+
+# Plots für Average Trip Flight Time
+
+# Jedes Jahr separat laden und speichern
+df25 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2025.csv",
+).pint.dequantify()
+df25.columns = df25.columns.droplevel(1)
+
+df24 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2024.csv",
+).pint.dequantify()
+df24.columns = df24.columns.droplevel(1)
+
+df23 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2023.csv",
+).pint.dequantify()
+df23.columns = df23.columns.droplevel(1)
+
+df19 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2019.csv",
+).pint.dequantify()
+df19.columns = df19.columns.droplevel(1)
+
+df18 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2018.csv",
+).pint.dequantify()
+df18.columns = df18.columns.droplevel(1)
+
+df13 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2013.csv",
+).pint.dequantify()
+df13.columns = df13.columns.droplevel(1)
+
+
+# Top 15 Flugzeugtypen aus 2024 als Referenz
+top_types = df25["Average trip flight time"].sort_values(ascending=False).head(20).index.tolist()
+
+# Gesamtsumme über alle Jahre berechnen und danach sortieren
+total = (
+    df25["Average trip flight time"].reindex(top_types).fillna(0)
+    + df24["Average trip flight time"].reindex(top_types).fillna(0)
+    + df23["Average trip flight time"].reindex(top_types).fillna(0)
+    + df19["Average trip flight time"].reindex(top_types).fillna(0)
+    + df18["Average trip flight time"].reindex(top_types).fillna(0)
+    + df13["Average trip flight time"].reindex(top_types).fillna(0)
+)
+sorted_types = total.sort_values(ascending=False).index.tolist()
+
+# Diagramm erstellen
+datasets = {
+    "2013": df13,
+    "2018": df18,
+    "2019": df19,
+    "2023": df23,
+    "2024": df24,
+    "2025": df25,
+}
+
+fig = go.Figure()
+for year, df in datasets.items():
+    df_filtered = df.loc[df.index.isin(top_types), "Average trip flight time"]
+    df_filtered = df_filtered.reindex(sorted_types)  # Reihenfolge anwenden
+    fig.add_trace(go.Bar(name=year, x=df_filtered.index, y=df_filtered.values))
+
+fig.update_layout(
+    barmode="group",
+    title="Average trip flight time by Aircraft Type",
+    xaxis_tickangle=-45,
+    yaxis_title="Average trip flight time [hours]",
 )
 fig.show()
