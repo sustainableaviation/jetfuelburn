@@ -97,7 +97,9 @@ def process_data_usdot_t2(
     df_t2["REV_TON_MILES"] = df_t2["REV_TON_MILES"].pint.to(ureg("km*kg"))
     df_t2["AVL_TON_MILES"] = df_t2["AVL_TON_MILES"].pint.to(ureg("km*kg"))
     df_t2["REV_ACRFT_MILES_FLOWN"] = df_t2["REV_ACRFT_MILES_FLOWN"].pint.to(ureg("km"))
-    df_t2["REV_TON_MILES_FREIGHT"] = df_t2["REV_TON_MILES_FREIGHT"].pint.to(ureg("km*kg"))
+    df_t2["REV_TON_MILES_FREIGHT"] = df_t2["REV_TON_MILES_FREIGHT"].pint.to(
+        ureg("km*kg")
+    )
     df_t2["REV_TON_MILES_MAIL"] = df_t2["REV_TON_MILES_MAIL"].pint.to(ureg("km*kg"))
 
     # DATA FILTERING
@@ -140,14 +142,14 @@ def process_data_usdot_t2(
     df_t2["Revenue PAX km"] = df_t2["REV_PAX_MILES"]
 
     df_t2["Average trip distance"] = (
-            df_t2["REV_ACRFT_MILES_FLOWN"] / df_t2["REV_ACRFT_DEP_PERF"]
+        df_t2["REV_ACRFT_MILES_FLOWN"] / df_t2["REV_ACRFT_DEP_PERF"]
     )
     df_t2["Average trip flight time"] = (
-            df_t2["REV_ACRFT_HRS_AIRBORNE"] / df_t2["REV_ACRFT_DEP_PERF"]
+        df_t2["REV_ACRFT_HRS_AIRBORNE"] / df_t2["REV_ACRFT_DEP_PERF"]
     )
     df_t2["Freight and mail transported"] = (
-        (df_t2["REV_TON_MILES_FREIGHT"] + df_t2["REV_TON_MILES_MAIL"]) / df_t2["REV_ACRFT_MILES_FLOWN"]
-    )
+        df_t2["REV_TON_MILES_FREIGHT"] + df_t2["REV_TON_MILES_MAIL"]
+    ) / df_t2["REV_ACRFT_MILES_FLOWN"]
 
     # SANITY CHECKS
 
@@ -166,7 +168,6 @@ def process_data_usdot_t2(
         "Average trip distance",
         "Average trip flight time",
         "Freight and mail transported",
-
     ]
     df_t2 = df_t2[list_return_columns]
 
@@ -502,7 +503,12 @@ df13.columns = df13.columns.droplevel(1)
 
 
 # Top 15 Flugzeugtypen aus 2024 als Referenz
-top_types = df25["Freight and mail transported"].sort_values(ascending=False).head(20).index.tolist()
+top_types = (
+    df25["Freight and mail transported"]
+    .sort_values(ascending=False)
+    .head(20)
+    .index.tolist()
+)
 
 # Gesamtsumme über alle Jahre berechnen und danach sortieren
 total = (
@@ -582,7 +588,9 @@ df13.columns = df13.columns.droplevel(1)
 
 
 # Top 15 Flugzeugtypen aus 2024 als Referenz
-top_types = df25["Average trip distance"].sort_values(ascending=False).head(20).index.tolist()
+top_types = (
+    df25["Average trip distance"].sort_values(ascending=False).head(20).index.tolist()
+)
 
 # Gesamtsumme über alle Jahre berechnen und danach sortieren
 total = (
@@ -662,7 +670,12 @@ df13.columns = df13.columns.droplevel(1)
 
 
 # Top 15 Flugzeugtypen aus 2024 als Referenz
-top_types = df25["Average trip flight time"].sort_values(ascending=False).head(20).index.tolist()
+top_types = (
+    df25["Average trip flight time"]
+    .sort_values(ascending=False)
+    .head(20)
+    .index.tolist()
+)
 
 # Gesamtsumme über alle Jahre berechnen und danach sortieren
 total = (
