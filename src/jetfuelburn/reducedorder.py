@@ -1830,7 +1830,7 @@ class aim2015:
     -----
     Data is available for 8 aircraft size classes, as defined in the AIM2015 documentation, Section 2.3, Table 1:
 
-    | Index | Size Category         | Approx. Range | Reference Aircraft | Reference Engine     |
+    | Index | Size Category         | PAX Number    | Reference Aircraft | Reference Engine     |
     |-------|-----------------------|---------------|--------------------|----------------------|
     | 1     | Small Regional Jet    | 30-69         | CRJ 700            | GE CF34 8C5B1        |
     | 2     | Large Regional Jet    | 70-109        | Embraer 190        | GE CF34 10E6         |
