@@ -463,5 +463,56 @@ class usdot:
         else:
             aircraft_data = usdot._aircraft_data[year][acft]
 
-        movements = aircraft_data["Number of flights performed"]
+        movements = aircraft_data["Number of flights captured"]
         return movements
+
+    def calculate_average_time(
+        year: int,
+        acft: str,
+    ) -> dict:
+        if year not in usdot._years:
+            raise ValueError(f"No data available for year '{year}'.")
+        if acft not in usdot._aircraft_data[year]:
+            raise ValueError(
+                f"US DOT Aircraft Designator '{acft}' not found in model data."
+            )
+        else:
+            aircraft_data = usdot._aircraft_data[year][acft]
+
+        time = aircraft_data["Average trip flight time"] * ureg("h")
+        time = time.to("h")
+        return time
+
+    def calculate_average_distance(
+        year: int,
+        acft: str,
+    ) -> dict:
+        if year not in usdot._years:
+            raise ValueError(f"No data available for year '{year}'.")
+        if acft not in usdot._aircraft_data[year]:
+            raise ValueError(
+                f"US DOT Aircraft Designator '{acft}' not found in model data."
+            )
+        else:
+            aircraft_data = usdot._aircraft_data[year][acft]
+
+        distance = aircraft_data["Average trip distance"] * ureg("km")
+        distance = distance.to("km")
+        return distance
+
+    def calculate_average_cargo(
+        year: int,
+        acft: str,
+    ) -> dict:
+        if year not in usdot._years:
+            raise ValueError(f"No data available for year '{year}'.")
+        if acft not in usdot._aircraft_data[year]:
+            raise ValueError(
+                f"US DOT Aircraft Designator '{acft}' not found in model data."
+            )
+        else:
+            aircraft_data = usdot._aircraft_data[year][acft]
+
+        cargo = aircraft_data["Freight and mail transported"] * ureg("kg")
+        cargo = cargo.to("kg")
+        return cargo
