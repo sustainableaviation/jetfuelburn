@@ -405,3 +405,37 @@ class TestGenerate4DTrajectory:
         )
         assert isinstance(result, pd.DataFrame)
         assert len(result) > 0
+
+    # --- descent / TOD behavior --------------------------------------------
+
+    def test_tod_no_premature_ground_level(self, tmp_yaml):
+        """
+        With TOD strategy, the aircraft must hold cruise altitude at the start
+        of a descent segment rather than descending immediately.
+
+        Setup
+        -----
+        - DEP: 35000 ft, t=0 min
+        - MID: DSC,      t=60 min
+        - ARR: 0 ft,     t=120 min
+
+        ROD in the 5000–35000 ft band = 1000 ft/min → 35 min needed to descend
+        from 35000 to 0 ft. TOD should therefore occur around t=25 min, meaning
+        the aircraft must still be at 35000 ft at t=10 min.
+        The old (buggy) behaviour would already be at 25000 ft by t=10 min.
+        """
+        df = pd.DataFrame({
+            "waypoint": ["DEP", "MID", "ARR"],
+            "alt": [35000, "DSC", 0],
+            "timecum": [0, 60, 120],
+            "lat": [47.0, 47.5, 48.0],
+            "lon": [8.0, 8.5, 9.0],
+        })
+        result = generate_4d_trajectory(df, "TEST", tmp_yaml, time_resolution=1 * ureg.minute)
+        # At t=10 min the aircraft should still be at cruise altitude (TOD not yet reached)
+        ts_check = pd.Timestamp("2025-01-01 00:10:00")
+        row = result[result["timestamp"] == ts_check]
+        assert len(row) > 0, "Expected a row at t=10 min"
+        assert row["alt_filled"].iloc[0] > 30000, (
+            "Aircraft should still be near cruise altitude at t=10 min (TOD not yet reached)"
+        )
