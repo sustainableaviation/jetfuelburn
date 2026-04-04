@@ -137,7 +137,7 @@ def process_data_usdot_t2(
     df_t2["Fuel/Revenue Weight Distance"] = (
         df_t2["AIRCRAFT_FUELS"] / df_t2["REV_TON_MILES"]
     )
-    df_t2["Number of flights performed"] = df_t2["REV_ACRFT_DEP_PERF"]
+    df_t2["Number of flights captured"] = df_t2["REV_ACRFT_DEP_PERF"]
 
     df_t2["Revenue PAX km"] = df_t2["REV_PAX_MILES"]
 
@@ -163,7 +163,7 @@ def process_data_usdot_t2(
         "Fuel/Revenue Seat Distance",
         "Fuel/Available Weight Distance",
         "Fuel/Revenue Weight Distance",
-        "Number of flights performed",
+        "Number of flights captured",
         "Revenue PAX km",
         "Average trip distance",
         "Average trip flight time",
@@ -178,7 +178,7 @@ def process_data_usdot_t2(
         "Fuel/Revenue Seat Distance": "mean",
         "Fuel/Available Weight Distance": "mean",
         "Fuel/Revenue Weight Distance": "mean",
-        "Number of flights performed": "sum",
+        "Number of flights captured": "sum",
         "Revenue PAX km": "sum",
         "Average trip distance": "mean",
         "Average trip flight time": "mean",
@@ -339,7 +339,7 @@ df13.columns = df13.columns.droplevel(1)
 
 # Top 15 Flugzeugtypen aus 2024 als Referenz
 top_types = (
-    df25["Number of flights performed"]
+    df25["Number of flights captured"]
     .sort_values(ascending=False)
     .head(20)
     .index.tolist()
@@ -347,12 +347,12 @@ top_types = (
 
 # Gesamtsumme über alle Jahre berechnen und danach sortieren
 total = (
-    df25["Number of flights performed"].reindex(top_types).fillna(0)
-    + df24["Number of flights performed"].reindex(top_types).fillna(0)
-    + df23["Number of flights performed"].reindex(top_types).fillna(0)
-    + df19["Number of flights performed"].reindex(top_types).fillna(0)
-    + df18["Number of flights performed"].reindex(top_types).fillna(0)
-    + df13["Number of flights performed"].reindex(top_types).fillna(0)
+    df25["Number of flights captured"].reindex(top_types).fillna(0)
+    + df24["Number of flights captured"].reindex(top_types).fillna(0)
+    + df23["Number of flights captured"].reindex(top_types).fillna(0)
+    + df19["Number of flights captured"].reindex(top_types).fillna(0)
+    + df18["Number of flights captured"].reindex(top_types).fillna(0)
+    + df13["Number of flights captured"].reindex(top_types).fillna(0)
 )
 sorted_types = total.sort_values(ascending=False).index.tolist()
 
@@ -368,7 +368,7 @@ datasets = {
 
 fig = go.Figure()
 for year, df in datasets.items():
-    df_filtered = df.loc[df.index.isin(top_types), "Number of flights performed"]
+    df_filtered = df.loc[df.index.isin(top_types), "Number of flights captured"]
     df_filtered = df_filtered.reindex(sorted_types)  # Reihenfolge anwenden
     fig.add_trace(go.Bar(name=year, x=df_filtered.index, y=df_filtered.values))
 
