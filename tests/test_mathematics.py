@@ -1,5 +1,5 @@
 import pytest
-from jetfuelburn.utility.math import _interpolate
+from jetfuelburn.utility.mathematics import _interpolate
 
 
 def test_interpolate_basic_logic():

@@ -7,8 +7,8 @@ import pint_pandas
 
 
 def process_data_usdot_t2(
-    path_csv_t2: str = "jetfuelburn/data/USDOT/T_SCHEDULE_T2.csv",
-    path_csv_aircraft_types: str = "jetfuelburn/data/USDOT/T_SCHEDULE_T2_WITH_ICAO.csv",
+    t2_csv_path: str = "jetfuelburn/data/USDOT/T_SCHEDULE_T2.csv",
+    aircraft_types_csv_path: str = "jetfuelburn/data/USDOT/T_SCHEDULE_T2_WITH_ICAO.csv",
 ) -> pd.DataFrame:
     """
     Function for processing the US DOT T2 dataset.
@@ -27,13 +27,13 @@ def process_data_usdot_t2(
     """
 
     df_t2 = pd.read_csv(
-        filepath_or_buffer=path_csv_t2,
+        filepath_or_buffer=t2_csv_path,
         header=0,
         index_col=None,
         sep=",",
     )
     df_aircraft_types = pd.read_csv(
-        filepath_or_buffer=path_csv_aircraft_types,
+        filepath_or_buffer=aircraft_types_csv_path,
         header=0,
         index_col=None,
         sep=",",
