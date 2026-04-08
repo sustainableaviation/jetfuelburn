@@ -21,10 +21,13 @@ jobs:
         with:
           python-version: '3.14'
 
-      - name: Install & Test
+      - name: Install dependencies
         run: |
-          pip install pytest pytest-cov genbadge[coverage]
-          pip install -e .
+          python -m pip install --upgrade pip
+          pip install genbadge[coverage]
+          pip install -e .[testing,optionaldependencies]
+      - name: Test with pytest
+        run: |
           pytest --cov=./ --cov-report=xml
 
       - name: Generate Badge

@@ -3,6 +3,25 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## `3.1.0` (16. March 2026)
+
+## Fixes
+
+- Updated the `utility.mapping` module to improve route rendering and label display.
+
+## `3.0.0` (16. March 2026)
+
+## Improvements
+
+- Added a new `utility.mapping` module for mapping-related calculations.
+- Added a new `utility.ofp` module for flight plan-related calculations.
+- Updated the installation instructions to include optional dependencies.
+
+### Breaking Changes
+
+- Renamed the `utility.math` module to `utility.mathematics` to avoid namespace conflicts with the Python built-in `math` module.
+- Renamed all variables pointing to file names to use `_path` suffix (e.g. `data.yaml` > `data_path`).
+
 ## `2.0.1` (20. February 2026)
 
 ### Fixes

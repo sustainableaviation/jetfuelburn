@@ -132,7 +132,10 @@ class TestCalculateAtmosphericTemperature:
     """Test suite for _calculate_atmospheric_temperature."""
 
     @pytest.mark.parametrize("row", ISA_DATA)
-    def test_values_against_isa_table(self, row):
+    def test_values_against_isa_table(
+        self,
+        row,
+    ):
         """Checks if calculated temperature matches the ISA table values."""
         altitude = row["H_m"] * ureg.meter
         expected = ureg.Quantity(row["T_C"], ureg.degC)
@@ -157,7 +160,10 @@ class TestCalculateAtmosphericDensity:
     """Test suite for _calculate_atmospheric_density."""
 
     @pytest.mark.parametrize("row", ISA_DATA)
-    def test_values_against_isa_table(self, row):
+    def test_values_against_isa_table(
+        self,
+        row,
+    ):
         """Checks if calculated density matches the ISA table values."""
         altitude = row["H_m"] * ureg.meter
         expected = row["rho_kg/m^3"] * (ureg.kg / ureg.m**3)
@@ -182,7 +188,10 @@ class TestCalculateSpeedOfSound:
     """Test suite for _calculate_speed_of_sound."""
 
     @pytest.mark.parametrize("row", ISA_DATA)
-    def test_values_against_isa_table(self, row):
+    def test_values_against_isa_table(
+        self,
+        row,
+    ):
         """Checks if speed of sound matches ISA table for the given temperature."""
         temperature = ureg.Quantity(row["T_C"], ureg.degC)
         expected = (ureg.Quantity(row["a_kt"], ureg.knot)).to(ureg.kph)
@@ -207,7 +216,10 @@ class TestCalculateAircraftVelocity:
     """Test suite for _calculate_airspeed_from_mach."""
 
     @pytest.mark.parametrize("row", ISA_DATA)
-    def test_values_against_isa_table(self, row):
+    def test_values_against_isa_table(
+        self,
+        row,
+    ):
         """
         Validates velocity calculation.
         At Mach 1.0, the velocity must equal the local speed of sound from the table.
@@ -216,7 +228,10 @@ class TestCalculateAircraftVelocity:
         mach = 1.0
         expected = (row["a_kt"] * ureg.knot).to(ureg.kph)
 
-        result = _calculate_airspeed_from_mach(mach, altitude)
+        result = _calculate_airspeed_from_mach(
+            mach,
+            altitude,
+        )
 
         assert approx_with_units(result, expected, rel=1e-3)
 
@@ -236,13 +251,19 @@ class TestCalculateDynamicPressure:
 
     def test_output_units(self):
         """Checks that the function returns pressure units (Pascals)."""
-        result = _calculate_dynamic_pressure(100 * ureg.kph, 1000 * ureg.meter)
+        result = _calculate_dynamic_pressure(
+            100 * ureg.kph,
+            1000 * ureg.meter,
+        )
         assert result.units == ureg.pascal
 
     def test_error_handling(self):
         """Checks that invalid altitude inputs raise ValueError."""
         with pytest.raises(ValueError):
-            _calculate_dynamic_pressure(500 * ureg.kph, 25000 * ureg.meter)
+            _calculate_dynamic_pressure(
+                500 * ureg.kph,
+                25000 * ureg.meter,
+            )
 
     def test_calculation_accuracy(self):
         """
@@ -256,7 +277,10 @@ class TestCalculateDynamicPressure:
         speed = 100 * ureg.mps
         expected = 6125 * ureg.Pa
 
-        result = _calculate_dynamic_pressure(speed, altitude)
+        result = _calculate_dynamic_pressure(
+            speed,
+            altitude,
+        )
 
         assert approx_with_units(result, expected, rel=1e-3)
 
@@ -265,7 +289,10 @@ class TestCalculateMachFromAirspeed:
     """Test suite for _calculate_mach_from_airspeed."""
 
     @pytest.mark.parametrize("row", ISA_DATA)
-    def test_mach_one_equivalence(self, row):
+    def test_mach_one_equivalence(
+        self,
+        row,
+    ):
         """
         At Mach 1.0, True Airspeed (TAS) equals the local Speed of Sound.
         We input the speed of sound from the ISA table and expect Mach 1.0 back.
@@ -276,7 +303,10 @@ class TestCalculateMachFromAirspeed:
 
         expected_mach = 1.0 * ureg.dimensionless
 
-        result = _calculate_mach_from_airspeed(airspeed, altitude)
+        result = _calculate_mach_from_airspeed(
+            airspeed,
+            altitude,
+        )
 
         assert approx_with_units(result, expected_mach, rel=1e-3)
 
@@ -289,7 +319,10 @@ class TestCalculateMachFromAirspeed:
         altitude = 10500 * ureg.meter
 
         airspeed = _calculate_airspeed_from_mach(original_mach, altitude)
-        result_mach = _calculate_mach_from_airspeed(airspeed, altitude)
+        result_mach = _calculate_mach_from_airspeed(
+            airspeed,
+            altitude,
+        )
 
         assert result_mach.units == ureg.dimensionless
         assert approx_with_units(
