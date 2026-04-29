@@ -8,7 +8,9 @@
         "Revenue PAX km":235765496843.3825378418,
         "Average trip distance":1735.1913579797,
         "Average trip flight time":2.388109622,
-        "Freight and mail transported":111.2330276021
+        "Freight and mail transported":111.2330276021,
+        "Average PAX per flight":111.3629965469,
+        "Total Fuel Consumption":2588560639.8776469231
     },
     "Airbus Industrie A320-100\/200":{
         "Fuel\/Available Seat Distance":0.0273164687,
@@ -19,7 +21,9 @@
         "Revenue PAX km":466634666956.4490356445,
         "Average trip distance":1773.7196289763,
         "Average trip flight time":2.4468674712,
-        "Freight and mail transported":88.9729557646
+        "Freight and mail transported":88.9729557646,
+        "Average PAX per flight":127.7802535189,
+        "Total Fuel Consumption":4686927378.8711919785
     },
     "Airbus Industrie A320-200n":{
         "Fuel\/Available Seat Distance":0.0248513568,
@@ -30,7 +34,9 @@
         "Revenue PAX km":22709278632.9404144287,
         "Average trip distance":2011.6433609718,
         "Average trip flight time":2.7632139139,
-        "Freight and mail transported":null
+        "Freight and mail transported":null,
+        "Average PAX per flight":150.4756358856,
+        "Total Fuel Consumption":173364388.3074724674
     },
     "Airbus Industrie A321-200n":{
         "Fuel\/Available Seat Distance":0.1303318554,
@@ -41,7 +47,9 @@
         "Revenue PAX km":13847322871.565568924,
         "Average trip distance":3164.3131868561,
         "Average trip flight time":4.0842381396,
-        "Freight and mail transported":115.8358773662
+        "Freight and mail transported":115.8358773662,
+        "Average PAX per flight":152.3489475246,
+        "Total Fuel Consumption":92932138.1306319833
     },
     "Airbus Industrie A321\/Lr":{
         "Fuel\/Available Seat Distance":0.0216330751,
@@ -52,7 +60,9 @@
         "Revenue PAX km":474657308387.6532592773,
         "Average trip distance":1897.1479428586,
         "Average trip flight time":2.6071583051,
-        "Freight and mail transported":167.7739032787
+        "Freight and mail transported":167.7739032787,
+        "Average PAX per flight":163.2142524808,
+        "Total Fuel Consumption":4285106729.1281652451
     },
     "Airbus Industrie A330-200":{
         "Fuel\/Available Seat Distance":0.0299646616,
@@ -63,7 +73,9 @@
         "Revenue PAX km":111476443055.8648376465,
         "Average trip distance":5376.602501151,
         "Average trip flight time":6.6405743108,
-        "Freight and mail transported":4945.9022037567
+        "Freight and mail transported":4945.9022037567,
+        "Average PAX per flight":198.2439925434,
+        "Total Fuel Consumption":1235566765.4615623951
     },
     "Airbus Industrie A330-300\/333":{
         "Fuel\/Available Seat Distance":0.0297743551,
@@ -74,7 +86,9 @@
         "Revenue PAX km":110939107368.0003967285,
         "Average trip distance":5185.345004411,
         "Average trip flight time":6.4087536044,
-        "Freight and mail transported":4986.3236817137
+        "Freight and mail transported":4986.3236817137,
+        "Average PAX per flight":232.0083412063,
+        "Total Fuel Consumption":1154878053.4186947346
     },
     "Airbus Industrie A350-900":{
         "Fuel\/Available Seat Distance":0.027059602,
@@ -85,7 +99,9 @@
         "Revenue PAX km":31877843206.2140197754,
         "Average trip distance":6524.50559723,
         "Average trip flight time":7.8126249033,
-        "Freight and mail transported":6761.9823797872
+        "Freight and mail transported":6761.9823797872,
+        "Average PAX per flight":262.6316361539,
+        "Total Fuel Consumption":301520550.892760098
     },
     "B787-800 Dreamliner":{
         "Fuel\/Available Seat Distance":0.0289471962,
@@ -96,7 +112,9 @@
         "Revenue PAX km":62481155801.9109191895,
         "Average trip distance":6459.1934493477,
         "Average trip flight time":7.5782703371,
-        "Freight and mail transported":6743.6387558168
+        "Freight and mail transported":6743.6387558168,
+        "Average PAX per flight":186.6216439858,
+        "Total Fuel Consumption":694995948.4494909048
     },
     "B787-900 Dreamliner":{
         "Fuel\/Available Seat Distance":0.0262780182,
@@ -107,7 +125,9 @@
         "Revenue PAX km":110555671006.6490936279,
         "Average trip distance":7302.9275787722,
         "Average trip flight time":8.4908961566,
-        "Freight and mail transported":9133.6089786874
+        "Freight and mail transported":9133.6089786874,
+        "Average PAX per flight":212.9810595396,
+        "Total Fuel Consumption":1152217141.9644918442
     },
     "Boeing 717-200":{
         "Fuel\/Available Seat Distance":0.0409777529,
@@ -118,7 +138,9 @@
         "Revenue PAX km":46265803418.5459213257,
         "Average trip distance":798.7998736045,
         "Average trip flight time":1.2644646796,
-        "Freight and mail transported":71.7345129527
+        "Freight and mail transported":71.7345129527,
+        "Average PAX per flight":85.7051862007,
+        "Total Fuel Consumption":732055099.2192602158
     },
     "Boeing 737-700\/700LR\/Max 7":{
         "Fuel\/Available Seat Distance":0.0539964455,
@@ -129,7 +151,9 @@
         "Revenue PAX km":435153122330.0152587891,
         "Average trip distance":1649.4085550746,
         "Average trip flight time":2.2766281416,
-        "Freight and mail transported":178.6979829806
+        "Freight and mail transported":178.6979829806,
+        "Average PAX per flight":100.6014765048,
+        "Total Fuel Consumption":4832712006.4792900085
     },
     "Boeing 737-800":{
         "Fuel\/Available Seat Distance":0.0225537834,
@@ -140,7 +164,9 @@
         "Revenue PAX km":780276067292.8236083984,
         "Average trip distance":1880.550534209,
         "Average trip flight time":2.5777531806,
-        "Freight and mail transported":222.8506018752
+        "Freight and mail transported":222.8506018752,
+        "Average PAX per flight":124.6213969216,
+        "Total Fuel Consumption":7228756076.176566124
     },
     "Boeing 737-900":{
         "Fuel\/Available Seat Distance":0.0563620609,
@@ -151,7 +177,9 @@
         "Revenue PAX km":36378462983.7911071777,
         "Average trip distance":1655.1836947523,
         "Average trip flight time":2.2809786273,
-        "Freight and mail transported":171.4215337562
+        "Freight and mail transported":171.4215337562,
+        "Average PAX per flight":146.183933011,
+        "Total Fuel Consumption":525464029.8467524648
     },
     "Boeing 737-900ER":{
         "Fuel\/Available Seat Distance":0.0243301889,
@@ -162,7 +190,9 @@
         "Revenue PAX km":364989740344.0865478516,
         "Average trip distance":2007.0621764295,
         "Average trip flight time":2.7160526935,
-        "Freight and mail transported":274.176410291
+        "Freight and mail transported":274.176410291,
+        "Average PAX per flight":135.3685942147,
+        "Total Fuel Consumption":2937330736.9130759239
     },
     "Boeing 747-400":{
         "Fuel\/Available Seat Distance":10.1588080832,
@@ -173,7 +203,9 @@
         "Revenue PAX km":1028052376.7120640278,
         "Average trip distance":4002.3306270816,
         "Average trip flight time":4.869603886,
-        "Freight and mail transported":null
+        "Freight and mail transported":null,
+        "Average PAX per flight":65.9945635157,
+        "Total Fuel Consumption":552722159.40936625
     },
     "Boeing 757-200":{
         "Fuel\/Available Seat Distance":0.0273798223,
@@ -184,7 +216,9 @@
         "Revenue PAX km":229723123247.8491210938,
         "Average trip distance":3637.4887250126,
         "Average trip flight time":4.639755221,
-        "Freight and mail transported":446.7461626546
+        "Freight and mail transported":446.7461626546,
+        "Average PAX per flight":138.7537439253,
+        "Total Fuel Consumption":2383200759.2497344017
     },
     "Boeing 757-300":{
         "Fuel\/Available Seat Distance":0.0368964529,
@@ -195,7 +229,9 @@
         "Revenue PAX km":52523403469.1688995361,
         "Average trip distance":2286.8026211764,
         "Average trip flight time":3.0410596574,
-        "Freight and mail transported":543.9441150238
+        "Freight and mail transported":543.9441150238,
+        "Average PAX per flight":159.621484286,
+        "Total Fuel Consumption":482564966.5796974301
     },
     "Boeing 767-200\/ER\/EM":{
         "Fuel\/Available Seat Distance":0.1868159367,
@@ -206,7 +242,9 @@
         "Revenue PAX km":18101986.6072320007,
         "Average trip distance":1873.7368525788,
         "Average trip flight time":2.5806460275,
-        "Freight and mail transported":null
+        "Freight and mail transported":null,
+        "Average PAX per flight":20.9767734643,
+        "Total Fuel Consumption":13034312.6544354558
     },
     "Boeing 767-300\/300ER":{
         "Fuel\/Available Seat Distance":0.0313165478,
@@ -217,7 +255,9 @@
         "Revenue PAX km":205875651110.2283630371,
         "Average trip distance":4607.5063556607,
         "Average trip flight time":5.7612135258,
-        "Freight and mail transported":4110.1779186737
+        "Freight and mail transported":4110.1779186737,
+        "Average PAX per flight":159.6378811196,
+        "Total Fuel Consumption":2485183888.1405787468
     },
     "Boeing 767-400\/ER":{
         "Fuel\/Available Seat Distance":0.0295467777,
@@ -228,7 +268,9 @@
         "Revenue PAX km":77268924677.8944091797,
         "Average trip distance":5733.7147568867,
         "Average trip flight time":6.9987478534,
-        "Freight and mail transported":5033.3851662592
+        "Freight and mail transported":5033.3851662592,
+        "Average PAX per flight":191.7906512503,
+        "Total Fuel Consumption":885708344.6616256237
     },
     "Boeing 777-200ER\/200LR\/233LR":{
         "Fuel\/Available Seat Distance":0.0310588626,
@@ -239,7 +281,9 @@
         "Revenue PAX km":338038138903.246887207,
         "Average trip distance":6965.7219037651,
         "Average trip flight time":8.2196956649,
-        "Freight and mail transported":7523.8931955837
+        "Freight and mail transported":7523.8931955837,
+        "Average PAX per flight":227.0049664942,
+        "Total Fuel Consumption":4179478125.3795399666
     },
     "Boeing 777-300\/300ER\/333ER":{
         "Fuel\/Available Seat Distance":0.0332504371,
@@ -250,7 +294,9 @@
         "Revenue PAX km":109887831312.4627227783,
         "Average trip distance":7299.1239205445,
         "Average trip flight time":8.550405393,
-        "Freight and mail transported":10365.8132926955
+        "Freight and mail transported":10365.8132926955,
+        "Average PAX per flight":265.7883453103,
+        "Total Fuel Consumption":1347773464.3076360226
     },
     "Boeing 787-10 Dreamliner":{
         "Fuel\/Available Seat Distance":0.0219745877,
@@ -261,7 +307,9 @@
         "Revenue PAX km":27345316.6356479973,
         "Average trip distance":2934.9482732308,
         "Average trip flight time":3.6153846154,
-        "Freight and mail transported":1468.5693916172
+        "Freight and mail transported":1468.5693916172,
+        "Average PAX per flight":238.9009617007,
+        "Total Fuel Consumption":266619.3466389498
     },
     "Boeing B737 Max 800":{
         "Fuel\/Available Seat Distance":0.0227311071,
@@ -272,7 +320,9 @@
         "Revenue PAX km":19539843143.166721344,
         "Average trip distance":1859.2559875867,
         "Average trip flight time":2.5526329183,
-        "Freight and mail transported":234.6069482457
+        "Freight and mail transported":234.6069482457,
+        "Average PAX per flight":149.0305349369,
+        "Total Fuel Consumption":161787085.7022233307
     },
     "Boeing B737 Max 900":{
         "Fuel\/Available Seat Distance":0.0200474597,
@@ -283,7 +333,9 @@
         "Revenue PAX km":4822854148.1134080887,
         "Average trip distance":2000.7076016133,
         "Average trip flight time":2.6391904819,
-        "Freight and mail transported":174.7389836396
+        "Freight and mail transported":174.7389836396,
+        "Average PAX per flight":152.7196843938,
+        "Total Fuel Consumption":35214970.4499695152
     },
     "Canadair CRJ 900":{
         "Fuel\/Available Seat Distance":0.2106734506,
@@ -294,7 +346,9 @@
         "Revenue PAX km":15279550042.8890895844,
         "Average trip distance":995.1884932969,
         "Average trip flight time":1.4934990726,
-        "Freight and mail transported":null
+        "Freight and mail transported":null,
+        "Average PAX per flight":60.388503034,
+        "Total Fuel Consumption":238027564.0200985074
     },
     "Canadair RJ-200ER \/RJ-440":{
         "Fuel\/Available Seat Distance":0.0455374979,
@@ -305,7 +359,9 @@
         "Revenue PAX km":26004456199.2314910889,
         "Average trip distance":610.7607429698,
         "Average trip flight time":1.0399400614,
-        "Freight and mail transported":null
+        "Freight and mail transported":null,
+        "Average PAX per flight":39.5084650236,
+        "Total Fuel Consumption":537839457.3316696882
     },
     "Canadair RJ-700":{
         "Fuel\/Available Seat Distance":0.0477516927,
@@ -316,7 +372,9 @@
         "Revenue PAX km":29554949980.6640663147,
         "Average trip distance":769.4276176642,
         "Average trip flight time":1.2100590571,
-        "Freight and mail transported":0.7998318656
+        "Freight and mail transported":0.7998318656,
+        "Average PAX per flight":51.637904805,
+        "Total Fuel Consumption":632902419.7015622854
     },
     "Embraer 190":{
         "Fuel\/Available Seat Distance":0.0563176812,
@@ -327,7 +385,9 @@
         "Revenue PAX km":31060489388.8101119995,
         "Average trip distance":893.9831712633,
         "Average trip flight time":1.4243793162,
-        "Freight and mail transported":17.2337002151
+        "Freight and mail transported":17.2337002151,
+        "Average PAX per flight":79.0959586424,
+        "Total Fuel Consumption":522061331.9194890261
     },
     "Embraer ERJ-175":{
         "Fuel\/Available Seat Distance":0.0304235657,
@@ -338,7 +398,9 @@
         "Revenue PAX km":54980464367.828742981,
         "Average trip distance":1361.147966726,
         "Average trip flight time":1.9823065953,
-        "Freight and mail transported":0.8913937863
+        "Freight and mail transported":0.8913937863,
+        "Average PAX per flight":56.1688667638,
+        "Total Fuel Consumption":906048037.8068163395
     },
     "Embraer-135":{
         "Fuel\/Available Seat Distance":0.2572237049,
@@ -349,7 +411,9 @@
         "Revenue PAX km":39522912.0802560002,
         "Average trip distance":761.1918320969,
         "Average trip flight time":1.1833405374,
-        "Freight and mail transported":null
+        "Freight and mail transported":null,
+        "Average PAX per flight":23.2898130129,
+        "Total Fuel Consumption":7921104.773653605
     },
     "Embraer-140":{
         "Fuel\/Available Seat Distance":0.0507548172,
@@ -360,7 +424,9 @@
         "Revenue PAX km":4535514518.870016098,
         "Average trip distance":950.3062629054,
         "Average trip flight time":1.5016949893,
-        "Freight and mail transported":0.6526514166
+        "Freight and mail transported":0.6526514166,
+        "Average PAX per flight":31.3978289791,
+        "Total Fuel Consumption":145430937.5918166041
     },
     "Embraer-145":{
         "Fuel\/Available Seat Distance":0.1088972585,
@@ -371,7 +437,9 @@
         "Revenue PAX km":23206795439.0976028442,
         "Average trip distance":793.723722894,
         "Average trip flight time":1.2841945507,
-        "Freight and mail transported":1.5085037774
+        "Freight and mail transported":1.5085037774,
+        "Average PAX per flight":38.1851158776,
+        "Total Fuel Consumption":1455345536.7556073666
     },
     "McDonnell Douglas DC9 Super 80\/MD81\/82\/83\/88":{
         "Fuel\/Available Seat Distance":0.037273961,
@@ -382,7 +450,9 @@
         "Revenue PAX km":87104652650.7252502441,
         "Average trip distance":1163.3602518544,
         "Average trip flight time":1.670679673,
-        "Freight and mail transported":92.5960228979
+        "Freight and mail transported":92.5960228979,
+        "Average PAX per flight":114.4780970942,
+        "Total Fuel Consumption":1357662170.5851583481
     },
     "McDonnell Douglas MD-90":{
         "Fuel\/Available Seat Distance":0.0315536167,
@@ -393,6 +463,8 @@
         "Revenue PAX km":34592558104.6087722778,
         "Average trip distance":1011.4917135999,
         "Average trip flight time":1.497657602,
-        "Freight and mail transported":125.2102301365
+        "Freight and mail transported":125.2102301365,
+        "Average PAX per flight":109.4973394713,
+        "Total Fuel Consumption":430536856.1501119137
     }
 }

@@ -271,7 +271,7 @@ class usdot:
     ```
     """
 
-    _years = [2013, 2018, 2024]
+    _years = [2013, 2018, 2019, 2023, 2024, 2025]
     _aircraft_data = {}
     for year in _years:
         with resources.open_text(
@@ -516,3 +516,19 @@ class usdot:
         cargo = aircraft_data["Freight and mail transported"] * ureg("kg")
         cargo = cargo.to("kg")
         return cargo
+
+    def calculate_average_pax(
+        year: int,
+        acft: str,
+    ) -> dict:
+        if year not in usdot._years:
+            raise ValueError(f"No data available for year '{year}'.")
+        if acft not in usdot._aircraft_data[year]:
+            raise ValueError(
+                f"US DOT Aircraft Designator '{acft}' not found in model data."
+            )
+        else:
+            aircraft_data = usdot._aircraft_data[year][acft]
+
+        pax = aircraft_data["Average PAX per flight"]
+        return pax
