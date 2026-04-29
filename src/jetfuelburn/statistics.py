@@ -77,7 +77,9 @@ class aeromaps:
         return sorted(aeromaps._statistical_data.keys())
 
     @staticmethod
-    def available_aircraft(year: int) -> list[str]:
+    def available_aircraft(
+        year: int,
+    ) -> list[str]:
         """
         Given a year, returns a sorted list of available aircraft types
         (e.g., ['long_range', 'medium_range', 'short_range']).
@@ -287,7 +289,9 @@ class usdot:
         return sorted(usdot._years)
 
     @staticmethod
-    def available_aircraft(year: int) -> list[str]:
+    def available_aircraft(
+        year: int,
+    ) -> list[str]:
         """
         Given a year, returns a sorted list of available ICAO aircraft designators included in the model.
         """
