@@ -536,3 +536,45 @@ class usdot:
 
         pax = aircraft_data["Average PAX per flight"]
         return pax
+
+    @staticmethod
+    def calculate_total_fuel_consumption(year: int) -> float:
+        r"""
+        Given a year, returns the total fuel burned by all aircraft types combined.
+
+        Calculated as:
+
+        $$
+        F_{\text{total}} = \sum_{\text{acft}} \frac{F}{\text{paxD}} \cdot \text{paxD}
+        $$
+
+        where $F/\text{paxD}$ is the ``Fuel/Revenue Seat Distance`` field (kg per pax-km)
+        and $\text{paxD}$ is the ``Revenue PAX km`` field (pax-km) for each aircraft type.
+
+        Parameters
+        ----------
+        year : int
+            Year of the data to be used for the calculation.
+
+        Returns
+        -------
+        pint.Quantity
+            Total fuel burned by all aircraft types combined, in kg.
+
+        Raises
+        ------
+        ValueError
+            If the year is not available in the model.
+        """
+        if year not in usdot._years:
+            raise ValueError(
+                f"No data available for year '{year}'. Please select one of the following: {usdot.available_years()}"
+            )
+
+        total_kg = sum(
+            data["Fuel/Revenue Seat Distance"] * data["Revenue PAX km"]
+            for data in usdot._aircraft_data[year].values()
+            if data["Fuel/Revenue Seat Distance"] is not None
+            and data["Revenue PAX km"] is not None
+        )
+        return (total_kg * ureg("kg")).to("kg")
