@@ -151,6 +151,14 @@ def process_data_usdot_t2(
         df_t2["REV_TON_MILES_FREIGHT"] + df_t2["REV_TON_MILES_MAIL"]
     ) / df_t2["REV_ACRFT_MILES_FLOWN"]
 
+    df_t2["Average PAX per flight"] = (
+        df_t2["REV_PAX_MILES"] / df_t2["REV_ACRFT_MILES_FLOWN"]
+    )
+
+    df_t2["Total Fuel Consumption"] = (
+        df_t2["AIRCRAFT_FUELS"]
+    )
+
     # SANITY CHECKS
 
     df_t2 = df_t2.loc[df_t2["REV_PAX_MILES"] <= df_t2["AVL_SEAT_MILES"]]
@@ -168,6 +176,8 @@ def process_data_usdot_t2(
         "Average trip distance",
         "Average trip flight time",
         "Freight and mail transported",
+        "Average PAX per flight",
+        "Total Fuel Consumption",
     ]
     df_t2 = df_t2[list_return_columns]
 
@@ -183,6 +193,8 @@ def process_data_usdot_t2(
         "Average trip distance": "mean",
         "Average trip flight time": "mean",
         "Freight and mail transported": "mean",
+        "Average PAX per flight": "mean",
+        "Total Fuel Consumption": "sum"
     }
     df_t2 = df_t2.groupby(
         by="Aircraft Designation (US DOT Schedule T2)",
@@ -206,6 +218,9 @@ def process_data_usdot_t2(
     )
     df_t2["Fuel/Revenue Weight Distance"] = (
         df_t2["Fuel/Revenue Weight Distance"] * density_jetfuel
+    )
+    df_t2["Total Fuel Consumption"] = (
+            df_t2["Total Fuel Consumption"] * density_jetfuel
     )
     df_t2 = df_t2.set_index("Aircraft Designation (US DOT Schedule T2)")
 
@@ -709,5 +724,90 @@ fig.update_layout(
     title="Average trip flight time by Aircraft Type",
     xaxis_tickangle=-45,
     yaxis_title="Average trip flight time [hours]",
+)
+fig.show()
+
+# -----------------------------------------------------------------------------------------------------------------------
+
+# Plots für Total Flight Time
+
+# Jedes Jahr separat laden und speichern
+df25 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2025.csv",
+).pint.dequantify()
+df25.columns = df25.columns.droplevel(1)
+
+df24 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2024.csv",
+).pint.dequantify()
+df24.columns = df24.columns.droplevel(1)
+
+df23 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2023.csv",
+).pint.dequantify()
+df23.columns = df23.columns.droplevel(1)
+
+df19 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2019.csv",
+).pint.dequantify()
+df19.columns = df19.columns.droplevel(1)
+
+df18 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2018.csv",
+).pint.dequantify()
+df18.columns = df18.columns.droplevel(1)
+
+df13 = process_data_usdot_t2(
+    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
+    path_csv_t2="data/T_SCHEDULE_T2_2013.csv",
+).pint.dequantify()
+df13.columns = df13.columns.droplevel(1)
+
+
+# Top 15 Flugzeugtypen aus 2024 als Referenz
+top_types = (
+    df25["Total Fuel Consumption"]
+    .sort_values(ascending=False)
+    .head(20)
+    .index.tolist()
+)
+
+# Gesamtsumme über alle Jahre berechnen und danach sortieren
+total = (
+    df25["Total Fuel Consumption"].reindex(top_types).fillna(0)
+    + df24["Total Fuel Consumption"].reindex(top_types).fillna(0)
+    + df23["Total Fuel Consumption"].reindex(top_types).fillna(0)
+    + df19["Total Fuel Consumption"].reindex(top_types).fillna(0)
+    + df18["Total Fuel Consumption"].reindex(top_types).fillna(0)
+    + df13["Total Fuel Consumption"].reindex(top_types).fillna(0)
+)
+sorted_types = total.sort_values(ascending=False).index.tolist()
+
+# Diagramm erstellen
+datasets = {
+    "2013": df13,
+    "2018": df18,
+    "2019": df19,
+    "2023": df23,
+    "2024": df24,
+    "2025": df25,
+}
+
+fig = go.Figure()
+for year, df in datasets.items():
+    df_filtered = df.loc[df.index.isin(top_types), "Total Fuel Consumption"]
+    df_filtered = df_filtered.reindex(sorted_types)  # Reihenfolge anwenden
+    fig.add_trace(go.Bar(name=year, x=df_filtered.index, y=df_filtered.values))
+
+fig.update_layout(
+    barmode="group",
+    title="Total Fuel Consumption per aircraft type",
+    xaxis_tickangle=-45,
+    yaxis_title="Total Fuel Consumption [kg]",
 )
 fig.show()
