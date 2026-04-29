@@ -111,9 +111,9 @@ def test_aux_tests():
 
 
 def test_aux_math():
-    import jetfuelburn.utility.math
+    import jetfuelburn.utility.mathematics
 
-    from jetfuelburn.utility.math import _interpolate
+    from jetfuelburn.utility.mathematics import _interpolate
 
     assert callable(_interpolate)
 

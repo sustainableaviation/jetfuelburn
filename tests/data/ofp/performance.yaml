@@ -1,0 +1,19 @@
+TEST:
+  climb:
+  - regime: initial_climb
+    min_alt: 0 ft
+    max_alt: 5000 ft
+    rate: 1000 ft/min
+  - regime: high_climb
+    min_alt: 5000 ft
+    max_alt: 35000 ft
+    rate: 500 ft/min
+  descent:
+  - regime: high_descent
+    min_alt: 5000 ft
+    max_alt: 35000 ft
+    rate: -1000 ft/min
+  - regime: approach
+    min_alt: 0 ft
+    max_alt: 5000 ft
+    rate: -500 ft/min

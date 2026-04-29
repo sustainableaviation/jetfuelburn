@@ -2,7 +2,9 @@ import bisect
 
 
 def _interpolate(
-    x_val: float | int, x_list: list[float | int], y_list: list[float | int]
+    x_val: float | int,
+    x_list: list[float | int],
+    y_list: list[float | int],
 ):
     r"""
     Given two sorted lists of x/y-pairs, performs one-dimensional linear interpolation for a given x-value:
@@ -46,7 +48,7 @@ def _interpolate(
     -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
-    from jetfuelburn.utility.math import _interpolate
+    from jetfuelburn.utility.mathematics import _interpolate
     _interpolate(
         x_val=5,
         x_list=[0, 10, 20],
