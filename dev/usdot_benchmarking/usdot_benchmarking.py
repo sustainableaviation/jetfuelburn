@@ -10,7 +10,7 @@ usdot.available_aircraft(usdot.available_years()[0])
 result1 = usdot.calculate_fuel_consumption_per_seat(
     year=2024,
     acft="Boeing 777-200ER/200LR/233LR",
-    R= 6187 * ureg.km,
+    R=6187 * ureg.km,
 )
 
 result2 = usdot.calculate_movements(
@@ -52,4 +52,3 @@ print(result5)
 print(result6)
 print(result7)
 print(result8)
-
