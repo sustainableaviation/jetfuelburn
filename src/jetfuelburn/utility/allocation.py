@@ -67,7 +67,7 @@ def footprint_allocation_by_area(
     --------
     - [IATA Recommended Practice RP 1726: Passenger CO2 Calculation Methodology](https://web.archive.org/web/20230526103741/https://www.iata.org/contentassets/139d686fa8f34c4ba7a41f7ba3e026e7/iata-rp-1726_passenger-co2.pdf)
     - [ICAO Carbon Emissions Calculator Methodology (Version 13.1)](https://web.archive.org/web/20240826103513/https://applications.icao.int/icec/Methodology%20ICAO%20Carbon%20Emissions%20Calculator_v13_Final.pdf)
-
+    - [World Bank Policy Research Working Paper 6471 _"Calculating the Carbon Footprint from Different Classes of Air Travel"_](https://documents1.worldbank.org/curated/en/141851468168853188/pdf/WPS6471.pdf)
 
     Raises
     ------
