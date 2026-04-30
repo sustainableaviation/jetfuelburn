@@ -40,6 +40,10 @@ result6 = usdot.calculate_average_pax(
 
 result7 = result1 * result6
 
+result8 = usdot.calculate_total_fuel_consumption(
+    year=2024,
+)
+
 print(result1)
 print(result2)
 print(result3)
@@ -47,4 +51,5 @@ print(result4)
 print(result5)
 print(result6)
 print(result7)
+print(result8)
 
