@@ -155,9 +155,7 @@ def process_data_usdot_t2(
         df_t2["REV_PAX_MILES"] / df_t2["REV_ACRFT_MILES_FLOWN"]
     )
 
-    df_t2["Total Fuel Consumption"] = (
-        df_t2["AIRCRAFT_FUELS"]
-    )
+    df_t2["Total Fuel Consumption"] = df_t2["AIRCRAFT_FUELS"]
 
     # SANITY CHECKS
 
@@ -194,7 +192,7 @@ def process_data_usdot_t2(
         "Average trip flight time": "mean",
         "Freight and mail transported": "mean",
         "Average PAX per flight": "mean",
-        "Total Fuel Consumption": "sum"
+        "Total Fuel Consumption": "sum",
     }
     df_t2 = df_t2.groupby(
         by="Aircraft Designation (US DOT Schedule T2)",
@@ -219,9 +217,7 @@ def process_data_usdot_t2(
     df_t2["Fuel/Revenue Weight Distance"] = (
         df_t2["Fuel/Revenue Weight Distance"] * density_jetfuel
     )
-    df_t2["Total Fuel Consumption"] = (
-            df_t2["Total Fuel Consumption"] * density_jetfuel
-    )
+    df_t2["Total Fuel Consumption"] = df_t2["Total Fuel Consumption"] * density_jetfuel
     df_t2 = df_t2.set_index("Aircraft Designation (US DOT Schedule T2)")
 
     return df_t2
@@ -771,10 +767,7 @@ df13.columns = df13.columns.droplevel(1)
 
 # Top 15 Flugzeugtypen aus 2024 als Referenz
 top_types = (
-    df25["Total Fuel Consumption"]
-    .sort_values(ascending=False)
-    .head(20)
-    .index.tolist()
+    df25["Total Fuel Consumption"].sort_values(ascending=False).head(20).index.tolist()
 )
 
 # Gesamtsumme über alle Jahre berechnen und danach sortieren
