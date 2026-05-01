@@ -21,12 +21,12 @@ YEAR = 2024
 # Average pax counts from US DOT data
 PAX_A320 = 128  # A320 average passengers
 PAX_B738 = 126  # 737-800 average passengers
-PAX_B772 = 228  # B772 average passengers (kept as before)
+PAX_B772 = 228  # B772 average passengers
 
 # Typical max seat configurations
 PAX_MAX_A320 = 180
 PAX_MAX_B738 = 189
-PAX_MAX_B772 = 365
+PAX_MAX_B772 = 440
 
 KG_PER_PAX = 100  # kg per pax incl. luggage
 
@@ -101,7 +101,7 @@ CONFIGS = {
         {"label": "B777", "acft": "B777"},
     ],
     "myclimate": [
-        {"label": "standard aircraft", "acft": "standard aircraft"},
+        {"label": "B737 (≤2500 km)", "acft": "B737"},
         {"label": "A320 (≤2500 km)", "acft": "A320"},
         {"label": "B777 (≥1500 km)", "acft": "B777"},
     ],
@@ -215,20 +215,14 @@ for model_name, df in results.items():
 combined = pd.concat({name: df for name, df in results.items()}, axis=1)
 combined.to_csv("distance_sweep_results.csv")
 
-# Plot: one subplot per model, one line per config
-fig, axes = plt.subplots(
-    nrows=len(CONFIGS),
-    ncols=1,
-    figsize=(9, 4 * len(CONFIGS)),
-    sharex=True,
-)
-
 SHORT_HAUL_LIMIT_KM = 5000
 SHORT_HAUL_AIRCRAFT = {"A320", "B738", "B737-800"}
 
 usdot_df = results["usdot"]
 
-for ax, (model_name, df) in zip(axes, results.items()):
+# Plot: one figure per model
+for model_name, df in results.items():
+    fig, ax = plt.subplots(figsize=(9, 4))
     for col in df.columns:
         is_short_haul = any(a in col for a in SHORT_HAUL_AIRCRAFT)
         series = df[col][df.index <= SHORT_HAUL_LIMIT_KM] if is_short_haul else df[col]
@@ -254,9 +248,89 @@ for ax, (model_name, df) in zip(axes, results.items()):
     ax.set_title(model_name)
     ax.set_ylabel("Fuel burn (kg)")
     ax.set_xlabel("Distance (km)")
-    ax.tick_params(labelbottom=True)
-    ax.legend(fontsize=7)
+    ax.legend(fontsize=7, loc="upper left")
     ax.grid(True)
-plt.tight_layout()
-plt.savefig("distance_sweep_plots.png", dpi=150)
-plt.show()
+    plt.tight_layout()
+    plt.savefig(f"distance_sweep_{model_name}.pdf", bbox_inches="tight")
+    plt.show()
+
+# Max-load configs for sacchi_etal and yanto_etal
+CONFIGS_MAX = {
+    "sacchi_etal": [
+        {
+            "label": f"A320 (pax_max={PAX_MAX_A320}, full)",
+            "pax_max": PAX_MAX_A320,
+            "pax": PAX_MAX_A320,
+        },
+        {
+            "label": f"B738 (pax_max={PAX_MAX_B738}, full)",
+            "pax_max": PAX_MAX_B738,
+            "pax": PAX_MAX_B738,
+        },
+        {
+            "label": f"B772 (pax_max={PAX_MAX_B772}, full)",
+            "pax_max": PAX_MAX_B772,
+            "pax": PAX_MAX_B772,
+        },
+    ],
+    "yanto_etal": [
+        {
+            "label": f"A320 ({PAX_MAX_A320} pax, full)",
+            "acft": "A320",
+            "PL": PAX_MAX_A320 * KG_PER_PAX * ureg.kg,
+        },
+        {
+            "label": f"B738 ({PAX_MAX_B738} pax, full)",
+            "acft": "B738",
+            "PL": PAX_MAX_B738 * KG_PER_PAX * ureg.kg,
+        },
+        {
+            "label": f"B772 ({PAX_MAX_B772} pax, full)",
+            "acft": "B772",
+            "PL": PAX_MAX_B772 * KG_PER_PAX * ureg.kg,
+        },
+    ],
+}
+
+results_max = {}
+for model_name, configs in CONFIGS_MAX.items():
+    data = {}
+    for cfg in configs:
+        data[cfg["label"]] = [
+            _run_model(model_name, cfg, d * ureg.km) for d in distances_km
+        ]
+    results_max[model_name] = pd.DataFrame(data, index=list(distances_km))
+    results_max[model_name].index.name = "distance_km"
+
+for model_name, df in results_max.items():
+    fig, ax = plt.subplots(figsize=(9, 4))
+    fig.suptitle("Fuel burn at maximum passenger load", fontsize=13)
+    for col in df.columns:
+        is_short_haul = any(a in col for a in SHORT_HAUL_AIRCRAFT)
+        series = df[col][df.index <= SHORT_HAUL_LIMIT_KM] if is_short_haul else df[col]
+        ax.plot(series.index, series, label=col)
+
+    for col in usdot_df.columns:
+        is_short_haul = any(a in col for a in SHORT_HAUL_AIRCRAFT)
+        series = (
+            usdot_df[col][usdot_df.index <= SHORT_HAUL_LIMIT_KM]
+            if is_short_haul
+            else usdot_df[col]
+        )
+        ax.plot(
+            series.index,
+            series,
+            linestyle="--",
+            linewidth=1,
+            alpha=0.6,
+            label=f"DOT: {col}",
+        )
+
+    ax.set_title(model_name)
+    ax.set_ylabel("Fuel burn (kg)")
+    ax.set_xlabel("Distance (km)")
+    ax.legend(fontsize=7, loc="upper left")
+    ax.grid(True)
+    plt.tight_layout()
+    plt.savefig(f"distance_sweep_{model_name}_max_load.pdf", bbox_inches="tight")
+    plt.show()

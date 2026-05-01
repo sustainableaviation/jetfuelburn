@@ -224,8 +224,8 @@ def process_data_usdot_t2(
 
 
 df = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2025.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2025.csv",
 )
 df_dequantified = df.pint.dequantify()
 df_dequantified.columns = df_dequantified.columns.droplevel(1)
@@ -237,8 +237,8 @@ df_dequantified.to_json(
 )
 
 df = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2024.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2024.csv",
 )
 df_dequantified = df.pint.dequantify()
 df_dequantified.columns = df_dequantified.columns.droplevel(1)
@@ -250,8 +250,8 @@ df_dequantified.to_json(
 )
 
 df = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2023.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2023.csv",
 )
 
 df_dequantified = df.pint.dequantify()
@@ -264,8 +264,8 @@ df_dequantified.to_json(
 )
 
 df = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2019.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2019.csv",
 )
 df_dequantified = df.pint.dequantify()
 df_dequantified.columns = df_dequantified.columns.droplevel(1)
@@ -278,8 +278,8 @@ df_dequantified.to_json(
 
 
 df = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2018.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2018.csv",
 )
 df_dequantified = df.pint.dequantify()
 df_dequantified.columns = df_dequantified.columns.droplevel(1)
@@ -292,8 +292,8 @@ df_dequantified.to_json(
 
 
 df = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2013.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2013.csv",
 )
 df_dequantified = df.pint.dequantify()
 df_dequantified.columns = df_dequantified.columns.droplevel(1)
@@ -312,38 +312,38 @@ import plotly.graph_objects as go
 
 # Jedes Jahr separat laden und speichern
 df25 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2025.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2025.csv",
 ).pint.dequantify()
 df25.columns = df25.columns.droplevel(1)
 
 df24 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2024.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2024.csv",
 ).pint.dequantify()
 df24.columns = df24.columns.droplevel(1)
 
 df23 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2023.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2023.csv",
 ).pint.dequantify()
 df23.columns = df23.columns.droplevel(1)
 
 df19 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2019.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2019.csv",
 ).pint.dequantify()
 df19.columns = df19.columns.droplevel(1)
 
 df18 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2018.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2018.csv",
 ).pint.dequantify()
 df18.columns = df18.columns.droplevel(1)
 
 df13 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2013.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2013.csv",
 ).pint.dequantify()
 df13.columns = df13.columns.droplevel(1)
 
@@ -389,7 +389,7 @@ fig.update_layout(
     xaxis_tickangle=-45,
     yaxis_title="Movements",
 )
-fig.show()
+fig.write_image("flight_movements_by_aircraft_type.pdf")
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -397,38 +397,38 @@ fig.show()
 
 # Jedes Jahr separat laden und speichern
 df25 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2025.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2025.csv",
 ).pint.dequantify()
 df25.columns = df25.columns.droplevel(1)
 
 df24 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2024.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2024.csv",
 ).pint.dequantify()
 df24.columns = df24.columns.droplevel(1)
 
 df23 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2023.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2023.csv",
 ).pint.dequantify()
 df23.columns = df23.columns.droplevel(1)
 
 df19 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2019.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2019.csv",
 ).pint.dequantify()
 df19.columns = df19.columns.droplevel(1)
 
 df18 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2018.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2018.csv",
 ).pint.dequantify()
 df18.columns = df18.columns.droplevel(1)
 
 df13 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2013.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2013.csv",
 ).pint.dequantify()
 df13.columns = df13.columns.droplevel(1)
 
@@ -469,7 +469,7 @@ fig.update_layout(
     xaxis_tickangle=-45,
     yaxis_title="Revenue PAX km",
 )
-fig.show()
+fig.write_image("revenue_pax_km_by_aircraft_type.pdf")
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -477,38 +477,38 @@ fig.show()
 
 # Jedes Jahr separat laden und speichern
 df25 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2025.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2025.csv",
 ).pint.dequantify()
 df25.columns = df25.columns.droplevel(1)
 
 df24 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2024.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2024.csv",
 ).pint.dequantify()
 df24.columns = df24.columns.droplevel(1)
 
 df23 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2023.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2023.csv",
 ).pint.dequantify()
 df23.columns = df23.columns.droplevel(1)
 
 df19 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2019.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2019.csv",
 ).pint.dequantify()
 df19.columns = df19.columns.droplevel(1)
 
 df18 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2018.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2018.csv",
 ).pint.dequantify()
 df18.columns = df18.columns.droplevel(1)
 
 df13 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2013.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2013.csv",
 ).pint.dequantify()
 df13.columns = df13.columns.droplevel(1)
 
@@ -554,7 +554,7 @@ fig.update_layout(
     xaxis_tickangle=-45,
     yaxis_title="Average freight and mail transported [kg/km]",
 )
-fig.show()
+fig.write_image("freight_mail_by_aircraft_type.pdf")
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -562,38 +562,38 @@ fig.show()
 
 # Jedes Jahr separat laden und speichern
 df25 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2025.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2025.csv",
 ).pint.dequantify()
 df25.columns = df25.columns.droplevel(1)
 
 df24 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2024.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2024.csv",
 ).pint.dequantify()
 df24.columns = df24.columns.droplevel(1)
 
 df23 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2023.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2023.csv",
 ).pint.dequantify()
 df23.columns = df23.columns.droplevel(1)
 
 df19 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2019.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2019.csv",
 ).pint.dequantify()
 df19.columns = df19.columns.droplevel(1)
 
 df18 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2018.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2018.csv",
 ).pint.dequantify()
 df18.columns = df18.columns.droplevel(1)
 
 df13 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2013.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2013.csv",
 ).pint.dequantify()
 df13.columns = df13.columns.droplevel(1)
 
@@ -636,7 +636,7 @@ fig.update_layout(
     xaxis_tickangle=-45,
     yaxis_title="Average trip distance [km]",
 )
-fig.show()
+fig.write_image("average_trip_distance_by_aircraft_type.pdf")
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -644,38 +644,38 @@ fig.show()
 
 # Jedes Jahr separat laden und speichern
 df25 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2025.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2025.csv",
 ).pint.dequantify()
 df25.columns = df25.columns.droplevel(1)
 
 df24 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2024.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2024.csv",
 ).pint.dequantify()
 df24.columns = df24.columns.droplevel(1)
 
 df23 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2023.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2023.csv",
 ).pint.dequantify()
 df23.columns = df23.columns.droplevel(1)
 
 df19 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2019.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2019.csv",
 ).pint.dequantify()
 df19.columns = df19.columns.droplevel(1)
 
 df18 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2018.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2018.csv",
 ).pint.dequantify()
 df18.columns = df18.columns.droplevel(1)
 
 df13 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2013.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2013.csv",
 ).pint.dequantify()
 df13.columns = df13.columns.droplevel(1)
 
@@ -721,7 +721,7 @@ fig.update_layout(
     xaxis_tickangle=-45,
     yaxis_title="Average trip flight time [hours]",
 )
-fig.show()
+fig.write_image("average_trip_flight_time_by_aircraft_type.pdf")
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -729,38 +729,38 @@ fig.show()
 
 # Jedes Jahr separat laden und speichern
 df25 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2025.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2025.csv",
 ).pint.dequantify()
 df25.columns = df25.columns.droplevel(1)
 
 df24 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2024.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2024.csv",
 ).pint.dequantify()
 df24.columns = df24.columns.droplevel(1)
 
 df23 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2023.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2023.csv",
 ).pint.dequantify()
 df23.columns = df23.columns.droplevel(1)
 
 df19 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2019.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2019.csv",
 ).pint.dequantify()
 df19.columns = df19.columns.droplevel(1)
 
 df18 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2018.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2018.csv",
 ).pint.dequantify()
 df18.columns = df18.columns.droplevel(1)
 
 df13 = process_data_usdot_t2(
-    path_csv_aircraft_types="data/L_AIRCRAFT_TYPE.csv",
-    path_csv_t2="data/T_SCHEDULE_T2_2013.csv",
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2013.csv",
 ).pint.dequantify()
 df13.columns = df13.columns.droplevel(1)
 
@@ -803,4 +803,4 @@ fig.update_layout(
     xaxis_tickangle=-45,
     yaxis_title="Total Fuel Consumption [kg]",
 )
-fig.show()
+fig.write_image("total_fuel_consumption_by_aircraft_type.pdf")
