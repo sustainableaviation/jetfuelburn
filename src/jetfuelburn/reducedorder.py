@@ -2087,7 +2087,7 @@ class eea_emission_inventory_2009:
 
     Notes
     -----
-    Data from `1.A.3.a Aviation vs2.3spreadsheet2-1updated2007.xlsx` [used with permission](../_static/permissions/opensky_network_data_access_confirmation.pdf) 
+    Data from `1.A.3.a Aviation vs2.3spreadsheet2-1updated2007.xlsx` [used with permission](../_static/permissions/opensky_network_data_access_confirmation.pdf)
     from the Swedish Defence Research Agency (foi.se).
 
     Warnings
