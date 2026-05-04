@@ -458,6 +458,28 @@ class usdot:
         year: int,
         acft: str,
     ) -> dict:
+        """
+        Given a year and aircraft designator, returns the number of flights captured.
+
+        Parameters
+        ----------
+        year : int
+            Year of the data to be used for the calculation.
+        acft : str
+            US DOT aircraft designator string (e.g. ``'B739'``).
+
+        Returns
+        -------
+        int or float
+            Number of flights captured for the given aircraft type and year.
+
+        Raises
+        ------
+        ValueError
+            If the year is not available in the model.
+        ValueError
+            If the aircraft designator is not found in the model data for the given year.
+        """
         if year not in usdot._years:
             raise ValueError(f"No data available for year '{year}'.")
         if acft not in usdot._aircraft_data[year]:
@@ -474,6 +496,28 @@ class usdot:
         year: int,
         acft: str,
     ) -> dict:
+        """
+            Given a year and aircraft designator, returns the average trip flight time.
+
+            Parameters
+            ----------
+            year : int
+                Year of the data to be used for the calculation.
+            acft : str
+                US DOT aircraft designator string (e.g. ``'B739'``).
+
+            Returns
+            -------
+            pint.Quantity
+                Average trip flight time for the given aircraft type and year, in hours.
+
+            Raises
+            ------
+            ValueError
+                If the year is not available in the model.
+            ValueError
+                If the aircraft designator is not found in the model data for the given year.
+            """
         if year not in usdot._years:
             raise ValueError(f"No data available for year '{year}'.")
         if acft not in usdot._aircraft_data[year]:
@@ -491,6 +535,29 @@ class usdot:
         year: int,
         acft: str,
     ) -> dict:
+        """
+           Given a year and aircraft designator, returns the average trip distance.
+
+           Parameters
+           ----------
+           year : int
+               Year of the data to be used for the calculation.
+           acft : str
+               US DOT aircraft designator string (e.g. ``'B739'``).
+
+           Returns
+           -------
+           pint.Quantity
+               Average trip distance for the given aircraft type and year, in kilometres.
+
+           Raises
+           ------
+           ValueError
+               If the year is not available in the model.
+           ValueError
+               If the aircraft designator is not found in the model data for the given year.
+           """
+
         if year not in usdot._years:
             raise ValueError(f"No data available for year '{year}'.")
         if acft not in usdot._aircraft_data[year]:
@@ -508,6 +575,29 @@ class usdot:
         year: int,
         acft: str,
     ) -> dict:
+        """
+            Given a year and aircraft designator, returns the average freight and mail transported.
+
+            Parameters
+            ----------
+            year : int
+                Year of the data to be used for the calculation.
+            acft : str
+                US DOT aircraft designator string (e.g. ``'B739'``).
+
+            Returns
+            -------
+            pint.Quantity
+                Average freight and mail transported per flight for the given aircraft
+                type and year, in kilograms.
+
+            Raises
+            ------
+            ValueError
+                If the year is not available in the model.
+            ValueError
+                If the aircraft designator is not found in the model data for the given year.
+            """
         if year not in usdot._years:
             raise ValueError(f"No data available for year '{year}'.")
         if acft not in usdot._aircraft_data[year]:
@@ -525,6 +615,28 @@ class usdot:
         year: int,
         acft: str,
     ) -> dict:
+        """
+            Given a year and aircraft designator, returns the average number of passengers per flight.
+
+            Parameters
+            ----------
+            year : int
+                Year of the data to be used for the calculation.
+            acft : str
+                US DOT aircraft designator string (e.g. ``'B739'``).
+
+            Returns
+            -------
+            int or float
+                Average number of passengers per flight for the given aircraft type and year.
+
+            Raises
+            ------
+            ValueError
+                If the year is not available in the model.
+            ValueError
+                If the aircraft designator is not found in the model data for the given year.
+            """
         if year not in usdot._years:
             raise ValueError(f"No data available for year '{year}'.")
         if acft not in usdot._aircraft_data[year]:
