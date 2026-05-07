@@ -73,6 +73,7 @@ CONFIGS = {
         {"label": "250 seats", "available_seats": 260},
         {"label": "365 seats", "available_seats": 365},
     ],
+
     "seymour_etal": [
         {"label": "A320", "acft": "A320"},
         {"label": "B738", "acft": "B738"},

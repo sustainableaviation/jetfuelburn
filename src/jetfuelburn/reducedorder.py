@@ -133,6 +133,10 @@ class montlaur_etal:
             raise ValueError(
                 "Flights under 200 km are invalid for aircraft with 172+ seats."
             )
+        if available_seats <= 180 and available_seats >= 172 and d_km > 3500 * ureg.km:
+            raise ValueError(
+                f"Distance {d_km:.0f} exceeds the 3500 km limit for aircraft with 172–180 seats."
+            )
         if model not in ("B_D", "D_E") and model != "":
             raise ValueError(
                 f"Model '{model}' is not recognized. Use 'B_D', 'D_E', or leave blank for auto-selection based on available seats and distance."
@@ -1966,6 +1970,18 @@ class aim2015:
             raise ValueError(
                 "Aircraft size class must be between 1 and 8. Compare the table in the class documentation."
             )
+        if acft_size_class in (1, 2):
+            total_distance = (D_climb + D_cruise + D_descent).to("km").magnitude
+            if total_distance > 3500:
+                raise ValueError(
+                    f"Total distance {total_distance:.0f} km exceeds the 3500 km limit for regional aircraft (size classes 1 and 2)."
+                )
+        if acft_size_class == 3:
+            total_distance = (D_climb + D_cruise + D_descent).to("km").magnitude
+            if total_distance > 2500:
+                raise ValueError(
+                    f"Total distance {total_distance:.0f} km exceeds the 2500 km limit for small narrowbody aircraft (size class 3)."
+                )
 
         D_climb = D_climb.to("km").magnitude
         D_cruise = D_cruise.to("km").magnitude

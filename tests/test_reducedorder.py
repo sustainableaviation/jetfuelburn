@@ -60,6 +60,8 @@ def test_unit_consistency():
 def test_invalid_input_raising():
     with pytest.raises(ValueError):
         montlaur_etal.calculate_fuel_consumption(50000 * ureg.km, 200)
+    with pytest.raises(ValueError):
+        montlaur_etal.calculate_fuel_consumption(4000 * ureg.km, 180)
 
 
 class TestSacchiEtal:

@@ -1,6 +1,7 @@
 import jetfuelburn
 from jetfuelburn import ureg
 from jetfuelburn.statistics import usdot
+from jetfuelburn.reducedorder import aim2015
 
 aircraft = usdot.available_aircraft(2024)
 
@@ -44,6 +45,15 @@ result8 = usdot.calculate_total_fuel_consumption(
     year=2024,
 )
 
+fuelburn_aim = aim2015.calculate_fuel_consumption(
+    acft_size_class=7,
+    D_climb=300*ureg.km,
+    D_cruise=(6187-300-200)*ureg.km,
+    D_descent=200*ureg.km,
+    PL= 226 * 0.1 * ureg.metric_ton
+)
+
+
 print(result1)
 print(result2)
 print(result3)
@@ -52,3 +62,4 @@ print(result5)
 print(result6)
 print(result7)
 print(result8)
+print(fuelburn_aim)
