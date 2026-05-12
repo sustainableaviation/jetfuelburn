@@ -58,9 +58,14 @@ def process_data_usdot_t2(
         'REV_TON_MILES_240': 'REV_TON_MILES',
         'AVL_TON_MILES_280': 'AVL_TON_MILES',
         'AIRCRAFT_FUELS_921': 'AIRCRAFT_FUELS',
+        'REV_ACRFT_MILES_FLOWN_410': 'REV_ACRFT_MILES_FLOWN',
+        'REV_ACRFT_HRS_AIRBORNE_610': 'REV_ACRFT_HRS_AIRBORNE',
+        'REV_TON_MILES_FREIGHT_247': 'REV_TON_MILES_FREIGHT',
+        'REV_TON_MILES_MAIL_249': 'REV_TON_MILES_MAIL',
         'CARRIER_GROUP': 'CARRIER_GROUP',
         'AIRCRAFT_CONFIG': 'AIRCRAFT_CONFIG',
         'AIRCRAFT_TYPE': 'AIRCRAFT_TYPE',
+        'REV_ACRFT_DEP_PERF_510' _ 'REV_ACRFT_DEP_PERF',
     }
     """
 
@@ -70,9 +75,14 @@ def process_data_usdot_t2(
         "REV_TON_MILES": "pint[miles*short_ton]",
         "AVL_TON_MILES": "pint[miles*short_ton]",
         "AIRCRAFT_FUELS": "pint[gallons]",
+        "REV_ACRFT_MILES_FLOWN": "pint[miles]",
+        "REV_ACRFT_HRS_AIRBORNE": "pint[hours]",
+        "REV_TON_MILES_FREIGHT": "pint[miles*short_ton]",
+        "REV_TON_MILES_MAIL": "pint[miles*short_ton]",
         "CARRIER_GROUP": "pint[]",
         "AIRCRAFT_CONFIG": "pint[]",
         "AIRCRAFT_TYPE": "pint[]",
+        "REV_ACRFT_DEP_PERF": "pint[]",
     }
     dict_columns_for_renaming = {
         df_t2.filter(like=column_name).columns[0]: column_name
@@ -86,6 +96,11 @@ def process_data_usdot_t2(
     df_t2["REV_PAX_MILES"] = df_t2["REV_PAX_MILES"].pint.to(ureg("km"))
     df_t2["REV_TON_MILES"] = df_t2["REV_TON_MILES"].pint.to(ureg("km*kg"))
     df_t2["AVL_TON_MILES"] = df_t2["AVL_TON_MILES"].pint.to(ureg("km*kg"))
+    df_t2["REV_ACRFT_MILES_FLOWN"] = df_t2["REV_ACRFT_MILES_FLOWN"].pint.to(ureg("km"))
+    df_t2["REV_TON_MILES_FREIGHT"] = df_t2["REV_TON_MILES_FREIGHT"].pint.to(
+        ureg("km*kg")
+    )
+    df_t2["REV_TON_MILES_MAIL"] = df_t2["REV_TON_MILES_MAIL"].pint.to(ureg("km*kg"))
 
     # DATA FILTERING
 
@@ -98,6 +113,11 @@ def process_data_usdot_t2(
         "REV_TON_MILES",
         "AVL_TON_MILES",
         "AIRCRAFT_FUELS",
+        "REV_ACRFT_DEP_PERF",
+        "REV_ACRFT_MILES_FLOWN",
+        "REV_ACRFT_HRS_AIRBORNE",
+        "REV_TON_MILES_FREIGHT",
+        "REV_TON_MILES_MAIL",
     ]
     df_t2[list_numeric_columns] = df_t2[list_numeric_columns].replace(
         to_replace=0, value=pd.NA
@@ -117,6 +137,25 @@ def process_data_usdot_t2(
     df_t2["Fuel/Revenue Weight Distance"] = (
         df_t2["AIRCRAFT_FUELS"] / df_t2["REV_TON_MILES"]
     )
+    df_t2["Number of flights captured"] = df_t2["REV_ACRFT_DEP_PERF"]
+
+    df_t2["Revenue PAX km"] = df_t2["REV_PAX_MILES"]
+
+    df_t2["Average trip distance"] = (
+        df_t2["REV_ACRFT_MILES_FLOWN"] / df_t2["REV_ACRFT_DEP_PERF"]
+    )
+    df_t2["Average trip flight time"] = (
+        df_t2["REV_ACRFT_HRS_AIRBORNE"] / df_t2["REV_ACRFT_DEP_PERF"]
+    )
+    df_t2["Freight and mail transported"] = (
+        df_t2["REV_TON_MILES_FREIGHT"] + df_t2["REV_TON_MILES_MAIL"]
+    ) / df_t2["REV_ACRFT_MILES_FLOWN"]
+
+    df_t2["Average PAX per flight"] = (
+        df_t2["REV_PAX_MILES"] / df_t2["REV_ACRFT_MILES_FLOWN"]
+    )
+
+    df_t2["Total Fuel Consumption"] = df_t2["AIRCRAFT_FUELS"]
 
     # SANITY CHECKS
 
@@ -130,6 +169,13 @@ def process_data_usdot_t2(
         "Fuel/Revenue Seat Distance",
         "Fuel/Available Weight Distance",
         "Fuel/Revenue Weight Distance",
+        "Number of flights captured",
+        "Revenue PAX km",
+        "Average trip distance",
+        "Average trip flight time",
+        "Freight and mail transported",
+        "Average PAX per flight",
+        "Total Fuel Consumption",
     ]
     df_t2 = df_t2[list_return_columns]
 
@@ -140,6 +186,13 @@ def process_data_usdot_t2(
         "Fuel/Revenue Seat Distance": "mean",
         "Fuel/Available Weight Distance": "mean",
         "Fuel/Revenue Weight Distance": "mean",
+        "Number of flights captured": "sum",
+        "Revenue PAX km": "sum",
+        "Average trip distance": "mean",
+        "Average trip flight time": "mean",
+        "Freight and mail transported": "mean",
+        "Average PAX per flight": "mean",
+        "Total Fuel Consumption": "sum",
     }
     df_t2 = df_t2.groupby(
         by="Aircraft Designation (US DOT Schedule T2)",
@@ -164,10 +217,24 @@ def process_data_usdot_t2(
     df_t2["Fuel/Revenue Weight Distance"] = (
         df_t2["Fuel/Revenue Weight Distance"] * density_jetfuel
     )
+    df_t2["Total Fuel Consumption"] = df_t2["Total Fuel Consumption"] * density_jetfuel
     df_t2 = df_t2.set_index("Aircraft Designation (US DOT Schedule T2)")
 
     return df_t2
 
+
+df = process_data_usdot_t2(
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2025.csv",
+)
+df_dequantified = df.pint.dequantify()
+df_dequantified.columns = df_dequantified.columns.droplevel(1)
+
+df_dequantified.to_json(
+    path_or_buf="USDOT_data_2025.json",
+    orient="index",
+    indent=4,
+)
 
 df = process_data_usdot_t2(
     aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
@@ -177,7 +244,62 @@ df_dequantified = df.pint.dequantify()
 df_dequantified.columns = df_dequantified.columns.droplevel(1)
 
 df_dequantified.to_json(
-    path_or_buf="out.json",
+    path_or_buf="USDOT_data_2024.json",
+    orient="index",
+    indent=4,
+)
+
+df = process_data_usdot_t2(
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2023.csv",
+)
+
+df_dequantified = df.pint.dequantify()
+df_dequantified.columns = df_dequantified.columns.droplevel(1)
+
+df_dequantified.to_json(
+    path_or_buf="USDOT_data_2023.json",
+    orient="index",
+    indent=4,
+)
+
+df = process_data_usdot_t2(
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2019.csv",
+)
+df_dequantified = df.pint.dequantify()
+df_dequantified.columns = df_dequantified.columns.droplevel(1)
+
+df_dequantified.to_json(
+    path_or_buf="USDOT_data_2019.json",
+    orient="index",
+    indent=4,
+)
+
+
+df = process_data_usdot_t2(
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2018.csv",
+)
+df_dequantified = df.pint.dequantify()
+df_dequantified.columns = df_dequantified.columns.droplevel(1)
+
+df_dequantified.to_json(
+    path_or_buf="USDOT_data_2018.json",
+    orient="index",
+    indent=4,
+)
+
+
+df = process_data_usdot_t2(
+    aircraft_types_csv_path="data/L_AIRCRAFT_TYPE.csv",
+    t2_csv_path="data/T_SCHEDULE_T2_2013.csv",
+)
+df_dequantified = df.pint.dequantify()
+df_dequantified.columns = df_dequantified.columns.droplevel(1)
+
+df_dequantified.to_json(
+    path_or_buf="USDOT_data_2013.json",
     orient="index",
     indent=4,
 )
