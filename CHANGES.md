@@ -3,7 +3,7 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## `3.2.0` (4. May 2026)
+## `3.3.0` (12. May 2026)
 
 ### Improvements
 
@@ -19,6 +19,12 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
     - `calculate_average_cargo()`: returns the average freight and mail transported for a given aircraft type and year.
     - `calculate_average_pax()`: returns the average number of passengers per flight for a given aircraft type and year.
     - `calculate_total_fuel_consumption()`: returns the total fuel consumption across all aircraft types for a given year.
+
+## `3.2.0` (12. May 2026)
+
+## Improvements
+
+- Added additional regression coefficients for military and transport aircraft to the `reducedorder.eea_emission_inventory_2009` module for improved fuel burn estimation accuracy.
 
 ## `3.1.0` (16. March 2026)
 

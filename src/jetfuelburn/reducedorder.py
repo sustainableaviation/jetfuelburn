@@ -1830,7 +1830,7 @@ class aim2015:
     -----
     Data is available for 8 aircraft size classes, as defined in the AIM2015 documentation, Section 2.3, Table 1:
 
-    | Index | Size Category         | Approx. Range | Reference Aircraft | Reference Engine     |
+    | Index | Size Category         | PAX Number    | Reference Aircraft | Reference Engine     |
     |-------|-----------------------|---------------|--------------------|----------------------|
     | 1     | Small Regional Jet    | 30-69         | CRJ 700            | GE CF34 8C5B1        |
     | 2     | Large Regional Jet    | 70-109        | Embraer 190        | GE CF34 10E6         |
@@ -2084,6 +2084,13 @@ class eea_emission_inventory_2009:
     References
     ----------
     - [EMEP/EEA air pollutant emission inventory guidebook - 2009, Part B, Section 1 (Energy), Subsection 1.A.3.a (`Aviation_annex.zip`)](https://www.eea.europa.eu/en/analysis/publications/emep-eea-emission-inventory-guidebook-2009)
+
+    Notes
+    -----
+    Data on military and transport aircraft from the sub-table `1.A.3.a Aviation vs2.3spreadsheet2-1updated2007.xlsx`
+    [used with permission](../_static/permissions/opensky_network_data_access_confirmation.pdf)
+    by the Swedish Defence Research Agency (foi.se). Note that this data may be a poor representation of
+    newer variants of the same aircraft types.
 
     Warnings
     --------
