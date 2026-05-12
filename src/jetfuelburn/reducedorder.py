@@ -2087,8 +2087,10 @@ class eea_emission_inventory_2009:
 
     Notes
     -----
-    Data from `1.A.3.a Aviation vs2.3spreadsheet2-1updated2007.xlsx` [used with permission](../_static/permissions/opensky_network_data_access_confirmation.pdf)
-    from the Swedish Defence Research Agency (foi.se).
+    Data on military and transport aircraft from the sub-table `1.A.3.a Aviation vs2.3spreadsheet2-1updated2007.xlsx` 
+    [used with permission](../_static/permissions/opensky_network_data_access_confirmation.pdf)
+    by the Swedish Defence Research Agency (foi.se). Note that this data may be a poor representation of 
+    newer variants of the same aircraft types.
 
     Warnings
     --------
