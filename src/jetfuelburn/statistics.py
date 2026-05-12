@@ -273,7 +273,7 @@ class usdot:
     ```
     """
 
-    _years = [2013, 2018, 2024]
+    _years = [2013, 2018, 2019, 2023, 2024, 2025]
     _aircraft_data = {}
     for year in _years:
         with resources.open_text(
@@ -453,3 +453,240 @@ class usdot:
         fuelburn = (aircraft_data["Fuel/Revenue Seat Distance"] * ureg("kg/km")) * R
         fuelburn = fuelburn.to("kg")
         return fuelburn
+
+    def calculate_movements(
+        year: int,
+        acft: str,
+    ) -> dict:
+        """
+        Given a year and aircraft designator, returns the number of flights captured.
+
+        Parameters
+        ----------
+        year : int
+            Year of the data to be used for the calculation.
+        acft : str
+            US DOT aircraft designator string (e.g. ``'B739'``).
+
+        Returns
+        -------
+        int or float
+            Number of flights captured for the given aircraft type and year.
+
+        Raises
+        ------
+        ValueError
+            If the year is not available in the model.
+        ValueError
+            If the aircraft designator is not found in the model data for the given year.
+        """
+        if year not in usdot._years:
+            raise ValueError(f"No data available for year '{year}'.")
+        if acft not in usdot._aircraft_data[year]:
+            raise ValueError(
+                f"US DOT Aircraft Designator '{acft}' not found in model data."
+            )
+        else:
+            aircraft_data = usdot._aircraft_data[year][acft]
+
+        movements = aircraft_data["Number of flights captured"]
+        return movements
+
+    def calculate_average_time(
+        year: int,
+        acft: str,
+    ) -> dict:
+        """
+        Given a year and aircraft designator, returns the average trip flight time.
+
+        Parameters
+        ----------
+        year : int
+            Year of the data to be used for the calculation.
+        acft : str
+            US DOT aircraft designator string (e.g. ``'B739'``).
+
+        Returns
+        -------
+        pint.Quantity
+            Average trip flight time for the given aircraft type and year, in hours.
+
+        Raises
+        ------
+        ValueError
+            If the year is not available in the model.
+        ValueError
+            If the aircraft designator is not found in the model data for the given year.
+        """
+        if year not in usdot._years:
+            raise ValueError(f"No data available for year '{year}'.")
+        if acft not in usdot._aircraft_data[year]:
+            raise ValueError(
+                f"US DOT Aircraft Designator '{acft}' not found in model data."
+            )
+        else:
+            aircraft_data = usdot._aircraft_data[year][acft]
+
+        time = aircraft_data["Average trip flight time"] * ureg("h")
+        time = time.to("h")
+        return time
+
+    def calculate_average_distance(
+        year: int,
+        acft: str,
+    ) -> dict:
+        """
+        Given a year and aircraft designator, returns the average trip distance.
+
+        Parameters
+        ----------
+        year : int
+            Year of the data to be used for the calculation.
+        acft : str
+            US DOT aircraft designator string (e.g. ``'B739'``).
+
+        Returns
+        -------
+        pint.Quantity
+            Average trip distance for the given aircraft type and year, in kilometres.
+
+        Raises
+        ------
+        ValueError
+            If the year is not available in the model.
+        ValueError
+            If the aircraft designator is not found in the model data for the given year.
+        """
+
+        if year not in usdot._years:
+            raise ValueError(f"No data available for year '{year}'.")
+        if acft not in usdot._aircraft_data[year]:
+            raise ValueError(
+                f"US DOT Aircraft Designator '{acft}' not found in model data."
+            )
+        else:
+            aircraft_data = usdot._aircraft_data[year][acft]
+
+        distance = aircraft_data["Average trip distance"] * ureg("km")
+        distance = distance.to("km")
+        return distance
+
+    def calculate_average_cargo(
+        year: int,
+        acft: str,
+    ) -> dict:
+        """
+        Given a year and aircraft designator, returns the average freight and mail transported.
+
+        Parameters
+        ----------
+        year : int
+            Year of the data to be used for the calculation.
+        acft : str
+            US DOT aircraft designator string (e.g. ``'B739'``).
+
+        Returns
+        -------
+        pint.Quantity
+            Average freight and mail transported per flight for the given aircraft
+            type and year, in kilograms.
+
+        Raises
+        ------
+        ValueError
+            If the year is not available in the model.
+        ValueError
+            If the aircraft designator is not found in the model data for the given year.
+        """
+        if year not in usdot._years:
+            raise ValueError(f"No data available for year '{year}'.")
+        if acft not in usdot._aircraft_data[year]:
+            raise ValueError(
+                f"US DOT Aircraft Designator '{acft}' not found in model data."
+            )
+        else:
+            aircraft_data = usdot._aircraft_data[year][acft]
+
+        cargo = aircraft_data["Freight and mail transported"] * ureg("kg")
+        cargo = cargo.to("kg")
+        return cargo
+
+    def calculate_average_pax(
+        year: int,
+        acft: str,
+    ) -> dict:
+        """
+        Given a year and aircraft designator, returns the average number of passengers per flight.
+
+        Parameters
+        ----------
+        year : int
+            Year of the data to be used for the calculation.
+        acft : str
+            US DOT aircraft designator string (e.g. ``'B739'``).
+
+        Returns
+        -------
+        int or float
+            Average number of passengers per flight for the given aircraft type and year.
+
+        Raises
+        ------
+        ValueError
+            If the year is not available in the model.
+        ValueError
+            If the aircraft designator is not found in the model data for the given year.
+        """
+        if year not in usdot._years:
+            raise ValueError(f"No data available for year '{year}'.")
+        if acft not in usdot._aircraft_data[year]:
+            raise ValueError(
+                f"US DOT Aircraft Designator '{acft}' not found in model data."
+            )
+        else:
+            aircraft_data = usdot._aircraft_data[year][acft]
+
+        pax = aircraft_data["Average PAX per flight"]
+        return pax
+
+    @staticmethod
+    def calculate_total_fuel_consumption(year: int) -> float:
+        r"""
+        Given a year, returns the total fuel burned by all aircraft types combined.
+
+        Calculated as:
+
+        $$
+        F_{\text{total}} = \sum_{\text{acft}} \frac{F}{\text{paxD}} \cdot \text{paxD}
+        $$
+
+        where $F/\text{paxD}$ is the ``Fuel/Revenue Seat Distance`` field (kg per pax-km)
+        and $\text{paxD}$ is the ``Revenue PAX km`` field (pax-km) for each aircraft type.
+
+        Parameters
+        ----------
+        year : int
+            Year of the data to be used for the calculation.
+
+        Returns
+        -------
+        pint.Quantity
+            Total fuel burned by all aircraft types combined, in kg.
+
+        Raises
+        ------
+        ValueError
+            If the year is not available in the model.
+        """
+        if year not in usdot._years:
+            raise ValueError(
+                f"No data available for year '{year}'. Please select one of the following: {usdot.available_years()}"
+            )
+
+        total_kg = sum(
+            data["Fuel/Revenue Seat Distance"] * data["Revenue PAX km"]
+            for data in usdot._aircraft_data[year].values()
+            if data["Fuel/Revenue Seat Distance"] is not None
+            and data["Revenue PAX km"] is not None
+        )
+        return (total_kg * ureg("kg")).to("kg")

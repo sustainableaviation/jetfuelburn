@@ -8,7 +8,8 @@ The `jetfuelburn` package was developed by [Michael Weinold](https://www.linkedi
 
 | Contributor | Role | Contributions | Date |
 |-------------|------|---------------|------|
-| [Noe Marty](https://www.linkedin.com/in/noemarty/) | Semester Project Student at ETH Zurich | [Comparison of Methods](https://doi.org/10.3929/ethz-b-000749349) | 2025 |
+| [Noe Marty](https://www.linkedin.com/in/noemarty/) | Semester Project Student at ETH Zurich | [Comparison of Methods](https://doi.org/10.3929/ethz-b-000749349) | 2025-2026 |
+| [Olivier Schnyder](https://www.linkedin.com/in/olivier-s-7b2198b6/) | Semester Project Student at ETH Zurich | Benchmarking of Reduced-Order Methods | 2026 |
 
 ## Citing the Tool
 
