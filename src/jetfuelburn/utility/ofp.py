@@ -244,8 +244,14 @@ def generate_4d_trajectory(
     Notes
     -----
     The function implements a `leveloff` strategy by default:
-    If the aircraft reaches the altitude of the next waypoint before arriving at the waypoint's
-    target time (or distance), it will level off at that target altitude until the waypoint is reached.
+
+    - **Climb**: the aircraft begins climbing immediately and levels off at the target altitude,
+      holding it until the waypoint is reached.
+    - **Descent**: the aircraft holds its current altitude for as long as possible, then begins
+      descending at the applicable rate so as to arrive at the target altitude exactly at the
+      next waypoint (Top of Descent / TOD back-calculation). The TOD is estimated using the
+      descent rate at the current altitude; as the aircraft descends through multiple regimes
+      the rate is re-evaluated at each time step.
 
     ![Flight Plan Diagram](../_static/ofp_1.svg)
 
@@ -365,17 +371,20 @@ def generate_4d_trajectory(
                         curr_alt += r_val * (step_s / 60.0)
                         if curr_alt > leveloff_target:
                             curr_alt = leveloff_target
-                    else:  # descent
+                    else:  # descent: hold altitude until TOD, then descend
                         rate = _get_aircraft_performance(
                             perf_data_path=perf_data_path,
                             aircraft_type=aircraft_type,
                             phase="descent",
                             alt=curr_alt * ureg(unit_alt),
                         )
-                        r_val = rate.to(f"{unit_alt}/min").magnitude
-                        curr_alt += r_val * (step_s / 60.0)
-                        if curr_alt < leveloff_target:
-                            curr_alt = leveloff_target
+                        r_val = rate.to(f"{unit_alt}/min").magnitude  # negative
+                        alt_to_lose = curr_alt - leveloff_target
+                        time_needed_s = (alt_to_lose / abs(r_val)) * 60.0
+                        if rem_s <= time_needed_s:
+                            curr_alt += r_val * (step_s / 60.0)
+                            if curr_alt < leveloff_target:
+                                curr_alt = leveloff_target
 
             curr_t += pd.Timedelta(seconds=step_s)
             if duration_s > 0:
