@@ -1982,7 +1982,12 @@ class aim2015:
                 raise ValueError(
                     f"Total distance {total_distance:.0f} km exceeds the 2500 km limit for small narrowbody aircraft (size class 3)."
                 )
-
+        if acft_size_class == 4:
+            total_distance = (D_climb + D_cruise + D_descent).to("km").magnitude
+            if total_distance > 5000:
+                raise ValueError(
+                    f"Total distance {total_distance:.0f} km exceeds the 5000 km limit for medium narrowbody aircraft (size class 4)."
+                )
         D_climb = D_climb.to("km").magnitude
         D_cruise = D_cruise.to("km").magnitude
         D_descent = D_descent.to("km").magnitude

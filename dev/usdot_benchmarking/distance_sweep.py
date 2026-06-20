@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from jetfuelburn import ureg
 from jetfuelburn.reducedorder import (
     sacchi_etal,
@@ -11,6 +13,17 @@ from jetfuelburn.reducedorder import (
 from jetfuelburn.statistics import usdot
 import pandas as pd
 import matplotlib.pyplot as plt
+
+PLOTS_DIR = Path("distance_sweep_plots")
+PLOTS_DIR.mkdir(exist_ok=True)
+
+plt.rcParams['axes.facecolor'] = 'white'
+plt.rcParams['figure.facecolor'] = 'white'
+plt.rcParams['text.color'] = 'black'
+plt.rcParams['axes.labelcolor'] = 'black'
+plt.rcParams['axes.edgecolor'] = 'black'
+plt.rcParams['xtick.color'] = 'black'
+plt.rcParams['ytick.color'] = 'black'
 
 distances_km = range(1000, 7001, 100)
 
@@ -70,7 +83,6 @@ CONFIGS = {
     ],
     "montlaur_etal": [
         {"label": "180 seats", "available_seats": 180},
-        {"label": "250 seats", "available_seats": 260},
         {"label": "365 seats", "available_seats": 365},
     ],
 
@@ -81,13 +93,8 @@ CONFIGS = {
     ],
     "aim2015": [
         {
-            "label": "size class 3 (regional)",
-            "acft_size_class": 3,
-            "PL": 100 * KG_PER_PAX * ureg.kg,
-        },
-        {
-            "label": f"size class 5 (narrow-body, A320 {PAX_A320} pax)",
-            "acft_size_class": 5,
+            "label": f"size class 4 (narrow-body, A320 {PAX_A320} pax)",
+            "acft_size_class": 4,
             "PL": PAX_A320 * KG_PER_PAX * ureg.kg,
         },
         {
@@ -98,7 +105,6 @@ CONFIGS = {
     ],
     "eea_emission_inventory_2009": [
         {"label": "A320", "acft": "A320"},
-        {"label": "B763", "acft": "B763"},
         {"label": "B777", "acft": "B777"},
     ],
     "myclimate": [
@@ -214,7 +220,7 @@ for model_name, df in results.items():
 
 # Save all results to a single CSV with a model column
 combined = pd.concat({name: df for name, df in results.items()}, axis=1)
-combined.to_csv("distance_sweep_results.csv")
+combined.to_csv(PLOTS_DIR / "distance_sweep_results.csv")
 
 SHORT_HAUL_LIMIT_KM = 5000
 SHORT_HAUL_AIRCRAFT = {"A320", "B738", "B737-800"}
@@ -246,13 +252,12 @@ for model_name, df in results.items():
                 label=f"DOT: {col}",
             )
 
-    ax.set_title(model_name)
     ax.set_ylabel("Fuel burn (kg)")
     ax.set_xlabel("Distance (km)")
     ax.legend(fontsize=7, loc="upper left")
     ax.grid(True)
     plt.tight_layout()
-    plt.savefig(f"distance_sweep_{model_name}.pdf", bbox_inches="tight")
+    plt.savefig(PLOTS_DIR / f"distance_sweep_{model_name}.pdf", bbox_inches="tight")
     plt.show()
 
 # Max-load configs for sacchi_etal and yanto_etal
@@ -305,7 +310,6 @@ for model_name, configs in CONFIGS_MAX.items():
 
 for model_name, df in results_max.items():
     fig, ax = plt.subplots(figsize=(9, 4))
-    fig.suptitle("Fuel burn at maximum passenger load", fontsize=13)
     for col in df.columns:
         is_short_haul = any(a in col for a in SHORT_HAUL_AIRCRAFT)
         series = df[col][df.index <= SHORT_HAUL_LIMIT_KM] if is_short_haul else df[col]
@@ -327,11 +331,10 @@ for model_name, df in results_max.items():
             label=f"DOT: {col}",
         )
 
-    ax.set_title(model_name)
     ax.set_ylabel("Fuel burn (kg)")
     ax.set_xlabel("Distance (km)")
     ax.legend(fontsize=7, loc="upper left")
     ax.grid(True)
     plt.tight_layout()
-    plt.savefig(f"distance_sweep_{model_name}_max_load.pdf", bbox_inches="tight")
+    plt.savefig(PLOTS_DIR / f"distance_sweep_{model_name}_max_load.pdf", bbox_inches="tight")
     plt.show()
