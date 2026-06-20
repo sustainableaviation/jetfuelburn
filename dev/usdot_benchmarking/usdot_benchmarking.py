@@ -5,7 +5,6 @@ from jetfuelburn import ureg
 from jetfuelburn.statistics import usdot
 from jetfuelburn.reducedorder import aim2015
 
-
 aircraft = usdot.available_aircraft(2024)
 
 result10 = myclimate.available_aircraft()
@@ -50,19 +49,12 @@ result8 = usdot.calculate_total_fuel_consumption(
 )
 
 fuelburn1 = sacchi_etal.calculate_fuel_consumption(
-    year = 2024,
-    pax_max = 180,
-    pax = 160,
-    R = 1500*ureg.km
+    year=2024, pax_max=180, pax=160, R=1500 * ureg.km
 )
 
 fuelburn2 = sacchi_etal.calculate_fuel_consumption(
-    year = 2024,
-    pax_max = 180,
-    pax = 120,
-    R = 1500*ureg.km
+    year=2024, pax_max=180, pax=120, R=1500 * ureg.km
 )
-
 
 
 print(fuelburn1)

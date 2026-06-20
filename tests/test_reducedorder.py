@@ -1,4 +1,3 @@
-
 import pytest
 from pint import DimensionalityError
 from jetfuelburn import ureg

@@ -17,13 +17,13 @@ import matplotlib.pyplot as plt
 PLOTS_DIR = Path("distance_sweep_plots")
 PLOTS_DIR.mkdir(exist_ok=True)
 
-plt.rcParams['axes.facecolor'] = 'white'
-plt.rcParams['figure.facecolor'] = 'white'
-plt.rcParams['text.color'] = 'black'
-plt.rcParams['axes.labelcolor'] = 'black'
-plt.rcParams['axes.edgecolor'] = 'black'
-plt.rcParams['xtick.color'] = 'black'
-plt.rcParams['ytick.color'] = 'black'
+plt.rcParams["axes.facecolor"] = "white"
+plt.rcParams["figure.facecolor"] = "white"
+plt.rcParams["text.color"] = "black"
+plt.rcParams["axes.labelcolor"] = "black"
+plt.rcParams["axes.edgecolor"] = "black"
+plt.rcParams["xtick.color"] = "black"
+plt.rcParams["ytick.color"] = "black"
 
 distances_km = range(1000, 7001, 100)
 
@@ -85,7 +85,6 @@ CONFIGS = {
         {"label": "180 seats", "available_seats": 180},
         {"label": "365 seats", "available_seats": 365},
     ],
-
     "seymour_etal": [
         {"label": "A320", "acft": "A320"},
         {"label": "B738", "acft": "B738"},
@@ -336,5 +335,7 @@ for model_name, df in results_max.items():
     ax.legend(fontsize=7, loc="upper left")
     ax.grid(True)
     plt.tight_layout()
-    plt.savefig(PLOTS_DIR / f"distance_sweep_{model_name}_max_load.pdf", bbox_inches="tight")
+    plt.savefig(
+        PLOTS_DIR / f"distance_sweep_{model_name}_max_load.pdf", bbox_inches="tight"
+    )
     plt.show()
