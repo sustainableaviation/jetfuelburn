@@ -17,6 +17,10 @@ the lift-to-drag ratio (L/D) and specific fuel consumption (TSFC) are often more
     All code editors on this page will remember these imports and later variable definitions.
 
 ```pyodide session='fuel' install='jetfuelburn'
+# install jetfuelburn into the browser's Python runtime
+import micropip
+await micropip.install('jetfuelburn')
+
 import jetfuelburn
 from jetfuelburn import ureg
 from jetfuelburn.rangeequation import calculate_fuel_consumption_breguet

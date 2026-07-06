@@ -1,15 +1,17 @@
 version: 2
 
+# Zensical build, per https://docs.readthedocs.com/platform/latest/intro/zensical.html
 build:
-  os: "ubuntu-lts-latest"
+  os: ubuntu-24.04
   tools:
-    python: "latest"
-
-mkdocs:
-  configuration: mkdocs.yaml
-
-python:
-  install:
-    - requirements: docs/_requirements.txt
-    - method: pip
-      path: .
+    python: latest
+  jobs:
+    install:
+      - pip install -r docs/_requirements.txt
+      - pip install .
+    build:
+      html:
+        - zensical build
+    post_build:
+      - mkdir -p $READTHEDOCS_OUTPUT/html/
+      - cp --recursive site/* $READTHEDOCS_OUTPUT/html/

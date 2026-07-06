@@ -59,6 +59,10 @@ Flight trajectories can be obtained in two ways:
 
 !!! example "Usage Example"
     ```pyodide install='openap' 
+    # install openap into the browser's Python runtime
+    import micropip
+    await micropip.install('openap')
+
     from openap import FuelFlow
     import pandas as pd
     from pyodide.http import open_url
