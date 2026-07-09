@@ -1,13 +1,10 @@
-mkdocs-material
+zensical>=0.0.50
 mkdocstrings-python
+mkdocstrings>=1.0.2
 ruff
 pymdown-extensions
-markdown-exec
-mkdocs-jupyter
-mkdocs-include-markdown-plugin
-mkdocs-pdf
+markdown-exec[ansi]>=1.12.3
 # requirements for interactive figures
 plotly-express
 pandas
 jetfuelburn
-ipyleaflet
