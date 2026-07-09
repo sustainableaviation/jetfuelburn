@@ -1,9 +1,9 @@
-zensical
+zensical>=0.0.50
 mkdocstrings-python
 mkdocstrings>=1.0.2
 ruff
 pymdown-extensions
-markdown-exec[ansi]>=1.12.2
+markdown-exec[ansi]>=1.12.3
 # requirements for interactive figures
 plotly-express
 pandas

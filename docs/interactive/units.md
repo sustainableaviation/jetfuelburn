@@ -5,10 +5,6 @@ The `jetfuelburn` package utilises the [`pint` package](https://pint.readthedocs
 To use physical units, simply load the `ureg` object (**u**nit **reg**istry) from the `jetfuelburn` package. You can now start [defining physical quantities](https://pint.readthedocs.io/en/stable/user/defining-quantities.html): 
 
 ```pyodide session="units" install="jetfuelburn"
-# install jetfuelburn into the browser's Python runtime
-import micropip
-await micropip.install("jetfuelburn")
-
 from jetfuelburn import ureg
 100 * ureg.kg
 ```

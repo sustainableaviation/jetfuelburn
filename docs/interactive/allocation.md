@@ -7,10 +7,6 @@ Passengers in first class are allocated more fuel than passengers in economy cla
     For a detailed discussion on area and weight considerations, compare World Bank Policy Research Working Paper 6471 (2013) by Bofinger and Strand ["Calculating the carbon footprint from different classes of air travel."](https://hdl.handle.net/10986/15602).
 
 ```pyodide session="allocation" install="jetfuelburn"
-# install jetfuelburn into the browser's Python runtime
-import micropip
-await micropip.install("jetfuelburn")
-
 from jetfuelburn import ureg
 from jetfuelburn.utility.allocation import footprint_allocation_by_area
 footprint_allocation_by_area(
