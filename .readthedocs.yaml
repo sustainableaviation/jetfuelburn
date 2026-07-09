@@ -2,7 +2,7 @@ version: 2
 
 # Zensical build, per https://docs.readthedocs.com/platform/latest/intro/zensical.html
 build:
-  os: ubuntu-24.04
+  os: ubuntu-lts-latest
   tools:
     python: latest
   jobs:
