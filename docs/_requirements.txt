@@ -5,6 +5,8 @@ ruff
 pymdown-extensions
 markdown-exec[ansi]>=1.12.3
 # requirements for interactive figures
-plotly-express
+# plotly 6.9.0 bundles plotly.js 3.7.0 — keep in sync with the jsDelivr
+# URL in mkdocs.yaml (extra_javascript) when bumping
+plotly==6.9.0
 pandas
 jetfuelburn
