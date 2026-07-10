@@ -94,8 +94,10 @@ extra_javascript:
   - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js
   - https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.js
   - _javascripts/tablesort.js
-  # version must match the plotly python package used at build time
-  - https://cdn.plot.ly/plotly-3.7.0.min.js
+  # version must match the plotly python package used at build time;
+  # loaded from jsDelivr because plotly's own CDN (cdn.plot.ly) does not
+  # serve the 3.7.x line (HTTP 403)
+  - https://cdn.jsdelivr.net/npm/plotly.js-dist-min@3.7.0/plotly.min.js
   - _javascripts/plotly.js
 extra_css:
   # https://cdnjs.com/libraries/KaTeX
