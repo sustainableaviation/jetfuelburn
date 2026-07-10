@@ -45,7 +45,12 @@ fig.add_layout_image(
     )
 )
 
-print(fig.to_html(full_html=False, include_plotlyjs="cdn"))
-# https://pawamoy.github.io/markdown-exec/gallery/#with-plotly
+# Emit the figure as an inert JSON data attribute; _javascripts/plotly.js
+# draws it on every page load. Inline <script> output (fig.to_html) breaks
+# under instant navigation: Zensical re-executes content scripts on page
+# swap, but inline scripts run before the plotly.js CDN script has loaded,
+# and attributes (e.g. type="application/json") are stripped from clones.
+import html
+print(f'<div class="plotly-figure" data-fig="{html.escape(fig.to_json())}"><div class="plotly-figure-target"></div></div>')
 ```
 _Interactive visualization of fuel burn for different Airbus and Boeing aircraft types, based on 2018 statistical data provided by the U.S. Department of Transportation ([`jetfuelburn.statistics.usdot`][])._
