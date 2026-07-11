@@ -253,7 +253,7 @@ def generate_4d_trajectory(
       descent rate at the current altitude; as the aircraft descends through multiple regimes
       the rate is re-evaluated at each time step.
 
-    ![Flight Plan Diagram](../_static/ofp_1.svg)
+    <img alt="Flight Plan Diagram" src="../_static/ofp_1.svg">
 
     **Figure 1:** Diagrammatic representation of the `leveloff` strategy.
     Shown are two different _climb regimes_, which describe the altitude-dependent

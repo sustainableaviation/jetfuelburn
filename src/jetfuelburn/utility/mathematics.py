@@ -9,7 +9,7 @@ def _interpolate(
     r"""
     Given two sorted lists of x/y-pairs, performs one-dimensional linear interpolation for a given x-value:
 
-    ![1d Interpolation](../_static/interpolation.svg)
+    <img alt="1d Interpolation" src="../_static/interpolation.svg">
 
     The interpolation is performed using the formula:
 

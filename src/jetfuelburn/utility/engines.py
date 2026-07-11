@@ -52,7 +52,7 @@ def calculate_corrected_tsfc(
     Trust-specific fuel consumption is a complex function of many parameters,
     and generally dependent on engine thrust as well as the Mach number:
 
-    ![TSFC vs Thrust](../_static/tsfc.svg)
+    <img alt="TSFC vs Thrust" src="../_static/tsfc.svg">
 
     The correction formula implemented in this function is a simplified empirical model
     which considers only variations in Mach number and atmospheric temperature, not thrust.
@@ -103,7 +103,7 @@ def calculate_corrected_tsfc(
     Engine performance charts often report TSFC at specific conditions.
     Consider, for example, this excerpt from the JT15D-1 engine datasheet:
 
-    ![Engine Datasheet](https://marien.sdsu.edu/Class_Materials/jt15d-engine.pdf){ type=application/pdf style="min-height:50vh;width:100%" }
+    <object type="application/pdf" data="https://marien.sdsu.edu/Class_Materials/jt15d-engine.pdf" style="min-height:50vh;width:100%"><a href="https://marien.sdsu.edu/Class_Materials/jt15d-engine.pdf">JT15D engine datasheet (PDF)</a></object>
 
     ```pyodide install='jetfuelburn'
     from jetfuelburn import ureg

@@ -11,7 +11,7 @@ class montlaur_etal:
     r"""
     This class implements the reduced-order fuel burn model of Montlaur et al. (2025):
 
-    ![Montlaur et al. Visual Abstract](../_static/reduced_order_montlaur_etal.svg)
+    <img alt="Montlaur et al. Visual Abstract" src="../_static/reduced_order_montlaur_etal.svg">
 
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
@@ -169,7 +169,7 @@ class sacchi_etal:
     r"""
     This class implements the reduced-order fuel burn model of Sacchi et al. (2023):
 
-    ![Sacchi et al. Visual Abstract](../_static/reduced_order_sacchi.svg)
+    <img alt="Sacchi et al. Visual Abstract" src="../_static/reduced_order_sacchi.svg">
 
     In this model, fuel burn calculations are based on a weight-based power law.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
@@ -221,7 +221,7 @@ class sacchi_etal:
     | $r_{fut}$      | [dimensionless]   | Projected future annual improvement rate (post-2018)                   |
     | $t$            | [time]            | Scenario year (>=2018)                                                 |
 
-    ![Annual Improvement Plot](../_static/reduced_order_sacchi_improvement.svg)
+    <img alt="Annual Improvement Plot" src="../_static/reduced_order_sacchi_improvement.svg">
 
     Operating empty weight (OEW) is calculated as a function of maximum passenger capacity:
 
@@ -229,7 +229,7 @@ class sacchi_etal:
     OEW = \left(0.0927 \cdot pax_{max}^2 + 253.6 \cdot pax_{max} \cdot (1 - 0.00174)^{(t - 2004)}\right) \; [kg]
     $$
 
-    ![Weight Approximation](../_static/reduced_order_sacchi_weight.svg)
+    <img alt="Weight Approximation" src="../_static/reduced_order_sacchi_weight.svg">
 
     Notes
     -----
@@ -408,7 +408,7 @@ class yanto_etal:
     r"""
     This class implements the the reduced-order fuel burn model of Yanto and Liem (2017):
 
-    ![Payload/Range Diagram](../_static/reduced_order_yanto_etal.svg)
+    <img alt="Payload/Range Diagram" src="../_static/reduced_order_yanto_etal.svg">
 
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
@@ -581,7 +581,7 @@ class lee_etal:
     """
     This class implements the the reduced-order fuel burn model of Lee et al. (2010).
 
-    ![Payload/Range Diagram](../_static/reduced_order_lee_etal.svg)
+    <img alt="Payload/Range Diagram" src="../_static/reduced_order_lee_etal.svg">
 
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
@@ -989,7 +989,7 @@ class seymour_etal:
     r"""
     Reduced-order fuel burn model based on Seymour et al. (2020).
 
-    ![Payload/Range Diagram](../_static/reduced_order_seymour_etal.svg)
+    <img alt="Payload/Range Diagram" src="../_static/reduced_order_seymour_etal.svg">
 
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
@@ -1803,7 +1803,7 @@ class aim2015:
 
     The class implements the reduced-order fuel burn model of the [AIM2015 air transport model](https://www.atslab.org/data-tools/) (part "Aircraft Performance Model"):
 
-    ![Payload/Range Diagram](../_static/reduced_order_aim2015.svg)
+    <img alt="Payload/Range Diagram" src="../_static/reduced_order_aim2015.svg">
 
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
@@ -2065,7 +2065,7 @@ class eea_emission_inventory_2009:
     r"""
     The class implements the reduced-order fuel burn model of the [EMEP/EEA air pollutant emission inventory guidebook](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023) (2009).
 
-    ![Payload/Range Diagram](../_static/reduced_order_eea2009.svg)
+    <img alt="Payload/Range Diagram" src="../_static/reduced_order_eea2009.svg">
 
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
@@ -2088,7 +2088,7 @@ class eea_emission_inventory_2009:
     Notes
     -----
     Data on military and transport aircraft from the sub-table `1.A.3.a Aviation vs2.3spreadsheet2-1updated2007.xlsx`
-    [used with permission](../_static/permissions/opensky_network_data_access_confirmation.pdf)
+    <a href="../_static/permissions/opensky_network_data_access_confirmation.pdf">used with permission</a>
     by the Swedish Defence Research Agency (foi.se). Note that this data may be a poor representation of
     newer variants of the same aircraft types.
 
