@@ -1,5 +1,7 @@
 # https://www.mkdocs.org/user-guide/configuration/
+# Built with Zensical (https://zensical.org), which reads this mkdocs.yaml natively.
 site_name: JetFuelBurn Documentation
+site_url: https://jetfuelburn.readthedocs.io/
 repo_url: https://github.com/sustainableaviation/jetfuelburn
 copyright: © Paul Scherrer Institute (PSI) and Contributors | Code under MIT License
 nav:
@@ -38,11 +40,10 @@ theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
   custom_dir: docs/_overrides
   logo: _static/logos/jetfuelburn_logo.svg
   favicon: _static/logos/jetfuelburn_logo.svg
-  highlightjs: true
-  navigation_depth: 4
   features:
-    - navigation.instant
-    - navigation.instant.progress
+    # instant navigation is intentionally disabled: it re-executes page
+    # content scripts out of order (breaks the interactive Plotly figure)
+    # — see https://github.com/zensical/ui/issues/190
     - navigation.expand
     - navigation.path
     - navigation.indexes
@@ -73,14 +74,7 @@ plugins:
             separate_signature: true
   - markdown-exec
   - autorefs
-  - include-markdown
-#  - mkdocs-jupyter:
-#      include: ["docs/**/*.ipynb"]
-#      execute: False
-#      show_input: True
-#      include_source: True
-  - mkdocs-pdf
-  
+
 markdown_extensions:
   - admonition
   - pymdownx.superfences
@@ -90,8 +84,7 @@ markdown_extensions:
   - pymdownx.arithmatex:
       generic: true
   - pymdownx.snippets
-  - pymdownx.highlight:
-      use_pygments: false
+  - pymdownx.highlight
   - attr_list
 
 extra_javascript:
