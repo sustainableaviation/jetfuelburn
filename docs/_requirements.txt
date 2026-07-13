@@ -1,13 +1,14 @@
-mkdocs-material
+zensical>=0.0.50
 mkdocstrings-python
+# mkdocstrings >=1.0.6 fixes the docstring relative-link double-rewrite under
+# Zensical (https://github.com/zensical/zensical/issues/818)
+mkdocstrings>=1.0.6
 ruff
 pymdown-extensions
-markdown-exec
-mkdocs-jupyter
-mkdocs-include-markdown-plugin
-mkdocs-pdf
+markdown-exec[ansi]>=1.12.3
 # requirements for interactive figures
-plotly-express
+# plotly 6.9.0 bundles plotly.js 3.7.0 — keep in sync with the jsDelivr URL
+# in docs/index.md when bumping
+plotly==6.9.0
 pandas
 jetfuelburn
-ipyleaflet
