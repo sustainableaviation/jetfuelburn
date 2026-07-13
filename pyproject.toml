@@ -44,7 +44,6 @@ tracker = "https://github.com/sustainableaviation/jetfuelburn/issues"
 testing = [
     "pytest",
     "pytest-cov",
-    "python-coveralls",
 ]
 optionaldependencies = [
     "pandas",
