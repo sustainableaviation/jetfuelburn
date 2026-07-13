@@ -32,7 +32,7 @@ classifiers = [
 
 requires-python = ">=3.11"
 
-dependencies = ["pint"]
+dependencies = ["pint", "pyyaml"]
 
 [project.urls]
 source = "https://github.com/sustainableaviation/jetfuelburn"
