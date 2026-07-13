@@ -45,7 +45,9 @@ fig.add_layout_image(
     )
 )
 
-print(fig.to_html(full_html=False, include_plotlyjs="cdn"))
-# https://pawamoy.github.io/markdown-exec/gallery/#with-plotly
+# Load plotly.js from jsDelivr rather than the default cdn.plot.ly, which has
+# been unreliable for the 3.7.x line; keep the version matching the plotly pin
+# in docs/_requirements.txt. https://pawamoy.github.io/markdown-exec/gallery/#with-plotly
+print(fig.to_html(full_html=False, include_plotlyjs="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@3.7.0/plotly.min.js"))
 ```
 _Interactive visualization of fuel burn for different Airbus and Boeing aircraft types, based on 2018 statistical data provided by the U.S. Department of Transportation ([`jetfuelburn.statistics.usdot`][])._
