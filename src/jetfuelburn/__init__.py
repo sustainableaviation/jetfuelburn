@@ -4,4 +4,4 @@ from pint import UnitRegistry, set_application_registry
 ureg = UnitRegistry()
 set_application_registry(ureg)
 
-__version__ = "3.3.0"
+__version__ = "3.4.0"

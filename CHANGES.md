@@ -3,6 +3,21 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## `3.4.0` (14. July 2026)
+
+### Improvements
+
+- Improved the descent logic of `utility.ofp.generate_4d_trajectory`: the aircraft now holds its altitude until the Top of Descent (TOD) and then descends so as to reach each waypoint's target altitude exactly on arrival, re-evaluating the descent rate as it passes through successive altitude regimes (previously it began descending immediately). Added a regression test for descent from the TOD.
+
+### Fixed
+
+- The bundled EUROCONTROL APD sample performance dataset is now included in installed packages. It was previously stored as `data.yaml`, which the package-data configuration (matching only `*.json`, `*.csv`, and `*.gz`) excluded from the built distribution, so `utility.ofp` lookups against the shipped dataset failed for installed users. It is now stored as `data.json` and packaged correctly.
+
+### Changed
+
+- Aircraft performance data for `utility.ofp` is now stored as JSON and read with the standard-library `json` module instead of YAML, removing the (previously only transitively satisfied) `PyYAML` dependency.
+- Documentation is now built with [Zensical](https://zensical.org), the successor to Material for MkDocs.
+
 ## `3.3.0` (12. May 2026)
 
 ### Improvements
