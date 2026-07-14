@@ -8,7 +8,7 @@ except ImportError as e:
     ) from e
 
 import math
-import yaml
+import json
 from pathlib import Path
 from jetfuelburn import ureg
 
@@ -28,37 +28,46 @@ def _get_aircraft_performance(
     """
     Look up the climb or descent rate for a given aircraft type and altitude.
 
-    Given a YAML performance data file, returns the rate of climb (positive)
+    Given a JSON performance data file, returns the rate of climb (positive)
     or rate of descent (negative) applicable to the supplied altitude, according
     to the altitude-band regime defined for the aircraft and flight phase.
 
     Performance data must be provided in the following format:
 
-    ```yaml
-    B123:
-        climb:
-            - regime: initial_climb
-                description: Initial climb to 5000 ft
-                min_alt: 0 ft
-                max_alt: 4639 ft
-                rate: 2979 ft/min
-        descent:
-            - regime: initial_descent
-                description: Initial descent to FL240
-                max_alt: 40489 ft
-                min_alt: 25323 ft
-                rate: -1059 ft/min
+    ```json
+    {
+        "B123": {
+            "climb": [
+                {
+                    "regime": "initial_climb",
+                    "description": "Initial climb to 5000 ft",
+                    "min_alt": "0 ft",
+                    "max_alt": "4639 ft",
+                    "rate": "2979 ft/min"
+                }
+            ],
+            "descent": [
+                {
+                    "regime": "initial_descent",
+                    "description": "Initial descent to FL240",
+                    "max_alt": "40489 ft",
+                    "min_alt": "25323 ft",
+                    "rate": "-1059 ft/min"
+                }
+            ]
+        }
+    }
     ```
 
     Parameters
     ----------
     perf_data_path : Path
-        Path to the YAML file containing aircraft performance data.
+        Path to the JSON file containing aircraft performance data.
         The file must follow the schema used by the EUROCONTROL APD dataset
-        (see `src/jetfuelburn/data/EurocontrolAPD/data.yaml`).
+        (see `src/jetfuelburn/data/EurocontrolAPD/data.json`).
     aircraft_type : str
         ICAO aircraft type designator (e.g. ``'B123'``), matching a top-level
-        key in the YAML file.
+        key in the JSON file.
     phase : str
         Flight phase; must be either ``'climb'`` or ``'descent'``.
     alt : pint.Quantity
@@ -76,11 +85,11 @@ def _get_aircraft_performance(
     ValueError
         If *phase* is not ``'climb'`` or ``'descent'``.
     ValueError
-        If *aircraft_type* is not present in the YAML file.
+        If *aircraft_type* is not present in the JSON file.
     ValueError
         If the flight phase is missing for the given *aircraft_type*.
     ValueError
-        If a regime in the YAML file has ``min_alt == max_alt`` (degenerate band).
+        If a regime in the JSON file has ``min_alt == max_alt`` (degenerate band).
     ValueError
         If *alt* does not fall within any altitude band defined for the aircraft
         and flight phase.
@@ -96,7 +105,7 @@ def _get_aircraft_performance(
     from jetfuelburn import ureg
 
     jetfuelburn._get_aircraft_performance(
-        jetfuelburn.data.EurocontrolAPD.data.yaml,
+        jetfuelburn.data.EurocontrolAPD.data.json,
         "B123",
         "climb",
         30000 * ureg.ft,
@@ -104,7 +113,7 @@ def _get_aircraft_performance(
     ```
     """
     with open(perf_data_path, "r") as f:
-        data = yaml.safe_load(f)
+        data = json.load(f)
 
     if phase not in ("climb", "descent"):
         raise ValueError(f"Unknown flight phase: {phase!r}. Use 'climb' or 'descent'.")
@@ -188,7 +197,7 @@ def generate_4d_trajectory(
         ICAO aircraft type designator (e.g. ``'B123'``), passed directly to
         :func:`_get_aircraft_performance`.
     perf_data_path : Path
-        Path to the YAML performance data file; forwarded to
+        Path to the JSON performance data file; forwarded to
         :func:`_get_aircraft_performance`.
     time_resolution : pint.Quantity, optional
         Resampling resolution as a Pint time quantity (e.g. ``1 * ureg.minute``).
@@ -278,7 +287,7 @@ def generate_4d_trajectory(
     result = jetfuelburn.generate_4d_trajectory(
         df_ofp,
         "B123",
-        jetfuelburn.DATA_YAML,
+        jetfuelburn.DATA_JSON,
         time_resolution=1 * ureg.minute,
         timestamp_start=pd.Timestamp("2025-01-01 00:00:00"),
     )
