@@ -14,27 +14,27 @@ from jetfuelburn.utility.ofp import _get_aircraft_performance, generate_4d_traje
 # Helpers / shared fixtures
 # ---------------------------------------------------------------------------
 
-DATA_YAML = (
+DATA_JSON = (
     Path(__file__).parent.parent
     / "src"
     / "jetfuelburn"
     / "data"
     / "EurocontrolAPD"
-    / "data.yaml"
+    / "data.json"
 )
-"""Path to the real EUROCONTROL APD YAML file shipped with the package."""
+"""Path to the real EUROCONTROL APD JSON file shipped with the package."""
 
 OFP_CSV = Path(__file__).parent / "data" / "ofp" / "ofp_basic.csv"
 """Path to the OFP test fixture."""
 
-PERF_YAML = Path(__file__).parent / "data" / "ofp" / "performance.yaml"
+PERF_JSON = Path(__file__).parent / "data" / "ofp" / "performance.json"
 """Path to the performance test fixture."""
 
 
 @pytest.fixture()
-def tmp_yaml() -> Path:
-    """Return the path to the static performance YAML test fixture."""
-    return PERF_YAML
+def tmp_json() -> Path:
+    """Return the path to the static performance JSON test fixture."""
+    return PERF_JSON
 
 
 @pytest.fixture()
@@ -55,110 +55,110 @@ class TestGetAircraftPerformance:
 
     def test_climb_lower_band(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """Altitude in the lower climb band returns the correct rate."""
-        rate = _get_aircraft_performance(tmp_yaml, "TEST", "climb", 2500 * ureg.ft)
+        rate = _get_aircraft_performance(tmp_json, "TEST", "climb", 2500 * ureg.ft)
         assert rate.check("[length]/[time]")
         assert math.isclose(rate.to("ft/min").magnitude, 1000.0)
 
     def test_climb_upper_band(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """Altitude in the higher climb band returns the correct rate."""
-        rate = _get_aircraft_performance(tmp_yaml, "TEST", "climb", 20000 * ureg.ft)
+        rate = _get_aircraft_performance(tmp_json, "TEST", "climb", 20000 * ureg.ft)
         assert rate.check("[length]/[time]")
         assert math.isclose(rate.to("ft/min").magnitude, 500.0)
 
     def test_descent_upper_band(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """Altitude in the higher descent band returns a negative rate."""
-        rate = _get_aircraft_performance(tmp_yaml, "TEST", "descent", 20000 * ureg.ft)
+        rate = _get_aircraft_performance(tmp_json, "TEST", "descent", 20000 * ureg.ft)
         assert rate.check("[length]/[time]")
         assert math.isclose(rate.to("ft/min").magnitude, -1000.0)
 
     def test_descent_lower_band(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """Altitude in the approach descent band returns the correct rate."""
-        rate = _get_aircraft_performance(tmp_yaml, "TEST", "descent", 2500 * ureg.ft)
+        rate = _get_aircraft_performance(tmp_json, "TEST", "descent", 2500 * ureg.ft)
         assert rate.check("[length]/[time]")
         assert math.isclose(rate.to("ft/min").magnitude, -500.0)
 
     def test_boundary_altitude_lower(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """Altitude exactly at the lower boundary (0 ft) is accepted."""
-        rate = _get_aircraft_performance(tmp_yaml, "TEST", "climb", 0 * ureg.ft)
+        rate = _get_aircraft_performance(tmp_json, "TEST", "climb", 0 * ureg.ft)
         assert math.isclose(rate.to("ft/min").magnitude, 1000.0)
 
     def test_boundary_altitude_band_transition(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """Altitude exactly at the band boundary (5 000 ft) is accepted."""
-        rate = _get_aircraft_performance(tmp_yaml, "TEST", "climb", 5000 * ureg.ft)
+        rate = _get_aircraft_performance(tmp_json, "TEST", "climb", 5000 * ureg.ft)
         # 5 000 ft satisfies BOTH bands (min_alt <= alt <= max_alt for both);
         # the first matching band is returned.
         assert rate.check("[length]/[time]")
 
-    def test_uses_real_yaml_file(self):
-        """Smoke-test against the real EUROCONTROL APD YAML bundled with the package."""
-        rate = _get_aircraft_performance(DATA_YAML, "B123", "climb", 10000 * ureg.ft)
+    def test_uses_real_json_file(self):
+        """Smoke-test against the real EUROCONTROL APD JSON bundled with the package."""
+        rate = _get_aircraft_performance(DATA_JSON, "B123", "climb", 10000 * ureg.ft)
         assert rate.check("[length]/[time]")
         assert rate.magnitude > 0  # climb rate must be positive
 
-    def test_real_yaml_descent_is_negative(self):
+    def test_real_json_descent_is_negative(self):
         """Descent rates in the real data file are negative."""
-        rate = _get_aircraft_performance(DATA_YAML, "B123", "descent", 30000 * ureg.ft)
+        rate = _get_aircraft_performance(DATA_JSON, "B123", "descent", 30000 * ureg.ft)
         assert rate.to("ft/min").magnitude < 0
 
     # --- error handling ----------------------------------------------------
 
     def test_invalid_phase_raises(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """A phase other than 'climb' or 'descent' raises :class:`ValueError`."""
         with pytest.raises(ValueError, match="climb.*descent"):
-            _get_aircraft_performance(tmp_yaml, "TEST", "cruise", 10000 * ureg.ft)
+            _get_aircraft_performance(tmp_json, "TEST", "cruise", 10000 * ureg.ft)
 
     def test_unknown_aircraft_raises(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
-        """An aircraft key absent from the YAML raises :class:`ValueError`."""
+        """An aircraft key absent from the JSON raises :class:`ValueError`."""
         with pytest.raises(ValueError, match="not found"):
-            _get_aircraft_performance(tmp_yaml, "UNKNOWN_XYZ", "climb", 10000 * ureg.ft)
+            _get_aircraft_performance(tmp_json, "UNKNOWN_XYZ", "climb", 10000 * ureg.ft)
 
     def test_altitude_out_of_bands_raises(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """An altitude above all defined bands raises :class:`ValueError`."""
         with pytest.raises(ValueError, match="not found in any altitude band"):
-            _get_aircraft_performance(tmp_yaml, "TEST", "climb", 99999 * ureg.ft)
+            _get_aircraft_performance(tmp_json, "TEST", "climb", 99999 * ureg.ft)
 
     def test_error_message_lists_available_aircraft(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """The ValueError for an unknown aircraft lists available aircraft types."""
         with pytest.raises(ValueError, match="TEST"):
-            _get_aircraft_performance(tmp_yaml, "BOGUS", "climb", 10000 * ureg.ft)
+            _get_aircraft_performance(tmp_json, "BOGUS", "climb", 10000 * ureg.ft)
 
     def test_wrong_unit_raises(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """Passing a non-length quantity is rejected by the ``@ureg.check`` decorator."""
         with pytest.raises(Exception):
-            _get_aircraft_performance(tmp_yaml, "TEST", "climb", 10000 * ureg.kg)
+            _get_aircraft_performance(tmp_json, "TEST", "climb", 10000 * ureg.kg)
 
 
 # ---------------------------------------------------------------------------
@@ -173,16 +173,16 @@ class TestGenerate4DTrajectory:
 
     def test_empty_dataframe_raises(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """An empty flight plan raises :class:`ValueError`."""
         df_empty = pd.DataFrame(columns=["waypoint", "alt", "timecum", "lat", "lon"])
         with pytest.raises(ValueError, match="[Ee]mpty"):
-            generate_4d_trajectory(df_empty, "TEST", tmp_yaml)
+            generate_4d_trajectory(df_empty, "TEST", tmp_json)
 
     def test_missing_column_raises(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """A DataFrame missing a required column raises :class:`ValueError`."""
         df = pd.DataFrame(
@@ -195,13 +195,13 @@ class TestGenerate4DTrajectory:
             }
         )
         with pytest.raises(ValueError, match="alt"):
-            generate_4d_trajectory(df, "TEST", tmp_yaml)
+            generate_4d_trajectory(df, "TEST", tmp_json)
 
     # --- output shape / types ----------------------------------------------
 
     def test_output_is_dataframe(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """The return value is a :class:`pandas.DataFrame`."""
         df = pd.DataFrame(
@@ -213,12 +213,12 @@ class TestGenerate4DTrajectory:
                 "lon": [8.0, 9.0],
             }
         )
-        result = generate_4d_trajectory(df, "TEST", tmp_yaml)
+        result = generate_4d_trajectory(df, "TEST", tmp_json)
         assert isinstance(result, pd.DataFrame)
 
     def test_output_contains_alt_filled(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """The output DataFrame contains the ``alt_filled`` column."""
         df = pd.DataFrame(
@@ -230,12 +230,12 @@ class TestGenerate4DTrajectory:
                 "lon": [8.0, 9.0],
             }
         )
-        result = generate_4d_trajectory(df, "TEST", tmp_yaml)
+        result = generate_4d_trajectory(df, "TEST", tmp_json)
         assert "alt_filled" in result.columns
 
     def test_output_resolution_1min(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """
         With ``resolution_min=1``, consecutive timestamps in the output are
@@ -257,7 +257,7 @@ class TestGenerate4DTrajectory:
             }
         )
         result = generate_4d_trajectory(
-            df, "TEST", tmp_yaml, time_resolution=1 * ureg.minute
+            df, "TEST", tmp_json, time_resolution=1 * ureg.minute
         )
         # The 'timestamp' column holds datetime64 values after the merge
         timestamps = pd.to_datetime(result["timestamp"].dropna())
@@ -270,7 +270,7 @@ class TestGenerate4DTrajectory:
 
     def test_level_off_at_next_waypoint_altitude(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """
         Aircraft climbs to the next waypoint's altitude well before the waypoint
@@ -298,7 +298,7 @@ class TestGenerate4DTrajectory:
         result = generate_4d_trajectory(
             df,
             "TEST",
-            tmp_yaml,
+            tmp_json,
             time_resolution=1 * ureg.minute,
             timestamp_start=pd.Timestamp("2025-01-01 00:00:00"),
         )
@@ -310,7 +310,7 @@ class TestGenerate4DTrajectory:
 
     def test_clb_token_is_interpolated(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """
         Waypoints tagged with the ``'CLB'`` string token get their altitude
@@ -327,7 +327,7 @@ class TestGenerate4DTrajectory:
             }
         )
         result = generate_4d_trajectory(
-            df, "TEST", tmp_yaml, time_resolution=1 * ureg.minute
+            df, "TEST", tmp_json, time_resolution=1 * ureg.minute
         )
         assert result["alt_filled"].notna().all()
 
@@ -343,7 +343,7 @@ class TestGenerate4DTrajectory:
         result = generate_4d_trajectory(
             df_ofp=df,
             aircraft_type="B123",
-            perf_data_path=DATA_YAML,
+            perf_data_path=DATA_JSON,
             time_resolution=1 * ureg.minute,
         )
         assert isinstance(result, pd.DataFrame)
@@ -369,7 +369,7 @@ class TestGenerate4DTrajectory:
         result = generate_4d_trajectory(
             df_ofp=df,
             aircraft_type="B123",
-            perf_data_path=DATA_YAML,
+            perf_data_path=DATA_JSON,
             time_resolution=1 * ureg.minute,
         )
         alts = result["alt_filled"].dropna()
@@ -381,7 +381,7 @@ class TestGenerate4DTrajectory:
 
     def test_custom_column_names(
         self,
-        tmp_yaml: Path,
+        tmp_json: Path,
     ):
         """Custom column name arguments are respected."""
         df = pd.DataFrame(
@@ -396,7 +396,7 @@ class TestGenerate4DTrajectory:
         result = generate_4d_trajectory(
             df_ofp=df,
             aircraft_type="TEST",
-            perf_data_path=tmp_yaml,
+            perf_data_path=tmp_json,
             colname_wp="wp",
             colname_timecum="elapsed",
             colname_alt="elevation",
@@ -408,7 +408,7 @@ class TestGenerate4DTrajectory:
 
     # --- descent / TOD behavior --------------------------------------------
 
-    def test_tod_no_premature_ground_level(self, tmp_yaml):
+    def test_tod_no_premature_ground_level(self, tmp_json):
         """
         With TOD strategy, the aircraft must hold cruise altitude at the start
         of a descent segment rather than descending immediately.
@@ -434,7 +434,7 @@ class TestGenerate4DTrajectory:
             }
         )
         result = generate_4d_trajectory(
-            df, "TEST", tmp_yaml, time_resolution=1 * ureg.minute
+            df, "TEST", tmp_json, time_resolution=1 * ureg.minute
         )
         # At t=10 min the aircraft should still be at cruise altitude (TOD not yet reached)
         ts_check = pd.Timestamp("2025-01-01 00:10:00")
