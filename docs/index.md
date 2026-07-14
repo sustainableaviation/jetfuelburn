@@ -2,7 +2,7 @@
 
 [![PyPI Downloads](https://img.shields.io/pepy/dt/jetfuelburn?label=PyPI%20Downloads&logo=pypi&logoColor=white)](https://pepy.tech/project/jetfuelburn)
 [![License: MIT](https://img.shields.io/pypi/l/jetfuelburn?label=License&logo=open-source-initiative&logoColor=white)](https://pypi.org/project/jetfuelburn/)
-[![Coverage Status](https://coveralls.io/repos/github/sustainableaviation/jetfuelburn/badge.svg?branch=main)](https://coveralls.io/github/sustainableaviation/jetfuelburn?branch=main)
+[![Coverage](https://img.shields.io/coverallsCoverage/github/sustainableaviation/jetfuelburn?branch=main&label=Coverage)](https://coveralls.io/github/sustainableaviation/jetfuelburn?branch=main)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/jetfuelburn?logo=python&logoColor=white)](https://pypi.org/project/jetfuelburn/)
 [![Code style: black](https://img.shields.io/badge/Code%20Style-Black-000000.svg)](https://github.com/psf/black)
 
