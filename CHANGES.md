@@ -9,9 +9,23 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 Old names remain available as deprecated aliases: they point to the new class and figure functions.
 
+| Module | Before (3.4.0) | After (4.0.0) |
+|---|---|---|
+| `reducedorder` | `<model>.calculate_fuel_consumption()` | `<model>.calculate()` |
+| `reducedorder`, `statistics`, `utility.aerodynamics` | `<class>.available_aircraft()` | `<class>.list_aircraft()` |
+| `statistics` | `usdot.available_years()` | `usdot.list_years()` |
+| `statistics` | `usdot.calculate_fuel_consumption_per_seat()` | `usdot.calculate_per_seat()` |
+| `statistics` | `usdot.calculate_fuel_consumption_per_weight()` | `usdot.calculate_per_weight()` |
+| `rangeequation` | `calculate_fuel_consumption_breguet()` | `range_equation.calculate()` |
+| `rangeequation` | `calculate_fuel_consumption_breguet_improved()` | `range_equation.calculate_improved()` |
+| `rangeequation` | `calculate_fuel_consumption_stepclimb_integration()` | `range_equation.calculate_stepclimb_integration()` |
+| `rangeequation` | `calculate_fuel_consumption_stepclimb_arctan()` | `range_equation.calculate_stepclimb_arctan()` |
+| `diagrams` | `calculate_fuel_consumption_payload_range()` | `payload_range.calculate()` |
+| `utility.aerodynamics` | `openap_drag_polars`, `jsbsim_drag_polars` | `poll_schumann_drag_polars` |
+| `figures.aerodynamics` | `figure_openap_dragpolar()`, `figure_jsbsim_dragpolar_mach_effects()` | `figure_poll_schumann_dragpolar()` |
+
 - Airport lookups in `utility.geography` follow the new airport list. Codes of closed or re-coded airports and some former airport names now raise a `ValueError` in `calculate_distance_between_airports()`.
-- The drag-polar classes `utility.aerodynamics.openap_drag_polars` and `utility.aerodynamics.jsbsim_drag_polars` are replaced by `utility.aerodynamics.poll_schumann_drag_polars`.
-- The list function `available_aircraft()` is replaced by `list_aircraft()`. Aircraft are identified by ICAO designators throughout: e.g. 'Boeing 737 MAX 7' becomes `B37M`, 'E175' becomes `E75L` and 'Airbus A321neo' becomes `A21N`, etc.
+- Aircraft are identified by ICAO designators throughout: e.g. 'Boeing 737 MAX 7' becomes `B37M`, 'E175' becomes `E75L` and 'Airbus A321neo' becomes `A21N`, etc.
 - `statistics.aeromaps` and its data in `data/AeroMaps` are removed.
 
 ### Changed
@@ -23,7 +37,7 @@ Old names remain available as deprecated aliases: they point to the new class an
 
 ### Fixes
 
-- `reducedorder.seymour_etal.calculate_fuel_consumption()` squared the first coefficient (`a1**2 * R`), which dropped the quadratic term in all earlier releases. It now evaluates $F = a_1 R^2 + a_2 R + c$. Together with the new coefficients, results rise by a median of 3.5 % at 1,000 km, 9 % at 3,000 km and 19 % at 6,000 km (over the types whose maximum range in Table L.6 of the Supplementary Information reaches the distance). Results for the 26 types with a negative quadratic coefficient fall below those of earlier releases at long range, and `calculate_fuel_consumption()` raises a `ValueError` where such a fit no longer returns a positive fuel burn.
+- `reducedorder.seymour_etal.calculate()` squared the first coefficient (`a1**2 * R`), which dropped the quadratic term in all earlier releases. It now evaluates $F = a_1 R^2 + a_2 R + c$. Together with the new coefficients, results rise by a median of 3.5 % at 1,000 km, 9 % at 3,000 km and 19 % at 6,000 km (over the types whose maximum range in Table L.6 of the Supplementary Information reaches the distance). Results for the 26 types with a negative quadratic coefficient fall below those of earlier releases at long range, and `calculate()` raises a `ValueError` where such a fit no longer returns a positive fuel burn.
 
 ## `3.4.0` (14. July 2026)
 

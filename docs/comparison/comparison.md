@@ -22,5 +22,5 @@ The following table shows which aircraft types are supported by each model in th
     - ✗ indicates the aircraft type is not supported
     - Values in parentheses (e.g., A332, B772) indicate the closest available aircraft variant
     - This table shows a representative sample of aircraft types; most models support many more aircraft types
-    - Check each model's `available_aircraft()` method for the complete list of supported aircraft
+    - Check each model's `list_aircraft()` method for the complete list of supported aircraft
 

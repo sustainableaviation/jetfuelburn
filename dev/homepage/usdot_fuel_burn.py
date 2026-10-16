@@ -8,37 +8,37 @@ from jetfuelburn.statistics import usdot
 list_range = [r for r in range(125, 1000, 40)]
 
 list_data_A320 = [
-    usdot.calculate_fuel_consumption_per_seat(
+    usdot.calculate_per_seat(
         year=2018, acft="Airbus Industrie A320-200n", R=range * ureg.km
     ).magnitude
     for range in list_range
 ]
 list_data_B737 = [
-    usdot.calculate_fuel_consumption_per_seat(
+    usdot.calculate_per_seat(
         year=2018, acft="Boeing 737-800", R=range * ureg.km
     ).magnitude
     for range in list_range
 ]
 list_data_A330 = [
-    usdot.calculate_fuel_consumption_per_seat(
+    usdot.calculate_per_seat(
         year=2018, acft="Airbus Industrie A330-200", R=range * ureg.km
     ).magnitude
     for range in list_range
 ]
 list_data_B757 = [
-    usdot.calculate_fuel_consumption_per_seat(
+    usdot.calculate_per_seat(
         year=2018, acft="Boeing 757-200", R=range * ureg.km
     ).magnitude
     for range in list_range
 ]
 list_data_A350 = [
-    usdot.calculate_fuel_consumption_per_seat(
+    usdot.calculate_per_seat(
         year=2018, acft="Airbus Industrie A350-900", R=range * ureg.km
     ).magnitude
     for range in list_range
 ]
 list_data_B787 = [
-    usdot.calculate_fuel_consumption_per_seat(
+    usdot.calculate_per_seat(
         year=2018, acft="B787-900 Dreamliner", R=range * ureg.km
     ).magnitude
     for range in list_range

@@ -133,7 +133,7 @@ def _run_model(model_name, cfg, R):
     try:
         if model_name == "sacchi_etal":
             return (
-                sacchi_etal.calculate_fuel_consumption(
+                sacchi_etal.calculate(
                     year=YEAR, pax_max=cfg["pax_max"], pax=cfg["pax"], R=R
                 )
                 .to("kg")
@@ -142,28 +142,22 @@ def _run_model(model_name, cfg, R):
 
         if model_name == "yanto_etal":
             return (
-                yanto_etal.calculate_fuel_consumption(
-                    acft=cfg["acft"], R=R, PL=cfg["PL"]
-                )
+                yanto_etal.calculate(acft=cfg["acft"], R=R, PL=cfg["PL"])
                 .to("kg")
                 .magnitude
             )
 
         if model_name == "montlaur_etal":
-            fuel_per_km = montlaur_etal.calculate_fuel_consumption(
+            fuel_per_km = montlaur_etal.calculate(
                 distance=R, available_seats=cfg["available_seats"]
             )
             return (fuel_per_km * R * cfg["available_seats"]).to("kg").magnitude
 
         if model_name == "seymour_etal":
-            return (
-                seymour_etal.calculate_fuel_consumption(acft=cfg["acft"], R=R)
-                .to("kg")
-                .magnitude
-            )
+            return seymour_etal.calculate(acft=cfg["acft"], R=R).to("kg").magnitude
 
         if model_name == "aim2015":
-            res = aim2015.calculate_fuel_consumption(
+            res = aim2015.calculate(
                 acft_size_class=cfg["acft_size_class"],
                 D_climb=D_CLIMB,
                 D_cruise=R - D_CLIMB - D_DESCENT,
@@ -173,20 +167,14 @@ def _run_model(model_name, cfg, R):
             return sum(v.to("kg").magnitude for v in res.values())
 
         if model_name == "eea_emission_inventory_2009":
-            res = eea_emission_inventory_2009.calculate_fuel_consumption(
-                acft=cfg["acft"], R=R
-            )
+            res = eea_emission_inventory_2009.calculate(acft=cfg["acft"], R=R)
             return res["mass_fuel_total"].to("kg").magnitude
 
         if model_name == "myclimate":
-            return (
-                myclimate.calculate_fuel_consumption(acft=cfg["acft"], x=R)
-                .to("kg")
-                .magnitude
-            )
+            return myclimate.calculate(acft=cfg["acft"], x=R).to("kg").magnitude
 
         if model_name == "usdot":
-            fuel_per_pax = usdot.calculate_fuel_consumption_per_seat(
+            fuel_per_pax = usdot.calculate_per_seat(
                 year=cfg["year"], acft=cfg["acft"], R=R
             )
             return (fuel_per_pax * cfg["pax"]).to("kg").magnitude

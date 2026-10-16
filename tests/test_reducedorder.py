@@ -47,19 +47,19 @@ def test_value_consistency(distance_km, seats, expected_fuel_ask, description):
     https://github.com/luis-uow/emissions_fuel_estimation?tab=GPL-3.0-1-ov-file
     """
     # 1. Calculate New Implementation Value
-    new_result = montlaur_etal.calculate_fuel_consumption(
+    new_result = montlaur_etal.calculate(
         distance=distance_km * ureg.km, available_seats=seats
     )
 
 
 def test_unit_consistency():
-    result = montlaur_etal.calculate_fuel_consumption(1000 * ureg.km, 150)
+    result = montlaur_etal.calculate(1000 * ureg.km, 150)
     assert result.check("[mass]/[length]")
 
 
 def test_invalid_input_raising():
     with pytest.raises(ValueError):
-        montlaur_etal.calculate_fuel_consumption(50000 * ureg.km, 200)
+        montlaur_etal.calculate(50000 * ureg.km, 200)
 
 
 class TestSacchiEtal:
@@ -69,34 +69,28 @@ class TestSacchiEtal:
 
         # 1. Year < 2018
         with pytest.raises(ValueError, match="Year must be 2018 or later"):
-            sacchi_etal.calculate_fuel_consumption(
-                year=2017, pax_max=180, pax=150, R=1000 * ureg.km
-            )
+            sacchi_etal.calculate(year=2017, pax_max=180, pax=150, R=1000 * ureg.km)
 
         # 2. Pax > Pax Max
         with pytest.raises(ValueError, match="between 0 and maximum pax"):
-            sacchi_etal.calculate_fuel_consumption(
-                year=2020, pax_max=180, pax=181, R=1000 * ureg.km
-            )
+            sacchi_etal.calculate(year=2020, pax_max=180, pax=181, R=1000 * ureg.km)
 
         # 3. Negative Pax
         with pytest.raises(ValueError, match="between 0 and maximum pax"):
-            sacchi_etal.calculate_fuel_consumption(
-                year=2020, pax_max=180, pax=-1, R=1000 * ureg.km
-            )
+            sacchi_etal.calculate(year=2020, pax_max=180, pax=-1, R=1000 * ureg.km)
 
     def test_dimensionality_checks(self):
         """Test that passing wrong units raises DimensionalityError."""
 
         # 1. Range with Mass Units
         with pytest.raises(DimensionalityError):
-            sacchi_etal.calculate_fuel_consumption(
+            sacchi_etal.calculate(
                 year=2020, pax_max=180, pax=150, R=1000 * ureg.kg  # Wrong dimension
             )
 
         # 2. Tolerance with Time units
         with pytest.raises(DimensionalityError):
-            sacchi_etal.calculate_fuel_consumption(
+            sacchi_etal.calculate(
                 year=2020,
                 pax_max=180,
                 pax=150,
@@ -111,12 +105,12 @@ class TestSacchiEtal:
         pax = 150
 
         # Calculate with km
-        res_km = sacchi_etal.calculate_fuel_consumption(
+        res_km = sacchi_etal.calculate(
             year=year, pax_max=pax_max, pax=pax, R=1000 * ureg.km
         )
 
         # Calculate with nmi (approx 539.957 nmi = 1000 km)
-        res_nmi = sacchi_etal.calculate_fuel_consumption(
+        res_nmi = sacchi_etal.calculate(
             year=year, pax_max=pax_max, pax=pax, R=539.9568 * ureg.nmi
         )
 
@@ -131,7 +125,7 @@ class TestSacchiEtal:
         # Case 1: 2018
         # See: Cell AE8 in sheet "Scenarios" of Supplement 1 to Sacchi et al. (2023)
         # https://doi.org/10.5281/zenodo.8059750
-        fuel_1 = sacchi_etal.calculate_fuel_consumption(
+        fuel_1 = sacchi_etal.calculate(
             year=2018, pax_max=210, pax=177, R=6654 * ureg.km
         )
         expected_1 = 42278 * ureg.kg
@@ -144,7 +138,7 @@ class TestSacchiEtal:
         # Case 2: 2025
         # See: Cell AE15 in sheet "Scenarios" of Supplement 1 to Sacchi et al. (2023)
         # https://doi.org/10.5281/zenodo.8059750
-        fuel_2 = sacchi_etal.calculate_fuel_consumption(
+        fuel_2 = sacchi_etal.calculate(
             year=2025, pax_max=214, pax=184, R=6654 * ureg.km
         )
         expected_2 = 39606 * ureg.kg
@@ -157,7 +151,7 @@ class TestSacchiEtal:
         # Case 2: 2025
         # See: Cell AE15 in sheet "Scenarios" of Supplement 1 to Sacchi et al. (2023)
         # https://doi.org/10.5281/zenodo.8059750
-        fuel_3 = sacchi_etal.calculate_fuel_consumption(
+        fuel_3 = sacchi_etal.calculate(
             year=2050, pax_max=231, pax=214, R=6654 * ureg.km
         )
         expected_3 = 31854 * ureg.kg
@@ -173,7 +167,7 @@ def test_yanto_etal_B739(fixture_yanto_B739):
 
     for r, pl in params:
         input_data, expected_output = make_case(r, pl)
-        calculated_output = yanto_etal.calculate_fuel_consumption(
+        calculated_output = yanto_etal.calculate(
             acft=input_data["acft"],
             R=input_data["R"],
             PL=input_data["PL"],
@@ -190,7 +184,7 @@ def test_aim2015(fixture_aim2015_B787):
 
     for d in distances:
         input_data, expected_output = make_case(d)
-        calculated_output = aim2015.calculate_fuel_consumption(
+        calculated_output = aim2015.calculate(
             acft_size_class=input_data["acft_size_class"],
             D_climb=input_data["D_climb"],
             D_cruise=input_data["D_cruise"],
@@ -209,7 +203,7 @@ def test_seymour(fixture_seymour_B738):
 
     for R in ranges:
         input_data, expected_output = make_case(R)
-        calculated_output = seymour_etal.calculate_fuel_consumption(
+        calculated_output = seymour_etal.calculate(
             acft=input_data["acft"],
             R=input_data["R"],
         )
@@ -222,14 +216,11 @@ def test_seymour(fixture_seymour_B738):
 
 def test_seymour_outside_fitted_range():
     # D228: a1 < 0 and a maximum range of 500 km (Table L.6); the fit drops below zero at about 1,613 km.
-    assert (
-        seymour_etal.calculate_fuel_consumption(acft="D228", R=500 * ureg.km)
-        > 0 * ureg.kg
-    )
+    assert seymour_etal.calculate(acft="D228", R=500 * ureg.km) > 0 * ureg.kg
     with pytest.raises(ValueError, match="outside its fitted range"):
-        seymour_etal.calculate_fuel_consumption(acft="D228", R=2000 * ureg.km)
+        seymour_etal.calculate(acft="D228", R=2000 * ureg.km)
     with pytest.raises(ValueError, match="must be non-negative"):
-        seymour_etal.calculate_fuel_consumption(acft="B738", R=-1 * ureg.km)
+        seymour_etal.calculate(acft="B738", R=-1 * ureg.km)
 
 
 def test_eea2009(fixture_eea_A320):
@@ -237,7 +228,7 @@ def test_eea2009(fixture_eea_A320):
 
     for R in ranges:
         input_data, expected_output = make_case(R)
-        calculated_output = eea_emission_inventory_2009.calculate_fuel_consumption(
+        calculated_output = eea_emission_inventory_2009.calculate(
             acft=input_data["acft"],
             R=input_data["R"],
         )
@@ -253,7 +244,7 @@ def test_myclimate_standard(fixture_myclimate_standard):
 
     for x in params:
         input_data, expected_output = make_case(x)
-        calculated_output = myclimate.calculate_fuel_consumption(
+        calculated_output = myclimate.calculate(
             acft="standard aircraft",
             x=input_data["x"],
         )

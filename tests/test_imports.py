@@ -3,23 +3,18 @@ import jetfuelburn
 
 
 def test_rangeequation():
-    from jetfuelburn.rangeequation import (
-        calculate_fuel_consumption_stepclimb_integration,
-    )
-    from jetfuelburn.rangeequation import calculate_fuel_consumption_stepclimb_arctan
-    from jetfuelburn.rangeequation import calculate_fuel_consumption_breguet_improved
-    from jetfuelburn.rangeequation import calculate_fuel_consumption_breguet
+    from jetfuelburn.rangeequation import range_equation
 
-    assert callable(calculate_fuel_consumption_stepclimb_integration)
-    assert callable(calculate_fuel_consumption_stepclimb_arctan)
-    assert callable(calculate_fuel_consumption_breguet_improved)
-    assert callable(calculate_fuel_consumption_breguet)
+    assert callable(range_equation.calculate_stepclimb_integration)
+    assert callable(range_equation.calculate_stepclimb_arctan)
+    assert callable(range_equation.calculate_improved)
+    assert callable(range_equation.calculate)
 
 
 def test_diagrams():
-    from jetfuelburn.diagrams import calculate_fuel_consumption_payload_range
+    from jetfuelburn.diagrams import payload_range
 
-    assert callable(calculate_fuel_consumption_payload_range)
+    assert callable(payload_range.calculate)
 
 
 def test_averages():
@@ -27,10 +22,10 @@ def test_averages():
 
     from jetfuelburn.statistics import usdot
 
-    assert callable(usdot.available_years)
-    assert callable(usdot.available_aircraft)
-    assert callable(usdot.calculate_fuel_consumption_per_seat)
-    assert callable(usdot.calculate_fuel_consumption_per_weight)
+    assert callable(usdot.list_years)
+    assert callable(usdot.list_aircraft)
+    assert callable(usdot.calculate_per_seat)
+    assert callable(usdot.calculate_per_weight)
 
 
 def test_reducedorder():
@@ -38,28 +33,28 @@ def test_reducedorder():
 
     from jetfuelburn.reducedorder import yanto_etal
 
-    assert callable(yanto_etal.available_aircraft)
-    assert callable(yanto_etal.calculate_fuel_consumption)
+    assert callable(yanto_etal.list_aircraft)
+    assert callable(yanto_etal.calculate)
 
     from jetfuelburn.reducedorder import lee_etal
 
-    assert callable(lee_etal.available_aircraft)
-    assert callable(lee_etal.calculate_fuel_consumption)
+    assert callable(lee_etal.list_aircraft)
+    assert callable(lee_etal.calculate)
 
     from jetfuelburn.reducedorder import seymour_etal
 
-    assert callable(seymour_etal.available_aircraft)
-    assert callable(seymour_etal.calculate_fuel_consumption)
+    assert callable(seymour_etal.list_aircraft)
+    assert callable(seymour_etal.calculate)
 
     from jetfuelburn.reducedorder import aim2015
 
-    assert callable(aim2015.available_aircraft)
-    assert callable(aim2015.calculate_fuel_consumption)
+    assert callable(aim2015.list_aircraft)
+    assert callable(aim2015.calculate)
 
     from jetfuelburn.reducedorder import myclimate
 
-    assert callable(myclimate.available_aircraft)
-    assert callable(myclimate.calculate_fuel_consumption)
+    assert callable(myclimate.list_aircraft)
+    assert callable(myclimate.calculate)
 
 
 def test_aux_physics():

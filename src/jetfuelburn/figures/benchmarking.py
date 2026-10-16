@@ -21,27 +21,21 @@ range_points = list(range(0, 10001, 250))
 
 results = []
 for current_range in range_points:
-    fuelburn = myclimate.calculate_fuel_consumption(
-        acft="standard aircraft", x=current_range * ureg.km
-    )
+    fuelburn = myclimate.calculate(acft="standard aircraft", x=current_range * ureg.km)
     # Assuming fuelburn is a pint Quantity, store its magnitude
     results.append({"range": current_range, "fuelburn": fuelburn.magnitude})
 df_myclimate_standard = pd.DataFrame(results)
 
 results = []
 for current_range in range_points:
-    fuelburn = seymour_etal.calculate_fuel_consumption(
-        acft="A321", R=current_range * ureg.km
-    )
+    fuelburn = seymour_etal.calculate(acft="A321", R=current_range * ureg.km)
     # Assuming fuelburn is a pint Quantity, store its magnitude
     results.append({"range": current_range, "fuelburn": fuelburn.magnitude})
 df_seymour_a321 = pd.DataFrame(results)
 
 results = []
 for current_range in range_points:
-    fuelburn = seymour_etal.calculate_fuel_consumption(
-        acft="B722", R=current_range * ureg.km
-    )
+    fuelburn = seymour_etal.calculate(acft="B722", R=current_range * ureg.km)
     # Assuming fuelburn is a pint Quantity, store its magnitude
     results.append({"range": current_range, "fuelburn": fuelburn.magnitude})
 df_seymour_b727 = pd.DataFrame(results)

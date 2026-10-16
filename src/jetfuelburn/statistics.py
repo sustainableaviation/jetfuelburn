@@ -105,9 +105,9 @@ class usdot:
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.statistics import usdot
-    usdot.available_years()
-    usdot.available_aircraft(usdot.available_years()[0])
-    usdot.calculate_fuel_consumption_per_weight(
+    usdot.list_years()
+    usdot.list_aircraft(usdot.list_years()[0])
+    usdot.calculate_per_weight(
         year=2024,
         acft='B787-800 Dreamliner',
         R=1000 * ureg.nmi,
@@ -125,14 +125,14 @@ class usdot:
             _aircraft_data[year] = json.load(file)
 
     @staticmethod
-    def available_years() -> list[int]:
+    def list_years() -> list[int]:
         """
         Returns a sorted list of available years included in the model.
         """
         return sorted(usdot._years)
 
     @staticmethod
-    def available_aircraft(
+    def list_aircraft(
         year: int,
     ) -> list[str]:
         """
@@ -147,7 +147,7 @@ class usdot:
         "[length]",
         "[mass]",
     )
-    def calculate_fuel_consumption_per_weight(
+    def calculate_per_weight(
         year: int,
         acft: str,
         R: float,
@@ -229,7 +229,7 @@ class usdot:
         None,
         "[length]",
     )
-    def calculate_fuel_consumption_per_seat(
+    def calculate_per_seat(
         year: int,
         acft: str,
         R: float,
@@ -523,7 +523,7 @@ class usdot:
         """
         if year not in usdot._years:
             raise ValueError(
-                f"No data available for year '{year}'. Please select one of the following: {usdot.available_years()}"
+                f"No data available for year '{year}'. Please select one of the following: {usdot.list_years()}"
             )
 
         total_kg = sum(
@@ -533,3 +533,17 @@ class usdot:
             and data["Revenue PAX km"] is not None
         )
         return (total_kg * ureg("kg")).to("kg")
+
+
+# Deprecated aliases of methods renamed in jetfuelburn 4.0.0 (to be removed in 5.0.0).
+from jetfuelburn.utility.code import _add_deprecated_method_aliases
+
+_add_deprecated_method_aliases(
+    usdot,
+    {
+        "calculate_fuel_consumption_per_weight": "calculate_per_weight",
+        "calculate_fuel_consumption_per_seat": "calculate_per_seat",
+        "available_aircraft": "list_aircraft",
+        "available_years": "list_years",
+    },
+)

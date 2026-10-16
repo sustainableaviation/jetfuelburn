@@ -70,7 +70,7 @@ class montlaur_etal:
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import montlaur_etal
-    result = montlaur_etal.calculate_fuel_consumption(
+    result = montlaur_etal.calculate(
         distance=1500 * ureg.km,
         available_seats=180,
     )
@@ -95,7 +95,7 @@ class montlaur_etal:
 
     @staticmethod
     @ureg.check("[length]", None, None)
-    def calculate_fuel_consumption(
+    def calculate(
         distance: float,
         available_seats: int,
         model: str = "",
@@ -271,7 +271,7 @@ class sacchi_etal:
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import sacchi_etal
-    sacchi_etal.calculate_fuel_consumption(
+    sacchi_etal.calculate(
         year=2025,
         pax_max=180,
         pax=150,
@@ -344,7 +344,7 @@ class sacchi_etal:
         "[mass]",  # tolerance
         None,  # max_iterations
     )
-    def calculate_fuel_consumption(
+    def calculate(
         cls,
         year: int,
         pax_max: int,
@@ -475,8 +475,8 @@ class yanto_etal:
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import yanto_etal
-    yanto_etal.available_aircraft()[0:10]
-    yanto_etal.calculate_fuel_consumption(
+    yanto_etal.list_aircraft()[0:10]
+    yanto_etal.calculate(
         acft='A321',
         R=2200*ureg.km,
         PL=18*ureg.metric_ton
@@ -525,7 +525,7 @@ class yanto_etal:
     }
 
     @staticmethod
-    def available_aircraft() -> list[str]:
+    def list_aircraft() -> list[str]:
         """
         Returns a sorted list of available ICAO aircraft designators included in the model.
         """
@@ -537,7 +537,7 @@ class yanto_etal:
         "[length]",
         "[mass]",
     )
-    def calculate_fuel_consumption(
+    def calculate(
         acft: str,
         R: float,
         PL: float,
@@ -641,8 +641,8 @@ class lee_etal:
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import lee_etal
-    lee_etal.available_aircraft()[0:10]
-    lee_etal.calculate_fuel_consumption(
+    lee_etal.list_aircraft()[0:10]
+    lee_etal.calculate(
         acft='B732',
         W_E=265825*ureg.N,
         W_MPLD=156476*ureg.N,
@@ -831,7 +831,7 @@ class lee_etal:
     }
 
     @staticmethod
-    def available_aircraft() -> list[str]:
+    def list_aircraft() -> list[str]:
         """
         Returns a sorted list of available ICAO aircraft designators included in the model.
         """
@@ -852,7 +852,7 @@ class lee_etal:
         "[speed]",  # V
         "[length]",  # d
     )
-    def calculate_fuel_consumption(
+    def calculate(
         acft: str,
         W_E: float,
         W_MPLD: float,
@@ -1034,7 +1034,7 @@ class seymour_etal:
     Each fit is based on 25 simulated missions between 200 km (or the type's shortest distance in the OAG data, if longer)
     and the type's maximum range in Table L.6 of the Supplementary Information (e.g. 5,803 km for the B738).
     Results beyond that range are extrapolations. For the 26 types with a negative $a_1$, the fit bends downward
-    beyond that range; `calculate_fuel_consumption()` raises a `ValueError` where the fit no longer returns a positive fuel burn.
+    beyond that range; `calculate()` raises a `ValueError` where the fit no longer returns a positive fuel burn.
 
     Warnings
     --------
@@ -1086,8 +1086,8 @@ class seymour_etal:
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import seymour_etal
-    seymour_etal.available_aircraft()[0:10]
-    seymour_etal.calculate_fuel_consumption(
+    seymour_etal.list_aircraft()[0:10]
+    seymour_etal.calculate(
         acft='A321',
         R=2200*ureg.km,
     )
@@ -1763,7 +1763,7 @@ class seymour_etal:
     }
 
     @staticmethod
-    def available_aircraft() -> list[str]:
+    def list_aircraft() -> list[str]:
         """
         Returns a sorted list of available ICAO aircraft designators included in the model.
         """
@@ -1774,7 +1774,7 @@ class seymour_etal:
         None,
         "[length]",
     )
-    def calculate_fuel_consumption(
+    def calculate(
         acft: str,
         R: float,
     ) -> float:
@@ -1919,7 +1919,7 @@ class aim2015:
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import aim2015
-    aim2015.calculate_fuel_consumption(
+    aim2015.calculate(
         acft_size_class=8,
         D_climb=300*ureg.km,
         D_cruise=(15000-300-200)*ureg.km,
@@ -1941,7 +1941,7 @@ class aim2015:
             }
 
     @staticmethod
-    def available_aircraft() -> list[str]:
+    def list_aircraft() -> list[str]:
         """
         Returns a sorted list of available ICAO aircraft designators included in the model.
         """
@@ -1955,7 +1955,7 @@ class aim2015:
         "[length]",
         "[mass]",
     )
-    def calculate_fuel_consumption(
+    def calculate(
         acft_size_class: int,
         D_climb: float,
         D_cruise: float,
@@ -2149,7 +2149,7 @@ class eea_emission_inventory_2009:
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import eea_emission_inventory_2009
-    eea_emission_inventory_2009.calculate_fuel_consumption(
+    eea_emission_inventory_2009.calculate(
         acft='A320',
         R=1500*ureg.km
     )
@@ -2161,7 +2161,7 @@ class eea_emission_inventory_2009:
         _aircraft_data = json.load(file)
 
     @staticmethod
-    def available_aircraft() -> list[str]:
+    def list_aircraft() -> list[str]:
         """
         Returns a sorted list of available ICAO aircraft designators included in the model.
         """
@@ -2172,7 +2172,7 @@ class eea_emission_inventory_2009:
         None,
         "[length]",
     )
-    def calculate_fuel_consumption(
+    def calculate(
         acft: str,
         R: float,
     ) -> dict:
@@ -2346,8 +2346,8 @@ class myclimate:
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import myclimate
-    myclimate.available_aircraft()[0:10]
-    myclimate.calculate_fuel_consumption(
+    myclimate.list_aircraft()[0:10]
+    myclimate.calculate(
         acft='B737',
         x=2200*ureg.km,
     )
@@ -2363,7 +2363,7 @@ class myclimate:
     }
 
     @staticmethod
-    def available_aircraft() -> list[str]:
+    def list_aircraft() -> list[str]:
         """
         Returns a sorted list of available ICAO aircraft designators included in the model.
         """
@@ -2374,7 +2374,7 @@ class myclimate:
         None,  # acft
         "[length]",
     )
-    def calculate_fuel_consumption(
+    def calculate(
         acft: str,
         x: float,
     ) -> float:
@@ -2434,3 +2434,26 @@ class myclimate:
             c = myclimate._regression_coefficients[acft]["c"]
 
         return (a * x**2 + b * x + c) * ureg.kg
+
+
+# Deprecated aliases of methods renamed in jetfuelburn 4.0.0 (to be removed in 5.0.0).
+from jetfuelburn.utility.code import _add_deprecated_method_aliases
+
+for _cls in (montlaur_etal, sacchi_etal):
+    _add_deprecated_method_aliases(_cls, {"calculate_fuel_consumption": "calculate"})
+for _cls in (
+    yanto_etal,
+    lee_etal,
+    seymour_etal,
+    aim2015,
+    eea_emission_inventory_2009,
+    myclimate,
+):
+    _add_deprecated_method_aliases(
+        _cls,
+        {
+            "calculate_fuel_consumption": "calculate",
+            "available_aircraft": "list_aircraft",
+        },
+    )
+del _cls
