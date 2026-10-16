@@ -3,9 +3,22 @@ name: Lint
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
-      - uses: psf/black@26.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: psf/black@258e7dbf348bc23cb70b8cdf693481c04634ebcc # 26.10.1
+        with:
+          # Any Black release of 2026: the stable style only changes with the January release.
+          version: "~= 26.0"
