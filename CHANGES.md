@@ -3,6 +3,49 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## `4.0.0` (16. October 2026)
+
+### Breaking Changes
+
+Old names remain available as deprecated aliases: they point to the new class and figure functions.
+
+| Module | Before (3.4.0) | After (4.0.0) |
+|---|---|---|
+| `reducedorder` | `<model>.calculate_fuel_consumption()` | `<model>.calculate()` |
+| `reducedorder`, `statistics`, `utility.aerodynamics` | `<class>.available_aircraft()` | `<class>.list_aircraft()` |
+| `statistics` | `usdot.available_years()` | `usdot.list_years()` |
+| `statistics` | `usdot.calculate_fuel_consumption_per_seat()` | `usdot.calculate_per_seat()` |
+| `statistics` | `usdot.calculate_fuel_consumption_per_weight()` | `usdot.calculate_per_weight()` |
+| `rangeequation` | `calculate_fuel_consumption_breguet()` | `range_equation.calculate()` |
+| `rangeequation` | `calculate_fuel_consumption_breguet_improved()` | `range_equation.calculate_improved()` |
+| `rangeequation` | `calculate_fuel_consumption_stepclimb_integration()` | `range_equation.calculate_stepclimb_integration()` |
+| `rangeequation` | `calculate_fuel_consumption_stepclimb_arctan()` | `range_equation.calculate_stepclimb_arctan()` |
+| `diagrams` | `calculate_fuel_consumption_payload_range()` | `payload_range.calculate()` |
+| `utility.aerodynamics` | `openap_drag_polars`, `jsbsim_drag_polars` | `poll_schumann_drag_polars` |
+| `figures.aerodynamics` | `figure_openap_dragpolar()`, `figure_jsbsim_dragpolar_mach_effects()` | `figure_poll_schumann_dragpolar()` |
+
+- Airport lookups in `utility.geography` follow the new airport list. Codes of closed or re-coded airports and some former airport names now raise a `ValueError` in `calculate_distance_between_airports()`.
+- Aircraft are identified by ICAO designators throughout: e.g. 'Boeing 737 MAX 7' becomes `B37M`, 'E175' becomes `E75L` and 'Airbus A321neo' becomes `A21N`, etc.
+- `statistics.aeromaps` and its data in `data/AeroMaps` are removed.
+
+### Improvements
+
+- Added `reducedorder.gossling_etal`, a private-jet fuel burn model by Gössling, Humpe & Leitão (2024) for 69 business and private jet types.
+- Added `reducedorder.turgut_etal`, a cruise fuel-flow model by Turgut et al. (2014) for five narrow-body types.
+- Added `reducedorder.models_for_aircraft()`, which lists the reduced-order models that support a given aircraft type.
+
+### Changed
+
+- The airport list used by `utility.geography` now uses [OurAirports](https://ourairports.com/data/) (public domain). The list now contains 11,763 airports (9,051 IATA and 10,530 ICAO codes) and corrects coordinates that the old list had wrong by up to 14,450 km (e.g. `GBI`, `SHO`, `KUR`).
+- `reducedorder.seymour_etal` now uses the coefficients published in Table M.7 of the Supplementary Information of Seymour et al. (2020). They replace the values of the FEAT GitHub `.csv` file, an earlier fit committed in June 2020. The 133 aircraft types stay the same.
+- `utility.aerodynamics.poll_schumann_drag_polars` implements the clean-configuration drag polar of Poll & Schumann (2025) for the 67 aircraft types of their Table 2, with a Reynolds-number-dependent zero-lift drag and wave drag. It replaces the OpenAP drag polars and the JSBSim/FlightGear drag tables, which are no longer bundled.
+- The package now ships `NOTICE.md`, which lists the source, copyright holder and licence of all bundled third-party data. Each class that uses such data has a short Licensing Note that points to it.
+
+### Fixes
+
+- `reducedorder.seymour_etal.calculate()` squared the first coefficient (`a1**2 * R`), which dropped the quadratic term in all earlier releases. It now evaluates $F = a_1 R^2 + a_2 R + c$. Together with the new coefficients, results rise by a median of 3.5 % at 1,000 km, 9 % at 3,000 km and 19 % at 6,000 km (over the types whose maximum range in Table L.6 of the Supplementary Information reaches the distance). Results for the 26 types with a negative quadratic coefficient fall below those of earlier releases at long range, and `calculate()` raises a `ValueError` where such a fit no longer returns a positive fuel burn.
+- `reducedorder.myclimate` had the coefficients of the A320 and the B737 swapped. They now match the parameter tables of the myclimate Calculation Principles page.
+
 ## `3.4.0` (14. July 2026)
 
 ### Improvements

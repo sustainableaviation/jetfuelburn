@@ -1,7 +1,7 @@
 import pytest
 
 from jetfuelburn.utility.tests import approx_with_units
-from jetfuelburn.diagrams import calculate_fuel_consumption_payload_range
+from jetfuelburn.diagrams import payload_range
 from .fixtures.diagrams import make_payload_range_case
 
 
@@ -10,7 +10,7 @@ def test_calculate_fuel_consumption_payload_range(make_payload_range_case):
 
     for d in distances:
         input_data, expected_output = make_case(d)
-        calculated_output = calculate_fuel_consumption_payload_range(
+        calculated_output = payload_range.calculate(
             d=input_data["d"],
             oew=input_data["oew"],
             mtow=input_data["mtow"],

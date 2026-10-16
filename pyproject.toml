@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=75.0"]
+requires = ["setuptools>=77.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -13,7 +13,8 @@ maintainers = [
 
 description = "A Python package for calculating fuel burn of commercial aircraft."
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
+license-files = ["LICENSE.txt", "NOTICE.md"]
 dynamic = ["version"]
 
 # https://pypi.org/classifiers/
@@ -66,8 +67,8 @@ readme = {file = "README.md"}
 testpaths = ["tests"]
 
 [tool.coverage.run]
-# figure/plot generation and the closed-form stub are not unit-tested;
-# exclude them so the reported percentage reflects testable code
+# figure/plot generation and the closed-form stub are not unit-tested.
+# Exclude them so the reported percentage reflects testable code
 omit = [
     "*/jetfuelburn/figures/*",
     "*/jetfuelburn/closedform.py",

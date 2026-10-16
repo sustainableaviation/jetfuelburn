@@ -50,3 +50,10 @@ Funding was provided by the [Swiss Innovation Agency Innosuisse](https://innosui
 ```plaintext
 --8<-- "LICENSE.txt"
 ```
+
+!!! note "Third-party data"
+    JetFuelBurn also contains data and model coefficients from third parties, under their own licenses
+    (public domain, MIT, CC BY 4.0) or with permission of the rights holder.
+    Their sources, copyright holders and licenses are listed in the
+    [`NOTICE.md`](https://github.com/sustainableaviation/jetfuelburn/blob/main/NOTICE.md) file,
+    which ships with every release of the package.

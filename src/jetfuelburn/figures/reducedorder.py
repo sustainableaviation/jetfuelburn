@@ -41,7 +41,7 @@ def figure_lee2010():
 
     results = []
     for range in df_fres_const["range"]:
-        dict_results = lee_etal.calculate_fuel_consumption(
+        dict_results = lee_etal.calculate(
             acft=input_data["acft"],
             W_E=input_data["W_E"],
             W_MPLD=input_data["W_MPLD"],

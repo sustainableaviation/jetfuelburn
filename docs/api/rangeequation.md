@@ -12,9 +12,9 @@
 
     | Variables assumed Constant | Variables allowed to Vary | Additional Assumptions | Solution | Function |
     |----------------------------|---------------------------|------------------------|----------|----------|
-    | $TSFC$ <br> $L/D$ <br> $V$ | $m$ | none | _"Breguet range equation (climb-cruise)"_ | [`calculate_fuel_consumption_breguet`][jetfuelburn.rangeequation.calculate_fuel_consumption_breguet] <br> [`calculate_fuel_consumption_breguet_improved`][jetfuelburn.rangeequation.calculate_fuel_consumption_breguet_improved] |
-    | $TSFC$ <br> $h$ <br> $V$ | $m$ <br> $L/D$ | low-speed drag polar applies $C_D = C_{D_0} + KC_L^2$ | _"arctan solution (step-climb)"_ | [`calculate_fuel_consumption_stepclimb_arctan`][jetfuelburn.rangeequation.calculate_fuel_consumption_stepclimb_arctan] |
-    | $TSFC$ <br> $h$ <br> $V$ | $m$ <br> $L/D$ | none | _"numerical solution (step-climb)"_ | [`calculate_fuel_consumption_stepclimb_integration`][jetfuelburn.rangeequation.calculate_fuel_consumption_stepclimb_integration] |
+    | $TSFC$ <br> $L/D$ <br> $V$ | $m$ | none | _"Breguet range equation (climb-cruise)"_ | [`calculate`][jetfuelburn.rangeequation.range_equation.calculate] <br> [`calculate_improved`][jetfuelburn.rangeequation.range_equation.calculate_improved] |
+    | $TSFC$ <br> $h$ <br> $V$ | $m$ <br> $L/D$ | low-speed drag polar applies $C_D = C_{D_0} + KC_L^2$ | _"arctan solution (step-climb)"_ | [`calculate_stepclimb_arctan`][jetfuelburn.rangeequation.range_equation.calculate_stepclimb_arctan] |
+    | $TSFC$ <br> $h$ <br> $V$ | $m$ <br> $L/D$ | none | _"numerical solution (step-climb)"_ | [`calculate_stepclimb_integration`][jetfuelburn.rangeequation.range_equation.calculate_stepclimb_integration] |
 
     !!! note "References"
         Section 13.2 in Young, T. M. (2018).

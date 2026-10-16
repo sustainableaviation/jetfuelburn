@@ -2,170 +2,7 @@
 from jetfuelburn import ureg
 from importlib import resources
 import json
-import csv
 from jetfuelburn import ureg
-
-
-class aeromaps:
-    r"""
-    This class implements the the reduced-order fuel burn model of the AeroMaps software tool by Planès et al. (2023).
-
-    In this model, fuel burn calculations are based on statistical average values in MJ/ASK (megajoule per available seat-kilometer) for three representative aircraft types,
-    with future efficiency improvements modelled over time:
-
-    > The corresponding historical fleet was calibrated using mean fuel consumption per market and representative aircraft.
-    > - [Planès et al. (2023), P.5](https://doi.org/10.59490/joas.2023.7147)
-
-    > The future aircraft fleet can be modelled using two solutions: a top-down approach  based on annual efficiency gains, and a bottom-up approach in which aircraft data (performance,  entry-into-service...) are coupled with fleet renewal models.
-    > - [Planès et al. (2023), P.5](https://doi.org/10.59490/joas.2023.7147)
-
-    Here, the `drop_in` (fuel) data is used, although the model also data on future `hydrogen` aircraft.
-
-    Warnings
-    --------
-    It is unclear from the model documentation whether the fuel consumption values given in MJ/ASK for future years are based on the top-down or bottom-up approach.
-
-    References
-    ----------
-    Planès, T., Delbecq, S., & Salgas, A. (2023).
-    AeroMAPS: a framework for performing multidisciplinary assessment of prospective scenarios for air transport.
-    In _Journal of Open Aviation Science_.
-    doi:[10.59490/joas.2023.7147](https://doi.org/10.59490/joas.2023.7147)
-
-    Planès, T., Salgas, A., Pollet, F., & Delbecq, S. (2025).
-    Simulation and analyses of ICAO transition scenarios using the AeroMAPS open-source framework.
-    In _Towards Sustainable Aviation Summit (TSAS 2025)_.
-    doi:[10.60711/TSAS25.20250216.7026241092200926](https://doi.org/10.60711/TSAS25.20250216.7026241092200926)
-
-    Pollet, F., Planès, T., & Delbecq, S. (2024).
-    A Comprehensive Methodology for Performing Prospective Life Cycle Assessments of Future Air Transport Scenarios.
-    In _34th Congress of the International Council of the Aeronautical Sciences_.
-    hal:[hal-04703961](https://hal.science/hal-04703961v1)
-
-    See Also
-    --------
-    Excel in the AeroMAPS repository containing the statistical average energy use of aircraft types (short/medium/long-haul): [`aeromaps/resources/data/data.xlsx`](https://github.com/AeroMAPS/AeroMAPS/blob/5febefe03cd69815a6949b67c43906c209ac14b1/aeromaps/resources/data/data.xlsx)
-
-    Example
-    -------
-    ```pyodide install='jetfuelburn'
-    import jetfuelburn
-    from jetfuelburn import ureg
-    from jetfuelburn.statistics import aeromaps
-    aeromaps.calculate_fuel_consumption(
-        acft_type='long_range',
-        year=2020,
-        R=4000*ureg('km')
-    )
-    ```
-    """
-
-    _statistical_data = {}
-    with resources.open_text(
-        "jetfuelburn.data.AeroMaps", "aeromaps_data.csv", encoding="utf-8-sig"
-    ) as file:
-        csv_reader = csv.DictReader(file)
-        for row in csv_reader:
-            year = int(row.pop("year"))
-            _statistical_data[year] = {k: float(v) for k, v in row.items()}
-
-    @staticmethod
-    def available_years() -> list[int]:
-        """
-        Returns a sorted list of available years included in the model.
-        """
-        return sorted(aeromaps._statistical_data.keys())
-
-    @staticmethod
-    def available_aircraft(
-        year: int,
-    ) -> list[str]:
-        """
-        Given a year, returns a sorted list of available aircraft types
-        (e.g., ['long_range', 'medium_range', 'short_range']).
-        """
-        if year not in aeromaps._statistical_data:
-            return []
-        return sorted(aeromaps._statistical_data[year].keys())
-
-    @staticmethod
-    @ureg.check(
-        None,  # acft_type
-        None,  # year
-        "[length]",
-    )
-    def calculate_fuel_consumption(
-        acft_type: str,
-        year: int,
-        R: float,
-    ) -> float:
-        r"""
-        Given an aircraft type and range, calculates the fuel burned during flight **per passenger**.
-
-        Data is based on averages of fuel consumption per weight-distance flown by specific aircraft types,
-        in specific years, based on the assumptions of the AeroMaps software framework by Planès et al. (2023):
-
-        $$
-        F/pax = MJ/ASK * R / e
-        $$
-
-        where:
-
-        | Symbol     | Dimension     | Description                              |
-        | ---------- | ------------- | ---------------------------------------- |
-        | $F$        | [weight]      | Fuel burned during flight                |
-        | $pax$      | [1]           | Number of passengers                     |
-        | $R$        | length        | Range of the flight                      |
-        | $MJ/ASK$   | energy/length | Average energy use per available seat-km |
-        | $e$        | energy/weight | Specific energy content of jet fuel      |
-
-        Warnings
-        --------
-        This model does not
-
-        Parameters
-        ----------
-        year : int
-            Year of the data to be used for the calculation.
-        acft_type : str
-            Aircraft type (short/medium/long-haul) to be used for the calculation.
-        R : pint.Quantity
-            Range of the flight.
-
-        Returns
-        -------
-        pint.Quantity
-            Fuel burned during flight per passenger.
-
-        Raises
-        ------
-        ValueError
-            If the range is negative.
-            If the year is not available in the model.
-            If the aircraft type (short/medium/long-haul) is not available in the model for the given year.
-
-        """
-        if R.magnitude < 0:
-            raise ValueError(f"Range must not be negative.")
-        else:
-            R = R.to("km")
-        if year not in aeromaps._statistical_data:
-            raise ValueError(
-                f"Year '{year}' not found in model data. Please select one of the following: {aeromaps.available_years()}"
-            )
-        if acft_type not in aeromaps._statistical_data[year]:
-            raise ValueError(
-                f"Aircraft type '{acft_type}' not found in model data for year '{year}'. Please select one of the following: {aeromaps.available_aircraft(year)}"
-            )
-
-        specific_energy = 43.15 * ureg(
-            "MJ/kg"
-        )  # https://en.wikipedia.org/wiki/Jet_fuel#Types
-        fuel_burn_MJ = (
-            aeromaps._statistical_data[year][acft_type] * R.magnitude
-        )  # in MJ
-        fuel_burn_kg = fuel_burn_MJ * ureg("MJ") / specific_energy  # in kg
-        return fuel_burn_kg.to("kg")
 
 
 class usdot:
@@ -256,15 +93,21 @@ class usdot:
     - [US DOT: BTS: Air Carrier Summary Data (Form 41 and 298C Summary Data)](https://www.transtats.bts.gov/Tables.asp?QO_VQ=EGD&QO)
     - [US DOT: BTS: Air Carrier Summary Data: T2 (U.S. Air Carrier Traffic And Capacity Statistics by Aircraft Type)](https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FIH)
 
+    Licensing Note
+    --------------
+    Data from the U.S. Department of Transportation, Bureau of Transportation Statistics
+    (Form 41 Schedule T-100), public domain.
+    Full notice in [`NOTICE.md`](https://github.com/sustainableaviation/jetfuelburn/blob/main/NOTICE.md).
+
     Example
     --------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.statistics import usdot
-    usdot.available_years()
-    usdot.available_aircraft(usdot.available_years()[0])
-    usdot.calculate_fuel_consumption_per_weight(
+    usdot.list_years()
+    usdot.list_aircraft(usdot.list_years()[0])
+    usdot.calculate_per_weight(
         year=2024,
         acft='B787-800 Dreamliner',
         R=1000 * ureg.nmi,
@@ -282,14 +125,14 @@ class usdot:
             _aircraft_data[year] = json.load(file)
 
     @staticmethod
-    def available_years() -> list[int]:
+    def list_years() -> list[int]:
         """
         Returns a sorted list of available years included in the model.
         """
         return sorted(usdot._years)
 
     @staticmethod
-    def available_aircraft(
+    def list_aircraft(
         year: int,
     ) -> list[str]:
         """
@@ -304,7 +147,7 @@ class usdot:
         "[length]",
         "[mass]",
     )
-    def calculate_fuel_consumption_per_weight(
+    def calculate_per_weight(
         year: int,
         acft: str,
         R: float,
@@ -386,7 +229,7 @@ class usdot:
         None,
         "[length]",
     )
-    def calculate_fuel_consumption_per_seat(
+    def calculate_per_seat(
         year: int,
         acft: str,
         R: float,
@@ -680,7 +523,7 @@ class usdot:
         """
         if year not in usdot._years:
             raise ValueError(
-                f"No data available for year '{year}'. Please select one of the following: {usdot.available_years()}"
+                f"No data available for year '{year}'. Please select one of the following: {usdot.list_years()}"
             )
 
         total_kg = sum(
@@ -690,3 +533,17 @@ class usdot:
             and data["Revenue PAX km"] is not None
         )
         return (total_kg * ureg("kg")).to("kg")
+
+
+# Deprecated aliases of methods renamed in jetfuelburn 4.0.0 (to be removed in 5.0.0).
+from jetfuelburn.utility.code import _add_deprecated_method_aliases
+
+_add_deprecated_method_aliases(
+    usdot,
+    {
+        "calculate_fuel_consumption_per_weight": "calculate_per_weight",
+        "calculate_fuel_consumption_per_seat": "calculate_per_seat",
+        "available_aircraft": "list_aircraft",
+        "available_years": "list_years",
+    },
+)

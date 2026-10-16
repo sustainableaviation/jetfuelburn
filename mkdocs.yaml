@@ -3,7 +3,7 @@
 site_name: JetFuelBurn Documentation
 site_url: https://jetfuelburn.readthedocs.io/
 repo_url: https://github.com/sustainableaviation/jetfuelburn
-copyright: © Paul Scherrer Institute (PSI) and Contributors | Code under MIT License
+copyright: © JetFuelBurn Contributors | Code under MIT License
 nav:
   - Home: 'index.md'
   - About: 'about.md'
@@ -70,7 +70,7 @@ plugins:
             show_root_heading: true
             heading_level: 2
             show_source: true
-            filters: []
+            filters: ["!^__getattr__$"]
             separate_signature: true
   - markdown-exec
   - autorefs
@@ -91,14 +91,14 @@ extra_javascript:
   - _javascripts/katex.js
   # https://cdnjs.com/libraries/KaTeX
   # unpkg is incredibly slow (17s to load the css file)
-  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js
-  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js
-  - https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.19.0/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.19.0/contrib/auto-render.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.7.1/tablesort.min.js
   - _javascripts/tablesort.js
 extra_css:
   # https://cdnjs.com/libraries/KaTeX
   # unpkg is incredibly slow (17s to load the css file)
-  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.19.0/katex.min.css
   - _css/extra.css
 
 watch:

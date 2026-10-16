@@ -13,6 +13,8 @@ The following table shows which aircraft types are supported by each model in th
 | **[myclimate][jetfuelburn.reducedorder.myclimate]**                                              | ✗        | ✗       | ✓**        | ✗        | ✓**        | ** exact subtype not specified             |
 | **[Seymour et al][jetfuelburn.reducedorder.seymour_etal]**                                       | ✓        | ✓       | ✓          | ✓        | ✓          |                                            |
 | **[Yanto et al][jetfuelburn.reducedorder.yanto_etal]**                                           | ✗        | ✗       | ✓          | ✓        | ✓          |                                            |
+| **[Gössling et al][jetfuelburn.reducedorder.gossling_etal]**                                     | ✗        | ✗       | ✗          | ✗        | ✗          | business/private jets only                 |
+| **[Turgut et al][jetfuelburn.reducedorder.turgut_etal]**                                         | ✗        | ✗       | ✗          | ✗        | ✗          | cruise fuel-flow rate, narrow-body only    |
 | **[(Breguet) Range Equation][jetfuelburn.rangeequation]**                                                | ✓        | ✓       | ✓          | ✓        | ✓          | requires values for L/D, TSFC, etc. as input|
 | **[Google's Travel Impact Model](https://github.com/google/travel-impact-model)**        | ✓        | ✓       | ✓          | ✓        | ✓          |                                            |
 | **[Poll-Schumann (pycontrails)](https://py.contrails.org/notebooks/AircraftPerformance.html)**   | ✓        | ✓       | ✓          | ✓        | ✓          |                                            |
@@ -21,6 +23,6 @@ The following table shows which aircraft types are supported by each model in th
     - ✓ indicates the aircraft type is supported by the model
     - ✗ indicates the aircraft type is not supported
     - Values in parentheses (e.g., A332, B772) indicate the closest available aircraft variant
-    - This table shows a representative sample of aircraft types; most models support many more aircraft types
-    - Check each model's `available_aircraft()` method for the complete list of supported aircraft
+    - This table shows a representative sample of aircraft types. Most models support many more aircraft types
+    - Check each model's `list_aircraft()` method for the complete list of supported aircraft
 

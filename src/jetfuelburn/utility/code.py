@@ -81,3 +81,90 @@ def _normalize_physics_function_or_scalar(
         raise TypeError(
             f"Input must be Quantity, scalar, or Callable. Got {type(function_or_scalar)}"
         )
+
+
+def _deprecated_alias(func: Callable, old_name: str, new_name: str) -> Callable:
+    r"""
+    Wraps a function so that calling it under its old name raises a `DeprecationWarning`
+    and then runs the function unchanged.
+
+    Parameters
+    ----------
+    func : Callable
+        The function under its new name.
+    old_name : str
+        The old name, as shown in the warning (e.g. `seymour_etal.calculate_fuel_consumption`).
+    new_name : str
+        The new name, as shown in the warning (e.g. `seymour_etal.calculate`).
+
+    Returns
+    -------
+    Callable
+        The wrapped function.
+    """
+    import functools
+    import warnings
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        warnings.warn(
+            f"`{old_name}` is deprecated since jetfuelburn 4.0.0 and will be removed in 5.0.0. "
+            f"Use `{new_name}` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+def _add_deprecated_method_aliases(cls: type, aliases: dict[str, str]) -> None:
+    r"""
+    Adds deprecated aliases for renamed static methods to a class.
+
+    Parameters
+    ----------
+    cls : type
+        The class that holds the renamed methods.
+    aliases : dict[str, str]
+        Old method name mapped to new method name, e.g. `{"available_aircraft": "list_aircraft"}`.
+    """
+    for old, new in aliases.items():
+        alias = _deprecated_alias(
+            getattr(cls, new), f"{cls.__name__}.{old}", f"{cls.__name__}.{new}"
+        )
+        setattr(cls, old, staticmethod(alias))
+
+
+def _deprecated_module_attribute(module: str, name: str, aliases: dict) -> object:
+    r"""
+    Resolves a removed module-level name to its replacement and raises a `DeprecationWarning`.
+    Meant to be called from a module-level `__getattr__` (PEP 562).
+
+    Parameters
+    ----------
+    module : str
+        The module name (`__name__`).
+    name : str
+        The requested attribute name.
+    aliases : dict
+        Old name mapped to a tuple of (new name, replacement object)
+        or (new name, replacement object, note appended to the warning).
+
+    Raises
+    ------
+    AttributeError
+        If the name is not a deprecated alias.
+    """
+    import warnings
+
+    if name not in aliases:
+        raise AttributeError(f"module {module!r} has no attribute {name!r}")
+    new_name, replacement, *note = aliases[name]
+    warnings.warn(
+        f"`{module}.{name}` is deprecated since jetfuelburn 4.0.0 and will be removed in 5.0.0. "
+        f"Use `{module}.{new_name}` instead." + "".join(f" {n}" for n in note),
+        DeprecationWarning,
+        stacklevel=3,
+    )
+    return replacement

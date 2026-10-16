@@ -1,145 +1,144 @@
 import pytest
 from jetfuelburn import ureg
-from jetfuelburn.utility.aerodynamics import (
-    jsbsim_drag_polars,
-    openap_drag_polars,
+from jetfuelburn.utility.aerodynamics import poll_schumann_drag_polars
+from jetfuelburn.utility.physics import (
+    _calculate_dynamic_pressure,
+    _calculate_airspeed_from_mach,
 )
 
 
-class TestJsbsimDragPolarsIntegration:
+class TestPollSchumannDragPolars:
     """
-    Integration tests for JSBSim drag polars.
-    These tests run against the ACTUAL data.json file in the package.
-    """
-
-    def test_data_loading(self):
-        """Verifies that the JSON data file is found and loaded, returning a non-empty list."""
-        available = jsbsim_drag_polars.available_aircraft()
-        assert isinstance(available, list)
-        assert len(available) > 0, "No aircraft loaded from JSBSim data.json"
-
-    def test_drag_calculation_sanity(self):
-        """
-        Picks the first available aircraft and ensures the drag calculation
-        runs without error and returns a positive Force.
-        """
-        # Dynamically pick an aircraft that actually exists in the file
-        acft = jsbsim_drag_polars.available_aircraft()[0]
-
-        L = 50 * ureg.metric_ton * ureg.gravity
-        M = 0.78
-        h = 30000 * ureg.feet
-
-        drag = jsbsim_drag_polars.calculate_drag(acft, L, M, h)
-
-        assert drag.check("[force]")
-        assert drag.magnitude > 0
-        assert drag.units == ureg.newton
-
-    def test_lift_to_drag_sanity(self):
-        """
-        Verifies that L/D ratio is dimensionless and falls within a
-        physically reasonable range (e.g., 5 to 30 for fixed-wing aircraft).
-        """
-        acft = jsbsim_drag_polars.available_aircraft()[0]
-
-        L = 60 * ureg.metric_ton * ureg.gravity  # Convert 60 metric tons to Newtons
-        M = 0.75
-        h = 32000 * ureg.feet
-
-        l_d = jsbsim_drag_polars.calculate_lift_to_drag(acft, L, M, h)
-
-        assert l_d.check("[]")  # Dimensionless
-        # Sanity check: L/D for a jet should typically be between 5 and 25
-        assert 5.0 < l_d.magnitude < 25
-
-    def test_binder_function_integration(self):
-        """Verifies the binder function works with real data."""
-        acft = jsbsim_drag_polars.available_aircraft()[0]
-
-        # Create the bound function
-        calculate_for_acft = jsbsim_drag_polars.calculate_lift_to_drag_binder_function(
-            acft=acft
-        )
-
-        # Execute it
-        result = calculate_for_acft(L=50000 * ureg.newton, M=0.78, h=30000 * ureg.feet)
-
-        assert result.check("[]")
-        assert result.magnitude > 0
-
-    def test_invalid_aircraft_lookup(self):
-        """Ensures looking up a non-existent aircraft still raises ValueError."""
-        with pytest.raises(ValueError, match="not found"):
-            jsbsim_drag_polars.calculate_drag(
-                "NON_EXISTENT_CRAFT_XYZ", 10000 * ureg.N, 0.5, 10000 * ureg.ft
-            )
-
-
-class TestOpenApDragPolarsIntegration:
-    """
-    Integration tests for OpenAP drag polars.
-    These tests run against the ACTUAL data.csv file in the package.
+    Tests for the Poll & Schumann (2025) drag polar.
     """
 
     def test_data_loading(self):
-        """Verifies that the CSV data file is found and parsed."""
-        available = openap_drag_polars.available_aircraft()
-        assert isinstance(available, list)
-        assert len(available) > 0, "No aircraft loaded from OpenAP data.csv"
+        """Test that all 67 aircraft types of Table 2 are loaded."""
+        available = poll_schumann_drag_polars.list_aircraft()
+        assert len(available) == 67
+        assert {"A320", "B738", "B788", "A306", "B742", "B737"} <= set(available)
 
     def test_parameter_retrieval(self):
-        """Verifies we can retrieve basic parameters and they have correct units."""
-        acft = openap_drag_polars.available_aircraft()[0]
-
-        params = openap_drag_polars.get_basic_drag_parameters(acft)
-
-        assert "S" in params
-        assert "CD0" in params
-        assert "K" in params
-
-        # S must be an Area quantity
+        """Test the low-speed polar of the A320 at the design-optimum Reynolds number (Table 2, Eqs. 31-38)."""
+        params = poll_schumann_drag_polars.get_basic_drag_parameters("A320")
         assert params["S"].check("[area]")
-        # CD0 and K should be floats (dimensionless coefficients)
-        assert isinstance(params["CD0"], float)
-        assert isinstance(params["K"], float)
+        assert params["S"].to("m^2").magnitude == pytest.approx(122.4)
+        assert params["CD0"] == pytest.approx(0.01859, abs=5e-5)
+        assert params["K"] == pytest.approx(0.04314, abs=5e-5)
 
     def test_drag_calculation_sanity(self):
-        """
-        Picks an aircraft and ensures the drag calculation returns a valid Force.
-        """
-        acft = openap_drag_polars.available_aircraft()[0]
-
-        # Use typical values to ensure we don't hit edge cases (like stall)
-        L = 40000 * ureg.newton
-        M = 0.7
-        h = 25000 * ureg.feet
-
-        drag = openap_drag_polars.calculate_drag(acft, L, M, h)
-
-        # The function explicitly returns .to('N') in the source code
+        """Test that the drag is a positive force in newtons."""
+        drag = poll_schumann_drag_polars.calculate_drag(
+            "A320", 60 * ureg.metric_ton * ureg.gravity, 0.78, 35000 * ureg.ft
+        )
         assert drag.units == ureg.newton
         assert drag.magnitude > 0
 
+    def test_lift_to_drag_sanity(self):
+        """Test that every type has a plausible L/D at its design-optimum Mach number and lift coefficient at FL350."""
+        h = 35000 * ureg.ft
+        for acft in poll_schumann_drag_polars.list_aircraft():
+            data = poll_schumann_drag_polars._aircraft_data[acft]
+            q = _calculate_dynamic_pressure(
+                speed=_calculate_airspeed_from_mach(data["M_DO"], h), altitude=h
+            )
+            S = poll_schumann_drag_polars.get_basic_drag_parameters(acft)["S"]
+            l_d = poll_schumann_drag_polars.calculate_lift_to_drag(
+                acft, data["CL_DO"] * q * S, data["M_DO"], h
+            )
+            assert l_d.check("[]")
+            assert 14 < l_d.magnitude < 24, acft
+
+    def test_unit_invariance(self):
+        """Test that the same lift in different units gives the same drag."""
+        h = 35000 * ureg.ft
+        drag_n = poll_schumann_drag_polars.calculate_drag(
+            "B788", 1788e3 * ureg.N, 0.85, h
+        )
+        drag_kn = poll_schumann_drag_polars.calculate_drag(
+            "B788", 1788 * ureg.kN, 0.85, h
+        )
+        drag_lbf = poll_schumann_drag_polars.calculate_drag(
+            "B788", (1788e3 * ureg.N).to(ureg.lbf), 0.85, h
+        )
+        assert drag_n.magnitude == pytest.approx(drag_kn.magnitude, rel=1e-12)
+        assert drag_n.magnitude == pytest.approx(drag_lbf.magnitude, rel=1e-9)
+
     def test_physics_behavior(self):
-        """
-        Verifies basic physics relationships hold true with the real data:
-        Increasing Lift should increase Drag (due to induced drag).
-        """
-        acft = openap_drag_polars.available_aircraft()[0]
-        M = 0.75
-        h = 30000 * ureg.feet
+        """Test that drag rises with lift, and with Mach number at a fixed lift coefficient."""
+        h = 35000 * ureg.ft
+        assert poll_schumann_drag_polars.calculate_drag(
+            "A320", 80 * ureg.kN, 0.75, h
+        ) > poll_schumann_drag_polars.calculate_drag("A320", 40 * ureg.kN, 0.75, h)
 
-        drag_low_lift = openap_drag_polars.calculate_drag(acft, 40000 * ureg.N, M, h)
-        drag_high_lift = openap_drag_polars.calculate_drag(acft, 80000 * ureg.N, M, h)
+        lift = 60 * ureg.metric_ton * ureg.gravity
 
-        assert drag_high_lift > drag_low_lift
+        def drag_per_lift(M):
+            # the lift scales with M², so the lift coefficient stays fixed
+            L = lift * (M / 0.78) ** 2
+            return (
+                poll_schumann_drag_polars.calculate_drag("A320", L, M, h) / L
+            ).magnitude
+
+        assert drag_per_lift(0.82) > drag_per_lift(0.78) > drag_per_lift(0.70)
+        assert poll_schumann_drag_polars.calculate_drag(
+            "A320", lift, 0.82, h, compressibility=False
+        ) < poll_schumann_drag_polars.calculate_drag("A320", lift, 0.82, h)
+
+    def test_reproduces_paper_figure_3(self):
+        """
+        Test against Fig. 3 of Poll & Schumann (2025): maximum L/D of an A320 at 58,800 kg
+        over altitude at fixed Mach number (values read from the vector drawing of the PDF).
+        """
+        lift = 58800 * ureg.kg * ureg.gravity
+        figure_3 = {
+            0.65: 17.731,
+            0.70: 17.539,
+            0.75: 17.068,
+            0.80: 16.162,
+            0.82: 15.313,
+        }
+        for M, l_d_max in figure_3.items():
+            best = max(
+                poll_schumann_drag_polars.calculate_lift_to_drag(
+                    "A320", lift, M, z * 25 * ureg.m
+                ).magnitude
+                for z in range(320, 560)
+            )
+            assert best == pytest.approx(l_d_max, rel=2e-3), M
+
+    def test_binder_function_integration(self):
+        """Test the partial returned by the binder function."""
+        calculate_for_a320 = (
+            poll_schumann_drag_polars.calculate_lift_to_drag_binder_function(
+                acft="A320"
+            )
+        )
+        l_d = calculate_for_a320(L=500 * ureg.kN, M=0.78, h=30000 * ureg.feet)
+        assert l_d.check("[]")
+        assert l_d.magnitude > 0
+        assert (
+            poll_schumann_drag_polars.calculate_lift_to_drag_binder_function(
+                "A320", 500 * ureg.kN, 0.78, 30000 * ureg.feet
+            )
+            == l_d
+        )
 
     def test_invalid_inputs(self):
-        """Checks validation logic works (even with real data loaded)."""
-        acft = openap_drag_polars.available_aircraft()[0]
-
+        """Test that invalid inputs raise ValueError."""
+        with pytest.raises(ValueError, match="not found"):
+            poll_schumann_drag_polars.calculate_drag(
+                "NON_EXISTENT_CRAFT_XYZ", 10000 * ureg.N, 0.5, 10000 * ureg.ft
+            )
         with pytest.raises(ValueError, match="Mach number"):
-            openap_drag_polars.calculate_drag(
-                acft, 10000 * ureg.N, -0.5, 10000 * ureg.ft
+            poll_schumann_drag_polars.calculate_drag(
+                "A320", 10000 * ureg.N, -0.5, 10000 * ureg.ft
+            )
+        with pytest.raises(ValueError, match="Altitude"):
+            poll_schumann_drag_polars.calculate_drag(
+                "A320", 10000 * ureg.N, 0.5, -1 * ureg.ft
+            )
+        with pytest.raises(ValueError, match="Lift"):
+            poll_schumann_drag_polars.calculate_drag(
+                "A320", 0 * ureg.N, 0.5, 10000 * ureg.ft
             )

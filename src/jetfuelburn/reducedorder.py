@@ -59,13 +59,18 @@ class montlaur_etal:
     | "Model D, E"      | $50 \le S \le 172$          | $100 \le D \le 5000$ km       | **CAT D:** B38M, A319<br>**CAT E:** CRJ2, CRJ9, E190                  |
     | "Model B, D"      | $172 \le S \le 350$         | $200 \le D \le 12000$ km      | **CAT B:** A359, A339, B77W, B788, B789<br>**CAT D:** A21N, A20N, B38M |
 
+    Licensing Note
+    --------------
+    Coefficients from Montlaur et al. (2025), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+    Full notice in [`NOTICE.md`](https://github.com/sustainableaviation/jetfuelburn/blob/main/NOTICE.md).
+
     Example
     -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import montlaur_etal
-    result = montlaur_etal.calculate_fuel_consumption(
+    result = montlaur_etal.calculate(
         distance=1500 * ureg.km,
         available_seats=180,
     )
@@ -90,7 +95,7 @@ class montlaur_etal:
 
     @staticmethod
     @ureg.check("[length]", None, None)
-    def calculate_fuel_consumption(
+    def calculate(
         distance: float,
         available_seats: int,
         model: str = "",
@@ -255,13 +260,18 @@ class sacchi_etal:
     Cell `BU8` in [Supplement 1 of Sacchi et al. (2020)](https://doi.org/10.5281/zenodo.8059750) for fuel burn in takeoff/landing.
     Cell `BP8` in [Supplement 1 of Sacchi et al. (2020)](https://doi.org/10.5281/zenodo.8059750) for OEW as a function of max passengers.
 
+    Licensing Note
+    --------------
+    Coefficients from Sacchi et al. (2023) and its Supplementary Data, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+    Full notice in [`NOTICE.md`](https://github.com/sustainableaviation/jetfuelburn/blob/main/NOTICE.md).
+
     Example
     -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import sacchi_etal
-    sacchi_etal.calculate_fuel_consumption(
+    sacchi_etal.calculate(
         year=2025,
         pax_max=180,
         pax=150,
@@ -334,7 +344,7 @@ class sacchi_etal:
         "[mass]",  # tolerance
         None,  # max_iterations
     )
-    def calculate_fuel_consumption(
+    def calculate(
         cls,
         year: int,
         pax_max: int,
@@ -465,8 +475,8 @@ class yanto_etal:
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import yanto_etal
-    yanto_etal.available_aircraft()[0:10]
-    yanto_etal.calculate_fuel_consumption(
+    yanto_etal.list_aircraft()[0:10]
+    yanto_etal.calculate(
         acft='A321',
         R=2200*ureg.km,
         PL=18*ureg.metric_ton
@@ -515,7 +525,7 @@ class yanto_etal:
     }
 
     @staticmethod
-    def available_aircraft() -> list[str]:
+    def list_aircraft() -> list[str]:
         """
         Returns a sorted list of available ICAO aircraft designators included in the model.
         """
@@ -527,7 +537,7 @@ class yanto_etal:
         "[length]",
         "[mass]",
     )
-    def calculate_fuel_consumption(
+    def calculate(
         acft: str,
         R: float,
         PL: float,
@@ -631,8 +641,8 @@ class lee_etal:
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import lee_etal
-    lee_etal.available_aircraft()[0:10]
-    lee_etal.calculate_fuel_consumption(
+    lee_etal.list_aircraft()[0:10]
+    lee_etal.calculate(
         acft='B732',
         W_E=265825*ureg.N,
         W_MPLD=156476*ureg.N,
@@ -821,7 +831,7 @@ class lee_etal:
     }
 
     @staticmethod
-    def available_aircraft() -> list[str]:
+    def list_aircraft() -> list[str]:
         """
         Returns a sorted list of available ICAO aircraft designators included in the model.
         """
@@ -842,7 +852,7 @@ class lee_etal:
         "[speed]",  # V
         "[length]",  # d
     )
-    def calculate_fuel_consumption(
+    def calculate(
         acft: str,
         W_E: float,
         W_MPLD: float,
@@ -992,8 +1002,9 @@ class seymour_etal:
     ![Payload/Range Diagram](../_static/reduced_order_seymour_etal.svg)
 
     In this model, fuel burn calculations are based on a regression model.
-    The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
-    from the Eurocontrol BADA flight trajectory simulation model and climb/descent fuel burn data based on engine data.
+    The regression coefficients were fitted to simulated flight missions: climb, cruise, descent, approach and landing
+    follow from BADA-based flight profile simulations, and taxi and take-off fuel flow from engine test data
+    (ICAO Engine Emissions Databank for jets, FOCA database for piston engines) or from BADA.
 
     Fuel burn is calculated according to Table M.7 in the supplement to Seymour et al. (2020):
 
@@ -1003,32 +1014,35 @@ class seymour_etal:
 
     where:
 
-    | Symbol     | Dimension            | Description                                   |
-    |------------|----------------------|-----------------------------------------------|
-    | $F$        | [mass]               | Fuel required for the mission of the aircraft |
-    | $R$        | [distance]           | Range of the aircraft (=mission distance)     |
-    | $a_1$      | [mass/distance²]     | Regression coefficient for range squared      |
-    | $a_2$      | [mass/distance]      | Regression coefficient for range              |
-    | $c$        | [mass]               | Constant term                                 |
+    | Symbol     | Dimension            | Description                                          |
+    |------------|----------------------|------------------------------------------------------|
+    | $F$        | [mass]               | Fuel required for the mission of the aircraft        |
+    | $R$        | [distance]           | Great-circle distance between origin and destination |
+    | $a_1$      | [mass/distance²]     | Regression coefficient for distance squared          |
+    | $a_2$      | [mass/distance]      | Regression coefficient for distance                  |
+    | $c$        | [mass]               | Constant term                                        |
+
+    $R$ is the great-circle distance $d_{gc}$ of Eq. 7 in Seymour et al. (2020).
+    The simulated missions behind the fit include average route inefficiency:
+    Eq. 6 of the paper sets their flight path distance to $d_{fp} = 1.0387 \cdot d_{gc} + 40.5$ km.
+
+    The coefficients are transcribed from Table M.7 of the Supplementary Information, the paper's published fit
+    (the FEAT GitHub `.csv` file holds an earlier fit, committed in June 2020).
 
     Warnings
     --------
-    Note that the regression coefficients provided in Table M.7 of the Supplementary Information
-    of Seymour et al. (2020) are not always consistent with the regression coefficients provided in the GitHub repository.
-    For instance:
-
-    |                   | reduced_fuel_a1       | reduced_fuel_a2   | reduced_fuel_intercept |
-    |-------------------|-----------------------|-------------------|------------------------|
-    | **Table M.7**     | 7.13e-05              | 2.94              | 1275                   |
-    | **GitHub** `.csv` | 7.378617475106708e-05 | 2.920849872328848 | 1218.8211966548952     |
-
-    This implementation uses the coefficients provided in the GitHub `.csv` file.
+    Each fit is based on 25 simulated missions between 200 km (or the type's shortest distance in the OAG data, if longer)
+    and the type's maximum range in Table L.6 of the Supplementary Information (e.g. 5,803 km for the B738).
+    Results beyond that range are extrapolations. For the 26 types with a negative $a_1$, the fit bends downward
+    beyond that range. Where the fit no longer returns a positive fuel burn, `calculate()` raises a `ValueError`.
 
     Warnings
     --------
     Note that Seymour et al. in the Disclaimers section of their publication mention, that:
-    > The fuel burn models provided in (...) [the supplementary information] shall not be used for
-    > comparing fuel efficiency and emission data between aircraft models and manufacturers.
+    > This document has been created with elements of Base of Aircraft Data (BADA) Family 3 Release 3.15
+    > which has been made available by EUROCONTROL to ETH Zurich (...). EUROCONTROL has all relevant rights to BADA.
+    > (...) The fuel burn models provided in SI M [Section M of the Supplementary Information, which holds Table M.7]
+    > shall not be used for comparing fuel efficiency and emission data between aircraft models and manufacturers.
     > Recommended model applications are reported in Section 3.5.
 
     Section 3.5 then mentions as potential applications:
@@ -1045,16 +1059,26 @@ class seymour_etal:
     | data availability     | 133 selected aircraft                                                       |
     | aircraft payload      | assumed to be average for each aircraft type                                |
     | climb/descent         | considered implicitly                                                       |
+    | route inefficiency    | considered implicitly, according to Eq. 6 of Seymour et al. (2020)          |
     | reserve fuel uplift   | considered implicitly, according to ICAO requirements                       |
     | diversion fuel uplift | considered implicitly, according to ICAO requirements                       |
 
     References
     ----------
-    - Seymour, K., Held, M., Georges, G., & Boulouchos, K. (2020).
+    Seymour, K., Held, M., Georges, G., & Boulouchos, K. (2020).
     Fuel Estimation in Air Transportation: Modeling global fuel consumption for commercial aviation.
     _Transportation Research Part D: Transport and Environment_, 88, 102528.
     doi:[10.1016/j.trd.2020.102528](https://doi.org/10.1016/j.trd.2020.102528)
-    - [FEAT Model GitHub Repository](https://github.com/kwdseymour/FEAT/tree/master)
+
+    See Also
+    --------
+    [FEAT repository on GitHub](https://github.com/kwdseymour/FEAT/tree/master):
+    Jupyter notebooks and `.csv` files that accompany the paper.
+
+    Licensing Note
+    --------------
+    Coefficients from Table M.7 of the Supplementary Information of Seymour et al. (2020), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+    Full notice in [`NOTICE.md`](https://github.com/sustainableaviation/jetfuelburn/blob/main/NOTICE.md).
 
     Example
     -------
@@ -1062,8 +1086,8 @@ class seymour_etal:
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import seymour_etal
-    seymour_etal.available_aircraft()[0:10]
-    seymour_etal.calculate_fuel_consumption(
+    seymour_etal.list_aircraft()[0:10]
+    seymour_etal.calculate(
         acft='A321',
         R=2200*ureg.km,
     )
@@ -1072,674 +1096,674 @@ class seymour_etal:
 
     _regression_coefficients = {
         "A140": {
-            "reduced_fuel_a1": 0.0001570270040569,
-            "reduced_fuel_a2": 1.2982777526024196,
-            "reduced_fuel_intercept": 160.62447178027185,
+            "reduced_fuel_a1": 1.57e-4,
+            "reduced_fuel_a2": 1.30,
+            "reduced_fuel_intercept": 160,
         },
         "A148": {
-            "reduced_fuel_a1": 6.398806910579147e-05,
-            "reduced_fuel_a2": 1.757267905324482,
-            "reduced_fuel_intercept": 971.0358232404124,
+            "reduced_fuel_a1": 6.38e-5,
+            "reduced_fuel_a2": 1.76,
+            "reduced_fuel_intercept": 999,
         },
         "A158": {
-            "reduced_fuel_a1": 3.3362854604312986e-05,
-            "reduced_fuel_a2": 2.566018863868268,
-            "reduced_fuel_intercept": 799.9393976678402,
+            "reduced_fuel_a1": 2.79e-5,
+            "reduced_fuel_a2": 2.58,
+            "reduced_fuel_intercept": 819,
         },
         "A20N": {
-            "reduced_fuel_a1": 5.668855923612881e-05,
-            "reduced_fuel_a2": 2.382220322790334,
-            "reduced_fuel_intercept": 955.9771828145858,
+            "reduced_fuel_a1": 5.52e-5,
+            "reduced_fuel_a2": 2.39,
+            "reduced_fuel_intercept": 1008,
         },
         "A21N": {
-            "reduced_fuel_a1": 6.322240065870233e-05,
-            "reduced_fuel_a2": 2.7236585444593007,
-            "reduced_fuel_intercept": 1121.9381760390395,
+            "reduced_fuel_a1": 7.07e-5,
+            "reduced_fuel_a2": 2.70,
+            "reduced_fuel_intercept": 1206,
         },
         "A306": {
-            "reduced_fuel_a1": 0.000208303528197,
-            "reduced_fuel_a2": 5.292754728665013,
-            "reduced_fuel_intercept": 2408.3891219198267,
+            "reduced_fuel_a1": 2.22e-4,
+            "reduced_fuel_a2": 5.22,
+            "reduced_fuel_intercept": 2703,
         },
         "A30B": {
-            "reduced_fuel_a1": 0.0001982893815144,
-            "reduced_fuel_a2": 6.474756928487186,
-            "reduced_fuel_intercept": 2222.798735754448,
+            "reduced_fuel_a1": 1.99e-4,
+            "reduced_fuel_a2": 6.50,
+            "reduced_fuel_intercept": 2491,
         },
         "A310": {
-            "reduced_fuel_a1": 0.0001632949648442,
-            "reduced_fuel_a2": 4.359746729125529,
-            "reduced_fuel_intercept": 2228.0275509617168,
+            "reduced_fuel_a1": 1.74e-4,
+            "reduced_fuel_a2": 4.31,
+            "reduced_fuel_intercept": 2432,
         },
         "A318": {
-            "reduced_fuel_a1": 6.89511440921109e-05,
-            "reduced_fuel_a2": 2.350075246472605,
-            "reduced_fuel_intercept": 1118.9090916083037,
+            "reduced_fuel_a1": 6.43e-5,
+            "reduced_fuel_a2": 2.37,
+            "reduced_fuel_intercept": 1175,
         },
         "A319": {
-            "reduced_fuel_a1": 7.861925591479135e-05,
-            "reduced_fuel_a2": 2.3082582355790655,
-            "reduced_fuel_intercept": 1194.0996838404626,
+            "reduced_fuel_a1": 7.70e-5,
+            "reduced_fuel_a2": 2.32,
+            "reduced_fuel_intercept": 1280,
         },
         "A320": {
-            "reduced_fuel_a1": 0.000130042337441,
-            "reduced_fuel_a2": 2.4260951197123437,
-            "reduced_fuel_intercept": 1310.7950948662055,
+            "reduced_fuel_a1": 1.25e-4,
+            "reduced_fuel_a2": 2.47,
+            "reduced_fuel_intercept": 1374,
         },
         "A321": {
-            "reduced_fuel_a1": -5.7378784219075385e-05,
-            "reduced_fuel_a2": 4.083572128715679,
-            "reduced_fuel_intercept": 1084.1337567410246,
+            "reduced_fuel_a1": -5.88e-5,
+            "reduced_fuel_a2": 4.09,
+            "reduced_fuel_intercept": 1182,
         },
         "A332": {
-            "reduced_fuel_a1": 0.0001747859503353,
-            "reduced_fuel_a2": 4.9031762660658,
-            "reduced_fuel_intercept": 3603.0351976719103,
+            "reduced_fuel_a1": 1.75e-4,
+            "reduced_fuel_a2": 4.91,
+            "reduced_fuel_intercept": 3727,
         },
         "A333": {
-            "reduced_fuel_a1": 2.6407166359376788e-05,
-            "reduced_fuel_a2": 6.517233690161649,
-            "reduced_fuel_intercept": 2090.642673369657,
+            "reduced_fuel_a1": 2.51e-5,
+            "reduced_fuel_a2": 6.53,
+            "reduced_fuel_intercept": 2232,
         },
         "A339": {
-            "reduced_fuel_a1": 0.0001769854542406,
-            "reduced_fuel_a2": 4.634359445213642,
-            "reduced_fuel_intercept": 4057.6671819265466,
+            "reduced_fuel_a1": 1.77e-4,
+            "reduced_fuel_a2": 4.64,
+            "reduced_fuel_intercept": 4219,
         },
         "A342": {
-            "reduced_fuel_a1": 0.0002358094393848,
-            "reduced_fuel_a2": 5.160351823288175,
-            "reduced_fuel_intercept": 4479.616294853418,
+            "reduced_fuel_a1": 2.47e-4,
+            "reduced_fuel_a2": 5.06,
+            "reduced_fuel_intercept": 4951,
         },
         "A343": {
-            "reduced_fuel_a1": 0.0002672084309844,
-            "reduced_fuel_a2": 5.40202955241821,
-            "reduced_fuel_intercept": 3954.7379543269417,
+            "reduced_fuel_a1": 2.62e-4,
+            "reduced_fuel_a2": 5.50,
+            "reduced_fuel_intercept": 3989,
         },
         "A345": {
-            "reduced_fuel_a1": 0.0002101950285755,
-            "reduced_fuel_a2": 6.852207692367797,
-            "reduced_fuel_intercept": 4919.303525652402,
+            "reduced_fuel_a1": 2.27e-4,
+            "reduced_fuel_a2": 6.72,
+            "reduced_fuel_intercept": 5302,
         },
         "A346": {
-            "reduced_fuel_a1": 0.0002565271632093,
-            "reduced_fuel_a2": 6.86051702890215,
-            "reduced_fuel_intercept": 5501.48232695819,
+            "reduced_fuel_a1": 2.60e-4,
+            "reduced_fuel_a2": 6.85,
+            "reduced_fuel_intercept": 5646,
         },
         "A359": {
-            "reduced_fuel_a1": 8.61825848810227e-05,
-            "reduced_fuel_a2": 6.152636361762516,
-            "reduced_fuel_intercept": 1753.6413158785144,
+            "reduced_fuel_a1": 8.57e-5,
+            "reduced_fuel_a2": 6.16,
+            "reduced_fuel_intercept": 1803,
         },
         "A35K": {
-            "reduced_fuel_a1": 0.0001846395304374,
-            "reduced_fuel_a2": 5.378231075979626,
-            "reduced_fuel_intercept": 4413.229547197276,
+            "reduced_fuel_a1": 1.85e-4,
+            "reduced_fuel_a2": 5.38,
+            "reduced_fuel_intercept": 4483,
         },
         "A388": {
-            "reduced_fuel_a1": 0.0002976350034167,
-            "reduced_fuel_a2": 11.402874182880453,
-            "reduced_fuel_intercept": 6408.219743091526,
+            "reduced_fuel_a1": 2.96e-4,
+            "reduced_fuel_a2": 11.43,
+            "reduced_fuel_intercept": 6565,
         },
         "AJ27": {
-            "reduced_fuel_a1": 0.0001128545234347,
-            "reduced_fuel_a2": 2.220290803974472,
-            "reduced_fuel_intercept": 896.880801146056,
+            "reduced_fuel_a1": 1.13e-4,
+            "reduced_fuel_a2": 2.22,
+            "reduced_fuel_intercept": 924,
         },
         "AN24": {
-            "reduced_fuel_a1": 6.1540118558856e-05,
-            "reduced_fuel_a2": 1.5981588090902188,
-            "reduced_fuel_intercept": 212.2134235255014,
+            "reduced_fuel_a1": 6.24e-5,
+            "reduced_fuel_a2": 1.60,
+            "reduced_fuel_intercept": 209,
         },
         "AN38": {
-            "reduced_fuel_a1": 3.03583389380524e-05,
-            "reduced_fuel_a2": 1.50932767352588,
-            "reduced_fuel_intercept": 60.10635243403112,
+            "reduced_fuel_a1": 3.00e-5,
+            "reduced_fuel_a2": 1.51,
+            "reduced_fuel_intercept": 60,
         },
         "AT43": {
-            "reduced_fuel_a1": 0.000203974136543,
-            "reduced_fuel_a2": 0.7995587234644723,
-            "reduced_fuel_intercept": 198.85276266580055,
+            "reduced_fuel_a1": 2.04e-4,
+            "reduced_fuel_a2": 0.80,
+            "reduced_fuel_intercept": 199,
         },
         "AT72": {
-            "reduced_fuel_a1": 0.0002572904328121,
-            "reduced_fuel_a2": 1.1306414713636488,
-            "reduced_fuel_intercept": 203.17938444650304,
+            "reduced_fuel_a1": 2.55e-4,
+            "reduced_fuel_a2": 1.14,
+            "reduced_fuel_intercept": 201,
         },
         "ATP": {
-            "reduced_fuel_a1": 0.0003809166804082,
-            "reduced_fuel_a2": 1.084751679629892,
-            "reduced_fuel_intercept": 227.04070386623405,
+            "reduced_fuel_a1": 4.76e-4,
+            "reduced_fuel_a2": 0.98,
+            "reduced_fuel_intercept": 239,
         },
         "B190": {
-            "reduced_fuel_a1": 3.5682877519871425e-05,
-            "reduced_fuel_a2": 0.6990438903158286,
-            "reduced_fuel_intercept": 81.44129452835466,
+            "reduced_fuel_a1": 3.63e-5,
+            "reduced_fuel_a2": 0.70,
+            "reduced_fuel_intercept": 82,
         },
         "B38M": {
-            "reduced_fuel_a1": 4.240664668087035e-05,
-            "reduced_fuel_a2": 2.2729590234452277,
-            "reduced_fuel_intercept": 976.4669475643968,
+            "reduced_fuel_a1": 3.90e-5,
+            "reduced_fuel_a2": 2.30,
+            "reduced_fuel_intercept": 993,
         },
         "B39M": {
-            "reduced_fuel_a1": 5.4363062104823e-05,
-            "reduced_fuel_a2": 2.1640858440661783,
-            "reduced_fuel_intercept": 1134.7527808384184,
+            "reduced_fuel_a1": 5.21e-5,
+            "reduced_fuel_a2": 2.18,
+            "reduced_fuel_intercept": 1160,
         },
         "B461": {
-            "reduced_fuel_a1": 0.0001896156534328,
-            "reduced_fuel_a2": 2.574807111911259,
-            "reduced_fuel_intercept": 1028.0273918223684,
+            "reduced_fuel_a1": 1.87e-4,
+            "reduced_fuel_a2": 2.58,
+            "reduced_fuel_intercept": 1066,
         },
         "B462": {
-            "reduced_fuel_a1": 9.335585006686742e-05,
-            "reduced_fuel_a2": 2.7314117130301314,
-            "reduced_fuel_intercept": 1007.602964246164,
+            "reduced_fuel_a1": 9.39e-5,
+            "reduced_fuel_a2": 2.74,
+            "reduced_fuel_intercept": 1045,
         },
         "B463": {
-            "reduced_fuel_a1": 0.0002324252599588,
-            "reduced_fuel_a2": 2.7270723090638445,
-            "reduced_fuel_intercept": 1091.4142853804456,
+            "reduced_fuel_a1": 2.41e-4,
+            "reduced_fuel_a2": 2.71,
+            "reduced_fuel_intercept": 1140,
         },
         "B712": {
-            "reduced_fuel_a1": 9.5143139789311e-05,
-            "reduced_fuel_a2": 2.5586278585965525,
-            "reduced_fuel_intercept": 888.8985953393758,
+            "reduced_fuel_a1": 9.54e-5,
+            "reduced_fuel_a2": 2.56,
+            "reduced_fuel_intercept": 935,
         },
         "B722": {
-            "reduced_fuel_a1": 0.0002302031088632,
-            "reduced_fuel_a2": 4.938178279411521,
-            "reduced_fuel_intercept": 1867.430322671009,
+            "reduced_fuel_a1": 2.32e-4,
+            "reduced_fuel_a2": 4.94,
+            "reduced_fuel_intercept": 1938,
         },
         "B732": {
-            "reduced_fuel_a1": 2.2603602200632625e-05,
-            "reduced_fuel_a2": 3.2972368428696255,
-            "reduced_fuel_intercept": 1136.061288362087,
+            "reduced_fuel_a1": 1.49e-5,
+            "reduced_fuel_a2": 3.33,
+            "reduced_fuel_intercept": 1208,
         },
         "B733": {
-            "reduced_fuel_a1": -1.8591243748478092e-05,
-            "reduced_fuel_a2": 3.397847036676938,
-            "reduced_fuel_intercept": 783.8308256672553,
+            "reduced_fuel_a1": -2.03e-5,
+            "reduced_fuel_a2": 3.41,
+            "reduced_fuel_intercept": 824,
         },
         "B734": {
-            "reduced_fuel_a1": 0.000104184430457,
-            "reduced_fuel_a2": 3.2101738101978854,
-            "reduced_fuel_intercept": 1167.7732498010064,
+            "reduced_fuel_a1": 1.03e-4,
+            "reduced_fuel_a2": 3.22,
+            "reduced_fuel_intercept": 1217,
         },
         "B735": {
-            "reduced_fuel_a1": 7.415187194803607e-05,
-            "reduced_fuel_a2": 2.644615749830163,
-            "reduced_fuel_intercept": 1144.5821378914425,
+            "reduced_fuel_a1": 7.44e-5,
+            "reduced_fuel_a2": 2.65,
+            "reduced_fuel_intercept": 1185,
         },
         "B736": {
-            "reduced_fuel_a1": 5.9790833605521954e-05,
-            "reduced_fuel_a2": 2.3907264907192607,
-            "reduced_fuel_intercept": 1141.073186805245,
+            "reduced_fuel_a1": 5.92e-5,
+            "reduced_fuel_a2": 2.40,
+            "reduced_fuel_intercept": 1185,
         },
         "B737": {
-            "reduced_fuel_a1": 8.453820942255774e-05,
-            "reduced_fuel_a2": 2.491056389417562,
-            "reduced_fuel_intercept": 1254.8001814325753,
+            "reduced_fuel_a1": 8.39e-5,
+            "reduced_fuel_a2": 2.50,
+            "reduced_fuel_intercept": 1310,
         },
         "B738": {
-            "reduced_fuel_a1": 7.378617475106708e-05,
-            "reduced_fuel_a2": 2.920849872328848,
-            "reduced_fuel_intercept": 1218.8211966548952,
+            "reduced_fuel_a1": 7.13e-5,
+            "reduced_fuel_a2": 2.94,
+            "reduced_fuel_intercept": 1275,
         },
         "B739": {
-            "reduced_fuel_a1": 5.865901988277855e-05,
-            "reduced_fuel_a2": 3.08055767111119,
-            "reduced_fuel_intercept": 1193.9582841250576,
+            "reduced_fuel_a1": 5.46e-5,
+            "reduced_fuel_a2": 3.11,
+            "reduced_fuel_intercept": 1227,
         },
         "B744": {
-            "reduced_fuel_a1": 0.0003298404730252,
-            "reduced_fuel_a2": 8.335664382081461,
-            "reduced_fuel_intercept": 5173.3875295867765,
+            "reduced_fuel_a1": 3.49e-4,
+            "reduced_fuel_a2": 8.19,
+            "reduced_fuel_intercept": 5726,
         },
         "B748": {
-            "reduced_fuel_a1": 0.0002615950218363,
-            "reduced_fuel_a2": 7.162095963451604,
-            "reduced_fuel_intercept": 6199.102376527022,
+            "reduced_fuel_a1": 2.81e-4,
+            "reduced_fuel_a2": 6.98,
+            "reduced_fuel_intercept": 6855,
         },
         "B752": {
-            "reduced_fuel_a1": 0.0001250041873004,
-            "reduced_fuel_a2": 3.647634675096872,
-            "reduced_fuel_intercept": 1815.4045757940405,
+            "reduced_fuel_a1": 1.25e-4,
+            "reduced_fuel_a2": 3.66,
+            "reduced_fuel_intercept": 1935,
         },
         "B753": {
-            "reduced_fuel_a1": 0.0001342318330896,
-            "reduced_fuel_a2": 4.317066583350788,
-            "reduced_fuel_intercept": 1813.2095734231495,
+            "reduced_fuel_a1": 1.39e-4,
+            "reduced_fuel_a2": 4.32,
+            "reduced_fuel_intercept": 2005,
         },
         "B762": {
-            "reduced_fuel_a1": 0.0001583633647879,
-            "reduced_fuel_a2": 4.430972686802388,
-            "reduced_fuel_intercept": 2153.699352414358,
+            "reduced_fuel_a1": 1.56e-4,
+            "reduced_fuel_a2": 4.46,
+            "reduced_fuel_intercept": 2198,
         },
         "B763": {
-            "reduced_fuel_a1": 0.0001498699734856,
-            "reduced_fuel_a2": 4.1777176647610075,
-            "reduced_fuel_intercept": 2897.9537791913026,
+            "reduced_fuel_a1": 1.50e-4,
+            "reduced_fuel_a2": 4.19,
+            "reduced_fuel_intercept": 3042,
         },
         "B764": {
-            "reduced_fuel_a1": 0.0001395325459059,
-            "reduced_fuel_a2": 5.114127993219688,
-            "reduced_fuel_intercept": 2381.9024793420685,
+            "reduced_fuel_a1": 1.44e-4,
+            "reduced_fuel_a2": 5.10,
+            "reduced_fuel_intercept": 2651,
         },
         "B772": {
-            "reduced_fuel_a1": 0.0001914747351383,
-            "reduced_fuel_a2": 5.782782753633973,
-            "reduced_fuel_intercept": 3631.7961997048337,
+            "reduced_fuel_a1": 1.92e-4,
+            "reduced_fuel_a2": 5.80,
+            "reduced_fuel_intercept": 3886,
         },
         "B773": {
-            "reduced_fuel_a1": 5.538872222565771e-05,
-            "reduced_fuel_a2": 8.815299638918951,
-            "reduced_fuel_intercept": 1523.2308861083802,
+            "reduced_fuel_a1": 5.52e-5,
+            "reduced_fuel_a2": 8.82,
+            "reduced_fuel_intercept": 1537,
         },
         "B77L": {
-            "reduced_fuel_a1": 0.000187327605956,
-            "reduced_fuel_a2": 5.340268459176023,
-            "reduced_fuel_intercept": 4948.453927021372,
+            "reduced_fuel_a1": 1.87e-4,
+            "reduced_fuel_a2": 5.38,
+            "reduced_fuel_intercept": 5189,
         },
         "B77W": {
-            "reduced_fuel_a1": 0.0002100662403456,
-            "reduced_fuel_a2": 6.448265007681931,
-            "reduced_fuel_intercept": 4650.533009643688,
+            "reduced_fuel_a1": 2.25e-4,
+            "reduced_fuel_a2": 6.31,
+            "reduced_fuel_intercept": 5186,
         },
         "B788": {
-            "reduced_fuel_a1": 0.0001189480776098,
-            "reduced_fuel_a2": 3.915939456305177,
-            "reduced_fuel_intercept": 2992.551574337729,
+            "reduced_fuel_a1": 1.19e-4,
+            "reduced_fuel_a2": 3.92,
+            "reduced_fuel_intercept": 3125,
         },
         "B789": {
-            "reduced_fuel_a1": 0.0001183339933326,
-            "reduced_fuel_a2": 3.8896865199583086,
-            "reduced_fuel_intercept": 3252.7546948675517,
+            "reduced_fuel_a1": 1.17e-4,
+            "reduced_fuel_a2": 3.91,
+            "reduced_fuel_intercept": 3407,
         },
         "B78X": {
-            "reduced_fuel_a1": 6.96546740401871e-05,
-            "reduced_fuel_a2": 4.9773040757617,
-            "reduced_fuel_intercept": 2688.3477805166585,
+            "reduced_fuel_a1": 6.99e-5,
+            "reduced_fuel_a2": 4.98,
+            "reduced_fuel_intercept": 2821,
         },
         "BCS1": {
-            "reduced_fuel_a1": -3.664096369648817e-05,
-            "reduced_fuel_a2": 2.643412792798112,
-            "reduced_fuel_intercept": 946.8722926376108,
+            "reduced_fuel_a1": -3.67e-5,
+            "reduced_fuel_a2": 2.64,
+            "reduced_fuel_intercept": 947,
         },
         "BCS3": {
-            "reduced_fuel_a1": 7.443724168476606e-05,
-            "reduced_fuel_a2": 2.6444285855634635,
-            "reduced_fuel_intercept": 1125.1345884342045,
+            "reduced_fuel_a1": 7.22e-5,
+            "reduced_fuel_a2": 2.66,
+            "reduced_fuel_intercept": 1160,
         },
         "BE20": {
-            "reduced_fuel_a1": 0.0001303970296386,
-            "reduced_fuel_a2": 0.4105068660204155,
-            "reduced_fuel_intercept": 96.25496475566538,
+            "reduced_fuel_a1": 1.28e-4,
+            "reduced_fuel_a2": 0.41,
+            "reduced_fuel_intercept": 96,
         },
         "BE40": {
-            "reduced_fuel_a1": 0.0003617800752137,
-            "reduced_fuel_a2": 0.2171313723076476,
-            "reduced_fuel_intercept": 391.7302550427421,
+            "reduced_fuel_a1": 3.59e-4,
+            "reduced_fuel_a2": 0.22,
+            "reduced_fuel_intercept": 392,
         },
         "BE55": {
-            "reduced_fuel_a1": 6.889557082612185e-07,
-            "reduced_fuel_a2": 0.3202570786539638,
-            "reduced_fuel_intercept": 30.36468757934483,
+            "reduced_fuel_a1": 6.88e-7,
+            "reduced_fuel_a2": 0.32,
+            "reduced_fuel_intercept": 30,
         },
         "BN2P": {
-            "reduced_fuel_a1": -8.205128215754698e-09,
-            "reduced_fuel_a2": 0.132753989743574,
-            "reduced_fuel_intercept": 21.547735384622264,
+            "reduced_fuel_a1": -1.01e-8,
+            "reduced_fuel_a2": 0.13,
+            "reduced_fuel_intercept": 22,
         },
         "C172": {
-            "reduced_fuel_a1": 1.2380190733546348e-06,
-            "reduced_fuel_a2": 0.1172950026862793,
-            "reduced_fuel_intercept": 11.483789127163092,
+            "reduced_fuel_a1": 1.24e-6,
+            "reduced_fuel_a2": 0.12,
+            "reduced_fuel_intercept": 11,
         },
         "C208": {
-            "reduced_fuel_a1": -3.67204459308379e-05,
-            "reduced_fuel_a2": 0.409798958305413,
-            "reduced_fuel_intercept": 35.55777284282115,
+            "reduced_fuel_a1": -3.30e-5,
+            "reduced_fuel_a2": 0.41,
+            "reduced_fuel_intercept": 36,
         },
         "C25A": {
-            "reduced_fuel_a1": -0.000282693779264,
-            "reduced_fuel_a2": 0.5862234916387068,
-            "reduced_fuel_intercept": 239.36721284281825,
+            "reduced_fuel_a1": -1.02e-5,
+            "reduced_fuel_a2": 0.55,
+            "reduced_fuel_intercept": 209,
         },
         "C310": {
-            "reduced_fuel_a1": 9.448978075532466e-07,
-            "reduced_fuel_a2": 0.2628322330731762,
-            "reduced_fuel_intercept": 44.83353114827668,
+            "reduced_fuel_a1": 9.12e-7,
+            "reduced_fuel_a2": 0.26,
+            "reduced_fuel_intercept": 45,
         },
         "C680": {
-            "reduced_fuel_a1": 2.5546695713196677e-05,
-            "reduced_fuel_a2": 0.8718606846703527,
-            "reduced_fuel_intercept": 330.4345529840358,
+            "reduced_fuel_a1": 2.77e-5,
+            "reduced_fuel_a2": 0.87,
+            "reduced_fuel_intercept": 331,
         },
         "CRJ1": {
-            "reduced_fuel_a1": 0.0001034796676926,
-            "reduced_fuel_a2": 1.3108614265324785,
-            "reduced_fuel_intercept": 500.6895406352646,
+            "reduced_fuel_a1": 1.04e-4,
+            "reduced_fuel_a2": 1.31,
+            "reduced_fuel_intercept": 501,
         },
         "CRJ2": {
-            "reduced_fuel_a1": -2.11890390524605e-05,
-            "reduced_fuel_a2": 1.4390157984528462,
-            "reduced_fuel_intercept": 437.06905144489065,
+            "reduced_fuel_a1": -2.13e-5,
+            "reduced_fuel_a2": 1.44,
+            "reduced_fuel_intercept": 440,
         },
         "CRJ7": {
-            "reduced_fuel_a1": 6.393263464610222e-05,
-            "reduced_fuel_a2": 1.8737227331809316,
-            "reduced_fuel_intercept": 683.5325674653322,
+            "reduced_fuel_a1": 6.35e-5,
+            "reduced_fuel_a2": 1.88,
+            "reduced_fuel_intercept": 683,
         },
         "CRJ9": {
-            "reduced_fuel_a1": 6.253854476767629e-05,
-            "reduced_fuel_a2": 1.9514863304008472,
-            "reduced_fuel_intercept": 679.4050140092891,
+            "reduced_fuel_a1": 6.24e-5,
+            "reduced_fuel_a2": 1.95,
+            "reduced_fuel_intercept": 680,
         },
         "CRJX": {
-            "reduced_fuel_a1": 7.589077616154682e-05,
-            "reduced_fuel_a2": 1.8814076564312476,
-            "reduced_fuel_intercept": 732.788165874158,
+            "reduced_fuel_a1": 7.56e-5,
+            "reduced_fuel_a2": 1.88,
+            "reduced_fuel_intercept": 733,
         },
         "CVLT": {
-            "reduced_fuel_a1": 0.0001075431766106,
-            "reduced_fuel_a2": 1.2467937281785135,
-            "reduced_fuel_intercept": 177.1336926863886,
+            "reduced_fuel_a1": 1.66e-4,
+            "reduced_fuel_a2": 1.16,
+            "reduced_fuel_intercept": 189,
         },
         "D228": {
-            "reduced_fuel_a1": -0.0005777542326272,
-            "reduced_fuel_a2": 0.9370732551466758,
-            "reduced_fuel_intercept": 5.040827335603524,
+            "reduced_fuel_a1": -5.84e-4,
+            "reduced_fuel_a2": 0.94,
+            "reduced_fuel_intercept": 3,
         },
         "D328": {
-            "reduced_fuel_a1": -0.000245484831348,
-            "reduced_fuel_a2": 1.0680542090625096,
-            "reduced_fuel_intercept": 99.0574540055157,
+            "reduced_fuel_a1": -2.02e-4,
+            "reduced_fuel_a2": 1.02,
+            "reduced_fuel_intercept": 111,
         },
         "DC94": {
-            "reduced_fuel_a1": -0.0007380147037094,
-            "reduced_fuel_a2": 4.582581485903085,
-            "reduced_fuel_intercept": 1369.165916181886,
+            "reduced_fuel_a1": -7.59e-4,
+            "reduced_fuel_a2": 4.66,
+            "reduced_fuel_intercept": 1425,
         },
         "DH8A": {
-            "reduced_fuel_a1": 5.4913163527237074e-05,
-            "reduced_fuel_a2": 1.2006748185217966,
-            "reduced_fuel_intercept": 82.97030736129432,
+            "reduced_fuel_a1": 5.56e-5,
+            "reduced_fuel_a2": 1.20,
+            "reduced_fuel_intercept": 83,
         },
         "DH8B": {
-            "reduced_fuel_a1": 5.294023651969404e-05,
-            "reduced_fuel_a2": 1.1298379879022638,
-            "reduced_fuel_intercept": 129.97126030913932,
+            "reduced_fuel_a1": 5.33e-5,
+            "reduced_fuel_a2": 1.13,
+            "reduced_fuel_intercept": 130,
         },
         "DH8C": {
-            "reduced_fuel_a1": 3.777230345836102e-05,
-            "reduced_fuel_a2": 1.2037109332443952,
-            "reduced_fuel_intercept": 130.9784890760368,
+            "reduced_fuel_a1": 3.80e-5,
+            "reduced_fuel_a2": 1.20,
+            "reduced_fuel_intercept": 131,
         },
         "DH8D": {
-            "reduced_fuel_a1": 4.137944106852309e-05,
-            "reduced_fuel_a2": 1.7022924843561966,
-            "reduced_fuel_intercept": 283.1844509558705,
+            "reduced_fuel_a1": 4.20e-5,
+            "reduced_fuel_a2": 1.70,
+            "reduced_fuel_intercept": 284,
         },
         "DHC2": {
-            "reduced_fuel_a1": 9.394277217245062e-09,
-            "reduced_fuel_a2": 0.1350185932366991,
-            "reduced_fuel_intercept": 18.63214523969382,
+            "reduced_fuel_a1": 6.06e-9,
+            "reduced_fuel_a2": 0.14,
+            "reduced_fuel_intercept": 19,
         },
         "DHC3": {
-            "reduced_fuel_a1": 9.394277217245062e-09,
-            "reduced_fuel_a2": 0.1350185932366991,
-            "reduced_fuel_intercept": 18.63214523969382,
+            "reduced_fuel_a1": 6.06e-9,
+            "reduced_fuel_a2": 0.14,
+            "reduced_fuel_intercept": 19,
         },
         "DHC6": {
-            "reduced_fuel_a1": -3.187691776518342e-05,
-            "reduced_fuel_a2": 0.6932737741810914,
-            "reduced_fuel_intercept": 28.91433554960173,
+            "reduced_fuel_a1": -3.19e-5,
+            "reduced_fuel_a2": 0.69,
+            "reduced_fuel_intercept": 29,
         },
         "DHC7": {
-            "reduced_fuel_a1": 0.0002256334072254,
-            "reduced_fuel_a2": 1.1144926491500595,
-            "reduced_fuel_intercept": 176.61790516295764,
+            "reduced_fuel_a1": 2.37e-4,
+            "reduced_fuel_a2": 1.10,
+            "reduced_fuel_intercept": 178,
         },
         "DOVE": {
-            "reduced_fuel_a1": 4.041204013649491e-07,
-            "reduced_fuel_a2": 0.4755121958528177,
-            "reduced_fuel_intercept": 41.24593693051449,
+            "reduced_fuel_a1": 3.97e-7,
+            "reduced_fuel_a2": 0.48,
+            "reduced_fuel_intercept": 41,
         },
         "E110": {
-            "reduced_fuel_a1": -0.0003954964631726,
-            "reduced_fuel_a2": 0.8019004282308231,
-            "reduced_fuel_intercept": 26.372293222619906,
+            "reduced_fuel_a1": -3.95e-4,
+            "reduced_fuel_a2": 0.80,
+            "reduced_fuel_intercept": 26,
         },
         "E120": {
-            "reduced_fuel_a1": 3.396360803553655e-05,
-            "reduced_fuel_a2": 0.7743334032519721,
-            "reduced_fuel_intercept": 130.4671411820412,
+            "reduced_fuel_a1": 3.55e-5,
+            "reduced_fuel_a2": 0.77,
+            "reduced_fuel_intercept": 131,
         },
         "E135": {
-            "reduced_fuel_a1": 3.881248459891573e-05,
-            "reduced_fuel_a2": 1.2802797068989786,
-            "reduced_fuel_intercept": 454.7038392357124,
+            "reduced_fuel_a1": 3.77e-5,
+            "reduced_fuel_a2": 1.28,
+            "reduced_fuel_intercept": 454,
         },
         "E145": {
-            "reduced_fuel_a1": 6.627833586003717e-05,
-            "reduced_fuel_a2": 1.3677383218438812,
-            "reduced_fuel_intercept": 466.9392548458616,
+            "reduced_fuel_a1": 6.63e-5,
+            "reduced_fuel_a2": 1.37,
+            "reduced_fuel_intercept": 467,
         },
         "E170": {
-            "reduced_fuel_a1": 7.130386850828785e-05,
-            "reduced_fuel_a2": 1.788021961966271,
-            "reduced_fuel_intercept": 734.8443010720312,
+            "reduced_fuel_a1": 7.15e-5,
+            "reduced_fuel_a2": 1.79,
+            "reduced_fuel_intercept": 746,
         },
         "E190": {
-            "reduced_fuel_a1": 2.5220395766467615e-05,
-            "reduced_fuel_a2": 2.272342310053173,
-            "reduced_fuel_intercept": 890.103548483628,
+            "reduced_fuel_a1": 1.74e-5,
+            "reduced_fuel_a2": 2.29,
+            "reduced_fuel_intercept": 900,
         },
         "E195": {
-            "reduced_fuel_a1": 9.296909049849587e-05,
-            "reduced_fuel_a2": 2.3434015643042234,
-            "reduced_fuel_intercept": 916.1048684752524,
+            "reduced_fuel_a1": 8.80e-5,
+            "reduced_fuel_a2": 2.37,
+            "reduced_fuel_intercept": 922,
         },
         "E55P": {
-            "reduced_fuel_a1": 2.8113528481754635e-05,
-            "reduced_fuel_a2": 0.5055806987093875,
-            "reduced_fuel_intercept": 263.0596628859755,
+            "reduced_fuel_a1": 2.84e-5,
+            "reduced_fuel_a2": 0.50,
+            "reduced_fuel_intercept": 263,
         },
         "E75L": {
-            "reduced_fuel_a1": 6.231272060497339e-05,
-            "reduced_fuel_a2": 1.7380947411831915,
-            "reduced_fuel_intercept": 765.1390243066526,
+            "reduced_fuel_a1": 6.13e-5,
+            "reduced_fuel_a2": 1.75,
+            "reduced_fuel_intercept": 772,
         },
         "E75S": {
-            "reduced_fuel_a1": 7.633313186405921e-05,
-            "reduced_fuel_a2": 1.8679073517735911,
-            "reduced_fuel_intercept": 748.818136677678,
+            "reduced_fuel_a1": 7.62e-5,
+            "reduced_fuel_a2": 1.87,
+            "reduced_fuel_intercept": 759,
         },
         "F100": {
-            "reduced_fuel_a1": 2.5980478899789716e-05,
-            "reduced_fuel_a2": 2.553982635471138,
-            "reduced_fuel_intercept": 986.7481180215008,
+            "reduced_fuel_a1": 2.57e-5,
+            "reduced_fuel_a2": 2.55,
+            "reduced_fuel_intercept": 987,
         },
         "F27": {
-            "reduced_fuel_a1": -0.0002541926266987,
-            "reduced_fuel_a2": 1.7277585574099523,
-            "reduced_fuel_intercept": 196.6758335860028,
+            "reduced_fuel_a1": -2.55e-4,
+            "reduced_fuel_a2": 1.73,
+            "reduced_fuel_intercept": 197,
         },
         "F28": {
-            "reduced_fuel_a1": -0.0002118866030524,
-            "reduced_fuel_a2": 2.4395667107842223,
-            "reduced_fuel_intercept": 919.63434762249,
+            "reduced_fuel_a1": -2.13e-4,
+            "reduced_fuel_a2": 2.44,
+            "reduced_fuel_intercept": 919,
         },
         "F406": {
-            "reduced_fuel_a1": -0.000172874678558,
-            "reduced_fuel_a2": 0.5916633519137168,
-            "reduced_fuel_intercept": 38.58854171684939,
+            "reduced_fuel_a1": -1.51e-4,
+            "reduced_fuel_a2": 0.58,
+            "reduced_fuel_intercept": 39,
         },
         "F50": {
-            "reduced_fuel_a1": -1.68579521124812e-05,
-            "reduced_fuel_a2": 1.603938199337737,
-            "reduced_fuel_intercept": 97.73412608032277,
+            "reduced_fuel_a1": -1.67e-5,
+            "reduced_fuel_a2": 1.60,
+            "reduced_fuel_intercept": 98,
         },
         "F70": {
-            "reduced_fuel_a1": 3.483050040475888e-05,
-            "reduced_fuel_a2": 2.154224431496384,
-            "reduced_fuel_intercept": 878.6415972747859,
+            "reduced_fuel_a1": 4.87e-5,
+            "reduced_fuel_a2": 2.11,
+            "reduced_fuel_intercept": 883,
         },
         "GLF4": {
-            "reduced_fuel_a1": -9.206168393838254e-06,
-            "reduced_fuel_a2": 2.0034530687683447,
-            "reduced_fuel_intercept": 776.3846882051707,
+            "reduced_fuel_a1": -8.48e-6,
+            "reduced_fuel_a2": 2.00,
+            "reduced_fuel_intercept": 776,
         },
         "GLF5": {
-            "reduced_fuel_a1": 8.496701035021204e-05,
-            "reduced_fuel_a2": 1.095257753616579,
-            "reduced_fuel_intercept": 856.2936427087615,
+            "reduced_fuel_a1": 9.22e-5,
+            "reduced_fuel_a2": 1.08,
+            "reduced_fuel_intercept": 861,
         },
         "IL96": {
-            "reduced_fuel_a1": 0.0003355134308113,
-            "reduced_fuel_a2": 6.6844565547395085,
-            "reduced_fuel_intercept": 3886.784383823287,
+            "reduced_fuel_a1": 3.35e-4,
+            "reduced_fuel_a2": 6.67,
+            "reduced_fuel_intercept": 3893,
         },
         "J328": {
-            "reduced_fuel_a1": 0.0002338523634559,
-            "reduced_fuel_a2": 0.9637716785777416,
-            "reduced_fuel_intercept": 519.1105608572915,
+            "reduced_fuel_a1": 2.31e-4,
+            "reduced_fuel_a2": 0.97,
+            "reduced_fuel_intercept": 519,
         },
         "JS31": {
-            "reduced_fuel_a1": -1.3220003405312042e-06,
-            "reduced_fuel_a2": 0.5713326852277414,
-            "reduced_fuel_intercept": 66.96258057491974,
+            "reduced_fuel_a1": -6.63e-7,
+            "reduced_fuel_a2": 0.57,
+            "reduced_fuel_intercept": 67,
         },
         "JS32": {
-            "reduced_fuel_a1": -3.3202229312800924e-05,
-            "reduced_fuel_a2": 0.6341877292061346,
-            "reduced_fuel_intercept": 59.2533679466319,
+            "reduced_fuel_a1": -3.19e-5,
+            "reduced_fuel_a2": 0.63,
+            "reduced_fuel_intercept": 60,
         },
         "JS41": {
-            "reduced_fuel_a1": -1.2082975956007049e-05,
-            "reduced_fuel_a2": 0.769800713351197,
-            "reduced_fuel_intercept": 104.27394833382344,
+            "reduced_fuel_a1": -8.91e-6,
+            "reduced_fuel_a2": 0.77,
+            "reduced_fuel_intercept": 105,
         },
         "L410": {
-            "reduced_fuel_a1": 4.591700730749438e-07,
-            "reduced_fuel_a2": 0.8687432438994225,
-            "reduced_fuel_intercept": 57.7775495453979,
+            "reduced_fuel_a1": -2.64e-5,
+            "reduced_fuel_a2": 0.89,
+            "reduced_fuel_intercept": 54,
         },
         "MD81": {
-            "reduced_fuel_a1": 0.0001858628498956,
-            "reduced_fuel_a2": 3.3496268406160934,
-            "reduced_fuel_intercept": 1377.4108977098076,
+            "reduced_fuel_a1": 2.26e-4,
+            "reduced_fuel_a2": 3.28,
+            "reduced_fuel_intercept": 1467,
         },
         "MD82": {
-            "reduced_fuel_a1": 0.0001642883930386,
-            "reduced_fuel_a2": 3.3107279063446025,
-            "reduced_fuel_intercept": 1363.4140348026076,
+            "reduced_fuel_a1": 1.68e-4,
+            "reduced_fuel_a2": 3.31,
+            "reduced_fuel_intercept": 1425,
         },
         "MD83": {
-            "reduced_fuel_a1": 0.0001459972320678,
-            "reduced_fuel_a2": 3.4171974425632308,
-            "reduced_fuel_intercept": 1333.2290201545793,
+            "reduced_fuel_a1": 1.55e-4,
+            "reduced_fuel_a2": 3.41,
+            "reduced_fuel_intercept": 1402,
         },
         "MD87": {
-            "reduced_fuel_a1": 0.0001229420769854,
-            "reduced_fuel_a2": 3.1550321556345344,
-            "reduced_fuel_intercept": 1323.906130239403,
+            "reduced_fuel_a1": 1.30e-4,
+            "reduced_fuel_a2": 3.13,
+            "reduced_fuel_intercept": 1391,
         },
         "MD88": {
-            "reduced_fuel_a1": 0.0001469270242324,
-            "reduced_fuel_a2": 3.3449436030636535,
-            "reduced_fuel_intercept": 1348.501342350547,
+            "reduced_fuel_a1": 1.69e-4,
+            "reduced_fuel_a2": 3.30,
+            "reduced_fuel_intercept": 1430,
         },
         "MD90": {
-            "reduced_fuel_a1": 0.0001511166380416,
-            "reduced_fuel_a2": 3.427298079612508,
-            "reduced_fuel_intercept": 1334.1836888132611,
+            "reduced_fuel_a1": 1.65e-4,
+            "reduced_fuel_a2": 3.41,
+            "reduced_fuel_intercept": 1413,
         },
         "P28B": {
-            "reduced_fuel_a1": 2.2807878111152926e-07,
-            "reduced_fuel_a2": 0.137086252545506,
-            "reduced_fuel_intercept": 18.05093881829021,
+            "reduced_fuel_a1": 2.44e-7,
+            "reduced_fuel_a2": 0.14,
+            "reduced_fuel_intercept": 18,
         },
         "PA31": {
-            "reduced_fuel_a1": 3.943218134239146e-07,
-            "reduced_fuel_a2": 0.4755192978074509,
-            "reduced_fuel_intercept": 41.244657480513666,
+            "reduced_fuel_a1": 3.94e-7,
+            "reduced_fuel_a2": 0.48,
+            "reduced_fuel_intercept": 41,
         },
         "PA46": {
-            "reduced_fuel_a1": -0.0001679652383734,
-            "reduced_fuel_a2": 0.2894163162406889,
-            "reduced_fuel_intercept": 17.568703209879217,
+            "reduced_fuel_a1": -1.67e-4,
+            "reduced_fuel_a2": 0.29,
+            "reduced_fuel_intercept": 18,
         },
         "PC12": {
-            "reduced_fuel_a1": 2.810992423724068e-05,
-            "reduced_fuel_a2": 0.3035124397652268,
-            "reduced_fuel_intercept": 54.70847918002542,
+            "reduced_fuel_a1": 3.00e-5,
+            "reduced_fuel_a2": 0.30,
+            "reduced_fuel_intercept": 55,
         },
         "RJ1H": {
-            "reduced_fuel_a1": 0.0002294929775152,
-            "reduced_fuel_a2": 2.5829642807420203,
-            "reduced_fuel_intercept": 1190.9403071438264,
+            "reduced_fuel_a1": 2.38e-4,
+            "reduced_fuel_a2": 2.57,
+            "reduced_fuel_intercept": 1243,
         },
         "RJ85": {
-            "reduced_fuel_a1": 0.0001193878936063,
-            "reduced_fuel_a2": 2.512925009824641,
-            "reduced_fuel_intercept": 1111.1277650256816,
+            "reduced_fuel_a1": 1.22e-4,
+            "reduced_fuel_a2": 2.51,
+            "reduced_fuel_intercept": 1148,
         },
         "SB20": {
-            "reduced_fuel_a1": 6.951271057831221e-05,
-            "reduced_fuel_a2": 1.230813290288315,
-            "reduced_fuel_intercept": 240.9698013823472,
+            "reduced_fuel_a1": 7.04e-5,
+            "reduced_fuel_a2": 1.23,
+            "reduced_fuel_intercept": 241,
         },
         "SF34": {
-            "reduced_fuel_a1": 3.761065756624493e-05,
-            "reduced_fuel_a2": 0.8668857367792905,
-            "reduced_fuel_intercept": 105.6885620679833,
+            "reduced_fuel_a1": 3.93e-5,
+            "reduced_fuel_a2": 0.86,
+            "reduced_fuel_intercept": 106,
         },
         "SU95": {
-            "reduced_fuel_a1": -1.590219730163156e-05,
-            "reduced_fuel_a2": 2.6098410185373004,
-            "reduced_fuel_intercept": 758.7285792270977,
+            "reduced_fuel_a1": -1.78e-5,
+            "reduced_fuel_a2": 2.62,
+            "reduced_fuel_intercept": 784,
         },
         "SW4": {
-            "reduced_fuel_a1": 3.887258047974296e-05,
-            "reduced_fuel_a2": 0.5434736952797017,
-            "reduced_fuel_intercept": 79.65634302404072,
+            "reduced_fuel_a1": 3.89e-5,
+            "reduced_fuel_a2": 0.54,
+            "reduced_fuel_intercept": 80,
         },
         "T134": {
-            "reduced_fuel_a1": 0.0001588596945443,
-            "reduced_fuel_a2": 2.2965986311400504,
-            "reduced_fuel_intercept": 1903.6897216554444,
+            "reduced_fuel_a1": 1.65e-4,
+            "reduced_fuel_a2": 2.27,
+            "reduced_fuel_intercept": 1924,
         },
         "T154": {
-            "reduced_fuel_a1": -3.740893149739577e-05,
-            "reduced_fuel_a2": 6.33528504824825,
-            "reduced_fuel_intercept": 1809.615118758342,
+            "reduced_fuel_a1": -3.58e-5,
+            "reduced_fuel_a2": 6.32,
+            "reduced_fuel_intercept": 1827,
         },
         "T204": {
-            "reduced_fuel_a1": 0.0001518677745644,
-            "reduced_fuel_a2": 3.766156885359951,
-            "reduced_fuel_intercept": 1780.3599248722055,
+            "reduced_fuel_a1": 1.51e-4,
+            "reduced_fuel_a2": 3.77,
+            "reduced_fuel_intercept": 1797,
         },
         "Y12": {
-            "reduced_fuel_a1": 6.525762169418137e-06,
-            "reduced_fuel_a2": 0.4703308850859443,
-            "reduced_fuel_intercept": 37.75680617124655,
+            "reduced_fuel_a1": 8.31e-6,
+            "reduced_fuel_a2": 0.47,
+            "reduced_fuel_intercept": 38,
         },
         "YK40": {
-            "reduced_fuel_a1": -0.0001548367132402,
-            "reduced_fuel_a2": 2.4829198850833447,
-            "reduced_fuel_intercept": 506.99668437757646,
+            "reduced_fuel_a1": -1.81e-4,
+            "reduced_fuel_a2": 2.52,
+            "reduced_fuel_intercept": 494,
         },
         "YK42": {
-            "reduced_fuel_a1": -3.869155508162691e-05,
-            "reduced_fuel_a2": 4.270710201048868,
-            "reduced_fuel_intercept": 1162.5017666089334,
+            "reduced_fuel_a1": -3.78e-5,
+            "reduced_fuel_a2": 4.27,
+            "reduced_fuel_intercept": 1164,
         },
     }
 
     @staticmethod
-    def available_aircraft() -> list[str]:
+    def list_aircraft() -> list[str]:
         """
         Returns a sorted list of available ICAO aircraft designators included in the model.
         """
@@ -1750,30 +1774,33 @@ class seymour_etal:
         None,
         "[length]",
     )
-    def calculate_fuel_consumption(
+    def calculate(
         acft: str,
         R: float,
     ) -> float:
         """
-        Given an ICAO aircraft designator and mission range, calculates the fuel burned.
+        Given an ICAO aircraft designator and the great-circle distance, calculates the fuel burned.
 
         Warnings
         --------
-        An "average" payload is assumed for every aircraft. Range is the only variable.
+        An "average" payload is assumed for every aircraft. Distance is the only variable.
 
         Parameters
         ----------
         acft : str
             ICAO Aircraft Designator
         R : float
-            Mission range [length]
+            Great-circle distance between origin and destination [length]
 
         Raises
         ------
         ValueError
             If the ICAO Aircraft Designator is not found in the model data.
         ValueError
-            If the mission range is negative.
+            If the great-circle distance is negative.
+        ValueError
+            If the fit returns no positive fuel burn at this distance
+            (types with a negative $a_1$, far beyond their maximum range).
 
         Returns
         -------
@@ -1785,15 +1812,21 @@ class seymour_etal:
                 f"ICAO Aircraft Designator '{acft}' not found in model data."
             )
         if R < 0:
-            raise ValueError("Mission range must be non-negative.")
+            raise ValueError("Great-circle distance must be non-negative.")
 
         R = R.to("km").magnitude
 
         m_f = (
-            seymour_etal._regression_coefficients[acft]["reduced_fuel_a1"] ** 2 * R
+            seymour_etal._regression_coefficients[acft]["reduced_fuel_a1"] * R**2
             + seymour_etal._regression_coefficients[acft]["reduced_fuel_a2"] * R
             + seymour_etal._regression_coefficients[acft]["reduced_fuel_intercept"]
         )
+        # Types with a negative a1 bend downward far beyond their fitted range.
+        if m_f <= 0:
+            raise ValueError(
+                f"The fit for '{acft}' returns no positive fuel burn at {R:.0f} km, "
+                "which lies outside its fitted range."
+            )
         return m_f * ureg("kg")
 
 
@@ -1874,13 +1907,19 @@ class aim2015:
     - [AIM2015 documentation (v11)](https://web.archive.org/web/20231001131622/https://www.atslab.org/wp-content/uploads/2023/02/AIM-2015-Documentation-v11.pdf)
     - [AIM2015 information in the EU MIDAS system](https://web.jrc.ec.europa.eu/policy-model-inventory/explore/models/model-aim/)
 
+    Licensing Note
+    --------------
+    Parameters from `AircraftPerformanceParams.csv` of AIM2015 v11
+    (UCL Air Transportation Systems Laboratory), MIT License.
+    Full notice in [`NOTICE.md`](https://github.com/sustainableaviation/jetfuelburn/blob/main/NOTICE.md).
+
     Example
     -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import aim2015
-    aim2015.calculate_fuel_consumption(
+    aim2015.calculate(
         acft_size_class=8,
         D_climb=300*ureg.km,
         D_cruise=(15000-300-200)*ureg.km,
@@ -1902,7 +1941,7 @@ class aim2015:
             }
 
     @staticmethod
-    def available_aircraft() -> list[str]:
+    def list_aircraft() -> list[str]:
         """
         Returns a sorted list of available ICAO aircraft designators included in the model.
         """
@@ -1916,7 +1955,7 @@ class aim2015:
         "[length]",
         "[mass]",
     )
-    def calculate_fuel_consumption(
+    def calculate(
         acft_size_class: int,
         D_climb: float,
         D_cruise: float,
@@ -2088,7 +2127,7 @@ class eea_emission_inventory_2009:
     Notes
     -----
     Data on military and transport aircraft from the sub-table `1.A.3.a Aviation vs2.3spreadsheet2-1updated2007.xlsx`
-    [used with permission](../_static/permissions/opensky_network_data_access_confirmation.pdf)
+    [used with permission](../_static/permissions/email_foi_se.pdf)
     by the Swedish Defence Research Agency (foi.se). Note that this data may be a poor representation of
     newer variants of the same aircraft types.
 
@@ -2098,13 +2137,19 @@ class eea_emission_inventory_2009:
     Later versions of the EEA guidebook (2013, 2016, 2019, 2023) instead use the Eurocontrol Advanced Emission Model (AEM), as documented in the respective guidebook files.
     These later models could not be incorporated into `jetfuelburn` for licensing reasons.
 
+    Licensing Note
+    --------------
+    Jet aircraft data from the EMEP/EEA air pollutant emission inventory guidebook 2009, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+    Turboprop and military transport data from FOI (Swedish Defence Research Agency), used with permission.
+    Full notice in [`NOTICE.md`](https://github.com/sustainableaviation/jetfuelburn/blob/main/NOTICE.md).
+
     Example
     -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import eea_emission_inventory_2009
-    eea_emission_inventory_2009.calculate_fuel_consumption(
+    eea_emission_inventory_2009.calculate(
         acft='A320',
         R=1500*ureg.km
     )
@@ -2116,7 +2161,7 @@ class eea_emission_inventory_2009:
         _aircraft_data = json.load(file)
 
     @staticmethod
-    def available_aircraft() -> list[str]:
+    def list_aircraft() -> list[str]:
         """
         Returns a sorted list of available ICAO aircraft designators included in the model.
         """
@@ -2127,7 +2172,7 @@ class eea_emission_inventory_2009:
         None,
         "[length]",
     )
-    def calculate_fuel_consumption(
+    def calculate(
         acft: str,
         R: float,
     ) -> dict:
@@ -2262,9 +2307,9 @@ class myclimate:
     |------------|-------------------|------------------------------------------------------------------------|
     | $f(x)$     | [mass]            | Fuel consumption (cruise) in kg                                        |
     | $LTO$      | [mass]            | Fuel consumption (landing-takeoff-cycle (LTO)) in kg                   |
-    | $x$        | [distance]        | Distance in km                                                         |
-    | $a$        | [mass]            | Coefficient of the quadratic term                                      |
-    | $b$        | [mass]            | Coefficient of the linear term                                         |
+    | $x$        | [distance]        | Flight distance in km: great-circle distance plus 95 km detour         |
+    | $a$        | [mass/distance²]  | Coefficient of the quadratic term                                      |
+    | $b$        | [mass/distance]   | Coefficient of the linear term                                         |
     | $c$        | [mass]            | Coefficient of the constant term                                       |
 
     Notes
@@ -2280,6 +2325,10 @@ class myclimate:
     | A320                  | not provided  | 165.00             |
     | A330                  | not provided  | 287.00             |
     | B777                  | not provided  | 370.00             |
+
+    The coefficients $a$, $b$ and $c$ are those of the two parameter tables in section 11 ("Formula")
+    of the Calculation Principles page: standard short-haul flight, Boeing 737 and A320 in the first table,
+    standard long-haul flight, Boeing 777 and A330 in the second.
 
     Key assumptions of this fuel calculation function:
 
@@ -2301,8 +2350,8 @@ class myclimate:
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.reducedorder import myclimate
-    myclimate.available_aircraft()[0:10]
-    myclimate.calculate_fuel_consumption(
+    myclimate.list_aircraft()[0:10]
+    myclimate.calculate(
         acft='B737',
         x=2200*ureg.km,
     )
@@ -2310,15 +2359,15 @@ class myclimate:
     """
 
     _regression_coefficients = {
-        "A320": {"a": 0.00016, "b": 1.454, "c": 1531.722},
-        "B737": {"a": 0.000032, "b": 2.588, "c": 1212.084},
+        "A320": {"a": 0.000032, "b": 2.588, "c": 1212.084},
+        "B737": {"a": 0.00016, "b": 1.454, "c": 1531.722},
         "A330": {"a": 0.00034, "b": 4.384, "c": 2457.737},
         "B777": {"a": 0.00034, "b": 6.112, "c": 3403.041},
         "standard aircraft": {},
     }
 
     @staticmethod
-    def available_aircraft() -> list[str]:
+    def list_aircraft() -> list[str]:
         """
         Returns a sorted list of available ICAO aircraft designators included in the model.
         """
@@ -2329,7 +2378,7 @@ class myclimate:
         None,  # acft
         "[length]",
     )
-    def calculate_fuel_consumption(
+    def calculate(
         acft: str,
         x: float,
     ) -> float:
@@ -2347,14 +2396,15 @@ class myclimate:
 
         but this would make sense only for the "standard short-haul" and "standard long-haul" aircraft?
 
-        In this function, short-haul aircraft can therefore only be used for distances of <1500km
-        and long-haul aircraft can only be used for distances of >2500km. The `standard aircraft` option
+        In this function, the short-haul aircraft (A320, B737) therefore accept distances up to 2500 km
+        and the long-haul aircraft (A330, B777) distances from 1500 km. The `standard aircraft` option
         can be used for all distances.
 
         Parameters
         ----------
         x : float
-            Mission distance [length].
+            Flight distance [length]. myclimate defines it as the great-circle distance
+            plus a detour correction of 95 km.
 
         Returns
         -------
@@ -2389,3 +2439,486 @@ class myclimate:
             c = myclimate._regression_coefficients[acft]["c"]
 
         return (a * x**2 + b * x + c) * ureg.kg
+
+
+class gossling_etal:
+    r"""
+    This class implements the reduced-order fuel burn model of Gössling, Humpe & Leitão (2024):
+
+    In this model, fuel burn is calculated from a single model-specific hourly fuel consumption value.
+    The hourly fuel consumption values were compiled manually from public manufacturer/broker brochures
+    of aircraft marketed as business or private jets, and paired with flight times derived from
+    [ADS-B Exchange](https://globe.adsbexchange.com) tracking data.
+
+    Fuel burn is calculated according to the function `leg_co2_kg()` in
+    [the code supplement](https://github.com/jorgecardleitao/private-jets/blob/main/src/emissions.rs)
+    to Gössling, Humpe & Leitão (2024):
+
+    $$
+        m_{fuel} = FF \cdot t \cdot \gamma \cdot \rho
+    $$
+
+    with the associated CO2 emissions given by:
+
+    $$
+        m_{CO_2} = m_{fuel} \cdot \epsilon
+    $$
+
+    where:
+
+    | Symbol         | Dimension                | Description                                                       |
+    |----------------|--------------------------|-------------------------------------------------------------------|
+    | $m_{fuel}$     | [mass]                   | Fuel burned during the flight                                     |
+    | $m_{CO_2}$     | [mass]                   | CO2 emitted during the flight                                     |
+    | $FF$           | [volume] / [time]        | Model-specific hourly fuel consumption (gallons per hour)         |
+    | $t$            | [time]                   | Flight time                                                       |
+    | $\gamma$       | [dimensionless]          | Volume of one US gallon in litres ($3.78541 \, \text{L/gal}$)     |
+    | $\rho$         | [mass] / [volume]        | Density of Jet-A fuel ($0.8 \, \text{kg/L}$)                      |
+    | $\epsilon$     | [dimensionless]          | CO2 emitted per unit mass of Jet-A burned ($3.16$)                |
+
+    The hourly fuel consumption $FF$ of a given model is the average over all tabulated sources for that model,
+    computed with integer (truncating) division as in the reference implementation
+    (cf. `load_private_jet_models()` in [`src/model.rs`](https://github.com/jorgecardleitao/private-jets/blob/main/src/model.rs)).
+
+    Notes
+    -----
+    Key assumptions of this fuel calculation function:
+
+    | Parameter             | Assumption                                                                       |
+    |-----------------------|----------------------------------------------------------------------------------|
+    | data availability     | 69 business/private-jet types (75 models in the dataset, 72 in the paper)        |
+    | aircraft payload      | not considered (a single hourly fuel flow is used per model)                     |
+    | climb/descent         | folded into a single model-average hourly fuel flow                              |
+    | reserve fuel uplift   | not considered                                                                   |
+    | diversion fuel uplift | not considered                                                                   |
+
+    Warnings
+    --------
+    The hourly fuel consumption values are figures from manufacturer/broker brochures ("marketing material"),
+    not operational data. The authors estimate the associated uncertainty at a standard deviation of at most 10%,
+    and note that, because a single constant fuel flow is applied irrespective of flight phase, distance, altitude,
+    payload or load factor, the resulting emission estimates "likely represent a lower boundary estimate".
+
+    References
+    ----------
+    Gössling, S., Humpe, A., & Leitão, J. (2024).
+    Private aviation is making a growing contribution to climate change.
+    _Communications Earth & Environment_, 5, 666.
+    doi:[10.1038/s43247-024-01775-z](https://doi.org/10.1038/s43247-024-01775-z)
+
+    See Also
+    --------
+    - Methodology `M-models-for-private-use` in the [Private Jets methodology](https://github.com/jorgecardleitao/private-jets/blob/main/methodology.md)
+    - Fuel/CO2 conversion `leg_co2_kg()` in [`src/emissions.rs`](https://github.com/jorgecardleitao/private-jets/blob/main/src/emissions.rs)
+    - Per-model averaging `load_private_jet_models()` in [`src/model.rs`](https://github.com/jorgecardleitao/private-jets/blob/main/src/model.rs)
+
+    Licensing Note
+    --------------
+    Fuel consumption data from `models.csv` of the private-jets repository by Jorge Leitão, MIT License.
+    Full notice in [`NOTICE.md`](https://github.com/sustainableaviation/jetfuelburn/blob/main/NOTICE.md).
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.reducedorder import gossling_etal
+    gossling_etal.list_aircraft()[0:10]
+    gossling_etal.calculate(
+        acft='GLF5',
+        flight_time=2*ureg.hour,
+    )
+    ```
+    """
+
+    _LITER_PER_US_GALLON = 3.78541  # litres per US gallon
+    _KG_PER_LITER = 0.8  # density of Jet-A fuel [kg/liter]
+
+    _fuel_flow_gph = {}
+    with resources.open_text("jetfuelburn.data.Gossling2024", "models.csv") as file:
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            model_name = row["model"]
+            gph = int(row["gph"])
+            if model_name in _fuel_flow_gph:
+                _fuel_flow_gph[model_name][0] += gph
+                _fuel_flow_gph[model_name][1] += 1
+            else:
+                _fuel_flow_gph[model_name] = [gph, 1]
+    # Average over all tabulated sources per model, replicating the integer (truncating)
+    # division of `load_private_jet_models()` in `src/model.rs` of the reference implementation.
+    _fuel_flow_gph = {
+        model_name: total // count
+        for model_name, (total, count) in _fuel_flow_gph.items()
+    }
+    # Key the models by ICAO aircraft type designator (`icao.csv`). Models that share a designator
+    # are averaged. Models without a designator are left out.
+    _models_by_icao = {}
+    with resources.open_text("jetfuelburn.data.Gossling2024", "icao.csv") as file:
+        for row in csv.DictReader(file):
+            if row["icao"]:
+                _models_by_icao.setdefault(row["icao"], []).append(row["model"])
+    _gph_by_model = _fuel_flow_gph
+    _fuel_flow_gph = {}
+    for icao, models in _models_by_icao.items():
+        total = 0
+        for model_name in models:
+            total += _gph_by_model[model_name]
+        _fuel_flow_gph[icao] = total // len(models)
+
+    @staticmethod
+    def list_aircraft() -> list[str]:
+        """
+        Returns a sorted list of available ICAO aircraft designators included in the model.
+        """
+        return sorted(gossling_etal._fuel_flow_gph.keys())
+
+    @staticmethod
+    @ureg.check(
+        None,  # acft
+        "[time]",
+    )
+    def calculate(
+        acft: str,
+        flight_time: float,
+    ) -> ureg.Quantity:
+        """
+        Given an ICAO aircraft designator and a flight time, calculates the fuel burned.
+
+        Warnings
+        --------
+        A single, constant model-average hourly fuel consumption is assumed. Flight time is the only variable.
+        The associated CO2 emissions can be obtained by multiplying the returned fuel mass by 3.16
+        (kg CO2 per kg of Jet-A burned).
+
+        Parameters
+        ----------
+        acft : str
+            ICAO Aircraft Designator (see `list_aircraft()`)
+        flight_time : float
+            Flight time [time]
+
+        Raises
+        ------
+        ValueError
+            If the ICAO Aircraft Designator is not found in the model data.
+        ValueError
+            If the flight time is negative.
+
+        Returns
+        -------
+        ureg.Quantity
+            Fuel mass [kg]
+        """
+        if acft not in gossling_etal._fuel_flow_gph:
+            raise ValueError(
+                f"ICAO Aircraft Designator '{acft}' not found in model data."
+            )
+        if flight_time < 0 * ureg.hour:
+            raise ValueError("Flight time must be non-negative.")
+
+        hours = flight_time.to("hour").magnitude
+        gph = gossling_etal._fuel_flow_gph[acft]
+
+        m_f = (
+            gph
+            * hours
+            * gossling_etal._LITER_PER_US_GALLON
+            * gossling_etal._KG_PER_LITER
+        )
+        return m_f * ureg("kg")
+
+
+class turgut_etal:
+    r"""
+    This class implements the reduced-order cruise fuel-flow model of Turgut et al. (2014):
+
+    In this model, the cruise-phase fuel flow is calculated from a multiple linear regression
+    on three flight parameters: cruise altitude, aircraft mass, and true airspeed (TAS).
+    The regression coefficients were obtained by fitting these parameters to 4320 cruise observations
+    from 3857 domestic flights operated by Turkish Airlines in January 2011 (using flight data records),
+    for the Airbus A319/A320/A321 and Boeing 737-700/737-800 aircraft.
+
+    Unlike the block-fuel models in this module, this model returns an instantaneous cruise fuel-flow
+    _rate_ (in kg/h) rather than a total mission fuel mass.
+
+    Fuel flow is calculated according to the regression coefficients in Table 2 of Turgut et al. (2014):
+
+    $$
+        FF = C_0 + C_h \cdot h + C_m \cdot m + C_V \cdot V
+    $$
+
+    where:
+
+    | Symbol     | Dimension                        | Description                                       |
+    |------------|----------------------------------|---------------------------------------------------|
+    | $FF$       | [mass] / [time]                  | Cruise fuel-flow rate                             |
+    | $h$        | [length]                         | Cruise altitude                                   |
+    | $m$        | [mass]                           | Aircraft mass                                     |
+    | $V$        | [speed]                          | True airspeed (TAS)                               |
+    | $C_0$      | [mass] / [time]                  | Regression constant (intercept)                   |
+    | $C_h$      | [mass] / ([time] $\cdot$ [length]) | Altitude coefficient                            |
+    | $C_m$      | [mass] / ([time] $\cdot$ [mass]) | Mass coefficient                                  |
+    | $C_V$      | [mass] / ([time] $\cdot$ [speed]) | TAS coefficient                                  |
+
+    The coefficients are those fitted for the variables in the units of the paper
+    (altitude in ft, mass in tonne, TAS in knot, fuel flow in kg/h). Inputs in any other
+    units are converted internally.
+
+    Notes
+    -----
+    Regression models available (cf. Table 2 in Turgut et al. (2014)):
+
+    | Key       | Regression model              | $N$    | Adj. $R^2$ |
+    |-----------|-------------------------------|--------|------------|
+    | `A319`    | Airbus A319                   | 217    | 0.857      |
+    | `A320`    | Airbus A320                   | 1200   | 0.828      |
+    | `A321`    | Airbus A321                   | 664    | 0.865      |
+    | `B737`    | Boeing 737-700                | 213    | 0.913      |
+    | `B738`    | Boeing 737-800                | 1643   | 0.882      |
+    | `Airbus`  | all Airbus aircraft (Group A) | 2081   | 0.931      |
+    | `Boeing`  | all Boeing aircraft (Group B) | 1856   | 0.896      |
+    | `Overall` | all aircraft                  | 3937   | 0.924      |
+
+    Key assumptions of this fuel calculation function:
+
+    | Parameter             | Assumption                                                                  |
+    |-----------------------|-----------------------------------------------------------------------------|
+    | data availability     | 5 narrow-body aircraft, plus 3 grouped models                               |
+    | flight phase          | cruise only (returns a fuel-flow rate, not a mission fuel mass)             |
+    | aircraft payload      | considered implicitly via the total aircraft mass input                     |
+    | climb/descent         | not modelled                                                                |
+    | reserve fuel uplift   | not applicable                                                              |
+    | diversion fuel uplift | not applicable                                                              |
+
+    Warnings
+    --------
+    This model returns a cruise fuel-flow **rate** (kg/h), not a total mission fuel mass.
+    To obtain the fuel burned in cruise, multiply the returned rate by the cruise time.
+
+    Warnings
+    --------
+    The regression is valid only within the domain of the data it was fitted to:
+    cruise altitude of approximately 22,000–40,000 ft, aircraft mass of approximately 45–79 tonne,
+    and TAS of approximately 300–440 knot. Extrapolating the linear model far outside these ranges is unreliable.
+
+    References
+    ----------
+    Turgut, E. T., Cavcar, M., Usanmaz, O., Canarslanlar, A. O., Dogeroglu, T., Armutlu, K., & Yay, O. D. (2014).
+    Fuel flow analysis for the cruise phase of commercial aircraft on domestic routes.
+    _Aerospace Science and Technology_, 37, 1–9.
+    doi:[10.1016/j.ast.2014.04.012](https://doi.org/10.1016/j.ast.2014.04.012)
+
+    See Also
+    --------
+    Table 2 ("The results of the regression analyses, where the FF parameter is dependent variable")
+    in Turgut et al. (2014).
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.reducedorder import turgut_etal
+    turgut_etal.list_aircraft()
+    turgut_etal.calculate(
+        acft='B738',
+        altitude=35000*ureg.ft,
+        mass=60.3*ureg.metric_ton,
+        TAS=364*ureg.knot,
+    )
+    ```
+    """
+
+    _regression_coefficients = {
+        "A319": {
+            "constant": -699.157,
+            "altitude": -0.021,
+            "mass": 17.732,
+            "tas": 6.696,
+        },
+        "A320": {
+            "constant": -621.171,
+            "altitude": -0.022,
+            "mass": 18.655,
+            "tas": 6.513,
+        },
+        "A321": {
+            "constant": -1067.277,
+            "altitude": -0.024,
+            "mass": 21.251,
+            "tas": 7.706,
+        },
+        "B737": {
+            "constant": -713.932,
+            "altitude": -0.025,
+            "mass": 18.670,
+            "tas": 6.964,
+        },
+        "B738": {
+            "constant": -708.506,
+            "altitude": -0.024,
+            "mass": 16.633,
+            "tas": 7.289,
+        },
+        "Airbus": {
+            "constant": -1171.308,
+            "altitude": -0.024,
+            "mass": 27.007,
+            "tas": 6.870,
+        },
+        "Boeing": {
+            "constant": -902.088,
+            "altitude": -0.025,
+            "mass": 20.591,
+            "tas": 7.528,
+        },
+        "Overall": {
+            "constant": -1053.146,
+            "altitude": -0.024,
+            "mass": 24.956,
+            "tas": 6.915,
+        },
+    }
+
+    @staticmethod
+    def list_aircraft() -> list[str]:
+        """
+        Returns a sorted list of available regression models.
+
+        In addition to the individual aircraft designators (`A319`, `A320`, `A321`, `B737`, `B738`),
+        the grouped models `Airbus` (all Airbus), `Boeing` (all Boeing) and `Overall` (all aircraft)
+        are available.
+        """
+        return sorted(turgut_etal._regression_coefficients.keys())
+
+    @staticmethod
+    @ureg.check(
+        None,  # acft
+        "[length]",  # altitude
+        "[mass]",  # mass
+        "[speed]",  # TAS
+    )
+    def calculate(
+        acft: str,
+        altitude: float,
+        mass: float,
+        TAS: float,
+    ) -> ureg.Quantity:
+        """
+        Given a regression model, cruise altitude, aircraft mass and true airspeed, calculates the cruise fuel-flow rate.
+
+        Warnings
+        --------
+        This function returns a cruise fuel-flow **rate** (kg/h), not a total mission fuel mass.
+
+        Parameters
+        ----------
+        acft : str
+            Regression model to use (see `list_aircraft()`)
+        altitude : float
+            Cruise altitude [length]
+        mass : float
+            Aircraft mass [mass]
+        TAS : float
+            True airspeed [speed]
+
+        Raises
+        ------
+        ValueError
+            If the regression model is not found in the model data.
+        ValueError
+            If altitude, mass or true airspeed are not greater than zero.
+
+        Returns
+        -------
+        ureg.Quantity
+            Cruise fuel-flow rate [kg/h]
+        """
+        if acft not in turgut_etal._regression_coefficients:
+            raise ValueError(
+                f"Regression model '{acft}' not found in model data. Please select one of the following: {turgut_etal.list_aircraft()}"
+            )
+        if altitude <= 0 * ureg.m:
+            raise ValueError("Cruise altitude must be greater than zero.")
+        if mass <= 0 * ureg.kg:
+            raise ValueError("Aircraft mass must be greater than zero.")
+        if TAS <= 0 * ureg.knot:
+            raise ValueError("True airspeed must be greater than zero.")
+
+        coef = turgut_etal._regression_coefficients[acft]
+        h = altitude.to("ft").magnitude
+        m = mass.to("metric_ton").magnitude
+        v = TAS.to("knot").magnitude
+
+        ff = (
+            coef["constant"] + coef["altitude"] * h + coef["mass"] * m + coef["tas"] * v
+        )
+        return ff * ureg("kg / hour")
+
+
+def models_for_aircraft(acft: str) -> list[str]:
+    """
+    Given an aircraft type, returns a sorted list of the reduced-order models in this module that support it.
+
+    A model supports an aircraft if the exact string `acft` is returned by that model's
+    `list_aircraft()` method. Each returned name is a class in `jetfuelburn.reducedorder`
+    whose `calculate()` method accepts that aircraft.
+
+    Note that models which are not keyed by aircraft type (e.g. `montlaur_etal` and `sacchi_etal`,
+    which select their regression from seat count or passenger capacity) do not expose an
+    `list_aircraft()` method and are therefore never included.
+
+    Parameters
+    ----------
+    acft : str
+        ICAO Aircraft Designator, exactly as returned by a model's `list_aircraft()` (e.g. `A320`).
+
+    Returns
+    -------
+    list[str]
+        Sorted names of the supporting models (e.g. `['seymour_etal', 'yanto_etal']`),
+        empty if no model supports the given aircraft.
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn.reducedorder import models_for_aircraft
+    models_for_aircraft('A320')
+    ```
+    """
+    matches = []
+    for name, obj in list(globals().items()):
+        if not isinstance(obj, type) or obj.__module__ != __name__:
+            continue
+        list_aircraft = getattr(obj, "list_aircraft", None)
+        if not callable(list_aircraft):
+            continue
+        supported = list_aircraft()
+        if isinstance(supported, (list, tuple)) and acft in supported:
+            matches.append(name)
+    return sorted(matches)
+
+
+# Deprecated aliases of methods renamed in jetfuelburn 4.0.0 (to be removed in 5.0.0).
+from jetfuelburn.utility.code import _add_deprecated_method_aliases
+
+for _cls in (montlaur_etal, sacchi_etal):
+    _add_deprecated_method_aliases(_cls, {"calculate_fuel_consumption": "calculate"})
+for _cls in (
+    yanto_etal,
+    lee_etal,
+    seymour_etal,
+    aim2015,
+    eea_emission_inventory_2009,
+    myclimate,
+):
+    _add_deprecated_method_aliases(
+        _cls,
+        {
+            "calculate_fuel_consumption": "calculate",
+            "available_aircraft": "list_aircraft",
+        },
+    )
+del _cls
