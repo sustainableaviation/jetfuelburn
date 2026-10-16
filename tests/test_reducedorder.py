@@ -19,6 +19,7 @@ from .fixtures.reducedorder import (
     fixture_lee_B732,
     fixture_eea_A320,
     fixture_myclimate_standard,
+    fixture_myclimate_aircraft,
 )
 
 
@@ -245,11 +246,27 @@ def test_myclimate_standard(fixture_myclimate_standard):
     for x in params:
         input_data, expected_output = make_case(x)
         calculated_output = myclimate.calculate(
-            acft="standard aircraft",
+            acft=input_data["acft"],
             x=input_data["x"],
         )
         assert approx_with_units(
             value_check=calculated_output,
             value_expected=expected_output.to("kg"),
             rel=0.075,
+        )
+
+
+def test_myclimate_aircraft(fixture_myclimate_aircraft):
+    make_case, params = fixture_myclimate_aircraft
+
+    for acft, x in params:
+        input_data, expected_output = make_case(acft, x)
+        calculated_output = myclimate.calculate(
+            acft=input_data["acft"],
+            x=input_data["x"],
+        )
+        assert approx_with_units(
+            value_check=calculated_output,
+            value_expected=expected_output.to("kg"),
+            rel=1e-9,
         )

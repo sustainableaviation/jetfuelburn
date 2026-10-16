@@ -213,7 +213,7 @@ def fixture_eea_A320():
 @pytest.fixture(scope="module")
 def fixture_myclimate_standard():
     """
-    Fixture returning a factory function to generate test cases for myclimate A320.
+    Fixture returning a factory function to generate test cases for the myclimate "standard aircraft".
 
     The `cases` dictionary contains:
     - `key`: distance [km]
@@ -221,21 +221,21 @@ def fixture_myclimate_standard():
 
     Notes
     -----
-    Expected values are computed using the myclimate formula for A320:
-    fuel = 0.00016 * x^2 + 1.454 * x + 1531.722, where x is in km.
+    Expected values are computed using the myclimate formula fuel = a * x^2 + b * x + c, where x is in km,
+    with the coefficients of the "standard short-haul flight" (x < 1500 km) and the "standard long-haul flight"
+    (x > 2500 km), linearly interpolated in between.
     Fuel burn includes both cruise and LTO phases.
-    Distances are limited to <= 2500 km for A320, as per the method's restrictions.
 
     See Also
     --------
     [Pytest Documentation "Factories as Fixtures"](https://docs.pytest.org/en/stable/how-to/fixtures.html#factories-as-fixtures)
 
-    xeferences
+    References
     ----------
     [myClimate Flight Emissions Calculator Calculation Principles](https://www.myclimate.org/en/information/about-myclimate/downloads/flight-emission-calculator/)
     """
     base_data = {
-        "acft": "A320",
+        "acft": "standard aircraft",
     }
 
     cases = {
@@ -249,6 +249,50 @@ def fixture_myclimate_standard():
             raise ValueError(f"No expected output defined for x={x}")
         input_data = base_data | {"x": x}
         expected_output = cases[x]
+        return input_data, expected_output
+
+    return _make_case, list(cases.keys())
+
+
+@pytest.fixture(scope="module")
+def fixture_myclimate_aircraft():
+    """
+    Fixture returning a factory function to generate test cases for the myclimate aircraft types.
+
+    The `cases` dictionary contains:
+    - `key`: (aircraft type, distance [km])
+    - `value`: expected value for calculated fuel burn [kg]
+
+    Notes
+    -----
+    Expected values are computed by hand as fuel = a * x^2 + b * x + c, with the coefficients
+    of the parameter tables in section 11 ("Formula") of the myclimate Calculation Principles page:
+
+    | Aircraft | a        | b     | c        |
+    |----------|----------|-------|----------|
+    | B737     | 0.00016  | 1.454 | 1531.722 |
+    | A320     | 0.000032 | 2.588 | 1212.084 |
+    | B777     | 0.00034  | 6.112 | 3403.041 |
+    | A330     | 0.00034  | 4.384 | 2457.737 |
+
+    Short-haul types are evaluated at 1000 km, long-haul types at 5000 km.
+
+    References
+    ----------
+    [myClimate Flight Emissions Calculator Calculation Principles](https://www.myclimate.org/en/information/about-myclimate/downloads/flight-emission-calculator/)
+    """
+    cases = {
+        ("B737", 1000 * ureg.km): 3145.722 * ureg.kg,
+        ("A320", 1000 * ureg.km): 3832.084 * ureg.kg,
+        ("B777", 5000 * ureg.km): 42463.041 * ureg.kg,
+        ("A330", 5000 * ureg.km): 32877.737 * ureg.kg,
+    }
+
+    def _make_case(acft, x):
+        if (acft, x) not in cases:
+            raise ValueError(f"No expected output defined for acft={acft}, x={x}")
+        input_data = {"acft": acft, "x": x}
+        expected_output = cases[(acft, x)]
         return input_data, expected_output
 
     return _make_case, list(cases.keys())

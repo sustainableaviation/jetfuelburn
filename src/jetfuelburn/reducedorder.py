@@ -2307,9 +2307,9 @@ class myclimate:
     |------------|-------------------|------------------------------------------------------------------------|
     | $f(x)$     | [mass]            | Fuel consumption (cruise) in kg                                        |
     | $LTO$      | [mass]            | Fuel consumption (landing-takeoff-cycle (LTO)) in kg                   |
-    | $x$        | [distance]        | Distance in km                                                         |
-    | $a$        | [mass]            | Coefficient of the quadratic term                                      |
-    | $b$        | [mass]            | Coefficient of the linear term                                         |
+    | $x$        | [distance]        | Flight distance in km: great-circle distance plus 95 km detour         |
+    | $a$        | [mass/distance²]  | Coefficient of the quadratic term                                      |
+    | $b$        | [mass/distance]   | Coefficient of the linear term                                         |
     | $c$        | [mass]            | Coefficient of the constant term                                       |
 
     Notes
@@ -2325,6 +2325,10 @@ class myclimate:
     | A320                  | not provided  | 165.00             |
     | A330                  | not provided  | 287.00             |
     | B777                  | not provided  | 370.00             |
+
+    The coefficients $a$, $b$ and $c$ are those of the two parameter tables in section 11 ("Formula")
+    of the Calculation Principles page: standard short-haul flight, Boeing 737 and A320 in the first table,
+    standard long-haul flight, Boeing 777 and A330 in the second.
 
     Key assumptions of this fuel calculation function:
 
@@ -2355,8 +2359,8 @@ class myclimate:
     """
 
     _regression_coefficients = {
-        "A320": {"a": 0.00016, "b": 1.454, "c": 1531.722},
-        "B737": {"a": 0.000032, "b": 2.588, "c": 1212.084},
+        "A320": {"a": 0.000032, "b": 2.588, "c": 1212.084},
+        "B737": {"a": 0.00016, "b": 1.454, "c": 1531.722},
         "A330": {"a": 0.00034, "b": 4.384, "c": 2457.737},
         "B777": {"a": 0.00034, "b": 6.112, "c": 3403.041},
         "standard aircraft": {},
@@ -2392,14 +2396,15 @@ class myclimate:
 
         but this would make sense only for the "standard short-haul" and "standard long-haul" aircraft?
 
-        In this function, short-haul aircraft can therefore only be used for distances of <1500km
-        and long-haul aircraft can only be used for distances of >2500km. The `standard aircraft` option
+        In this function, the short-haul aircraft (A320, B737) therefore accept distances up to 2500 km
+        and the long-haul aircraft (A330, B777) distances from 1500 km. The `standard aircraft` option
         can be used for all distances.
 
         Parameters
         ----------
         x : float
-            Mission distance [length].
+            Flight distance [length]. myclimate defines it as the great-circle distance
+            plus a detour correction of 95 km.
 
         Returns
         -------
