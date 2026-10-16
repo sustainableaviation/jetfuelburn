@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=75.0"]
+requires = ["setuptools>=77.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -13,7 +13,8 @@ maintainers = [
 
 description = "A Python package for calculating fuel burn of commercial aircraft."
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
+license-files = ["LICENSE.txt", "NOTICE.md"]
 dynamic = ["version"]
 
 # https://pypi.org/classifiers/
