@@ -2,6 +2,26 @@
 
 ## Data licensed under MIT
 
+### Private jet fuel consumption (`reducedorder.gossling_etal`)
+
+File: `src/jetfuelburn/data/Gossling2024/models.csv`
+
+Source: `src/models.csv` of the Private Jets repository, https://github.com/jorgecardleitao/private-jets
+(commit `8cbc1093`, retrieved 2026-07-14), unmodified.
+The dataset underlies Gössling, S., Humpe, A., & Leitão, J. (2024).
+Private aviation is making a growing contribution to climate change.
+_Communications Earth & Environment_, 5, 666. https://doi.org/10.1038/s43247-024-01775-z
+
+```
+Copyright (c) 2024 Jorge Leitão
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
+
 ### AIM2015 aircraft performance parameters (`reducedorder.aim2015`)
 
 File: `src/jetfuelburn/data/AIM2015/AIM2015_v11_AircraftPerformanceParams.csv`
@@ -69,8 +89,8 @@ part 3 full flight profile when the trajectory is specified.
 _The Aeronautical Journal_, 129(1334), 825-861. https://doi.org/10.1017/aer.2024.141
 
 © The Author(s), 2025. Published by Cambridge University Press on behalf of Royal Aeronautical Society.
-Changes: Table 2 transcribed to CSV, values as published, without the columns psi_6, (FL)_MO and M_MO;
-equations re-implemented in Python.
+Changes: Table 2 transcribed to CSV, values as published, without the columns psi_6, (FL)_MO and M_MO.
+Equations re-implemented in Python.
 
 ### EMEP/EEA air pollutant emission inventory guidebook 2009 (`reducedorder.eea_emission_inventory_2009`)
 

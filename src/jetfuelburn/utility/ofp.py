@@ -69,7 +69,7 @@ def _get_aircraft_performance(
         ICAO aircraft type designator (e.g. ``'B123'``), matching a top-level
         key in the JSON file.
     phase : str
-        Flight phase; must be either ``'climb'`` or ``'descent'``.
+        Flight phase, either ``'climb'`` or ``'descent'``.
     alt : pint.Quantity
         Current altitude with a length dimension (e.g. ``30000 * ureg.ft``).
         The ``@ureg.check`` decorator enforces dimensional correctness.
@@ -77,8 +77,8 @@ def _get_aircraft_performance(
     Returns
     -------
     pint.Quantity
-        Rate of climb or descent in ``ft/min``.  Climb rates are positive;
-        descent rates are negative.
+        Rate of climb or descent in ``ft/min``.  Climb rates are positive.
+        Descent rates are negative.
 
     Raises
     ------
@@ -197,7 +197,7 @@ def generate_4d_trajectory(
         ICAO aircraft type designator (e.g. ``'B123'``), passed directly to
         :func:`_get_aircraft_performance`.
     perf_data_path : Path
-        Path to the JSON performance data file; forwarded to
+        Path to the JSON performance data file, forwarded to
         :func:`_get_aircraft_performance`.
     time_resolution : pint.Quantity, optional
         Resampling resolution as a Pint time quantity (e.g. ``1 * ureg.minute``).
@@ -259,7 +259,7 @@ def generate_4d_trajectory(
     - **Descent**: the aircraft holds its current altitude for as long as possible, then begins
       descending at the applicable rate so as to arrive at the target altitude exactly at the
       next waypoint (Top of Descent / TOD back-calculation). The TOD is estimated using the
-      descent rate at the current altitude; as the aircraft descends through multiple regimes
+      descent rate at the current altitude. As the aircraft descends through multiple regimes,
       the rate is re-evaluated at each time step.
 
     ![Flight Plan Diagram](../_static/ofp_1.svg)

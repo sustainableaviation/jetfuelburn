@@ -66,8 +66,8 @@ readme = {file = "README.md"}
 testpaths = ["tests"]
 
 [tool.coverage.run]
-# figure/plot generation and the closed-form stub are not unit-tested;
-# exclude them so the reported percentage reflects testable code
+# figure/plot generation and the closed-form stub are not unit-tested.
+# Exclude them so the reported percentage reflects testable code
 omit = [
     "*/jetfuelburn/figures/*",
     "*/jetfuelburn/closedform.py",

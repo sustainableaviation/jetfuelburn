@@ -296,3 +296,95 @@ def fixture_myclimate_aircraft():
         return input_data, expected_output
 
     return _make_case, list(cases.keys())
+
+
+@pytest.fixture(scope="module")
+def fixture_gossling_gulfstream5():
+    """
+    Fixture returning a factory function to generate test cases.
+
+    The `cases` dictionary contains:
+    - `key`: flight time [hours]
+    - `value`: expected value for calculated fuel burn [kg]
+
+    Notes
+    -----
+    Expected values are computed with the model formula for the `GLF5` ('GULFSTREAM 5' in the dataset),
+    whose source-averaged hourly fuel consumption is 455 gph:
+    fuel = 455 [gph] * t [h] * 3.78541 [L/gal] * 0.8 [kg/L].
+
+    See Also
+    --------
+    [Pytest Documentation "Factories as Fixtures"](https://docs.pytest.org/en/stable/how-to/fixtures.html#factories-as-fixtures)
+
+    References
+    ----------
+    [`src/emissions.rs` in the Private Jets data repository](https://github.com/jorgecardleitao/private-jets/blob/main/src/emissions.rs)
+    """
+    base_data = {
+        "acft": "GLF5",
+    }
+
+    cases = {
+        90 * ureg.minute: 2066.83386 * ureg.kg,
+        2 * ureg.hour: 2755.7784800000004 * ureg.kg,
+        5 * ureg.hour: 6889.4462 * ureg.kg,
+    }
+
+    def _make_case(t):
+        if t not in cases:
+            raise ValueError(f"No expected output defined for t={t}")
+        input_data = base_data | {"flight_time": t}
+        expected_output = cases[t]
+        return input_data, expected_output
+
+    return _make_case, list(cases.keys())
+
+
+@pytest.fixture(scope="module")
+def fixture_turgut_cruise():
+    """
+    Fixture returning a factory function to generate test cases.
+
+    The `cases` dictionary contains:
+    - `key`: tuple of (regression model, altitude [ft], mass [tonne], TAS [knot])
+    - `value`: expected cruise fuel-flow rate [kg/h]
+
+    Notes
+    -----
+    The `B738` case at (35,000 ft, 60.3 tonne, 364 knot) is the worked example given in
+    Section 4 of Turgut et al. (2014): the paper reports that cruising 2000/4000/8000 ft
+    below the optimum altitude increases hourly fuel consumption by 2.3%/4.6%/9.1%, which
+    reproduces exactly from these coefficients. The remaining cases are evaluated directly
+    from the regression coefficients in Table 2.
+
+    See Also
+    --------
+    [Pytest Documentation "Factories as Fixtures"](https://docs.pytest.org/en/stable/how-to/fixtures.html#factories-as-fixtures)
+
+    References
+    ----------
+    [Table 2 in Turgut et al. (2014)](https://doi.org/10.1016/j.ast.2014.04.012)
+    """
+    cases = {
+        ("B738", 35000, 60.3, 364): 2107.6599 * ureg("kg/hour"),
+        ("A320", 35000, 59.6, 370): 2130.477 * ureg("kg/hour"),
+        ("A319", 30000, 56.2, 350): 2010.9813999999997 * ureg("kg/hour"),
+        ("Airbus", 36000, 62, 385): 2284.076 * ureg("kg/hour"),
+        ("Overall", 35000, 60, 380): 2231.9139999999998 * ureg("kg/hour"),
+    }
+
+    def _make_case(key):
+        if key not in cases:
+            raise ValueError(f"No expected output defined for {key}")
+        acft, altitude, mass, tas = key
+        input_data = {
+            "acft": acft,
+            "altitude": altitude * ureg.ft,
+            "mass": mass * ureg.metric_ton,
+            "TAS": tas * ureg.knot,
+        }
+        expected_output = cases[key]
+        return input_data, expected_output
+
+    return _make_case, list(cases.keys())

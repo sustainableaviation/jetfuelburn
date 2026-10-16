@@ -1,5 +1,7 @@
+import re
 import pytest
 from pint import DimensionalityError
+import jetfuelburn.reducedorder
 from jetfuelburn import ureg
 from jetfuelburn.utility.tests import approx_with_units
 from jetfuelburn.reducedorder import (
@@ -11,6 +13,9 @@ from jetfuelburn.reducedorder import (
     myclimate,
     sacchi_etal,
     montlaur_etal,
+    gossling_etal,
+    turgut_etal,
+    models_for_aircraft,
 )
 from .fixtures.reducedorder import (
     fixture_yanto_B739,
@@ -20,6 +25,8 @@ from .fixtures.reducedorder import (
     fixture_eea_A320,
     fixture_myclimate_standard,
     fixture_myclimate_aircraft,
+    fixture_gossling_gulfstream5,
+    fixture_turgut_cruise,
 )
 
 
@@ -216,7 +223,7 @@ def test_seymour(fixture_seymour_B738):
 
 
 def test_seymour_outside_fitted_range():
-    # D228: a1 < 0 and a maximum range of 500 km (Table L.6); the fit drops below zero at about 1,613 km.
+    # D228: a1 < 0 and a maximum range of 500 km (Table L.6). The fit drops below zero at about 1,613 km.
     assert seymour_etal.calculate(acft="D228", R=500 * ureg.km) > 0 * ureg.kg
     with pytest.raises(ValueError, match="outside its fitted range"):
         seymour_etal.calculate(acft="D228", R=2000 * ureg.km)
@@ -269,4 +276,186 @@ def test_myclimate_aircraft(fixture_myclimate_aircraft):
             value_check=calculated_output,
             value_expected=expected_output.to("kg"),
             rel=1e-9,
+        )
+
+
+def test_gossling_gulfstream5(fixture_gossling_gulfstream5):
+    make_case, params = fixture_gossling_gulfstream5
+
+    for t in params:
+        input_data, expected_output = make_case(t)
+        calculated_output = gossling_etal.calculate(
+            acft=input_data["acft"],
+            flight_time=input_data["flight_time"],
+        )
+        assert approx_with_units(
+            value_check=calculated_output,
+            value_expected=expected_output.to("kg"),
+            rel=1e-9,
+        )
+
+
+def test_gossling_consumption_range_matches_paper():
+    """
+    The abstract of Gössling et al. (2024) states that the identified private-jet models have
+    a fuel consumption ranging between 48 and 576 gallons per hour.
+    """
+    fuel_flows = gossling_etal._fuel_flow_gph.values()
+    assert min(fuel_flows) == 48
+    assert max(fuel_flows) == 576
+
+
+def test_gossling_model_count():
+    """
+    Guards the aircraft count documented in the class docstring against silent changes
+    to the bundled `data/Gossling2024/models.csv` dataset or its `icao.csv` mapping.
+    """
+    assert len(gossling_etal.list_aircraft()) == 69
+
+
+def test_gossling_icao_mapping():
+    """
+    Every model of the dataset appears in `icao.csv`, and every aircraft key is an ICAO designator.
+    """
+    import csv
+    from importlib import resources
+
+    package = "jetfuelburn.data.Gossling2024"
+    with resources.open_text(package, "models.csv") as file:
+        models = {row["model"] for row in csv.DictReader(file)}
+    with resources.open_text(package, "icao.csv") as file:
+        mapping = {row["model"]: row["icao"] for row in csv.DictReader(file)}
+    assert set(mapping) == models
+    assert all(
+        re.fullmatch(r"[A-Z][A-Z0-9]{1,3}", a) for a in gossling_etal.list_aircraft()
+    )
+    assert "GULFSTREAM 5" not in gossling_etal.list_aircraft()
+
+
+def test_turgut_cruise(fixture_turgut_cruise):
+    make_case, params = fixture_turgut_cruise
+
+    for key in params:
+        input_data, expected_output = make_case(key)
+        calculated_output = turgut_etal.calculate(
+            acft=input_data["acft"],
+            altitude=input_data["altitude"],
+            mass=input_data["mass"],
+            TAS=input_data["TAS"],
+        )
+        assert approx_with_units(
+            value_check=calculated_output.to("kg/hour"),
+            value_expected=expected_output.to("kg/hour"),
+            rel=1e-9,
+        )
+
+
+def test_turgut_below_optimum_altitude_matches_paper():
+    """
+    Section 4 of Turgut et al. (2014) states that, for the B738 at the mean cruise conditions
+    (35,000 ft, 60.3 tonne, 364 knot), cruising 2000/4000/8000 ft below the optimum altitude
+    increases hourly fuel consumption by 2.3%/4.6%/9.1%, respectively.
+    """
+    mass = 60.3 * ureg.metric_ton
+    tas = 364 * ureg.knot
+    ff_optimum = turgut_etal.calculate(
+        acft="B738", altitude=35000 * ureg.ft, mass=mass, TAS=tas
+    )
+    for delta_ft, expected_increase in ((2000, 0.023), (4000, 0.046), (8000, 0.091)):
+        ff_below = turgut_etal.calculate(
+            acft="B738", altitude=(35000 - delta_ft) * ureg.ft, mass=mass, TAS=tas
+        )
+        increase = (ff_below - ff_optimum) / ff_optimum
+        assert increase.magnitude == pytest.approx(expected_increase, abs=0.001)
+
+
+def test_turgut_returns_rate():
+    result = turgut_etal.calculate(
+        acft="A320",
+        altitude=35000 * ureg.ft,
+        mass=60 * ureg.metric_ton,
+        TAS=370 * ureg.knot,
+    )
+    assert result.check("[mass]/[time]")
+
+
+def test_turgut_invalid_input_raising():
+    base = dict(
+        altitude=35000 * ureg.ft, mass=60 * ureg.metric_ton, TAS=364 * ureg.knot
+    )
+    with pytest.raises(ValueError):
+        turgut_etal.calculate(acft="NOT A MODEL", **base)
+    with pytest.raises(ValueError):
+        turgut_etal.calculate(
+            acft="B738",
+            altitude=-1 * ureg.ft,
+            mass=60 * ureg.metric_ton,
+            TAS=364 * ureg.knot,
+        )
+    with pytest.raises(ValueError):
+        turgut_etal.calculate(
+            acft="B738", altitude=35000 * ureg.ft, mass=0 * ureg.kg, TAS=364 * ureg.knot
+        )
+    with pytest.raises(ValueError):
+        turgut_etal.calculate(
+            acft="B738",
+            altitude=35000 * ureg.ft,
+            mass=60 * ureg.metric_ton,
+            TAS=-5 * ureg.knot,
+        )
+
+
+def test_turgut_dimensionality_checks():
+    with pytest.raises(DimensionalityError):
+        turgut_etal.calculate(
+            acft="B738",
+            altitude=35000 * ureg.kg,  # Wrong dimension
+            mass=60 * ureg.metric_ton,
+            TAS=364 * ureg.knot,
+        )
+
+
+def test_models_for_aircraft():
+    # A320 is an exact key in several ICAO-designator-keyed models
+    result = models_for_aircraft("A320")
+    assert result == sorted(result)  # sorted output
+    for expected in ("yanto_etal", "seymour_etal", "turgut_etal", "aim2015"):
+        assert expected in result
+    # each returned model must genuinely list the aircraft
+    for name in result:
+        model = getattr(jetfuelburn.reducedorder, name)
+        assert "A320" in model.list_aircraft()
+
+    # an ICAO designator listed by one model only, and one listed by several
+    assert models_for_aircraft("C25M") == ["gossling_etal"]
+    assert models_for_aircraft("GLF5") == ["gossling_etal", "seymour_etal"]
+    assert models_for_aircraft("Overall") == ["turgut_etal"]
+
+    # models without an list_aircraft() method are never included
+    assert "montlaur_etal" not in models_for_aircraft("A320")
+    assert "sacchi_etal" not in models_for_aircraft("A320")
+
+    # matching is exact: unknown / wrong-case aircraft return an empty list
+    assert models_for_aircraft("a320") == []
+    assert models_for_aircraft("NOT AN AIRCRAFT") == []
+
+
+def test_gossling_unit_consistency():
+    result = gossling_etal.calculate(acft="GLF5", flight_time=2 * ureg.hour)
+    assert result.check("[mass]")
+
+
+def test_gossling_invalid_input_raising():
+    with pytest.raises(ValueError):
+        gossling_etal.calculate(acft="NOT AN AIRCRAFT", flight_time=1 * ureg.hour)
+    with pytest.raises(ValueError):
+        gossling_etal.calculate(acft="GULFSTREAM 5", flight_time=1 * ureg.hour)
+    with pytest.raises(ValueError):
+        gossling_etal.calculate(acft="GLF5", flight_time=-1 * ureg.hour)
+
+
+def test_gossling_dimensionality_checks():
+    with pytest.raises(DimensionalityError):
+        gossling_etal.calculate(
+            acft="GLF5", flight_time=100 * ureg.km  # Wrong dimension
         )

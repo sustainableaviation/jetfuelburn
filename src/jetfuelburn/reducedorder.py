@@ -1034,7 +1034,7 @@ class seymour_etal:
     Each fit is based on 25 simulated missions between 200 km (or the type's shortest distance in the OAG data, if longer)
     and the type's maximum range in Table L.6 of the Supplementary Information (e.g. 5,803 km for the B738).
     Results beyond that range are extrapolations. For the 26 types with a negative $a_1$, the fit bends downward
-    beyond that range; `calculate()` raises a `ValueError` where the fit no longer returns a positive fuel burn.
+    beyond that range. Where the fit no longer returns a positive fuel burn, `calculate()` raises a `ValueError`.
 
     Warnings
     --------
@@ -2439,6 +2439,466 @@ class myclimate:
             c = myclimate._regression_coefficients[acft]["c"]
 
         return (a * x**2 + b * x + c) * ureg.kg
+
+
+class gossling_etal:
+    r"""
+    This class implements the reduced-order fuel burn model of Gössling, Humpe & Leitão (2024):
+
+    In this model, fuel burn is calculated from a single model-specific hourly fuel consumption value.
+    The hourly fuel consumption values were compiled manually from public manufacturer/broker brochures
+    of aircraft marketed as business or private jets, and paired with flight times derived from
+    [ADS-B Exchange](https://globe.adsbexchange.com) tracking data.
+
+    Fuel burn is calculated according to the function `leg_co2_kg()` in
+    [the code supplement](https://github.com/jorgecardleitao/private-jets/blob/main/src/emissions.rs)
+    to Gössling, Humpe & Leitão (2024):
+
+    $$
+        m_{fuel} = FF \cdot t \cdot \gamma \cdot \rho
+    $$
+
+    with the associated CO2 emissions given by:
+
+    $$
+        m_{CO_2} = m_{fuel} \cdot \epsilon
+    $$
+
+    where:
+
+    | Symbol         | Dimension                | Description                                                       |
+    |----------------|--------------------------|-------------------------------------------------------------------|
+    | $m_{fuel}$     | [mass]                   | Fuel burned during the flight                                     |
+    | $m_{CO_2}$     | [mass]                   | CO2 emitted during the flight                                     |
+    | $FF$           | [volume] / [time]        | Model-specific hourly fuel consumption (gallons per hour)         |
+    | $t$            | [time]                   | Flight time                                                       |
+    | $\gamma$       | [dimensionless]          | Volume of one US gallon in litres ($3.78541 \, \text{L/gal}$)     |
+    | $\rho$         | [mass] / [volume]        | Density of Jet-A fuel ($0.8 \, \text{kg/L}$)                      |
+    | $\epsilon$     | [dimensionless]          | CO2 emitted per unit mass of Jet-A burned ($3.16$)                |
+
+    The hourly fuel consumption $FF$ of a given model is the average over all tabulated sources for that model,
+    computed with integer (truncating) division as in the reference implementation
+    (cf. `load_private_jet_models()` in [`src/model.rs`](https://github.com/jorgecardleitao/private-jets/blob/main/src/model.rs)).
+
+    Notes
+    -----
+    Key assumptions of this fuel calculation function:
+
+    | Parameter             | Assumption                                                                       |
+    |-----------------------|----------------------------------------------------------------------------------|
+    | data availability     | 69 business/private-jet types (75 models in the dataset, 72 in the paper)        |
+    | aircraft payload      | not considered (a single hourly fuel flow is used per model)                     |
+    | climb/descent         | folded into a single model-average hourly fuel flow                              |
+    | reserve fuel uplift   | not considered                                                                   |
+    | diversion fuel uplift | not considered                                                                   |
+
+    Warnings
+    --------
+    The hourly fuel consumption values are figures from manufacturer/broker brochures ("marketing material"),
+    not operational data. The authors estimate the associated uncertainty at a standard deviation of at most 10%,
+    and note that, because a single constant fuel flow is applied irrespective of flight phase, distance, altitude,
+    payload or load factor, the resulting emission estimates "likely represent a lower boundary estimate".
+
+    References
+    ----------
+    Gössling, S., Humpe, A., & Leitão, J. (2024).
+    Private aviation is making a growing contribution to climate change.
+    _Communications Earth & Environment_, 5, 666.
+    doi:[10.1038/s43247-024-01775-z](https://doi.org/10.1038/s43247-024-01775-z)
+
+    See Also
+    --------
+    - Methodology `M-models-for-private-use` in the [Private Jets methodology](https://github.com/jorgecardleitao/private-jets/blob/main/methodology.md)
+    - Fuel/CO2 conversion `leg_co2_kg()` in [`src/emissions.rs`](https://github.com/jorgecardleitao/private-jets/blob/main/src/emissions.rs)
+    - Per-model averaging `load_private_jet_models()` in [`src/model.rs`](https://github.com/jorgecardleitao/private-jets/blob/main/src/model.rs)
+
+    Licensing Note
+    --------------
+    Fuel consumption data from `models.csv` of the private-jets repository by Jorge Leitão, MIT License.
+    Full notice in [`NOTICE.md`](https://github.com/sustainableaviation/jetfuelburn/blob/main/NOTICE.md).
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.reducedorder import gossling_etal
+    gossling_etal.list_aircraft()[0:10]
+    gossling_etal.calculate(
+        acft='GLF5',
+        flight_time=2*ureg.hour,
+    )
+    ```
+    """
+
+    _LITER_PER_US_GALLON = 3.78541  # litres per US gallon
+    _KG_PER_LITER = 0.8  # density of Jet-A fuel [kg/liter]
+
+    _fuel_flow_gph = {}
+    with resources.open_text("jetfuelburn.data.Gossling2024", "models.csv") as file:
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            model_name = row["model"]
+            gph = int(row["gph"])
+            if model_name in _fuel_flow_gph:
+                _fuel_flow_gph[model_name][0] += gph
+                _fuel_flow_gph[model_name][1] += 1
+            else:
+                _fuel_flow_gph[model_name] = [gph, 1]
+    # Average over all tabulated sources per model, replicating the integer (truncating)
+    # division of `load_private_jet_models()` in `src/model.rs` of the reference implementation.
+    _fuel_flow_gph = {
+        model_name: total // count
+        for model_name, (total, count) in _fuel_flow_gph.items()
+    }
+    # Key the models by ICAO aircraft type designator (`icao.csv`). Models that share a designator
+    # are averaged. Models without a designator are left out.
+    _models_by_icao = {}
+    with resources.open_text("jetfuelburn.data.Gossling2024", "icao.csv") as file:
+        for row in csv.DictReader(file):
+            if row["icao"]:
+                _models_by_icao.setdefault(row["icao"], []).append(row["model"])
+    _gph_by_model = _fuel_flow_gph
+    _fuel_flow_gph = {}
+    for icao, models in _models_by_icao.items():
+        total = 0
+        for model_name in models:
+            total += _gph_by_model[model_name]
+        _fuel_flow_gph[icao] = total // len(models)
+
+    @staticmethod
+    def list_aircraft() -> list[str]:
+        """
+        Returns a sorted list of available ICAO aircraft designators included in the model.
+        """
+        return sorted(gossling_etal._fuel_flow_gph.keys())
+
+    @staticmethod
+    @ureg.check(
+        None,  # acft
+        "[time]",
+    )
+    def calculate(
+        acft: str,
+        flight_time: float,
+    ) -> ureg.Quantity:
+        """
+        Given an ICAO aircraft designator and a flight time, calculates the fuel burned.
+
+        Warnings
+        --------
+        A single, constant model-average hourly fuel consumption is assumed. Flight time is the only variable.
+        The associated CO2 emissions can be obtained by multiplying the returned fuel mass by 3.16
+        (kg CO2 per kg of Jet-A burned).
+
+        Parameters
+        ----------
+        acft : str
+            ICAO Aircraft Designator (see `list_aircraft()`)
+        flight_time : float
+            Flight time [time]
+
+        Raises
+        ------
+        ValueError
+            If the ICAO Aircraft Designator is not found in the model data.
+        ValueError
+            If the flight time is negative.
+
+        Returns
+        -------
+        ureg.Quantity
+            Fuel mass [kg]
+        """
+        if acft not in gossling_etal._fuel_flow_gph:
+            raise ValueError(
+                f"ICAO Aircraft Designator '{acft}' not found in model data."
+            )
+        if flight_time < 0 * ureg.hour:
+            raise ValueError("Flight time must be non-negative.")
+
+        hours = flight_time.to("hour").magnitude
+        gph = gossling_etal._fuel_flow_gph[acft]
+
+        m_f = (
+            gph
+            * hours
+            * gossling_etal._LITER_PER_US_GALLON
+            * gossling_etal._KG_PER_LITER
+        )
+        return m_f * ureg("kg")
+
+
+class turgut_etal:
+    r"""
+    This class implements the reduced-order cruise fuel-flow model of Turgut et al. (2014):
+
+    In this model, the cruise-phase fuel flow is calculated from a multiple linear regression
+    on three flight parameters: cruise altitude, aircraft mass, and true airspeed (TAS).
+    The regression coefficients were obtained by fitting these parameters to 4320 cruise observations
+    from 3857 domestic flights operated by Turkish Airlines in January 2011 (using flight data records),
+    for the Airbus A319/A320/A321 and Boeing 737-700/737-800 aircraft.
+
+    Unlike the block-fuel models in this module, this model returns an instantaneous cruise fuel-flow
+    _rate_ (in kg/h) rather than a total mission fuel mass.
+
+    Fuel flow is calculated according to the regression coefficients in Table 2 of Turgut et al. (2014):
+
+    $$
+        FF = C_0 + C_h \cdot h + C_m \cdot m + C_V \cdot V
+    $$
+
+    where:
+
+    | Symbol     | Dimension                        | Description                                       |
+    |------------|----------------------------------|---------------------------------------------------|
+    | $FF$       | [mass] / [time]                  | Cruise fuel-flow rate                             |
+    | $h$        | [length]                         | Cruise altitude                                   |
+    | $m$        | [mass]                           | Aircraft mass                                     |
+    | $V$        | [speed]                          | True airspeed (TAS)                               |
+    | $C_0$      | [mass] / [time]                  | Regression constant (intercept)                   |
+    | $C_h$      | [mass] / ([time] $\cdot$ [length]) | Altitude coefficient                            |
+    | $C_m$      | [mass] / ([time] $\cdot$ [mass]) | Mass coefficient                                  |
+    | $C_V$      | [mass] / ([time] $\cdot$ [speed]) | TAS coefficient                                  |
+
+    The coefficients are those fitted for the variables in the units of the paper
+    (altitude in ft, mass in tonne, TAS in knot, fuel flow in kg/h). Inputs in any other
+    units are converted internally.
+
+    Notes
+    -----
+    Regression models available (cf. Table 2 in Turgut et al. (2014)):
+
+    | Key       | Regression model              | $N$    | Adj. $R^2$ |
+    |-----------|-------------------------------|--------|------------|
+    | `A319`    | Airbus A319                   | 217    | 0.857      |
+    | `A320`    | Airbus A320                   | 1200   | 0.828      |
+    | `A321`    | Airbus A321                   | 664    | 0.865      |
+    | `B737`    | Boeing 737-700                | 213    | 0.913      |
+    | `B738`    | Boeing 737-800                | 1643   | 0.882      |
+    | `Airbus`  | all Airbus aircraft (Group A) | 2081   | 0.931      |
+    | `Boeing`  | all Boeing aircraft (Group B) | 1856   | 0.896      |
+    | `Overall` | all aircraft                  | 3937   | 0.924      |
+
+    Key assumptions of this fuel calculation function:
+
+    | Parameter             | Assumption                                                                  |
+    |-----------------------|-----------------------------------------------------------------------------|
+    | data availability     | 5 narrow-body aircraft, plus 3 grouped models                               |
+    | flight phase          | cruise only (returns a fuel-flow rate, not a mission fuel mass)             |
+    | aircraft payload      | considered implicitly via the total aircraft mass input                     |
+    | climb/descent         | not modelled                                                                |
+    | reserve fuel uplift   | not applicable                                                              |
+    | diversion fuel uplift | not applicable                                                              |
+
+    Warnings
+    --------
+    This model returns a cruise fuel-flow **rate** (kg/h), not a total mission fuel mass.
+    To obtain the fuel burned in cruise, multiply the returned rate by the cruise time.
+
+    Warnings
+    --------
+    The regression is valid only within the domain of the data it was fitted to:
+    cruise altitude of approximately 22,000–40,000 ft, aircraft mass of approximately 45–79 tonne,
+    and TAS of approximately 300–440 knot. Extrapolating the linear model far outside these ranges is unreliable.
+
+    References
+    ----------
+    Turgut, E. T., Cavcar, M., Usanmaz, O., Canarslanlar, A. O., Dogeroglu, T., Armutlu, K., & Yay, O. D. (2014).
+    Fuel flow analysis for the cruise phase of commercial aircraft on domestic routes.
+    _Aerospace Science and Technology_, 37, 1–9.
+    doi:[10.1016/j.ast.2014.04.012](https://doi.org/10.1016/j.ast.2014.04.012)
+
+    See Also
+    --------
+    Table 2 ("The results of the regression analyses, where the FF parameter is dependent variable")
+    in Turgut et al. (2014).
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.reducedorder import turgut_etal
+    turgut_etal.list_aircraft()
+    turgut_etal.calculate(
+        acft='B738',
+        altitude=35000*ureg.ft,
+        mass=60.3*ureg.metric_ton,
+        TAS=364*ureg.knot,
+    )
+    ```
+    """
+
+    _regression_coefficients = {
+        "A319": {
+            "constant": -699.157,
+            "altitude": -0.021,
+            "mass": 17.732,
+            "tas": 6.696,
+        },
+        "A320": {
+            "constant": -621.171,
+            "altitude": -0.022,
+            "mass": 18.655,
+            "tas": 6.513,
+        },
+        "A321": {
+            "constant": -1067.277,
+            "altitude": -0.024,
+            "mass": 21.251,
+            "tas": 7.706,
+        },
+        "B737": {
+            "constant": -713.932,
+            "altitude": -0.025,
+            "mass": 18.670,
+            "tas": 6.964,
+        },
+        "B738": {
+            "constant": -708.506,
+            "altitude": -0.024,
+            "mass": 16.633,
+            "tas": 7.289,
+        },
+        "Airbus": {
+            "constant": -1171.308,
+            "altitude": -0.024,
+            "mass": 27.007,
+            "tas": 6.870,
+        },
+        "Boeing": {
+            "constant": -902.088,
+            "altitude": -0.025,
+            "mass": 20.591,
+            "tas": 7.528,
+        },
+        "Overall": {
+            "constant": -1053.146,
+            "altitude": -0.024,
+            "mass": 24.956,
+            "tas": 6.915,
+        },
+    }
+
+    @staticmethod
+    def list_aircraft() -> list[str]:
+        """
+        Returns a sorted list of available regression models.
+
+        In addition to the individual aircraft designators (`A319`, `A320`, `A321`, `B737`, `B738`),
+        the grouped models `Airbus` (all Airbus), `Boeing` (all Boeing) and `Overall` (all aircraft)
+        are available.
+        """
+        return sorted(turgut_etal._regression_coefficients.keys())
+
+    @staticmethod
+    @ureg.check(
+        None,  # acft
+        "[length]",  # altitude
+        "[mass]",  # mass
+        "[speed]",  # TAS
+    )
+    def calculate(
+        acft: str,
+        altitude: float,
+        mass: float,
+        TAS: float,
+    ) -> ureg.Quantity:
+        """
+        Given a regression model, cruise altitude, aircraft mass and true airspeed, calculates the cruise fuel-flow rate.
+
+        Warnings
+        --------
+        This function returns a cruise fuel-flow **rate** (kg/h), not a total mission fuel mass.
+
+        Parameters
+        ----------
+        acft : str
+            Regression model to use (see `list_aircraft()`)
+        altitude : float
+            Cruise altitude [length]
+        mass : float
+            Aircraft mass [mass]
+        TAS : float
+            True airspeed [speed]
+
+        Raises
+        ------
+        ValueError
+            If the regression model is not found in the model data.
+        ValueError
+            If altitude, mass or true airspeed are not greater than zero.
+
+        Returns
+        -------
+        ureg.Quantity
+            Cruise fuel-flow rate [kg/h]
+        """
+        if acft not in turgut_etal._regression_coefficients:
+            raise ValueError(
+                f"Regression model '{acft}' not found in model data. Please select one of the following: {turgut_etal.list_aircraft()}"
+            )
+        if altitude <= 0 * ureg.m:
+            raise ValueError("Cruise altitude must be greater than zero.")
+        if mass <= 0 * ureg.kg:
+            raise ValueError("Aircraft mass must be greater than zero.")
+        if TAS <= 0 * ureg.knot:
+            raise ValueError("True airspeed must be greater than zero.")
+
+        coef = turgut_etal._regression_coefficients[acft]
+        h = altitude.to("ft").magnitude
+        m = mass.to("metric_ton").magnitude
+        v = TAS.to("knot").magnitude
+
+        ff = (
+            coef["constant"] + coef["altitude"] * h + coef["mass"] * m + coef["tas"] * v
+        )
+        return ff * ureg("kg / hour")
+
+
+def models_for_aircraft(acft: str) -> list[str]:
+    """
+    Given an aircraft type, returns a sorted list of the reduced-order models in this module that support it.
+
+    A model supports an aircraft if the exact string `acft` is returned by that model's
+    `list_aircraft()` method. Each returned name is a class in `jetfuelburn.reducedorder`
+    whose `calculate()` method accepts that aircraft.
+
+    Note that models which are not keyed by aircraft type (e.g. `montlaur_etal` and `sacchi_etal`,
+    which select their regression from seat count or passenger capacity) do not expose an
+    `list_aircraft()` method and are therefore never included.
+
+    Parameters
+    ----------
+    acft : str
+        ICAO Aircraft Designator, exactly as returned by a model's `list_aircraft()` (e.g. `A320`).
+
+    Returns
+    -------
+    list[str]
+        Sorted names of the supporting models (e.g. `['seymour_etal', 'yanto_etal']`),
+        empty if no model supports the given aircraft.
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn.reducedorder import models_for_aircraft
+    models_for_aircraft('A320')
+    ```
+    """
+    matches = []
+    for name, obj in list(globals().items()):
+        if not isinstance(obj, type) or obj.__module__ != __name__:
+            continue
+        list_aircraft = getattr(obj, "list_aircraft", None)
+        if not callable(list_aircraft):
+            continue
+        supported = list_aircraft()
+        if isinstance(supported, (list, tuple)) and acft in supported:
+            matches.append(name)
+    return sorted(matches)
 
 
 # Deprecated aliases of methods renamed in jetfuelburn 4.0.0 (to be removed in 5.0.0).

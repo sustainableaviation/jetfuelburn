@@ -28,6 +28,12 @@ Old names remain available as deprecated aliases: they point to the new class an
 - Aircraft are identified by ICAO designators throughout: e.g. 'Boeing 737 MAX 7' becomes `B37M`, 'E175' becomes `E75L` and 'Airbus A321neo' becomes `A21N`, etc.
 - `statistics.aeromaps` and its data in `data/AeroMaps` are removed.
 
+### Improvements
+
+- Added `reducedorder.gossling_etal`, a private-jet fuel burn model by Gössling, Humpe & Leitão (2024) for 69 business and private jet types.
+- Added `reducedorder.turgut_etal`, a cruise fuel-flow model by Turgut et al. (2014) for five narrow-body types.
+- Added `reducedorder.models_for_aircraft()`, which lists the reduced-order models that support a given aircraft type.
+
 ### Changed
 
 - The airport list used by `utility.geography` now uses [OurAirports](https://ourairports.com/data/) (public domain). The list now contains 11,763 airports (9,051 IATA and 10,530 ICAO codes) and corrects coordinates that the old list had wrong by up to 14,450 km (e.g. `GBI`, `SHO`, `KUR`).

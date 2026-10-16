@@ -62,7 +62,7 @@ class poll_schumann_drag_polars:
     - The drag-rise term $40 (X - X_{DO})^4$ of Eq. (44) is added outside the $\cos^3\Lambda$ factor.
       This reproduces Fig. 3 of the paper.
     - For the 14 types fitted with winglets or sharklets, $e_{LS}$ is multiplied by 1.075
-      (Poll & Schumann 2021, Part 2; winglet flags as in the pycontrails implementation of the model).
+      (Poll & Schumann 2021, Part 2, with the winglet flags of the pycontrails implementation of the model).
 
     The model describes the clean configuration (flaps and landing gear retracted).
 

@@ -56,6 +56,20 @@ def test_reducedorder():
     assert callable(myclimate.list_aircraft)
     assert callable(myclimate.calculate)
 
+    from jetfuelburn.reducedorder import gossling_etal
+
+    assert callable(gossling_etal.list_aircraft)
+    assert callable(gossling_etal.calculate)
+
+    from jetfuelburn.reducedorder import turgut_etal
+
+    assert callable(turgut_etal.list_aircraft)
+    assert callable(turgut_etal.calculate)
+
+    from jetfuelburn.reducedorder import models_for_aircraft
+
+    assert callable(models_for_aircraft)
+
 
 def test_aux_physics():
     import jetfuelburn.utility.physics

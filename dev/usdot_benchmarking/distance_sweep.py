@@ -32,7 +32,7 @@ KG_PER_PAX = 100  # kg per pax incl. luggage
 
 # Aircraft / parameter configurations per model.
 # sacchi_etal and montlaur_etal have no aircraft designator — seat count is varied instead.
-# myclimate: A320/B737 are short-haul only (≤2500 km); A330/B777 are long-haul only (≥1500 km).
+# myclimate: A320/B737 are short-haul only (≤2500 km). A330/B777 are long-haul only (≥1500 km).
 CONFIGS = {
     "sacchi_etal": [
         {
