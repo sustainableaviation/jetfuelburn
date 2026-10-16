@@ -53,8 +53,16 @@ def fixture_seymour_B738():
     Fixture returning a factory function to generate test cases.
 
     The `cases` dictionary contains:
-    - `key`: range [km]
+    - `key`: great-circle distance [km]
     - `value`: expected value for calculated fuel burn [kg]
+
+    Notes
+    -----
+    Expected values are computed with the published reduced-order model for the `B738`
+    (Table M.7 of the Supplementary Information of Seymour et al. (2020)):
+    fuel = 7.13e-5 * d^2 + 2.94 * d + 1275, where d is the great-circle distance in km.
+    The quadratic term contributes 71.3 kg at 1000 km and 1782.5 kg at 5000 km.
+    Both distances lie within the `B738` maximum range of 5803 km (Table L.6).
 
     See Also
     --------
@@ -62,15 +70,15 @@ def fixture_seymour_B738():
 
     References
     ----------
-    [Figure 1 in Jupyter Notebook `Reduced_Model_Shape_Exploration.ipynb`](https://github.com/kwdseymour/FEAT/blob/master/Reduced_Model_Shape_Exploration.ipynb)
+    [Table M.7 in the Supplementary Information of Seymour et al. (2020)](https://doi.org/10.1016/j.trd.2020.102528)
     """
     base_data = {
         "acft": "B738",
     }
 
     cases = {
-        902 * ureg.km: 4008 * ureg.kg,
-        5557 * ureg.km: 16728 * ureg.kg,
+        1000 * ureg.km: 4286.3 * ureg.kg,
+        5000 * ureg.km: 17757.5 * ureg.kg,
     }
 
     def _make_case(r):

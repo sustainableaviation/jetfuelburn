@@ -91,11 +91,11 @@ yanto_etal.calculate_fuel_consumption(
     For additional information, compare the function documentation:
     [`jetfuelburn.reducedorder.yanto_etal`][]
 
-#### Seymour et al. (2019)
+#### Seymour et al. (2020)
 
 !!! warning
     Note that Seymour et al. use "average weights" for every aircraft.
-    The only variable input is therefore the aircraft range.
+    The only variable input is therefore the great-circle distance between origin and destination.
 
 ```pyodide session='fuel'
 from jetfuelburn.reducedorder import seymour_etal

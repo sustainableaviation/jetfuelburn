@@ -25,7 +25,7 @@ class _AirportAtlas:
 
         See Also
         --------
-        [`ip2location-iata-icao`](https://github.com/ip2location/ip2location-iata-icao) list of airport codes, names and coordinates on GitHub.
+        [OurAirports](https://ourairports.com/data/) list of airport codes, names and coordinates (public domain).
         """
         if self._loaded:
             return
@@ -91,8 +91,8 @@ class _AirportAtlas:
             {
                 'iata': 'INN',
                 'icao': 'LOWI',
-                'airport': 'Innsbruck Airport (Kranebitten Airport)',
-                'latitude': 47.2602,
+                'name': 'Innsbruck Airport',
+                'latitude': 47.260201,
                 'longitude': 11.344
             }
             ```
@@ -194,7 +194,7 @@ def calculate_distance_between_airports(
 ):
     r"""
     Calculates the Great Circle distance between two airports.
-    The list of airports is sourced from the `ip2location-iata-icao` dataset.
+    The list of airports is sourced from [OurAirports](https://ourairports.com/data/).
 
     ```python exec="true" html="true"
     import plotly.graph_objects as go
@@ -231,7 +231,7 @@ def calculate_distance_between_airports(
 
     See Also
     --------
-    [`ip2location-iata-icao`](https://github.com/ip2location/ip2location-iata-icao) list of airport codes, names and coordinates on GitHub.
+    [OurAirports](https://ourairports.com/data/) list of airport codes, names and coordinates (public domain).
 
     Parameters
     ----------
@@ -256,6 +256,11 @@ def calculate_distance_between_airports(
     ------
     ValueError
         If either airport code/name is not found.
+
+    Licensing Note
+    --------------
+    Airport codes and coordinates from [OurAirports](https://ourairports.com/data/), public domain.
+    Full notice in [`NOTICE.md`](https://github.com/sustainableaviation/jetfuelburn/blob/main/NOTICE.md).
 
     Example
     -------

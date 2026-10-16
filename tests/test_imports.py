@@ -141,14 +141,10 @@ def test_aux_engines():
 def test_aux_aerodynamics():
     import jetfuelburn.utility.aerodynamics
 
-    from jetfuelburn.utility.aerodynamics import jsbsim_drag_polars
+    from jetfuelburn.utility.aerodynamics import poll_schumann_drag_polars
 
-    assert callable(jsbsim_drag_polars.calculate_drag)
-    assert callable(jsbsim_drag_polars.calculate_lift_to_drag)
-    assert callable(jsbsim_drag_polars.calculate_lift_to_drag_binder_function)
-
-    from jetfuelburn.utility.aerodynamics import openap_drag_polars
-
-    assert callable(openap_drag_polars.calculate_drag)
-    assert callable(openap_drag_polars.calculate_lift_to_drag)
-    assert callable(openap_drag_polars.calculate_lift_to_drag_binder_function)
+    assert callable(poll_schumann_drag_polars.list_aircraft)
+    assert callable(poll_schumann_drag_polars.get_basic_drag_parameters)
+    assert callable(poll_schumann_drag_polars.calculate_drag)
+    assert callable(poll_schumann_drag_polars.calculate_lift_to_drag)
+    assert callable(poll_schumann_drag_polars.calculate_lift_to_drag_binder_function)

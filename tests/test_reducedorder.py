@@ -216,8 +216,20 @@ def test_seymour(fixture_seymour_B738):
         assert approx_with_units(
             value_check=calculated_output,
             value_expected=expected_output.to("kg"),
-            rel=0.075,
+            rel=1e-6,
         )
+
+
+def test_seymour_outside_fitted_range():
+    # D228: a1 < 0 and a maximum range of 500 km (Table L.6); the fit drops below zero at about 1,613 km.
+    assert (
+        seymour_etal.calculate_fuel_consumption(acft="D228", R=500 * ureg.km)
+        > 0 * ureg.kg
+    )
+    with pytest.raises(ValueError, match="outside its fitted range"):
+        seymour_etal.calculate_fuel_consumption(acft="D228", R=2000 * ureg.km)
+    with pytest.raises(ValueError, match="must be non-negative"):
+        seymour_etal.calculate_fuel_consumption(acft="B738", R=-1 * ureg.km)
 
 
 def test_eea2009(fixture_eea_A320):

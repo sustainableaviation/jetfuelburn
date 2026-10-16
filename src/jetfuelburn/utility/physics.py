@@ -436,3 +436,52 @@ def _calculate_speed_of_sound(
     speed_of_sound = a0 * math.sqrt((T_val / T0).magnitude)
 
     return speed_of_sound.to(ureg.kph)
+
+
+@ureg.check("[length]")
+def _calculate_dynamic_viscosity(
+    altitude,
+) -> pint.Quantity:
+    r"""
+    Computes the dynamic viscosity of air as a function of altitude,
+    using Sutherland's law with the ISA temperature:
+
+    $$
+    \mu = \frac{\beta \cdot T^{3/2}}{T + S}
+    $$
+
+    where:
+
+    | Symbol  | Dimension             | Description                         | Value                                   |
+    |---------|-----------------------|-------------------------------------|-----------------------------------------|
+    | $\mu$   | [pressure·time]       | dynamic viscosity                   | N/A                                     |
+    | $T$     | [temperature]         | ISA temperature at altitude $h$     | N/A                                     |
+    | $\beta$ | [pressure·time/temperature$^{1/2}$] | Sutherland constant   | 1.458e-6 kg/(m·s·K$^{1/2}$)             |
+    | $S$     | [temperature]         | Sutherland temperature              | 110.4 K                                 |
+
+    References
+    ----------
+    Eqn. (22) in ICAO (1993). Manual of the ICAO Standard Atmosphere (extended to 80 kilometres). Doc 7488/3.
+
+    Parameters
+    ----------
+    altitude : Quantity [length]
+        Altitude above sea level (0 to 20,000 meters).
+
+    Returns
+    -------
+    ureg.Quantity (float) [pressure·time]
+        Dynamic viscosity of air [Pa·s].
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.utility.physics import _calculate_dynamic_viscosity
+    _calculate_dynamic_viscosity(altitude=10000*ureg.m)
+    ```
+    """
+    T = _calculate_atmospheric_temperature(altitude).to(ureg.kelvin).magnitude
+    mu = 1.458e-6 * T**1.5 / (T + 110.4)
+    return mu * ureg("Pa*s")

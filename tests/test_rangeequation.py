@@ -9,7 +9,7 @@ from jetfuelburn.rangeequation import (
 )
 from jetfuelburn.utility.tests import approx_with_units
 from jetfuelburn.utility.physics import _calculate_mach_from_airspeed
-from jetfuelburn.utility.aerodynamics import openap_drag_polars
+from jetfuelburn.utility.aerodynamics import poll_schumann_drag_polars
 
 from .fixtures.rangeequation import breguet_range_fuel_calculation_data_1
 
@@ -399,10 +399,10 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
         arctan_result = calculate_fuel_consumption_stepclimb_arctan(
             R=range,
             h=altitude,
-            K=openap_drag_polars.get_basic_drag_parameters("A320").get("K"),
-            C_D0=openap_drag_polars.get_basic_drag_parameters("A320").get("CD0"),
+            K=poll_schumann_drag_polars.get_basic_drag_parameters("A320").get("K"),
+            C_D0=poll_schumann_drag_polars.get_basic_drag_parameters("A320").get("CD0"),
             m_after_cruise=m_after_cruise,
-            S=openap_drag_polars.get_basic_drag_parameters("A320").get("S"),
+            S=poll_schumann_drag_polars.get_basic_drag_parameters("A320").get("S"),
             V=airspeed,
             TSFC=TSFC,
         )
@@ -413,7 +413,9 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
             h=altitude,
             M=mach,
             TSFC=TSFC,
-            LD=openap_drag_polars.calculate_lift_to_drag_binder_function(acft="A320"),
+            LD=poll_schumann_drag_polars.calculate_lift_to_drag_binder_function(
+                acft="A320"
+            ),
             integration_mass_step=100 * ureg.kg,
         )
 
