@@ -11,3 +11,98 @@
 .katex-display, .MathJax_Display {
     margin: 0em 0 !important; /* Adjust 0.5em to whatever size you prefer */
 }
+
+/* Site switcher. Sits above this site's own header and stays on screen. */
+:root {
+    --jfb-family-height: 40px;
+}
+
+.jfb-family-stack {
+    position: sticky;
+    top: 0;
+    z-index: 4;
+}
+
+.jfb-family-stack > .md-header {
+    position: relative;
+    top: auto;
+}
+
+.jfb-family {
+    display: flex;
+    align-items: stretch;
+    height: var(--jfb-family-height);
+    overflow-x: auto;
+    background: #13233f;
+    color: #fff;
+    /* Same face and size as .md-typeset body copy. */
+    font-family: var(--md-text-font-family);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+}
+
+.jfb-family__item {
+    display: flex;
+    flex: 1 0 max-content;
+    align-items: center;
+    justify-content: center;
+    padding: 0 18px;
+    color: rgba(255, 255, 255, 0.78);
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.jfb-family__item + .jfb-family__item {
+    box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.14);
+}
+
+.jfb-family__item:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.jfb-family__item.is-current {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 3px 0 #9bd4ff, inset 1px 0 0 rgba(255, 255, 255, 0.14);
+}
+
+.jfb-family__item:first-child.is-current {
+    box-shadow: inset 0 3px 0 #9bd4ff;
+}
+
+.jfb-family__item.is-pending {
+    cursor: default;
+}
+
+.jfb-family__item.is-pending:hover {
+    color: rgba(255, 255, 255, 0.78);
+    background: transparent;
+}
+
+.jfb-family__item:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -3px;
+}
+
+.jfb-family__name {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: 1;
+    letter-spacing: inherit;
+    white-space: nowrap;
+}
+
+@media screen and (min-width: 60em) {
+    .md-sidebar--secondary {
+        top: calc(2.4rem + var(--jfb-family-height));
+    }
+}
+
+@media screen and (min-width: 76.234375em) {
+    .md-sidebar--primary {
+        top: calc(2.4rem + var(--jfb-family-height));
+    }
+}
