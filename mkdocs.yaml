@@ -48,6 +48,7 @@ theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
     - navigation.top
     - content.footnote.tooltips
     - content.code.copy
+    - content.tabs.link
   palette:
     - scheme: default
       toggle:
@@ -76,6 +77,9 @@ plugins:
 markdown_extensions:
   - admonition
   - pymdownx.superfences
+  # https://zensical.org/docs/authoring/content-tabs/
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.details
   - toc:
       permalink: true

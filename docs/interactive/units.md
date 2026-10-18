@@ -47,4 +47,4 @@ You can search this list for specific units using list comprehensions:
 
 !!! note
 
-    Note that because of American hegemony in the world of science, `'ton'` refers to a short ton (2000 lbs). If you would instead like to use civilized tons (1000 kg), you can use `'metric_ton'` instead.
+    Note that in recognition of American exceptionalism, `'ton'` refers to a [short ton](https://en.wikipedia.org/wiki/Short_ton) (2000 lbs). If you would instead like to use civilized tons (1000 kg), you must use `'metric_ton'` instead.

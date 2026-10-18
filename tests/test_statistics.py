@@ -83,3 +83,18 @@ class TestUsdot:
             match="US DOT Aircraft Designator 'ufo' not found in model data.",
         ):
             usdot.calculate_per_seat(2024, "ufo", 100 * ureg.km)
+
+
+def test_lookup_methods_are_static():
+    """The lookup methods work on the class and on an instance alike."""
+    acft = usdot.list_aircraft(2024)[0]
+    for method in (
+        "calculate_movements",
+        "calculate_average_time",
+        "calculate_average_distance",
+        "calculate_average_cargo",
+        "calculate_average_pax",
+    ):
+        assert getattr(usdot(), method)(2024, acft) == getattr(usdot, method)(
+            2024, acft
+        )

@@ -139,7 +139,7 @@ class usdot:
         year: int,
     ) -> list[str]:
         """
-        Given a year, returns a sorted list of available ICAO aircraft designators included in the model.
+        Given a year, returns a sorted list of the aircraft type names of the US DOT lookup table included in the model.
         """
         return sorted(usdot._aircraft_data[year].keys())
 
@@ -181,7 +181,7 @@ class usdot:
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            Aircraft type to be used for the calculation.
+            Aircraft type as named in the US DOT lookup table (e.g. `'Boeing 737-800'`), see `list_aircraft(year)`.
         R : pint.Quantity
             Range of the flight.
         W : pint.Quantity
@@ -261,7 +261,7 @@ class usdot:
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            Aircraft type to be used for the calculation.
+            Aircraft type as named in the US DOT lookup table (e.g. `'Boeing 737-800'`), see `list_aircraft(year)`.
         R : pint.Quantity
             Range of the flight.
 
@@ -300,6 +300,7 @@ class usdot:
         fuelburn = fuelburn.to("kg")
         return fuelburn
 
+    @staticmethod
     def calculate_movements(
         year: int,
         acft: str,
@@ -312,7 +313,7 @@ class usdot:
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            US DOT aircraft designator string (e.g. `'B739'`).
+            Aircraft type as named in the US DOT lookup table (e.g. `'Boeing 737-900'`), see `list_aircraft(year)`.
 
         Returns
         -------
@@ -338,6 +339,7 @@ class usdot:
         movements = aircraft_data["Number of flights captured"]
         return movements
 
+    @staticmethod
     def calculate_average_time(
         year: int,
         acft: str,
@@ -350,7 +352,7 @@ class usdot:
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            US DOT aircraft designator string (e.g. `'B739'`).
+            Aircraft type as named in the US DOT lookup table (e.g. `'Boeing 737-900'`), see `list_aircraft(year)`.
 
         Returns
         -------
@@ -377,6 +379,7 @@ class usdot:
         time = time.to("h")
         return time
 
+    @staticmethod
     def calculate_average_distance(
         year: int,
         acft: str,
@@ -389,7 +392,7 @@ class usdot:
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            US DOT aircraft designator string (e.g. `'B739'`).
+            Aircraft type as named in the US DOT lookup table (e.g. `'Boeing 737-900'`), see `list_aircraft(year)`.
 
         Returns
         -------
@@ -417,6 +420,7 @@ class usdot:
         distance = distance.to("km")
         return distance
 
+    @staticmethod
     def calculate_average_cargo(
         year: int,
         acft: str,
@@ -429,7 +433,7 @@ class usdot:
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            US DOT aircraft designator string (e.g. `'B739'`).
+            Aircraft type as named in the US DOT lookup table (e.g. `'Boeing 737-900'`), see `list_aircraft(year)`.
 
         Returns
         -------
@@ -457,6 +461,7 @@ class usdot:
         cargo = cargo.to("kg")
         return cargo
 
+    @staticmethod
     def calculate_average_pax(
         year: int,
         acft: str,
@@ -469,7 +474,7 @@ class usdot:
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            US DOT aircraft designator string (e.g. `'B739'`).
+            Aircraft type as named in the US DOT lookup table (e.g. `'Boeing 737-900'`), see `list_aircraft(year)`.
 
         Returns
         -------

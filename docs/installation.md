@@ -1,14 +1,30 @@
 # Installation
 
-You can install `jetfuelburn` from [PyPI](https://pypi.org) using `pip`:
-
-```bash
-pip install jetfuelburn
-```
-
-!!! info "[![PyPI Wheel Size](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpypi.org%2Fpypi%2Fjetfuelburn%2Fjson&query=%24.urls%5B0%5D.size&label=PyPI%20Wheel%20Size&suffix=%20B&logo=pypi&logoColor=white)](https://pypi.org/project/jetfuelburn/)"
+!!! info
 
     The core version of `jetfuelburn` only depends on the [Pint](https://pint.readthedocs.io/en/stable/) library and therefore has only one top-level dependency. This makes `jetfuelburn` well-suited for WebAssembly Python environments [like Pyodide](https://pyodide.org/en/stable/usage/loading-packages.html) that work best with small package file-size. 
+
+You can install `jetfuelburn` from [PyPI](https://pypi.org) using your preferred package manager:
+
+=== "pip"
+
+    ```bash
+    pip install jetfuelburn
+    ```
+
+=== "uv"
+
+    To add the package to the current project:
+
+    ```bash
+    uv add jetfuelburn
+    ```
+
+    To install the package into an existing environment:
+
+    ```bash
+    uv pip install jetfuelburn
+    ```
 
 !!! warning
 
@@ -19,6 +35,20 @@ pip install jetfuelburn
     
     you need to install it including all optional dependencies:
 
-    ```bash
-    pip install jetfuelburn[optionaldependencies]
-    ```
+    === "pip"
+
+        ```bash
+        pip install jetfuelburn[optionaldependencies]
+        ```
+
+    === "uv"
+
+        ```bash
+        uv add "jetfuelburn[optionaldependencies]"
+        ```
+
+        or
+
+        ```bash
+        uv pip install "jetfuelburn[optionaldependencies]"
+        ```
