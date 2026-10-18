@@ -112,7 +112,7 @@ class poll_schumann_drag_polars:
         return sorted(poll_schumann_drag_polars._aircraft_data.keys())
 
     @staticmethod
-    def _get_data(acft: str) -> dict:
+    def _get_data(acft: str) -> dict[str, float]:
         if acft not in poll_schumann_drag_polars._aircraft_data:
             raise ValueError(
                 f"ICAO Aircraft Designator '{acft}' not found in model data."
@@ -172,7 +172,7 @@ class poll_schumann_drag_polars:
         acft: str,
         M: float | None = None,
         h: pint.Quantity | None = None,
-    ) -> dict:
+    ) -> dict[str, float | pint.Quantity]:
         r"""
         Returns the parameters of the low-speed parabolic drag polar $C_D = C_{D0} + K \cdot C_L^2$
         for a given aircraft.
@@ -185,13 +185,13 @@ class poll_schumann_drag_polars:
         acft : str
             ICAO Aircraft Designator (e.g., 'A320', 'B738', etc.)
         M : float, optional
-            Mach number
-        h : pint.Quantity (length), optional
-            Altitude
+            Mach number [dimensionless]
+        h : pint.Quantity, optional
+            Altitude [length]
 
         Returns
         -------
-        dict
+        dict[str, float | pint.Quantity]
             A dictionary of the form:
 
             | Key   | Type                   |  Description                                 |
@@ -254,18 +254,18 @@ class poll_schumann_drag_polars:
         ----------
         acft : str
             ICAO Aircraft Designator (e.g., 'A320', 'B738', etc.)
-        L : pint.Quantity (force)
-            Lift force
-        M : float (dimensionless)
-            Mach number
-        h : pint.Quantity (length)
-            Altitude
+        L : pint.Quantity
+            Lift force [force]
+        M : float | pint.Quantity
+            Mach number [dimensionless]
+        h : pint.Quantity
+            Altitude [length]
         compressibility : bool, optional
             Includes the wave drag if `True` (default). With `False`, only the low-speed polar is used.
 
         Returns
         -------
-        pint.Quantity (force)
+        pint.Quantity
             Drag force [N]
 
         Raises
@@ -344,19 +344,19 @@ class poll_schumann_drag_polars:
         ----------
         acft : str
             ICAO Aircraft Designator (e.g., 'A320', 'B738', etc.)
-        L : pint.Quantity (force)
-            Lift force
-        M : float or pint.Quantity (dimensionless)
-            Mach number
-        h : pint.Quantity (length)
-            Altitude
+        L : pint.Quantity
+            Lift force [force]
+        M : float | pint.Quantity
+            Mach number [dimensionless]
+        h : pint.Quantity
+            Altitude [length]
         compressibility : bool, optional
             Includes the wave drag if `True` (default).
 
         Returns
         -------
-        pint.Quantity (dimensionless)
-            Lift-to-drag ratio
+        pint.Quantity
+            Lift-to-drag ratio [dimensionless]
         """
         drag = poll_schumann_drag_polars.calculate_drag(acft, L, M, h, compressibility)
         return (L / drag).to("dimensionless")  # Eq. (45)

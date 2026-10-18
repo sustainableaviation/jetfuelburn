@@ -3,6 +3,7 @@ import csv
 import gzip
 from importlib.resources import files
 import math
+import pint
 from jetfuelburn import ureg
 
 
@@ -19,7 +20,7 @@ class _AirportAtlas:
         self._icao_index: dict[str, dict] = {}
         self._name_index: dict[str, dict] = {}
 
-    def _load_data(self):
+    def _load_data(self) -> None:
         r"""
         Loads the GZIP containing airport data into memory and builds indices.
 
@@ -57,7 +58,7 @@ class _AirportAtlas:
 
         self._loaded = True
 
-    def _get_airport(self, identifier: str, by: str = "iata") -> dict:
+    def _get_airport(self, identifier: str, by: str = "iata") -> dict | None:
         r"""
         Retrieves an airport data dictionary by the specified identifier.
 
@@ -120,7 +121,9 @@ class _AirportAtlas:
 _atlas = _AirportAtlas()
 
 
-def _calculate_haversine_distance(lat1, lon1, lat2, lon2):
+def _calculate_haversine_distance(
+    lat1: float, lon1: float, lat2: float, lon2: float
+) -> pint.Quantity:
     r"""
     Calculates the Great Circle distance between two points 
     on the earth (specified in decimal degrees).
@@ -158,7 +161,7 @@ def _calculate_haversine_distance(lat1, lon1, lat2, lon2):
     
     Returns
     -------
-    Quantity
+    pint.Quantity
         The distance between the two points [length].
 
     Example
@@ -191,7 +194,7 @@ def _calculate_haversine_distance(lat1, lon1, lat2, lon2):
 
 def calculate_distance_between_airports(
     origin: str, destination: str, identifier: str = "iata"
-):
+) -> pint.Quantity:
     r"""
     Calculates the Great Circle distance between two airports.
     The list of airports is sourced from [OurAirports](https://ourairports.com/data/).
@@ -249,8 +252,8 @@ def calculate_distance_between_airports(
         Default is `iata`.
     Returns
     -------
-    Quantity
-        The distance between the two airports as a `pint.Quantity` in kilometers.
+    pint.Quantity
+        The distance between the two airports in kilometers [length].
 
     Raises
     ------

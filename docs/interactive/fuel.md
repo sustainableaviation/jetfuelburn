@@ -25,8 +25,8 @@ range_equation.calculate(
     R=2000*ureg.nmi,
     LD=18,
     m_after_cruise=100*ureg.metric_ton,
-    v_cruise=800*ureg.kph,
-    TSFC_cruise=17*(ureg.mg/ureg.N/ureg.s),
+    V=800*ureg.kph,
+    TSFC=17*(ureg.mg/ureg.N/ureg.s),
 )
 ```
 
@@ -136,7 +136,7 @@ lee_etal.calculate(
     For additional information, compare the function documentation:
     [`jetfuelburn.reducedorder.lee_etal`][]
 
-#### AIM2025 (from 2015)
+#### AIM2015 (Dray et al. 2019)
 
 !!! warning
     Note that the AIM2015 model uses 'representative' aircraft (in different size classes) instead of specific aircraft types.

@@ -10,6 +10,7 @@ except ImportError as e:
 import math
 import json
 from pathlib import Path
+import pint
 from jetfuelburn import ureg
 
 
@@ -23,8 +24,8 @@ def _get_aircraft_performance(
     perf_data_path: Path,
     aircraft_type: str,
     phase: str,
-    alt: float | ureg.Quantity,
-):
+    alt: pint.Quantity,
+) -> pint.Quantity:
     """
     Look up the climb or descent rate for a given aircraft type and altitude.
 
@@ -168,7 +169,7 @@ def generate_4d_trajectory(
     df_ofp: pd.DataFrame | str | Path,
     aircraft_type: str,
     perf_data_path: Path | str,
-    time_resolution: ureg.Quantity = 1.0 * ureg.minute,
+    time_resolution: pint.Quantity = 1.0 * ureg.minute,
     strategy: str = "leveloff",
     colname_wp: str = "waypoint",
     colname_timecum: str = "timecum",

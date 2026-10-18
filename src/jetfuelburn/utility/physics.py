@@ -5,7 +5,7 @@ from jetfuelburn import ureg
 
 @ureg.check("[length]")
 def _calculate_atmospheric_temperature(
-    altitude,
+    altitude: pint.Quantity,
 ) -> pint.Quantity:
     r"""
     Computes the air temperature as a function of altitude up to 20,000 meters
@@ -35,12 +35,12 @@ def _calculate_atmospheric_temperature(
 
     Parameters
     ----------
-    altitude : Quantity [length]
-        Altitude above sea level (0 to 20,000 meters).
+    altitude : pint.Quantity
+        Altitude above sea level (0 to 20,000 meters) [length].
 
     Returns
     -------
-    ureg.Quantity (float) [temperature]
+    pint.Quantity
         Air temperature (°C).
 
     Raises
@@ -76,7 +76,7 @@ def _calculate_atmospheric_temperature(
 
 @ureg.check("[length]")
 def _calculate_atmospheric_density(
-    altitude,
+    altitude: pint.Quantity,
 ) -> pint.Quantity:
     r"""
     Computes the air density as a function of altitude up to 20,000 meters
@@ -120,12 +120,12 @@ def _calculate_atmospheric_density(
 
     Parameters
     ----------
-    altitude : Quantity [length]
-        Altitude above sea level (0 to 20,000 meters).
+    altitude : pint.Quantity
+        Altitude above sea level (0 to 20,000 meters) [length].
 
     Returns
     -------
-    ureg.Quantity (float) [mass/volume]
+    pint.Quantity
         Air density (kg/m³).
 
     Raises
@@ -176,8 +176,8 @@ def _calculate_atmospheric_density(
     "[length]",
 )
 def _calculate_dynamic_pressure(
-    speed: float,
-    altitude: float,
+    speed: pint.Quantity,
+    altitude: pint.Quantity,
 ) -> pint.Quantity:
     r"""
     Computes the dynamic pressure $q$ at a given speed and altitude.
@@ -205,14 +205,14 @@ def _calculate_dynamic_pressure(
 
     Parameters
     ----------
-    speed : float
+    speed : pint.Quantity
         Aircraft speed [speed]
-    altitude : float
-        Aircraft altitude above sea level [distance]
+    altitude : pint.Quantity
+        Aircraft altitude above sea level [length]
 
     Returns
     -------
-    ureg.Quantity (float) [pressure]
+    pint.Quantity
         Dynamic pressure (Pascals).
 
     Example
@@ -237,8 +237,8 @@ def _calculate_dynamic_pressure(
     "[length]",
 )
 def _calculate_airspeed_from_mach(
-    mach_number: float,
-    altitude: float,
+    mach_number: float | pint.Quantity,
+    altitude: pint.Quantity,
 ) -> pint.Quantity:
     r"""
     Converts aircraft speed from mach number $M$ to airspeed $V$,
@@ -259,14 +259,14 @@ def _calculate_airspeed_from_mach(
 
     Parameters
     ----------
-    mach_number : float [dimensionless]
-        Mach number
-    altitude : float [length]
-        Flight altitude above sea level
+    mach_number : float | pint.Quantity
+        Mach number [dimensionless]
+    altitude : pint.Quantity
+        Flight altitude above sea level [length]
 
     Returns
     -------
-    ureg.Quantity (float) [speed]
+    pint.Quantity
         Aircraft velocity (km/h).
 
     See Also
@@ -279,7 +279,7 @@ def _calculate_airspeed_from_mach(
 
     Returns
     -------
-    ureg.Quantity (float) [speed]
+    pint.Quantity
         Aircraft velocity in kilometers per hour.
 
     Example
@@ -308,9 +308,9 @@ def _calculate_airspeed_from_mach(
     "[length]",
 )
 def _calculate_mach_from_airspeed(
-    airspeed: float,
-    altitude: float,
-) -> float:
+    airspeed: pint.Quantity,
+    altitude: pint.Quantity,
+) -> pint.Quantity:
     r"""
     Converts aircraft airspeed $V$ to Mach number $M$,
     depending on the flight altitude $h$.
@@ -330,15 +330,15 @@ def _calculate_mach_from_airspeed(
 
     Parameters
     ----------
-    airspeed : float [speed]
-        Aircraft true airspeed (TAS).
-    altitude : float [length]
-        Flight altitude above sea level.
+    airspeed : pint.Quantity
+        Aircraft true airspeed (TAS) [speed].
+    altitude : pint.Quantity
+        Flight altitude above sea level [length].
 
     Returns
     -------
-    ureg.Quantity (float) [dimensionless]
-        Mach number.
+    pint.Quantity
+        Mach number [dimensionless].
 
     See Also
     --------
@@ -375,8 +375,8 @@ def _calculate_mach_from_airspeed(
 
 @ureg.check("[temperature]")
 def _calculate_speed_of_sound(
-    temperature,
-):
+    temperature: pint.Quantity,
+) -> pint.Quantity:
     r"""
     Computes the speed of sound in air as a function of temperature uses the relationship for an ideal gas:
 
@@ -411,12 +411,12 @@ def _calculate_speed_of_sound(
 
     Parameters
     ----------
-    temperature : Quantity [temperature]
-        The local air temperature.
+    temperature : pint.Quantity
+        The local air temperature [temperature].
 
     Returns
     -------
-    ureg.Quantity (float) [velocity]
+    pint.Quantity
         Speed of sound (km/h).
 
     Raises
@@ -440,7 +440,7 @@ def _calculate_speed_of_sound(
 
 @ureg.check("[length]")
 def _calculate_dynamic_viscosity(
-    altitude,
+    altitude: pint.Quantity,
 ) -> pint.Quantity:
     r"""
     Computes the dynamic viscosity of air as a function of altitude,
@@ -465,12 +465,12 @@ def _calculate_dynamic_viscosity(
 
     Parameters
     ----------
-    altitude : Quantity [length]
-        Altitude above sea level (0 to 20,000 meters).
+    altitude : pint.Quantity
+        Altitude above sea level (0 to 20,000 meters) [length].
 
     Returns
     -------
-    ureg.Quantity (float) [pressure·time]
+    pint.Quantity
         Dynamic viscosity of air [Pa·s].
 
     Example

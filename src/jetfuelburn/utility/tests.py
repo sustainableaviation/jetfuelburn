@@ -1,8 +1,14 @@
+import pint
 from jetfuelburn import ureg
 import pytest
 
 
-def approx_with_units(value_check, value_expected, rel=None, abs=None) -> bool:
+def approx_with_units(
+    value_check: pint.Quantity,
+    value_expected: pint.Quantity,
+    rel: float | None = None,
+    abs: float | None = None,
+) -> bool:
     """
     Given two Pint quantities, check if the values are approximately equal.
 
@@ -12,13 +18,13 @@ def approx_with_units(value_check, value_expected, rel=None, abs=None) -> bool:
 
     Parameters
     ----------
-    value_check : ureg.Quantity
+    value_check : pint.Quantity
         Value to check.
-    value_expected : ureg.Quantity
+    value_expected : pint.Quantity
         Value to compare against.
-    rel : _type_, optional
+    rel : float, optional
         Relative tolerance, by default None
-    abs : _type_, optional
+    abs : float, optional
         Absolute tolerance, by default None
 
     Returns
@@ -33,7 +39,12 @@ def approx_with_units(value_check, value_expected, rel=None, abs=None) -> bool:
     )
 
 
-def approx_dict(dict_check: dict, dict_expected: dict, rel=None, abs=None) -> bool:
+def approx_dict(
+    dict_check: dict,
+    dict_expected: dict,
+    rel: float | None = None,
+    abs: float | None = None,
+) -> bool:
     """
     Given two dictionaries, check if the values in the first dictionary are approximately equal to the values in the second dictionary.
 
@@ -49,9 +60,9 @@ def approx_dict(dict_check: dict, dict_expected: dict, rel=None, abs=None) -> bo
         Dictionary to check.
     dict_expected : dict
         Dictionary to compare against.
-    rel : _type_, optional
+    rel : float, optional
         Relative tolerance, by default None
-    abs : _type_, optional
+    abs : float, optional
         Absolute tolerance, by default None
 
     Returns
@@ -83,7 +94,10 @@ def approx_dict(dict_check: dict, dict_expected: dict, rel=None, abs=None) -> bo
 
 
 def approx_dict_of_dict(
-    dict_of_dict_check: dict, dict_of_dict_expected: dict, rel=None, abs=None
+    dict_of_dict_check: dict,
+    dict_of_dict_expected: dict,
+    rel: float | None = None,
+    abs: float | None = None,
 ) -> bool:
     """
     Given two dictionaries of dictionaries, check if the values in the first dictionary of dictionaries are approximately equal to the values in the second dictionary of dictionaries.
@@ -98,9 +112,9 @@ def approx_dict_of_dict(
         Dictionary of dictionaries to check.
     dict_of_dict_expected : dict
         Dictionary of dictionaries to compare against.
-    rel : _type_, optional
+    rel : float, optional
         Relative tolerance, by default None
-    abs : _type_, optional
+    abs : float, optional
         Absolute tolerance, by default None
 
     Returns

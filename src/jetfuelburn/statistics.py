@@ -2,6 +2,7 @@
 from jetfuelburn import ureg
 from importlib import resources
 import json
+import pint
 from jetfuelburn import ureg
 
 
@@ -150,9 +151,9 @@ class usdot:
     def calculate_per_weight(
         year: int,
         acft: str,
-        R: float,
-        W: float,
-    ) -> dict:
+        R: pint.Quantity,
+        W: pint.Quantity,
+    ) -> pint.Quantity:
         r"""
         Given an aircraft name, range and payload weight, calculates the fuel burned during flight.
 
@@ -232,8 +233,8 @@ class usdot:
     def calculate_per_seat(
         year: int,
         acft: str,
-        R: float,
-    ) -> dict:
+        R: pint.Quantity,
+    ) -> pint.Quantity:
         r"""
         Given an aircraft name and range, calculates the fuel burned during flight per passenger.
 
@@ -300,7 +301,7 @@ class usdot:
     def calculate_movements(
         year: int,
         acft: str,
-    ) -> dict:
+    ) -> float:
         """
         Given a year and aircraft designator, returns the number of flights captured.
 
@@ -313,7 +314,7 @@ class usdot:
 
         Returns
         -------
-        int or float
+        float
             Number of flights captured for the given aircraft type and year.
 
         Raises
@@ -338,7 +339,7 @@ class usdot:
     def calculate_average_time(
         year: int,
         acft: str,
-    ) -> dict:
+    ) -> pint.Quantity:
         """
         Given a year and aircraft designator, returns the average trip flight time.
 
@@ -377,7 +378,7 @@ class usdot:
     def calculate_average_distance(
         year: int,
         acft: str,
-    ) -> dict:
+    ) -> pint.Quantity:
         """
         Given a year and aircraft designator, returns the average trip distance.
 
@@ -417,7 +418,7 @@ class usdot:
     def calculate_average_cargo(
         year: int,
         acft: str,
-    ) -> dict:
+    ) -> pint.Quantity:
         """
         Given a year and aircraft designator, returns the average freight and mail transported.
 
@@ -457,7 +458,7 @@ class usdot:
     def calculate_average_pax(
         year: int,
         acft: str,
-    ) -> dict:
+    ) -> float:
         """
         Given a year and aircraft designator, returns the average number of passengers per flight.
 
@@ -470,7 +471,7 @@ class usdot:
 
         Returns
         -------
-        int or float
+        float
             Average number of passengers per flight for the given aircraft type and year.
 
         Raises
@@ -493,7 +494,7 @@ class usdot:
         return pax
 
     @staticmethod
-    def calculate_total_fuel_consumption(year: int) -> float:
+    def calculate_total_fuel_consumption(year: int) -> pint.Quantity:
         r"""
         Given a year, returns the total fuel burned by all aircraft types combined.
 

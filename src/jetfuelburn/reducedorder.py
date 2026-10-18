@@ -3,6 +3,7 @@ import csv
 import json
 import math
 from importlib import resources
+import pint
 from jetfuelburn import ureg
 from jetfuelburn.utility.physics import _calculate_dynamic_pressure
 
@@ -52,12 +53,12 @@ class montlaur_etal:
     Notes
     -----
     The model differentiates between "Small Aircraft" and "Large Aircraft" based on seat capacity and flight distance,
-    as defined in Table 1 of Montlaur et al. (2020):
+    as defined in Table 1 of Montlaur et al. (2025):
 
     | Model Designation | Seat Capacity ($S$)         | Flight Distance ($D$)         | Representative Aircraft                                              |
     |-------------------|-----------------------------|-------------------------------|------------------------------------------------------------------------|
     | "Model D, E"      | $50 \le S \le 172$          | $100 \le D \le 5000$ km       | **CAT D:** B38M, A319<br>**CAT E:** CRJ2, CRJ9, E190                  |
-    | "Model B, D"      | $172 \le S \le 350$         | $200 \le D \le 12000$ km      | **CAT B:** A359, A339, B77W, B788, B789<br>**CAT D:** A21N, A20N, B38M |
+    | "Model B, D"      | $172 \le S \le 365$         | $200 \le D \le 12000$ km      | **CAT B:** A359, A339, B77W, B788, B789<br>**CAT D:** A21N, A20N, B38M |
 
     Licensing Note
     --------------
@@ -96,16 +97,16 @@ class montlaur_etal:
     @staticmethod
     @ureg.check("[length]", None, None)
     def calculate(
-        distance: float,
+        distance: pint.Quantity,
         available_seats: int,
         model: str = "",
-    ) -> ureg.Quantity:
+    ) -> pint.Quantity:
         """
         Calculates the estimated fuel consumption per Available Seat Kilometer.
 
         Parameters
         ----------
-        distance : float
+        distance : pint.Quantity
             Flight distance [length]
         available_seats : int
             Number of available seats
@@ -116,7 +117,7 @@ class montlaur_etal:
 
         Returns
         -------
-        ureg.Quantity
+        pint.Quantity
             Estimated fuel consumption [mass/length]
 
         Raises
@@ -302,9 +303,9 @@ class sacchi_etal:
     @ureg.check(None, "[mass]", "[length]")  # year  # TOW  # R
     def _calculate_single_pass(
         year: int,
-        TOW: float,
-        R: float,
-    ) -> float:
+        TOW: pint.Quantity,
+        R: pint.Quantity,
+    ) -> pint.Quantity:
         """
         Helper function to calculate fuel for a specific given takeoff weight $TOW$ (including fuel).
         """
@@ -349,11 +350,11 @@ class sacchi_etal:
         year: int,
         pax_max: int,
         pax: int,
-        R: float,
-        reserve: float = 45 * ureg("min"),
-        tolerance: float = 100 * ureg("kg"),
+        R: pint.Quantity,
+        reserve: pint.Quantity = 45 * ureg("min"),
+        tolerance: pint.Quantity = 100 * ureg("kg"),
         max_iterations: int = 20,
-    ) -> float:
+    ) -> pint.Quantity:
         """
         Calculates the required fuel mass iteratively.
 
@@ -368,16 +369,19 @@ class sacchi_etal:
             Maximum passenger capacity of the aircraft.
         pax : int
             Number of passengers on board (assumed to weigh 110kg incl. luggage each).
-        R : float
+        R : pint.Quantity
             Mission range [length].
-        tolerance : float, optional
+        reserve : pint.Quantity, optional
+            Reserve fuel, given as flight time at an assumed cruise speed of 800 km/h [time].
+            Default is 45 min.
+        tolerance : pint.Quantity, optional
             Convergence tolerance for fuel mass [mass]. Default is 100 kg.
         max_iterations : int, optional
             Maximum number of iterations. Default is 20.
 
         Returns
         -------
-        float
+        pint.Quantity
             Total fuel mass [kg].
         """
         if year < 2018:
@@ -464,7 +468,7 @@ class yanto_etal:
 
     Warnings
     --------
-    The x-axis of all three panels in Figure 14 in Lee et al. (2010) are incorrectly rendered.
+    The x-axes of all three panels in Figure 14 of Yanto and Liem (2017) are incorrectly rendered.
     According to panel (a), the maximum achievable range of a Boeing 777 would be ~30'000NM. This is ~1.6x the circumference of the Earth.
     Neither assuming that the axis multiplier `1e4` nor the unit `nm` (sic!) are incorrect explains this issue.
     Figure 5 was instead used to test the implementation of the method.
@@ -539,9 +543,9 @@ class yanto_etal:
     )
     def calculate(
         acft: str,
-        R: float,
-        PL: float,
-    ) -> float:
+        R: pint.Quantity,
+        PL: pint.Quantity,
+    ) -> pint.Quantity:
         """
         Given an ICAO aircraft designator, mission range and payload mass, calculates the fuel burned.
 
@@ -549,9 +553,9 @@ class yanto_etal:
         ----------
         acft : str
             ICAO Aircraft Designator
-        R : float
+        R : pint.Quantity
             Mission range [length]
-        PL : float
+        PL : pint.Quantity
             Payload mass [mass]
 
         Raises
@@ -563,7 +567,7 @@ class yanto_etal:
 
         Returns
         -------
-        float
+        pint.Quantity
             Fuel mass [kg]
         """
         if R < 0:
@@ -854,54 +858,55 @@ class lee_etal:
     )
     def calculate(
         acft: str,
-        W_E: float,
-        W_MPLD: float,
-        W_MTO: float,
-        W_MF: float,
-        S: float,
-        C_D0: float,
-        C_D2: float,
-        c: float,
-        h: float,
-        V: float,
-        d: float,
-    ) -> dict[float, float]:
+        W_E: pint.Quantity,
+        W_MPLD: pint.Quantity,
+        W_MTO: pint.Quantity,
+        W_MF: pint.Quantity,
+        S: pint.Quantity,
+        C_D0: float | pint.Quantity,
+        C_D2: float | pint.Quantity,
+        c: pint.Quantity,
+        h: pint.Quantity,
+        V: pint.Quantity,
+        d: pint.Quantity,
+    ) -> dict[str, pint.Quantity]:
         """
-        Given an ICAO aircraft designator, mission range and payload mass, calculates the fuel burned.
+        Given an ICAO aircraft designator, the aircraft weights, drag polar and engine parameters,
+        the cruise altitude and speed, and the flight distance, calculates the fuel mass and the payload mass of the mission.
 
         Parameters
         ----------
         acft : str
             ICAO Aircraft Designator
-        W_E : float
+        W_E : pint.Quantity
             Aircraft empty weight [weight] (not mass !)
-        W_MPLD : float
+        W_MPLD : pint.Quantity
             Aircraft maximum payload [weight] (not mass !)
-        W_MTO : float
+        W_MTO : pint.Quantity
             Aircraft maximum takeoff weight [weight] (not mass !)
-        W_MF : float
+        W_MF : pint.Quantity
             Aircraft maximum fuel weight [weight] (not mass !)
-        S : float
+        S : pint.Quantity
             Aircraft wing area [area]
-        C_D0 : float
+        C_D0 : float | pint.Quantity
             Parasitic drag coefficient [dimensionless]
-        C_D2 : float
+        C_D2 : float | pint.Quantity
             Induced drag coefficient [dimensionless]
-        c : float
+        c : pint.Quantity
             Thrust specific fuel consumption [1/time]
-        h : float
+        h : pint.Quantity
             Cruise altitude [length]
-        V : float
+        V : pint.Quantity
             Cruise speed [speed]
-        d : float
+        d : pint.Quantity
             wind-compensated distance [length]
 
         Returns
         -------
-        dict
-            'mass_fuel' : ureg.Quantity
+        dict[str, pint.Quantity]
+            'mass_fuel' : pint.Quantity
                 Fuel mass [kg]
-            'mass_payload' : ureg.Quantity
+            'mass_payload' : pint.Quantity
                 Payload mass [kg]
 
         Raises
@@ -1776,8 +1781,8 @@ class seymour_etal:
     )
     def calculate(
         acft: str,
-        R: float,
-    ) -> float:
+        R: pint.Quantity,
+    ) -> pint.Quantity:
         """
         Given an ICAO aircraft designator and the great-circle distance, calculates the fuel burned.
 
@@ -1789,7 +1794,7 @@ class seymour_etal:
         ----------
         acft : str
             ICAO Aircraft Designator
-        R : float
+        R : pint.Quantity
             Great-circle distance between origin and destination [length]
 
         Raises
@@ -1804,7 +1809,7 @@ class seymour_etal:
 
         Returns
         -------
-        ureg.Quantity
+        pint.Quantity
             Fuel mass [kg]
         """
         if acft not in seymour_etal._regression_coefficients.keys():
@@ -1957,11 +1962,11 @@ class aim2015:
     )
     def calculate(
         acft_size_class: int,
-        D_climb: float,
-        D_cruise: float,
-        D_descent: float,
-        PL: float,
-    ) -> dict[float, float, float]:
+        D_climb: pint.Quantity,
+        D_cruise: pint.Quantity,
+        D_descent: pint.Quantity,
+        PL: pint.Quantity,
+    ) -> dict[str, pint.Quantity]:
         """
         Given an aircraft size class integer, payload and distances for climb, cruise, and descent, calculates the fuel burned during flight.
 
@@ -1969,13 +1974,13 @@ class aim2015:
         ----------
         acft_size_class : int
             Aircraft size class (1-8)
-        D_climb : ureg.Quantity
+        D_climb : pint.Quantity
             Climb distance [length]
-        D_cruise : ureg.Quantity
+        D_cruise : pint.Quantity
             Cruise distance [length]
-        D_descent : ureg.Quantity
+        D_descent : pint.Quantity
             Descent distance [length]
-        PL : ureg.Quantity
+        PL : pint.Quantity
             Payload [mass]
 
         Raises
@@ -1985,12 +1990,12 @@ class aim2015:
 
         Returns
         -------
-        dict
-            'mass_fuel_climb' : ureg.Quantity
+        dict[str, pint.Quantity]
+            'mass_fuel_climb' : pint.Quantity
                 Fuel mass (climb segment) [kg]
-            'mass_fuel_cruise' : ureg.Quantity
+            'mass_fuel_cruise' : pint.Quantity
                 Fuel mass (cruise segment) [kg]
-            'mass_fuel_descent' : ureg.Quantity
+            'mass_fuel_descent' : pint.Quantity
                 Fuel mass (descent segment) [kg]
         """
         if D_climb.magnitude < 0:
@@ -2174,12 +2179,12 @@ class eea_emission_inventory_2009:
     )
     def calculate(
         acft: str,
-        R: float,
-    ) -> dict:
+        R: pint.Quantity,
+    ) -> dict[str, pint.Quantity]:
         r"""
         Given an aircraft name and range, calculates the fuel burned during flight.
 
-        Data between reported range/fuel-burn points is extrapolated linearly:
+        Data between reported range/fuel-burn points is interpolated linearly:
 
         $$
             m_F(R=200) = m_F(125) + (200-125) \cdot \frac{m_F(250) - m_F(125)}{250 - 125}
@@ -2196,28 +2201,30 @@ class eea_emission_inventory_2009:
         Parameters
         ----------
         acft : str
-            ICAO Aircraft Designator. Note that some aircraft
-        R : ureg.Quantity
+            ICAO Aircraft Designator. Some entries stand for an aircraft family (e.g. `A330`, `B757`, `B777`),
+            because the guidebook reports one representative type per family (see `list_aircraft()`).
+        R : pint.Quantity
             Mission range [length]
 
         Returns
         -------
-        dict
-            'mass_fuel_total' : ureg.Quantity
+        dict[str, pint.Quantity]
+            'mass_fuel_total' : pint.Quantity
                 Fuel mass (total segment) [kg]
-            'mass_fuel_LTO' : ureg.Quantity
+            'mass_fuel_LTO' : pint.Quantity
                 Fuel mass (LTO segment) [kg]
-            'mass_fuel_taxi_in' : ureg.Quantity
+            'mass_fuel_taxi_in' : pint.Quantity
                 Fuel mass (taxi-in segment) [kg]
-            'mass_fuel_climbout' : ureg.Quantity
+            'mass_fuel_climbout' : pint.Quantity
                 Fuel mass (climbout segment) [kg]
-            'mass_fuel_takeoff' : ureg.Quantity
+            'mass_fuel_takeoff' : pint.Quantity
                 Fuel mass (takeoff segment) [kg]
-            'mass_fuel_climb_cruise_descent' : ureg.Quantity
+            'mass_fuel_climb_cruise_descent' : pint.Quantity
                 Fuel mass (climb, cruise, and descent segments) [kg]
-            'mass_fuel_approach_landing' : ureg.Quantity
+            'mass_fuel_approach_landing' : pint.Quantity
                 Fuel mass (approach and landing segment) [kg]
-            'mass_fuel_taxi_out' : ureg.Quantity
+            'mass_fuel_taxi_out' : pint.Quantity
+                Fuel mass (taxi-out segment) [kg]
 
         Raises
         ------
@@ -2380,8 +2387,8 @@ class myclimate:
     )
     def calculate(
         acft: str,
-        x: float,
-    ) -> float:
+        x: pint.Quantity,
+    ) -> pint.Quantity:
         r"""
         Given a flight distance, calculate the fleet-average fuel consumption of a flight using the
         [myClimate Flight Emissions Calculator](https://co2.myclimate.org/en/flight_calculators/new).
@@ -2402,14 +2409,16 @@ class myclimate:
 
         Parameters
         ----------
-        x : float
+        acft : str
+            Aircraft type: `A320`, `B737`, `A330`, `B777` or `standard aircraft` (see `list_aircraft()`)
+        x : pint.Quantity
             Flight distance [length]. myclimate defines it as the great-circle distance
             plus a detour correction of 95 km.
 
         Returns
         -------
-        float
-            Fuel consumption [mass] in kg.
+        pint.Quantity
+            Fuel mass [kg]
         """
         if x < (0 * ureg.km):
             raise ValueError("Distance must not be negative.")
@@ -2580,8 +2589,8 @@ class gossling_etal:
     )
     def calculate(
         acft: str,
-        flight_time: float,
-    ) -> ureg.Quantity:
+        flight_time: pint.Quantity,
+    ) -> pint.Quantity:
         """
         Given an ICAO aircraft designator and a flight time, calculates the fuel burned.
 
@@ -2595,7 +2604,7 @@ class gossling_etal:
         ----------
         acft : str
             ICAO Aircraft Designator (see `list_aircraft()`)
-        flight_time : float
+        flight_time : pint.Quantity
             Flight time [time]
 
         Raises
@@ -2607,7 +2616,7 @@ class gossling_etal:
 
         Returns
         -------
-        ureg.Quantity
+        pint.Quantity
             Fuel mass [kg]
         """
         if acft not in gossling_etal._fuel_flow_gph:
@@ -2801,10 +2810,10 @@ class turgut_etal:
     )
     def calculate(
         acft: str,
-        altitude: float,
-        mass: float,
-        TAS: float,
-    ) -> ureg.Quantity:
+        altitude: pint.Quantity,
+        mass: pint.Quantity,
+        TAS: pint.Quantity,
+    ) -> pint.Quantity:
         """
         Given a regression model, cruise altitude, aircraft mass and true airspeed, calculates the cruise fuel-flow rate.
 
@@ -2816,11 +2825,11 @@ class turgut_etal:
         ----------
         acft : str
             Regression model to use (see `list_aircraft()`)
-        altitude : float
+        altitude : pint.Quantity
             Cruise altitude [length]
-        mass : float
+        mass : pint.Quantity
             Aircraft mass [mass]
-        TAS : float
+        TAS : pint.Quantity
             True airspeed [speed]
 
         Raises
@@ -2832,7 +2841,7 @@ class turgut_etal:
 
         Returns
         -------
-        ureg.Quantity
+        pint.Quantity
             Cruise fuel-flow rate [kg/h]
         """
         if acft not in turgut_etal._regression_coefficients:

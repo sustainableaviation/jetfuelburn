@@ -35,7 +35,7 @@ def _validate_physics_function_parameters(
 
 
 def _normalize_physics_function_or_scalar(
-    function_or_scalar: int | float | pint.Quantity | Callable,
+    function_or_scalar: float | pint.Quantity | Callable,
 ) -> Callable:
     r"""
     Given a scalar or Callable, wraps scalars in a lambda function.
@@ -58,7 +58,7 @@ def _normalize_physics_function_or_scalar(
 
     Parameters
     ----------
-    function_or_scalar: int | float | pint.Quantity | Callable
+    function_or_scalar : float | pint.Quantity | Callable
         A scalar value or a function that computes a physics parameter.
 
     Returns

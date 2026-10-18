@@ -8,13 +8,13 @@ from jetfuelburn.utility.physics import _calculate_atmospheric_temperature
     "[time]/[length]", "[]", "[]", "[length]", "[length]", None  # [mg/Ns] = s/m
 )
 def calculate_corrected_tsfc(
-    tsfc_reported: pint.Quantity[float | int],
-    M_reported: pint.Quantity[float | int],
-    M_actual: pint.Quantity[float | int],
-    h_reported: pint.Quantity[float | int],
-    h_actual: pint.Quantity[float | int],
-    beta: float | int | pint.Quantity[float | int],
-) -> pint.Quantity[float | int]:
+    tsfc_reported: pint.Quantity,
+    M_reported: float | pint.Quantity,
+    M_actual: float | pint.Quantity,
+    h_reported: pint.Quantity,
+    h_actual: pint.Quantity,
+    beta: float | pint.Quantity,
+) -> pint.Quantity:
     r"""
     Given a reported thrust-specific fuel consumption (TSFC) at reference conditions,
     calculates the actual TSFC under different flight conditions according to an empirical correction formula
@@ -75,18 +75,18 @@ def calculate_corrected_tsfc(
 
     Parameters
     ----------
-    tsfc_reported: pint.Quantity[float | int]
-        The reported thrust-specific fuel consumption at the reference conditions (e.g., from engine performance charts).
-    h_reported: pint.Quantity[float | int]
-        The altitude at which the TSFC was reported (e.g., from engine performance charts).
-    M_reported: pint.Quantity[float | int]
-        The Mach number at which the TSFC was reported (e.g., from engine performance charts).
-    h_actual: pint.Quantity[float | int]
-        The actual altitude during the flight for which we want to calculate the TSFC.
-    M_actual: pint.Quantity[float | int]
-        The actual Mach number during the flight for which we want to calculate the TSFC.
-    beta: float | int | pint.Quantity[float | int]
-        An empirically derived exponent that captures how TSFC changes with Mach number.
+    tsfc_reported : pint.Quantity
+        The reported thrust-specific fuel consumption at the reference conditions (e.g., from engine performance charts) [time/length].
+    M_reported : float | pint.Quantity
+        The Mach number at which the TSFC was reported (e.g., from engine performance charts) [dimensionless].
+    M_actual : float | pint.Quantity
+        The actual Mach number during the flight for which we want to calculate the TSFC [dimensionless].
+    h_reported : pint.Quantity
+        The altitude at which the TSFC was reported (e.g., from engine performance charts) [length].
+    h_actual : pint.Quantity
+        The actual altitude during the flight for which we want to calculate the TSFC [length].
+    beta : float | pint.Quantity
+        An empirically derived exponent that captures how TSFC changes with Mach number [dimensionless].
 
     Raises
     ------
@@ -95,8 +95,8 @@ def calculate_corrected_tsfc(
 
     Returns
     -------
-    pint.Quantity[float | int]
-        The actual thrust-specific fuel consumption under the given flight conditions.
+    pint.Quantity
+        The actual thrust-specific fuel consumption under the given flight conditions [time/length].
 
     Example
     -------

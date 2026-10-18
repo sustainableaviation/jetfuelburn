@@ -9,7 +9,7 @@ from jetfuelburn.utility.physics import (
 )
 
 
-def figure_poll_schumann_dragpolar():
+def figure_poll_schumann_dragpolar() -> go.Figure:
     """
     Creates a Plotly figure of the lift-to-drag ratio over the drag coefficient
     of an A320 at 58,800 kg for five Mach numbers, using the Poll & Schumann (2025) drag polar.

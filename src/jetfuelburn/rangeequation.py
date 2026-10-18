@@ -35,7 +35,7 @@ class range_equation:
         m_after_cruise: pint.Quantity,
         R: pint.Quantity,
         h: pint.Quantity,
-        M: float,
+        M: float | pint.Quantity,
         TSFC: pint.Quantity | Callable,
         LD: float | pint.Quantity | Callable,
         integration_mass_step: pint.Quantity = 100 * ureg.kg,
@@ -121,24 +121,24 @@ class range_equation:
 
         Parameters
         ----------
-        m_after_cruise : float
+        m_after_cruise : pint.Quantity
             Mass of the aircraft after cruise segment (eg. OEW + Payload + Crew + Reserves) [mass]
-        R : float
+        R : pint.Quantity
             Range of the aircraft (=mission distance) [distance]
-        h : float
+        h : pint.Quantity
             Cruise altitude of the aircraft [length]
-        M : float
+        M : float | pint.Quantity
             Mach number during cruise [dimensionless]
-        TSFC : float or Callable
-            Thrust Specific Fuel Consumption of the aircraft during cruise, either as a constant value [time/distance] or as a function of Mach number and altitude.  
-        LD : float or Callable
-            Lift-to-drag ratio of the aircraft during cruise, either as a constant value [dimensionless] or as a function of lift, Mach number and altitude.  
-        integration_mass_step : float
+        TSFC : pint.Quantity or Callable
+            Thrust Specific Fuel Consumption of the aircraft during cruise, either as a constant value [time/distance] or as a function of Mach number and altitude.
+        LD : float, pint.Quantity or Callable
+            Lift-to-drag ratio of the aircraft during cruise, either as a constant value [dimensionless] or as a function of lift, Mach number and altitude.
+        integration_mass_step : pint.Quantity
             Mass step for numerical integration [mass]. A smaller step will yield a more accurate result, but will also increase computation time. Default is 100 kg.
-    
+
         Returns
         -------
-        pint.Quantity [mass]
+        pint.Quantity
             Required fuel mass [kg]
 
         Raises
@@ -223,15 +223,15 @@ class range_equation:
         "[time]/[length]",  # [mg/Ns] = s/m
     )
     def calculate_stepclimb_arctan(
-        R: pint.Quantity[float | int],
-        h: pint.Quantity[float | int],
-        K: float | int | pint.Quantity[float | int],
-        C_D0: float | int | pint.Quantity[float | int],
-        m_after_cruise: pint.Quantity[float | int],
-        S: pint.Quantity[float | int],
-        V: pint.Quantity[float | int],
-        TSFC: pint.Quantity[float | int],
-    ) -> float:
+        R: pint.Quantity,
+        h: pint.Quantity,
+        K: float | pint.Quantity,
+        C_D0: float | pint.Quantity,
+        m_after_cruise: pint.Quantity,
+        S: pint.Quantity,
+        V: pint.Quantity,
+        TSFC: pint.Quantity,
+    ) -> pint.Quantity:
         r"""
         Given a flight distance (=range) $R$ and basic aircraft performance parameters (see table),
         returns the fuel mass burned during the flight $m_f$ [kg] based on a flight schedule where 
@@ -365,15 +365,15 @@ class range_equation:
         "[]",
     )
     def calculate_improved(
-        R: pint.Quantity[float | int],
-        LD: float | int | pint.Quantity[float | int],
-        m_after_cruise: pint.Quantity[float | int],
-        V: pint.Quantity[float | int],
-        V_headwind: pint.Quantity[float | int],
-        TSFC: pint.Quantity[float | int],
-        lost_fuel_fraction: float | int | pint.Quantity[float | int] = 0.0152,
-        recovered_fuel_fraction: float | int | pint.Quantity[float | int] = 0.001,
-    ) -> float:
+        R: pint.Quantity,
+        LD: float | pint.Quantity,
+        m_after_cruise: pint.Quantity,
+        V: pint.Quantity,
+        V_headwind: pint.Quantity,
+        TSFC: pint.Quantity,
+        lost_fuel_fraction: float | pint.Quantity = 0.0152,
+        recovered_fuel_fraction: float | pint.Quantity = 0.001,
+    ) -> pint.Quantity:
         r"""
         Given a flight distance (=range) $R$ and basic aircraft performance parameters (see table),
         returns the fuel mass burned during the flight $m_f$ [kg] based on a flight schedule 
@@ -493,12 +493,12 @@ class range_equation:
         "[length]", "[]", "[mass]", "[speed]", "[time]/[length]"
     )  # [mg/Ns] = s/m
     def calculate(
-        R: pint.Quantity[float | int],
-        LD: float | int | pint.Quantity[float | int],
-        m_after_cruise: pint.Quantity[float | int],
-        V: pint.Quantity[float | int],
-        TSFC: pint.Quantity[float | int],
-    ) -> float:
+        R: pint.Quantity,
+        LD: float | pint.Quantity,
+        m_after_cruise: pint.Quantity,
+        V: pint.Quantity,
+        TSFC: pint.Quantity,
+    ) -> pint.Quantity:
         r"""
         Given a flight distance (=range) $R$ and basic aircraft performance parameters (see table),
         returns the fuel mass burned during the flight $m_f$ [kg] based on a flight schedule where
@@ -566,20 +566,20 @@ class range_equation:
 
         Parameters
         ----------
-        R : float
+        R : pint.Quantity
             Range of the aircraft (=mission distance) [distance]
-        LD : float
+        LD : float | pint.Quantity
             Lift-to-Drag ratio of the aircraft [dimensionless]
-        m_after_cruise : float
+        m_after_cruise : pint.Quantity
             Mass of the aircraft after landing (eg. OEW + Payload + Crew + Reserves) [mass]
-        V : float
+        V : pint.Quantity
             Average cruise speed of the aircraft (TAS) [speed]
-        TSFC : float
+        TSFC : pint.Quantity
             Average Thrust Specific Fuel Consumption of the aircraft during cruise [time/distance (results from the definition of TSFC)]
 
         Returns
         -------
-        float
+        pint.Quantity
             Required fuel mass [kg]
 
         Example

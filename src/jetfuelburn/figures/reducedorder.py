@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import pandas as pd
 
 
-def figure_lee2010():
+def figure_lee2010() -> go.Figure:
     """
     Creates a Plotly figure comparing my implementation of Lee et al. (2010) with the original data
     from the paper. The figure shows the payload vs range for a B732 aircraft.

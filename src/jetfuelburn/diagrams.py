@@ -1,3 +1,4 @@
+import pint
 from jetfuelburn import ureg
 
 
@@ -19,16 +20,16 @@ class payload_range:
         "[length]",
     )
     def calculate(
-        d: float,
-        oew: float,
-        mtow: float,
-        range_point_A: float,
-        payload_point_B: float,
-        range_point_B: float,
-        payload_point_C: float,
-        range_point_C: float,
-        range_point_D: float,
-    ) -> dict[float, float]:
+        d: pint.Quantity,
+        oew: pint.Quantity,
+        mtow: pint.Quantity,
+        range_point_A: pint.Quantity,
+        payload_point_B: pint.Quantity,
+        range_point_B: pint.Quantity,
+        payload_point_C: pint.Quantity,
+        range_point_C: pint.Quantity,
+        range_point_D: pint.Quantity,
+    ) -> dict[str, pint.Quantity]:
         r"""
         Given aircraft performance parameters from a payload/range diagram and a flight distance $d$,
         calculates the required fuel mass $m_F$ and payload mass $m_{PL}$ for a given mission.
@@ -66,31 +67,31 @@ class payload_range:
 
         Parameters
         ----------
-        d : float
+        d : pint.Quantity
             Flight distance [length]
-        oew : float
+        oew : pint.Quantity
             Operating Empty Weight (OEW) of the aircraft [mass]
-        mtow : float
+        mtow : pint.Quantity
             Maximum Takeoff Weight (MTOW) of the aircraft [mass]
-        range_point_A : float
+        range_point_A : pint.Quantity
             Range at point A [length]
-        payload_point_B : float
+        payload_point_B : pint.Quantity
             Payload mass at point B [mass]
-        range_point_B : float
+        range_point_B : pint.Quantity
             Range at point B [length]
-        payload_point_C : float
+        payload_point_C : pint.Quantity
             Payload mass at point C [mass]
-        range_point_C : float
+        range_point_C : pint.Quantity
             Range at point C [length]
-        range_point_D : float
+        range_point_D : pint.Quantity
             Range at point D [length]
 
         Returns
         -------
-        dict
-            'mass_fuel' : ureg.Quantity
+        dict[str, pint.Quantity]
+            'mass_fuel' : pint.Quantity
                 Fuel mass [kg]
-            'mass_payload' : ureg.Quantity
+            'mass_payload' : pint.Quantity
                 Payload mass [kg]
 
         Raises

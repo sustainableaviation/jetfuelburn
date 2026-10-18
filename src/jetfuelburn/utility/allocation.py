@@ -1,5 +1,8 @@
+import pint
+
+
 def footprint_allocation_by_area(
-    fuel_per_flight: float,
+    fuel_per_flight: float | pint.Quantity,
     size_factor_eco: float,
     size_factor_premiumeco: float,
     size_factor_business: float,
@@ -12,7 +15,7 @@ def footprint_allocation_by_area(
     load_factor_premiumeco: float,
     load_factor_business: float,
     load_factor_first: float,
-) -> dict[float, float, float, float]:
+) -> dict[str, float | pint.Quantity]:
     r"""
     Given the fuel burn per flight $F$, the number of seats in each cabin class $S_i$,
     the load factor in each cabin class $L_i$ and the size factor of each cabin class $s_i$,
@@ -77,7 +80,7 @@ def footprint_allocation_by_area(
 
     Parameters
     ----------
-    fuel_per_flight : float
+    fuel_per_flight : float | pint.Quantity
         Fuel burn per flight.
     size_factor_eco : float
         Size factor for economy class (1 by definition).
@@ -106,8 +109,9 @@ def footprint_allocation_by_area(
 
     Returns
     -------
-    dict[float, float, float, float]
-        Fuel burn per passenger per flight in economy, premium economy, business and first class.
+    dict[str, float | pint.Quantity]
+        Fuel burn per passenger per flight in economy, premium economy, business and first class
+        (keys `fuel_eco`, `fuel_premiumeco`, `fuel_business`, `fuel_first`), in the units of `fuel_per_flight`.
 
     Example
     -------
