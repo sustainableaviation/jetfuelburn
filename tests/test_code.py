@@ -51,6 +51,26 @@ class TestValidatePhysicsFunctionParameters:
 
         _validate_physics_function_parameters(dummy_func, set())
 
+    def test_var_keyword(self):
+        """A function with **kwargs accepts any parameter name."""
+
+        def dummy_func(**kwargs):
+            pass
+
+        _validate_physics_function_parameters(dummy_func, {"altitude", "speed"})
+
+    def test_partial_without_a_name(self):
+        """The error message copes with callables that have no __name__."""
+        import functools
+
+        def dummy_func(altitude):
+            pass
+
+        with pytest.raises(ValueError, match="missing parameters"):
+            _validate_physics_function_parameters(
+                functools.partial(dummy_func), {"altitude", "speed"}
+            )
+
 
 class TestNormalizePhysicsFunctionOrScalar:
     """Test suite for _normalize_physics_function_or_scalar."""

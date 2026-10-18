@@ -175,12 +175,12 @@ class range_equation:
         if h < 0 * ureg.meter:
             raise ValueError("Altitude must be non-negative")
 
-        if type(TSFC) == Callable:
+        if callable(TSFC):
             _validate_physics_function_parameters(
                 func=TSFC,
                 required_params={"M", "h"},
             )
-        if type(LD) == Callable:
+        if callable(LD):
             _validate_physics_function_parameters(
                 func=LD,
                 required_params={"L", "M", "h"},

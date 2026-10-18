@@ -48,6 +48,7 @@ Old names remain available as deprecated aliases: they point to the new class an
 - `reducedorder.seymour_etal.calculate()` squared the first coefficient (`a1**2 * R`), which dropped the quadratic term in all earlier releases. It now evaluates $F = a_1 R^2 + a_2 R + c$. Together with the new coefficients, results rise by a median of 3.5 % at 1,000 km, 9 % at 3,000 km and 19 % at 6,000 km (over the types whose maximum range in Table L.6 of the Supplementary Information reaches the distance). Results for the 26 types with a negative quadratic coefficient fall below those of earlier releases at long range, and `calculate()` raises a `ValueError` where such a fit no longer returns a positive fuel burn.
 - `reducedorder.myclimate` had the coefficients of the A320 and the B737 swapped. They now match the parameter tables of the myclimate Calculation Principles page.
 - `utility.allocation.footprint_allocation_by_area()` returns zero in the units of `fuel_per_flight` for cabin classes without seats. Earlier releases returned a bare `0` next to pint quantities.
+- `rangeequation.range_equation.calculate_stepclimb_integration()` now checks that a `TSFC` or `LD` function accepts the parameters it is called with (`M` and `h`, or `L`, `M` and `h`). The check never ran in earlier releases.
 
 ## `3.4.0` (14. July 2026)
 

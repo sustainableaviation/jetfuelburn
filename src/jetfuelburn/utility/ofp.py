@@ -103,14 +103,14 @@ def _get_aircraft_performance(
     Example
     -------
     ```pyodide install='jetfuelburn'
-    import jetfuelburn
+    from importlib.resources import files
     from jetfuelburn import ureg
-
-    jetfuelburn._get_aircraft_performance(
-        jetfuelburn.data.EurocontrolAPD.data.json,
-        "B123",
-        "climb",
-        30000 * ureg.ft,
+    from jetfuelburn.utility.ofp import _get_aircraft_performance
+    _get_aircraft_performance(
+        perf_data_path=files("jetfuelburn.data.EurocontrolAPD").joinpath("data.json"),
+        aircraft_type="B123",
+        phase="climb",
+        alt=30000 * ureg.ft,
     )
     ```
     """
@@ -277,8 +277,10 @@ def generate_4d_trajectory(
     Example
     -------
     ```pyodide install='jetfuelburn'
-    import jetfuelburn
+    from importlib.resources import files
+    import pandas as pd
     from jetfuelburn import ureg
+    from jetfuelburn.utility.ofp import generate_4d_trajectory
     df_ofp = pd.DataFrame({
         "waypoint": ["DEP", "MID", "ARR"],
         "alt": [0, "CLB", 5000],
@@ -286,10 +288,10 @@ def generate_4d_trajectory(
         "lat": [47.0, 47.5, 48.0],
         "lon": [8.0, 8.5, 9.0],
     })
-    result = jetfuelburn.generate_4d_trajectory(
-        df_ofp,
-        "B123",
-        jetfuelburn.DATA_JSON,
+    generate_4d_trajectory(
+        df_ofp=df_ofp,
+        aircraft_type="B123",
+        perf_data_path=files("jetfuelburn.data.EurocontrolAPD").joinpath("data.json"),
         time_resolution=1 * ureg.minute,
         timestamp_start=pd.Timestamp("2025-01-01 00:00:00"),
     )

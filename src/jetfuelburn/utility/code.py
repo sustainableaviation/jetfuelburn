@@ -10,7 +10,7 @@ def _validate_physics_function_parameters(
     required_params: set[str],
 ) -> None:
     r"""
-    Validates that a physics function has exactly the expected parameters.
+    Validates that a physics function accepts the expected parameters, by name or through `**kwargs`.
 
     Parameters
     ----------
@@ -22,15 +22,17 @@ def _validate_physics_function_parameters(
     Raises
     ------
     ValueError
-        If the function's parameters do not match the expected names.
+        If the function lacks one of the expected parameter names.
     """
-    sig = inspect.signature(func)
-    func_params = sig.parameters.keys()
-    missing = required_params - func_params
+    parameters = inspect.signature(func).parameters
+    if any(p.kind is inspect.Parameter.VAR_KEYWORD for p in parameters.values()):
+        return  # `**kwargs` accepts any parameter name
+    missing = required_params - parameters.keys()
     if missing:
+        name = getattr(func, "__name__", repr(func))
         raise ValueError(
-            f"Function {func.__name__} missing parameters: {missing}. "
-            f"Must accept: {required_params}"
+            f"Function {name} missing parameters: {sorted(missing)}. "
+            f"Must accept: {sorted(required_params)}"
         )
 
 

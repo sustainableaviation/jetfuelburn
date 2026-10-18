@@ -298,6 +298,35 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
         assert result.units == ureg.kg
         assert result.magnitude > 0
 
+    def test_callable_without_the_named_parameters_is_rejected(self):
+        """A TSFC or LD function must accept the names it is called with."""
+        params = dict(
+            m_after_cruise=100 * ureg.metric_ton,
+            R=2000 * ureg.nmi,
+            h=35000 * ureg.feet,
+            M=0.78,
+        )
+        with pytest.raises(ValueError, match="missing parameters"):
+            range_equation.calculate_stepclimb_integration(
+                TSFC=lambda x, y: 17 * (ureg.mg / ureg.N / ureg.s), LD=18, **params
+            )
+        with pytest.raises(ValueError, match="missing parameters"):
+            range_equation.calculate_stepclimb_integration(
+                TSFC=17 * (ureg.mg / ureg.N / ureg.s), LD=lambda L: 18, **params
+            )
+
+    def test_callable_with_kwargs_is_accepted(self):
+        """A function taking **kwargs accepts any parameter name."""
+        result = range_equation.calculate_stepclimb_integration(
+            m_after_cruise=100 * ureg.metric_ton,
+            R=2000 * ureg.nmi,
+            h=35000 * ureg.feet,
+            M=0.78,
+            TSFC=lambda **kwargs: 17 * (ureg.mg / ureg.N / ureg.s),
+            LD=lambda **kwargs: 18,
+        )
+        assert result.magnitude > 0
+
     @pytest.mark.parametrize(
         "invalid_input",
         [
