@@ -1,5 +1,4 @@
 # %%
-from jetfuelburn import ureg
 from importlib import resources
 import json
 import pint

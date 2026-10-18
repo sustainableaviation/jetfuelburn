@@ -1,5 +1,4 @@
 # %%
-from jetfuelburn import ureg
 import inspect
 from typing import Callable
 import pint

@@ -18,8 +18,6 @@ nav:
     - Range Equation: 'api/rangeequation.md'
     - Statistics Models: 'api/statistics.md'
     - Reduced Order Models: 'api/reducedorder.md'
-    #- Combined Models: 'api/combined.md'
-    #- Closed Form Models: 'api/closedform.md' 
     - Cabin Class Fuel Allocation: 'api/allocation.md'
   - API Reference (Utility):
     - Aerodynamics: 'api/aerodynamics.md'

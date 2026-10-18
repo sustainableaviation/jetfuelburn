@@ -27,6 +27,7 @@ Old names remain available as deprecated aliases: they point to the new class an
 - Airport lookups in `utility.geography` follow the new airport list. Codes of closed or re-coded airports and some former airport names now raise a `ValueError` in `calculate_distance_between_airports()`.
 - Aircraft are identified by ICAO designators throughout: e.g. 'Boeing 737 MAX 7' becomes `B37M`, 'E175' becomes `E75L` and 'Airbus A321neo' becomes `A21N`, etc.
 - `statistics.aeromaps` and its data in `data/AeroMaps` are removed.
+- The unimplemented `closedform` module and the `figures.benchmarking` and `figures.realdata` stubs are removed.
 
 ### Improvements
 
