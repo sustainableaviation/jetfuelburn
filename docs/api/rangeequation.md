@@ -19,7 +19,7 @@
     !!! note "References"
         Section 13.2 in Young, T. M. (2018).
         Performance of the Jet Transport Airplane (Section 13.7.3 "Fuel Required for Specified Range"). 
-        _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
+        _John Wiley & Sons_. <https://doi.org/10.1002/9781118534786>
 
     Note also that some authors spell "Breguet" as "Bréguet" (with accent on the "e"). This is not limited to non-French speakers. 
     Even in his original 1923 publication ["Calcul du Poids de Combustible Consummé par un Avion en vol Ascendant"](https://fr.wikisource.org/wiki/Livre:Comptes_rendus_hebdomadaires_des_séances_de_l’Académie_des_sciences,_tome_177,_1923.djvu)

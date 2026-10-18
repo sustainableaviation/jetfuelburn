@@ -148,7 +148,7 @@ class range_equation:
         Young, T. M. (2018). 
         Performance of the Jet Transport Airplane. 
         _John Wiley & Sons_. 
-        doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
+        <https://doi.org/10.1002/9781118534786>
 
         Example
         -------
@@ -340,7 +340,7 @@ class range_equation:
         Young, T. M. (2018). 
         Performance of the Jet Transport Airplane. 
         _John Wiley & Sons_. 
-        doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
+        <https://doi.org/10.1002/9781118534786>
 
         Example
         -------
@@ -524,7 +524,7 @@ class range_equation:
         Eqn. 19 in Randle, W. E., Hall, C. A., & Vera-Morales, M. (2011). 
         Improved range equation based on aircraft flight data. 
         _Journal of Aircraft_. 
-        doi:[10.2514/1.C031262](https://doi.org/10.2514/1.C031262)
+        <https://doi.org/10.2514/1.C031262>
 
         Example
         -------
@@ -662,8 +662,8 @@ class range_equation:
         References
         ----------
         - Young, T. M. (2018).
-        Performance of the Jet Transport Airplane (Section 13.7.3 "Fuel Required for Specified Range"). _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
-        - Cavcar, M. (2006). Bréguet range equation?. _Journal of Aircraft_. doi:[10.2514/1.17696](https://doi.org/10.2514/1.17696)
+        Performance of the Jet Transport Airplane (Section 13.7.3 "Fuel Required for Specified Range"). _John Wiley & Sons_. <https://doi.org/10.1002/9781118534786>
+        - Cavcar, M. (2006). Bréguet range equation?. _Journal of Aircraft_. <https://doi.org/10.2514/1.17696>
         - [Range (Aeronautics) entry on Wikipedia](https://en.wikipedia.org/wiki/Range_(aeronautics))
 
         Example

@@ -73,7 +73,7 @@ class poll_schumann_drag_polars:
     An estimation method for the fuel burn and other performance characteristics of civil transport aircraft;
     part 3 full flight profile when the trajectory is specified.
     _The Aeronautical Journal_, 129(1334), 825-861.
-    doi:[10.1017/aer.2024.141](https://doi.org/10.1017/aer.2024.141)
+    <https://doi.org/10.1017/aer.2024.141>
 
     Licensing Note
     --------------

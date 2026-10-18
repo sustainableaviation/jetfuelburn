@@ -17,7 +17,7 @@ def figure_lee2010() -> go.Figure:
     Lee, H. T., & Chatterji, G. (2010, September).
     Closed-form takeoff weight estimation model for air transportation simulation.
     In _10th AIAA Aviation Technology, Integration, and Operations (ATIO) Conference_ (p. 9156).
-    doi:[10.2514/6.2010-9156](https://doi.org/10.2514/6.2010-9156) (Figure 6, data `f_res=0.08`)
+    <https://doi.org/10.2514/6.2010-9156> (Figure 6, data `f_res=0.08`)
 
     Returns:
         go.Figure: Plotly figure object with payload vs range plot

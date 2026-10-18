@@ -79,7 +79,7 @@ def calculate_corrected_tsfc(
     See Also
     --------
     - [Thrust-Specific Fuel Consumption entry on Wikipedia](https://en.wikipedia.org/wiki/Thrust-specific_fuel_consumption)
-    - Bensel, A. (2018). Characteristics of the Specific Fuel Consumption for Jet Engines. _Master's Thesis_. doi:[10.15488/4316](https://doi.org/10.15488/4316)
+    - Bensel, A. (2018). Characteristics of the Specific Fuel Consumption for Jet Engines. _Master's Thesis_. <https://doi.org/10.15488/4316>
 
     Notes
     -----
@@ -93,11 +93,11 @@ def calculate_corrected_tsfc(
     - Eqn. 3 in Martinez-Val, R., & Perez, E. (1992).
     Optimum cruise lift coefficient in initial design of jet aircraft.
     _Journal of Aircraft_, 29(4), 712-714.
-    doi:[10.2514/3.46226](https://doi.org/10.2514/3.46226)
+    <https://doi.org/10.2514/3.46226>
     - Eqn. 2 in Cavcar, A. (2006).
     Constant altitude-constant Mach number cruise range of transport aircraft with compressibility effects.
     _Journal of Aircraft_, 43(1), 125-131.
-    doi:[10.2514/1.14252](https://doi.org/10.2514/1.14252)
+    <https://doi.org/10.2514/1.14252>
 
     Example
     -------

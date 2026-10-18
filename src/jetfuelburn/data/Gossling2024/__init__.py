@@ -5,7 +5,7 @@
 # `models.csv` is a verbatim copy (commit 8cbc1093, retrieved 2026-07-14) of `src/models.csv` in the
 # private-jets repository, MIT License, © 2024 Jorge Leitão. Full notice in NOTICE.md.
 # The dataset underlies Gössling, Humpe & Leitão (2024), "Private aviation is making a growing contribution
-# to climate change", Communications Earth & Environment 5:666, doi:10.1038/s43247-024-01775-z (CC BY 4.0).
+# to climate change", Communications Earth & Environment 5:666, https://doi.org/10.1038/s43247-024-01775-z (CC BY 4.0).
 # The columns `source` and `date` record where each row comes from.
 
 # ICAO designators:

@@ -54,12 +54,12 @@ class montlaur_etal:
     Montlaur, A., Trapote-Barreira, C., & Delgado, L. (2025).
     Analytical models of flight fuel consumption and Non-CO2 emissions as a function of aircraft capacity.
     _Applied Sciences_, 15(17), 9688.
-    doi:[10.3390/app15179688](https://doi.org/10.3390/app15179688)
+    <https://doi.org/10.3390/app15179688>
 
     Montlaur, A., Delgado, L., & Trapote-Barreira, C. (2021).
     Analytical models for CO2 emissions and travel time for short-to-medium-haul flights considering available seats.
     _Sustainability_, 13(18), 10401.
-    doi:[10.3390/su131810401](https://doi.org/10.3390/su131810401)
+    <https://doi.org/10.3390/su131810401>
 
     Licensing Note
     --------------
@@ -260,7 +260,7 @@ class sacchi_etal:
     References
     ----------
     Sacchi, R., Becattini, V., Gabrielli, P., Cox, B., Dirnaichner, A., Bauer, C., & Mazzotti, M. (2023).
-    How to make climate-neutral aviation fly. _Nature Communications_. doi:[10.1038/s41467-023-39749-y](https://doi.org/10.1038/s41467-023-39749-y)
+    How to make climate-neutral aviation fly. _Nature Communications_. <https://doi.org/10.1038/s41467-023-39749-y>
 
     Licensing Note
     --------------
@@ -472,7 +472,7 @@ class yanto_etal:
     Yanto, J., & Liem, R. P. (2017).
     Efficient fast approximation for aircraft fuel consumption for decision-making and policy analysis.
     In _AIAA Modeling and Simulation Technologies Conference_ (p. 3338).
-    doi:[10.2514/6.2017-3338](https://doi.org/10.2514/6.2017-3338)
+    <https://doi.org/10.2514/6.2017-3338>
 
     Example
     -------
@@ -638,7 +638,7 @@ class lee_etal:
     Lee, H. T., & Chatterji, G. (2010, September).
     Closed-form takeoff weight estimation model for air transportation simulation.
     In _10th AIAA Aviation Technology, Integration, and Operations (ATIO) Conference_ (p. 9156).
-    doi:[10.2514/6.2010-9156](https://doi.org/10.2514/6.2010-9156)
+    <https://doi.org/10.2514/6.2010-9156>
 
     Example
     -------
@@ -1077,7 +1077,7 @@ class seymour_etal:
     Seymour, K., Held, M., Georges, G., & Boulouchos, K. (2020).
     Fuel Estimation in Air Transportation: Modeling global fuel consumption for commercial aviation.
     _Transportation Research Part D: Transport and Environment_, 88, 102528.
-    doi:[10.1016/j.trd.2020.102528](https://doi.org/10.1016/j.trd.2020.102528)
+    <https://doi.org/10.1016/j.trd.2020.102528>
 
     Licensing Note
     --------------
@@ -1902,7 +1902,7 @@ class aim2015:
     - Dray, L. M., Krammer, P., Doyme, K., Wang, B., Al Zayat, K., O'Sullivan, A., & Schäfer, A. W. (2019).
     AIM2015: Validation and initial results from an open-source aviation systems model.
     _Transport Policy_, 79, 93-102.
-    doi:[10.1016/j.tranpol.2019.04.013](https://doi.org/10.1016/j.tranpol.2019.04.013)
+    <https://doi.org/10.1016/j.tranpol.2019.04.013>
     - Reynolds, T. G. (2009).
     Development of flight inefficiency metrics for environmental performance assessment of ATM.
     In _8th USA/Europe Seminar on Air Traffic Management Research and Development (ATM2009)_.
@@ -2517,7 +2517,7 @@ class gossling_etal:
     Gössling, S., Humpe, A., & Leitão, J. (2024).
     Private aviation is making a growing contribution to climate change.
     _Communications Earth & Environment_, 5, 666.
-    doi:[10.1038/s43247-024-01775-z](https://doi.org/10.1038/s43247-024-01775-z)
+    <https://doi.org/10.1038/s43247-024-01775-z>
 
     Licensing Note
     --------------
@@ -2640,6 +2640,8 @@ class turgut_etal:
     r"""
     This class implements the reduced-order cruise fuel-flow model of Turgut et al. (2014):
 
+    ![Turgut et al. Visual Abstract](../_static/reduced_order_turgut_etal.svg)
+
     In this model, the cruise-phase fuel flow is calculated from a multiple linear regression
     on three flight parameters: cruise altitude, aircraft mass, and true airspeed (TAS).
     The regression coefficients were obtained by fitting these parameters to 4320 cruise observations
@@ -2717,7 +2719,7 @@ class turgut_etal:
     Turgut, E. T., Cavcar, M., Usanmaz, O., Canarslanlar, A. O., Dogeroglu, T., Armutlu, K., & Yay, O. D. (2014).
     Fuel flow analysis for the cruise phase of commercial aircraft on domestic routes.
     _Aerospace Science and Technology_, 37, 1–9.
-    doi:[10.1016/j.ast.2014.04.012](https://doi.org/10.1016/j.ast.2014.04.012)
+    <https://doi.org/10.1016/j.ast.2014.04.012>
 
     Example
     -------

@@ -25,7 +25,7 @@ def load_isa_csv():
     "International Standard Atmosphere (ISA) Table" in Young, T. M. (2017).
     _Performance of the Jet Transport Airplane: Analysis Methods, Flight Operations, and Regulations._
     John Wiley & Sons.
-    doi:[10.1002/9781118534786.app1](https://doi.org/10.1002/9781118534786.app1)
+    <https://doi.org/10.1002/9781118534786.app1>
 
     See Also
     --------
@@ -82,7 +82,7 @@ def load_isa_csv():
     "International Standard Atmosphere (ISA) Table" in Young, T. M. (2017).
     _Performance of the Jet Transport Airplane: Analysis Methods, Flight Operations, and Regulations._
     John Wiley & Sons.
-    doi:[10.1002/9781118534786.app1](https://doi.org/10.1002/9781118534786.app1)
+    <https://doi.org/10.1002/9781118534786.app1>
 
     See Also
     --------

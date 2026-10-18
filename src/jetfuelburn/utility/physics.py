@@ -48,7 +48,7 @@ def _calculate_atmospheric_temperature(
 
     References
     ----------
-    Eqn.(1.6) in Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. doi:[10.1201/9781003279068](https://doi.org/10.1201/9781003279068)
+    Eqn.(1.6) in Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. <https://doi.org/10.1201/9781003279068>
 
     Example
     -------
@@ -132,8 +132,8 @@ def _calculate_atmospheric_density(
 
     References
     ----------
-    - Troposphere: Eqn. (4.14) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
-    - Stratosphere: Eqn. (4.16) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
+    - Troposphere: Eqn. (4.14) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. <https://doi.org/10.1002/9781118534786>
+    - Stratosphere: Eqn. (4.16) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. <https://doi.org/10.1002/9781118534786>
 
     Example
     -------
@@ -214,7 +214,7 @@ def _calculate_dynamic_pressure(
 
     References
     ----------
-    Eqn. (2.63) in in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
+    Eqn. (2.63) in in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. <https://doi.org/10.1002/9781118534786>
 
     Example
     -------
@@ -276,7 +276,7 @@ def _calculate_airspeed_from_mach(
 
     References
     ----------
-    Eqn.(1.33)-(1.34) Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. doi:[10.1201/9781003279068](https://doi.org/10.1201/9781003279068)
+    Eqn.(1.33)-(1.34) Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. <https://doi.org/10.1201/9781003279068>
 
     Example
     -------
@@ -342,7 +342,7 @@ def _calculate_mach_from_airspeed(
 
     References
     ----------
-    Eqn.(1.33)-(1.34) Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. doi:[10.1201/9781003279068](https://doi.org/10.1201/9781003279068)
+    Eqn.(1.33)-(1.34) Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. <https://doi.org/10.1201/9781003279068>
 
     Example
     -------
@@ -418,7 +418,7 @@ def _calculate_speed_of_sound(
 
     References
     ----------
-    Eqn. (2.77) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
+    Eqn. (2.77) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. <https://doi.org/10.1002/9781118534786>
     """
     T_val = temperature.to(ureg.kelvin)
     if T_val.magnitude < 0:

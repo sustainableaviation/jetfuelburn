@@ -31,7 +31,7 @@ Flight trajectories can be obtained in two ways:
 2. Actual Flight Data: Importing real flight trajectories from ADS-B data providers such as OpenSky Network, Flightradar24, or airplanes.live.
 
 !!! reference "References"
-    Sun, J., Hoekstra, J. M., & Ellerbroek, J. (2020). OpenAP: An open-source aircraft performance model for air transportation studies and simulations. *Aerospace*, 7(8), 104. doi:[10.3390/aerospace7080104](https://doi.org/10.3390/aerospace7080104)
+    Sun, J., Hoekstra, J. M., & Ellerbroek, J. (2020). OpenAP: An open-source aircraft performance model for air transportation studies and simulations. *Aerospace*, 7(8), 104. <https://doi.org/10.3390/aerospace7080104>
     
 !!! reference "See Also"
     - [OpenAP Handbook](https://openap.dev)

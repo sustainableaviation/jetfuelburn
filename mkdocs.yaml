@@ -39,9 +39,7 @@ theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
   logo: _static/logos/jetfuelburn_logo.svg
   favicon: _static/logos/jetfuelburn_logo.svg
   features:
-    # instant navigation is intentionally disabled: it re-executes page
-    # content scripts out of order (breaks the interactive Plotly figure)
-    # — see https://github.com/zensical/ui/issues/190
+    - navigation.instant
     - navigation.expand
     - navigation.path
     - navigation.indexes
