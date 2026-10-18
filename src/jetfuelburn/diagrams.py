@@ -1,3 +1,5 @@
+"""Fuel burn read off the payload/range diagram of an aircraft."""
+
 import pint
 from jetfuelburn import ureg
 
@@ -41,30 +43,6 @@ class payload_range:
         Note that in this figure, the y-axis shows _total_ aircraft weight, not _payload weight_.
         Total aircraft weight can be computed by adding the operating empty weight (OEW) to the payload weight and fuel weight.
 
-        Notes
-        -----
-        Key assumptions of this fuel calculation function:
-
-        | Parameter         | Assumption                                                          |
-        |-------------------|---------------------------------------------------------------------|
-        | data availability | excellent for existing aircraft (payload/range diagrams are public) |
-        | aircraft payload  | maximum payload possible payload                                    |
-        | climb/descent     | implicitly considered                                               |
-        | fuel reserves     | depends on (sometimes unknown) manufacturer assumptions             |
-        | alternate airport | depends on (sometimes unknown) manufacturer assumptions             |
-
-        Warnings
-        --------
-        There is no manufacturer-independent convention for including
-        reserve and alternate fuel in payload/range diagrams.
-        Limited evidence suggests that eg. Boeing always assumes a 200nmi diversion distance (cf. [Slide 43 in this Boeing presentation](https://web.archive.org/web/20250000000000*/http://aviation.itu.edu.tr//img/aviation/datafiles/Lecture%20Notes/FundamentalsofAirlineManagement20152016/Lecture%20Notes/10.1-ITU_Airplane_Performance.pdf) and [this airliners.net discussion](https://www.airliners.net/forum/viewtopic.php?t=764183#p11029989)).
-        The user is therefore cautioned against directly comparing aircraft of different manufacturers using this function.
-
-        References
-        --------
-        - [Burzlaff (2017), Fig. 3.10](https://www.fzt.haw-hamburg.de/pers/Scholz/arbeiten/TextBurzlaff.pdf)
-        - ["Aircraft Payload-Range Analysis for Financiers", Fig. 5 ff.](http://www.aircraftmonitor.com/uploads/1/5/9/9/15993320/aircraft_payload_range_analysis_for_financiers___v2.pdf)
-
         Parameters
         ----------
         d : pint.Quantity
@@ -102,6 +80,30 @@ class payload_range:
             If the distance is less than zero.
         ValueError
             If the distance exceeds the maximum range of the aircraft as per the payload-range diagram.
+
+        Warnings
+        --------
+        There is no manufacturer-independent convention for including
+        reserve and alternate fuel in payload/range diagrams.
+        Limited evidence suggests that eg. Boeing always assumes a 200nmi diversion distance (cf. [Slide 43 in this Boeing presentation](https://web.archive.org/web/20250000000000*/http://aviation.itu.edu.tr//img/aviation/datafiles/Lecture%20Notes/FundamentalsofAirlineManagement20152016/Lecture%20Notes/10.1-ITU_Airplane_Performance.pdf) and [this airliners.net discussion](https://www.airliners.net/forum/viewtopic.php?t=764183#p11029989)).
+        The user is therefore cautioned against directly comparing aircraft of different manufacturers using this function.
+
+        Notes
+        -----
+        Key assumptions of this fuel calculation function:
+
+        | Parameter         | Assumption                                                          |
+        |-------------------|---------------------------------------------------------------------|
+        | data availability | excellent for existing aircraft (payload/range diagrams are public) |
+        | aircraft payload  | maximum payload possible payload                                    |
+        | climb/descent     | implicitly considered                                               |
+        | fuel reserves     | depends on (sometimes unknown) manufacturer assumptions             |
+        | alternate airport | depends on (sometimes unknown) manufacturer assumptions             |
+
+        References
+        ----------
+        - [Burzlaff (2017), Fig. 3.10](https://www.fzt.haw-hamburg.de/pers/Scholz/arbeiten/TextBurzlaff.pdf)
+        - ["Aircraft Payload-Range Analysis for Financiers", Fig. 5 ff.](http://www.aircraftmonitor.com/uploads/1/5/9/9/15993320/aircraft_payload_range_analysis_for_financiers___v2.pdf)
 
         Example
         -------

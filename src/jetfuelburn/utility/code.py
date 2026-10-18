@@ -1,4 +1,5 @@
-# %%
+"""Helpers for function arguments and for deprecated names."""
+
 import inspect
 from typing import Callable
 import pint
@@ -40,21 +41,6 @@ def _normalize_physics_function_or_scalar(
     Given a scalar or Callable, wraps scalars in a lambda function.
     Callables are returned as-is.
 
-    See Also
-    --------
-    [`jetfuelburn.rangeequation.IntegratedRangeCalculator`][]
-
-    Notes
-    -----
-    For scalars, the resulting lambda function will accept any arguments and ignore them, returning the constant value.
-    For instance, for:
-
-    ```python
-    const_func = _normalize_physics_function(42)
-    ```
-
-    Calling `const_func(x, y, z)` for any `x`, `y`, `z` will return `42`.
-
     Parameters
     ----------
     function_or_scalar : float | pint.Quantity | Callable
@@ -69,6 +55,21 @@ def _normalize_physics_function_or_scalar(
     ------
     TypeError
         If the input is neither a scalar nor a Callable.
+
+    See Also
+    --------
+    [`jetfuelburn.rangeequation.IntegratedRangeCalculator`][]
+
+    Notes
+    -----
+    For scalars, the resulting lambda function will accept any arguments and ignore them, returning the constant value.
+    For instance, for:
+
+    ```python
+    const_func = _normalize_physics_function(42)
+    ```
+
+    Calling `const_func(x, y, z)` for any `x`, `y`, `z` will return `42`.
     """
     if isinstance(function_or_scalar, (pint.Quantity, float, int)):
         return lambda *args, **kwargs: function_or_scalar

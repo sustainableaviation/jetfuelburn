@@ -1,4 +1,6 @@
-# JetFuelBurn
+---
+hide_title: true
+---
 
 [![PyPI Downloads](https://img.shields.io/pepy/dt/jetfuelburn?label=PyPI%20Downloads&logo=pypi&logoColor=white)](https://pepy.tech/project/jetfuelburn)
 [![License: MIT](https://img.shields.io/pypi/l/jetfuelburn?label=License&logo=open-source-initiative&logoColor=white)](https://pypi.org/project/jetfuelburn/)

@@ -11,7 +11,7 @@ from jetfuelburn.utility.physics import (
     _calculate_speed_of_sound,
 )
 
-from jetfuelburn.utility.tests import approx_with_units
+from .helpers import approx_with_units
 
 
 def load_isa_csv():

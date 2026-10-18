@@ -1,4 +1,5 @@
-# %%
+"""Corrections of engine fuel consumption to other flight conditions."""
+
 import pint
 from jetfuelburn import ureg
 from jetfuelburn.utility.physics import _calculate_atmospheric_temperature
@@ -40,39 +41,6 @@ def calculate_corrected_tsfc(
     | $\Theta_{\text{reported}}$     | [dimensionless]  | The reported atmospheric temperature ratio, calculated as $T_{\text{reported}} / T(h=0)$.                                 |
     | $\beta$                        | [dimensionless]  | An empirically derived exponent that captures how TSFC changes with Mach number.                                          |
 
-    Notes
-    -----
-    Cavcar (2006) suggests for $\beta$:
-
-    > 0.2–0.4 for low bypass turbofan engines and 0.4–0.7 for high bypass turbofan engines.
-    - P.126 in Martinez-Val & Perez (1992)
-
-    Warnings
-    --------
-    Trust-specific fuel consumption is a complex function of many parameters,
-    and generally dependent on engine thrust as well as the Mach number:
-
-    ![TSFC vs Thrust](../_static/tsfc.svg)
-
-    The correction formula implemented in this function is a simplified empirical model
-    which considers only variations in Mach number and atmospheric temperature, not thrust.
-
-    See Also
-    --------
-    - [Thrust-Specific Fuel Consumption entry on Wikipedia](https://en.wikipedia.org/wiki/Thrust-specific_fuel_consumption)
-    - Bensel, A. (2018). Characteristics of the Specific Fuel Consumption for Jet Engines. _Master's Thesis_. doi:[10.15488/4316](https://doi.org/10.15488/4316)
-
-    References
-    ----------
-    - Eqn. 3 in Martinez-Val, R., & Perez, E. (1992).
-    Optimum cruise lift coefficient in initial design of jet aircraft.
-    _Journal of Aircraft_, 29(4), 712-714.
-    doi:[10.2514/3.46226](https://doi.org/10.2514/3.46226)
-    - Eqn. 2 in Cavcar, A. (2006).
-    Constant altitude-constant Mach number cruise range of transport aircraft with compressibility effects.
-    _Journal of Aircraft_, 43(1), 125-131.
-    doi:[10.2514/1.14252](https://doi.org/10.2514/1.14252)
-
     Parameters
     ----------
     tsfc_reported : pint.Quantity
@@ -88,15 +56,48 @@ def calculate_corrected_tsfc(
     beta : float | pint.Quantity
         An empirically derived exponent that captures how TSFC changes with Mach number [dimensionless].
 
+    Returns
+    -------
+    pint.Quantity
+        The actual thrust-specific fuel consumption under the given flight conditions [time/length].
+
     Raises
     ------
     ValueError
         If any of the input parameters are non-positive, or if beta is non-positive.
 
-    Returns
-    -------
-    pint.Quantity
-        The actual thrust-specific fuel consumption under the given flight conditions [time/length].
+    Warnings
+    --------
+    Thrust-specific fuel consumption is a complex function of many parameters,
+    and generally dependent on engine thrust as well as the Mach number:
+
+    ![TSFC vs Thrust](../_static/tsfc.svg)
+
+    The correction formula implemented in this function is a simplified empirical model
+    which considers only variations in Mach number and atmospheric temperature, not thrust.
+
+    See Also
+    --------
+    - [Thrust-Specific Fuel Consumption entry on Wikipedia](https://en.wikipedia.org/wiki/Thrust-specific_fuel_consumption)
+    - Bensel, A. (2018). Characteristics of the Specific Fuel Consumption for Jet Engines. _Master's Thesis_. doi:[10.15488/4316](https://doi.org/10.15488/4316)
+
+    Notes
+    -----
+    Cavcar (2006) suggests for $\beta$:
+
+    > 0.2–0.4 for low bypass turbofan engines and 0.4–0.7 for high bypass turbofan engines.
+    - P.126 in Martinez-Val & Perez (1992)
+
+    References
+    ----------
+    - Eqn. 3 in Martinez-Val, R., & Perez, E. (1992).
+    Optimum cruise lift coefficient in initial design of jet aircraft.
+    _Journal of Aircraft_, 29(4), 712-714.
+    doi:[10.2514/3.46226](https://doi.org/10.2514/3.46226)
+    - Eqn. 2 in Cavcar, A. (2006).
+    Constant altitude-constant Mach number cruise range of transport aircraft with compressibility effects.
+    _Journal of Aircraft_, 43(1), 125-131.
+    doi:[10.2514/1.14252](https://doi.org/10.2514/1.14252)
 
     Example
     -------
@@ -139,7 +140,7 @@ def calculate_corrected_tsfc(
 
     relative_temperature_reported = (
         t_reported_abs / t_sea_level_abs
-    )  # if not coverted to Kelvin, will raise "pint.errors.OffsetUnitCalculusError: Ambiguous operation with offset unit (degree_Celsius, degree_Celsius)"
+    )  # if not converted to Kelvin, will raise "pint.errors.OffsetUnitCalculusError: Ambiguous operation with offset unit (degree_Celsius, degree_Celsius)"
 
     relative_temperature_actual = t_actual_abs / t_sea_level_abs
     tsfc_actual = (

@@ -8,7 +8,8 @@ authors:
 title: "JetFuelBurn: A Python package for calculating fuel burn of commercial aircraft"
 license: MIT
 doi: 10.21105/joss.09280
-date-released: 2026-01-10
+version: 4.0.0
+date-released: 2026-10-16
 preferred-citation:
   type: article
   authors:

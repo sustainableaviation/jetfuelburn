@@ -1,4 +1,5 @@
-# %%
+"""Figures for the documentation of the aerodynamics module."""
+
 import plotly.graph_objects as go
 from jetfuelburn import ureg
 

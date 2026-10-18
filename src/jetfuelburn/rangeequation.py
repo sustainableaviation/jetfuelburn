@@ -1,3 +1,5 @@
+"""Closed-form and numerical solutions of the range equation for the fuel burned in cruise."""
+
 import pint
 from jetfuelburn import ureg
 import math
@@ -107,18 +109,6 @@ class range_equation:
             R \approx \sum_{i=0}^{n-1} \frac{r_a(m_i) + r_a(m_{i+1})}{2} \cdot (m_{i+1} - m_i)
             \end{equation}
 
-        See Also
-        --------
-        [`jetfuelburn.rangeequation.range_equation.calculate_stepclimb_arctan`][]
-
-        References
-        ----------
-        Eqn. 13.1aff. and Eqn. 13.28a ff. in 
-        Young, T. M. (2018). 
-        Performance of the Jet Transport Airplane. 
-        _John Wiley & Sons_. 
-        doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
-
         Parameters
         ----------
         m_after_cruise : pint.Quantity
@@ -147,6 +137,18 @@ class range_equation:
             If the dimensions of the inputs are invalid.
         ValueError
             If the magnitude of the inputs are invalid (eg. negative).
+
+        See Also
+        --------
+        [`jetfuelburn.rangeequation.range_equation.calculate_stepclimb_arctan`][]
+
+        References
+        ----------
+        Eqn. 13.1aff. and Eqn. 13.28a ff. in 
+        Young, T. M. (2018). 
+        Performance of the Jet Transport Airplane. 
+        _John Wiley & Sons_. 
+        doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
 
         Example
         -------
@@ -298,11 +300,41 @@ class range_equation:
             \begin{equation*}
             B_3 = \left(\frac{C_{D_0}}{K}\right) \left(\frac{\rho V^2 S}{2g}\right)^2
             \end{equation*}
-        
+
+        Parameters
+        ----------
+        R : pint.Quantity
+            Range of the aircraft (=mission distance) [distance]
+        h : pint.Quantity
+            Cruise altitude of the aircraft [length]
+        K : float | pint.Quantity
+            Lift-dependent drag factor of the aircraft [dimensionless]
+        C_D0 : float | pint.Quantity
+            Zero-lift drag coefficient of the aircraft [dimensionless]
+        m_after_cruise : pint.Quantity
+            Mass of the aircraft after cruise segment (eg. OEW + Payload + Crew + Reserves) [mass]
+        S : pint.Quantity
+            Wing reference area of the aircraft [area]
+        V : pint.Quantity
+            Average cruise speed of the aircraft (TAS) [speed]
+        TSFC : pint.Quantity
+            Thrust Specific Fuel Consumption of the aircraft during cruise [time/distance]
+
+        Returns
+        -------
+        pint.Quantity
+            Required fuel mass [kg]
+
+        Raises
+        ------
+        ValueError
+            If the dimensions of the inputs are invalid.
+        ValueError
+            If the magnitude of the inputs are invalid (eg. negative).
 
         References
         ----------
-        Eqn. 7.43 and Eqn. 13.25a ff. in 
+        Eqn. 7.43 and Eqn. 13.25a ff. in
         Young, T. M. (2018). 
         Performance of the Jet Transport Airplane. 
         _John Wiley & Sons_. 
@@ -325,7 +357,6 @@ class range_equation:
             TSFC=17*(ureg.mg/ureg.N/ureg.s),
         )
         ```
-
         """
         if R == 0 * ureg.meter:
             return 0 * ureg.kg
@@ -430,28 +461,29 @@ class range_equation:
                 m_f &= m_{\text{LDG}} \left( \frac{1}{e^{-\frac{s}{H}} - \frac{\Delta m_{\text{lost}}}{m_{\text{TO}}} + \frac{\Delta m_{\text{rec}}}{m_{\text{TO}}}} - 1 \right)
             \end{align}
 
-        Warnings
-        --------
-        Unlike the equation in Randle et al. (2011), this function uses mass [kg] 
-        instead of weight [N] for the fuel.
+        Parameters
+        ----------
+        R : pint.Quantity
+            Range of the aircraft (=mission distance) [distance]
+        LD : float | pint.Quantity
+            Lift-to-Drag ratio of the aircraft [dimensionless]
+        m_after_cruise : pint.Quantity
+            Mass of the aircraft after cruise segment (eg. OEW + Payload + Crew + Reserves) [mass]
+        V : pint.Quantity
+            Average cruise speed of the aircraft (TAS) [speed]
+        V_headwind : pint.Quantity
+            Average speed of the headwind component [speed]
+        TSFC : pint.Quantity
+            Thrust Specific Fuel Consumption of the aircraft during cruise [time/distance]
+        lost_fuel_fraction : float | pint.Quantity, optional
+            Fuel lost during takeoff and climb, as a fraction of the takeoff mass [dimensionless]. Default is 0.0152.
+        recovered_fuel_fraction : float | pint.Quantity, optional
+            Fuel recovered during descent and landing, as a fraction of the takeoff mass [dimensionless]. Default is 0.001.
 
-        Notes
-        -----
-        Assumes a lost fuel fraction $\Delta m_{lost}=0.0152$ 
-        and a recovered fuel fraction $\Delta m_{rec}=0.001$ as per 
-        section D of Randle et al. (2011). 
-        Values can be adjusted through function parameters.
-
-        References
-        --------
-        Eqn. 19 in Randle, W. E., Hall, C. A., & Vera-Morales, M. (2011). 
-        Improved range equation based on aircraft flight data. 
-        _Journal of Aircraft_. 
-        doi:[10.2514/1.C031262](https://doi.org/10.2514/1.C031262)
-
-        See Also
-        --------
-        [`jetfuelburn.rangeequation.range_equation.calculate`][]
+        Returns
+        -------
+        pint.Quantity
+            Required fuel mass [kg]
 
         Raises
         ------
@@ -459,7 +491,30 @@ class range_equation:
             If the dimensions of the inputs are invalid.
         ValueError
             If the magnitude of the inputs are invalid (eg. negative).
-    
+
+        Warnings
+        --------
+        Unlike the equation in Randle et al. (2011), this function uses mass [kg]
+        instead of weight [N] for the fuel.
+
+        See Also
+        --------
+        [`jetfuelburn.rangeequation.range_equation.calculate`][]
+
+        Notes
+        -----
+        Assumes a lost fuel fraction $\Delta m_{lost}=0.0152$
+        and a recovered fuel fraction $\Delta m_{rec}=0.001$ as per 
+        section D of Randle et al. (2011). 
+        Values can be adjusted through function parameters.
+
+        References
+        ----------
+        Eqn. 19 in Randle, W. E., Hall, C. A., & Vera-Morales, M. (2011). 
+        Improved range equation based on aircraft flight data. 
+        _Journal of Aircraft_. 
+        doi:[10.2514/1.C031262](https://doi.org/10.2514/1.C031262)
+
         Example
         -------
         ```pyodide install='jetfuelburn'
@@ -525,45 +580,6 @@ class range_equation:
 
         Note that thrust-specific fuel consumption (TSFC) is of dimension [time/distance], as the commonly used unit [g/kNs] simplifies accordingly.
 
-        Notes
-        -----
-        Key assumptions of this fuel calculation function:
-
-        | Parameter         | Assumption                                                                 |
-        |-------------------|----------------------------------------------------------------------------|
-        | data availability | adequate for both current aircraft (reports) and future aircraft (studies) |
-        | aircraft payload  | variable                                                                   |
-        | climb/descent     | not considered, only cruise-phase                                          |
-        | fuel reserves     | can be considered through $m_2$                                            |
-        | alternate airport | can be considered through $m_2$                                            |
-
-        Warnings
-        --------
-        This analytical fuel calculation method represents a simplification of actual flight dynamics.
-        Specifically, this function assumes a _flight schedule_ with constant airspeed and constant lift coefficient, resulting in a cruise-climb.
-        Young (2017) shows this in Section 13.3.3 "Second Flight Schedule":
-
-        > (...) the airplane must be flown in a way that will ensure that the ratio (...) [of weight to air density] remains constant.
-        > This is possible if the airplane is allowed to climb very slowly so that the relative density (...) decreases in direct proportion to the decrease in airplane weight (...).
-
-        References
-        --------
-        - Young, T. M. (2018).
-        Performance of the Jet Transport Airplane (Section 13.7.3 "Fuel Required for Specified Range"). _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
-        - Cavcar, M. (2006). Bréguet range equation?. _Journal of Aircraft_. doi:[10.2514/1.17696](https://doi.org/10.2514/1.17696)
-        - [Range (Aeronautics) entry on Wikipedia](https://en.wikipedia.org/wiki/Range_(aeronautics))
-
-        See Also
-        --------
-        [`jetfuelburn.rangeequation.range_equation.calculate_improved`][]
-
-        Raises
-        ------
-        ValueError
-            If the dimensions of the inputs are invalid.
-        ValueError
-            If the magnitude of the inputs are invalid (eg. negative).
-
         Parameters
         ----------
         R : pint.Quantity
@@ -581,6 +597,45 @@ class range_equation:
         -------
         pint.Quantity
             Required fuel mass [kg]
+
+        Raises
+        ------
+        ValueError
+            If the dimensions of the inputs are invalid.
+        ValueError
+            If the magnitude of the inputs are invalid (eg. negative).
+
+        Warnings
+        --------
+        This analytical fuel calculation method represents a simplification of actual flight dynamics.
+        Specifically, this function assumes a _flight schedule_ with constant airspeed and constant lift coefficient, resulting in a cruise-climb.
+        Young (2017) shows this in Section 13.3.3 "Second Flight Schedule":
+
+        > (...) the airplane must be flown in a way that will ensure that the ratio (...) [of weight to air density] remains constant.
+        > This is possible if the airplane is allowed to climb very slowly so that the relative density (...) decreases in direct proportion to the decrease in airplane weight (...).
+
+        See Also
+        --------
+        [`jetfuelburn.rangeequation.range_equation.calculate_improved`][]
+
+        Notes
+        -----
+        Key assumptions of this fuel calculation function:
+
+        | Parameter         | Assumption                                                                 |
+        |-------------------|----------------------------------------------------------------------------|
+        | data availability | adequate for both current aircraft (reports) and future aircraft (studies) |
+        | aircraft payload  | variable                                                                   |
+        | climb/descent     | not considered, only cruise-phase                                          |
+        | fuel reserves     | can be considered through $m_2$                                            |
+        | alternate airport | can be considered through $m_2$                                            |
+
+        References
+        ----------
+        - Young, T. M. (2018).
+        Performance of the Jet Transport Airplane (Section 13.7.3 "Fuel Required for Specified Range"). _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
+        - Cavcar, M. (2006). Bréguet range equation?. _Journal of Aircraft_. doi:[10.2514/1.17696](https://doi.org/10.2514/1.17696)
+        - [Range (Aeronautics) entry on Wikipedia](https://en.wikipedia.org/wiki/Range_(aeronautics))
 
         Example
         -------

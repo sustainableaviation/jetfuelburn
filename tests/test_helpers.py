@@ -1,7 +1,7 @@
 import pytest
 
 from jetfuelburn import ureg
-from jetfuelburn.utility.tests import (
+from .helpers import (
     approx_with_units,
     approx_dict,
     approx_dict_of_dict,

@@ -1,3 +1,5 @@
+"""Approximate comparisons of pint quantities, and of dictionaries of them, for the test suite."""
+
 import pint
 from jetfuelburn import ureg
 import pytest
@@ -11,10 +13,6 @@ def approx_with_units(
 ) -> bool:
     """
     Given two Pint quantities, check if the values are approximately equal.
-
-    See Also
-    --------
-    [`pytest.approx`](https://docs.pytest.org/en/stable/reference/reference.html#pytest-approx)
 
     Parameters
     ----------
@@ -31,6 +29,10 @@ def approx_with_units(
     -------
     bool
         True if the values are approximately equal, False otherwise.
+
+    See Also
+    --------
+    [`pytest.approx`](https://docs.pytest.org/en/stable/reference/reference.html#pytest-approx)
     """
     if value_check.units != value_expected.units:
         return False
@@ -50,10 +52,6 @@ def approx_dict(
 
     Also checks if the [Pint](https://ureg.readthedocs.io/en/stable/) units of the values in the first dictionary are equal to the units of the values in the second dictionary.
 
-    See Also
-    --------
-    [`pytest.approx`](https://docs.pytest.org/en/stable/reference/reference.html#pytest-approx)
-
     Parameters
     ----------
     dict_check : dict
@@ -69,6 +67,10 @@ def approx_dict(
     -------
     bool
         True if the values in the first dictionary are approximately equal to the values in the second dictionary, False otherwise.
+
+    See Also
+    --------
+    [`pytest.approx`](https://docs.pytest.org/en/stable/reference/reference.html#pytest-approx)
     """
     if dict_check.keys() != dict_expected.keys():
         return False
@@ -102,10 +104,6 @@ def approx_dict_of_dict(
     """
     Given two dictionaries of dictionaries, check if the values in the first dictionary of dictionaries are approximately equal to the values in the second dictionary of dictionaries.
 
-    See Also
-    --------
-    [`pytest.approx`](https://docs.pytest.org/en/stable/reference/reference.html#pytest-approx)
-
     Parameters
     ----------
     dict_of_dict_check : dict
@@ -121,6 +119,10 @@ def approx_dict_of_dict(
     -------
     bool
         True if the values in the first dictionary of dictionaries are approximately equal to the values in the second dictionary of dictionaries, False otherwise.
+
+    See Also
+    --------
+    [`pytest.approx`](https://docs.pytest.org/en/stable/reference/reference.html#pytest-approx)
     """
     if dict_of_dict_check.keys() != dict_of_dict_expected.keys():
         return False

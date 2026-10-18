@@ -1,3 +1,5 @@
+"""Numerical helpers."""
+
 import bisect
 
 
@@ -21,10 +23,6 @@ def _interpolate(
 
     $(x_{i-1}, y_{i-1})$ and $(x_i, y_i)$ are the known data points surrounding $x_{val}$.
 
-    See Also
-    --------
-    [`bisect.bisect_right`](https://docs.python.org/3/library/bisect.html#bisect.bisect_right)
-
     Parameters
     ----------
     x_val : float
@@ -43,6 +41,10 @@ def _interpolate(
     ------
     ValueError
         If x_val is out of bounds of x_list.
+
+    See Also
+    --------
+    [`bisect.bisect_right`](https://docs.python.org/3/library/bisect.html#bisect.bisect_right)
 
     Example
     -------

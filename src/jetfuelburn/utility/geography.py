@@ -1,4 +1,5 @@
-# %%
+"""Great-circle distances between airports."""
+
 import csv
 import gzip
 from importlib.resources import files
@@ -142,12 +143,6 @@ def _calculate_haversine_distance(
     | $\Delta\phi$, $\Delta\lambda$ | Difference in latitude and longitude (in radians)|
     | $R$                           | Mean earth radius (approx. 6,371 km)             |
 
-    See Also
-    --------
-    [Haversine formula entry on Wikipedia](https://en.wikipedia.org/wiki/Haversine_formula)  
-    [Great-circle distance entry on Wikipedia](https://en.wikipedia.org/wiki/Great-circle_distance)  
-    [Earth radius entry on Wikipedia](https://en.wikipedia.org/wiki/Earth_radius)
-
     Parameters
     ----------
     lat1 : float
@@ -158,11 +153,17 @@ def _calculate_haversine_distance(
         Latitude of point 2 in decimal degrees.
     lon2 : float
         Longitude of point 2 in decimal degrees.
-    
+
     Returns
     -------
     pint.Quantity
         The distance between the two points [length].
+
+    See Also
+    --------
+    [Haversine formula entry on Wikipedia](https://en.wikipedia.org/wiki/Haversine_formula)  
+    [Great-circle distance entry on Wikipedia](https://en.wikipedia.org/wiki/Great-circle_distance)  
+    [Earth radius entry on Wikipedia](https://en.wikipedia.org/wiki/Earth_radius)
 
     Example
     -------
@@ -232,10 +233,6 @@ def calculate_distance_between_airports(
     _Great Circle route between Sydney (SYD) and London Heathrow (LHR).
     On a mercator projection, the shortest path appears curved._
 
-    See Also
-    --------
-    [OurAirports](https://ourairports.com/data/) list of airport codes, names and coordinates (public domain).
-
     Parameters
     ----------
     origin : str
@@ -250,6 +247,7 @@ def calculate_distance_between_airports(
         `name`: Full airport name
 
         Default is `iata`.
+
     Returns
     -------
     pint.Quantity
@@ -259,6 +257,10 @@ def calculate_distance_between_airports(
     ------
     ValueError
         If either airport code/name is not found.
+
+    See Also
+    --------
+    [OurAirports](https://ourairports.com/data/) list of airport codes, names and coordinates (public domain).
 
     Licensing Note
     --------------

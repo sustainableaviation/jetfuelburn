@@ -2,7 +2,7 @@ import pytest
 from jetfuelburn import ureg
 import pint
 from jetfuelburn.rangeequation import range_equation
-from jetfuelburn.utility.tests import approx_with_units
+from .helpers import approx_with_units
 from jetfuelburn.utility.physics import _calculate_mach_from_airspeed
 from jetfuelburn.utility.aerodynamics import poll_schumann_drag_polars
 

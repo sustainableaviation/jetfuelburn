@@ -28,6 +28,7 @@ Old names remain available as deprecated aliases: they point to the new class an
 - Aircraft are identified by ICAO designators throughout: e.g. 'Boeing 737 MAX 7' becomes `B37M`, 'E175' becomes `E75L` and 'Airbus A321neo' becomes `A21N`, etc.
 - `statistics.aeromaps` and its data in `data/AeroMaps` are removed.
 - The unimplemented `closedform` module and the `figures.benchmarking` and `figures.realdata` stubs are removed.
+- `utility.tests`, the pytest-based comparison helpers, moved out of the package into the test suite (`tests/helpers.py`).
 
 ### Improvements
 

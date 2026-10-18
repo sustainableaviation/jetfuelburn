@@ -25,7 +25,7 @@ The implementation in `pycontrails` computes instantaneous fuel flow and total b
     - [contrails.org](https://contrails.org)
 
 !!! warning
-    `pycontrails`, which implements the Poll-Schumann model, is not a pure Python package and therefore not compatible with [Pyodide](https://pyodide.org/en/stable/). The below example is therefore not interactice.
+    `pycontrails`, which implements the Poll-Schumann model, is not a pure Python package and therefore not compatible with [Pyodide](https://pyodide.org/en/stable/). The below example is therefore not interactive.
 
 !!! example "Usage Example"
     ```python

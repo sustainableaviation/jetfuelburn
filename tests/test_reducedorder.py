@@ -3,7 +3,7 @@ import pytest
 from pint import DimensionalityError
 import jetfuelburn.reducedorder
 from jetfuelburn import ureg
-from jetfuelburn.utility.tests import approx_with_units
+from .helpers import approx_with_units
 from jetfuelburn.reducedorder import (
     yanto_etal,
     aim2015,

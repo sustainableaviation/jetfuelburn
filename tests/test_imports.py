@@ -104,17 +104,15 @@ def test_aux_allocation():
 
 
 def test_aux_tests():
-    import jetfuelburn.utility.tests
-
-    from jetfuelburn.utility.tests import approx_with_units
+    from .helpers import approx_with_units
 
     assert callable(approx_with_units)
 
-    from jetfuelburn.utility.tests import approx_dict
+    from .helpers import approx_dict
 
     assert callable(approx_dict)
 
-    from jetfuelburn.utility.tests import approx_dict_of_dict
+    from .helpers import approx_dict_of_dict
 
     assert callable(approx_dict_of_dict)
 

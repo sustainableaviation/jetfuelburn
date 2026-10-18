@@ -1,3 +1,5 @@
+"""Properties of the International Standard Atmosphere and conversions between airspeed and Mach number."""
+
 import math
 import pint
 from jetfuelburn import ureg
@@ -29,10 +31,6 @@ def _calculate_atmospheric_temperature(
 
     Temperature in the lower Stratosphere (> 11,000 m) is assumed constant at -56.5°C (216.65 K).
 
-    References
-    ----------
-    Eqn.(1.6) in Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. doi:[10.1201/9781003279068](https://doi.org/10.1201/9781003279068)
-
     Parameters
     ----------
     altitude : pint.Quantity
@@ -47,6 +45,10 @@ def _calculate_atmospheric_temperature(
     ------
     ValueError
         If altitude is less than 0 m or greater than 20,000 m.
+
+    References
+    ----------
+    Eqn.(1.6) in Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. doi:[10.1201/9781003279068](https://doi.org/10.1201/9781003279068)
 
     Example
     -------
@@ -113,11 +115,6 @@ def _calculate_atmospheric_density(
     | $R$     | [energy/(mass*temperature)] | specific gas constant for air              | 287.052874 J/(kg·K)  |
     | $M$     | [mass/mole]                 | molar mass of dry air                      | 0.0289644 kg/mol     |
 
-    References
-    ----------
-    - Troposphere: Eqn. (4.14) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
-    - Stratosphere: Eqn. (4.16) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
-
     Parameters
     ----------
     altitude : pint.Quantity
@@ -132,6 +129,11 @@ def _calculate_atmospheric_density(
     ------
     ValueError
         If altitude is less than 0 m or greater than 20,000 m.
+
+    References
+    ----------
+    - Troposphere: Eqn. (4.14) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
+    - Stratosphere: Eqn. (4.16) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
 
     Example
     -------
@@ -194,15 +196,6 @@ def _calculate_dynamic_pressure(
     | $\rho$ | [mass/volume]   | air density         |
     | $V$    | [speed]         | aircraft speed      |
 
-
-    See Also
-    --------
-    [Dynamic Pressure entry on Wikipedia](https://en.wikipedia.org/wiki/Dynamic_pressure)
-
-    References
-    --------
-    Eqn. (2.63) in in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
-
     Parameters
     ----------
     speed : pint.Quantity
@@ -214,6 +207,14 @@ def _calculate_dynamic_pressure(
     -------
     pint.Quantity
         Dynamic pressure (Pascals).
+
+    See Also
+    --------
+    [Dynamic Pressure entry on Wikipedia](https://en.wikipedia.org/wiki/Dynamic_pressure)
+
+    References
+    ----------
+    Eqn. (2.63) in in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
 
     Example
     -------
@@ -276,11 +277,6 @@ def _calculate_airspeed_from_mach(
     References
     ----------
     Eqn.(1.33)-(1.34) Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. doi:[10.1201/9781003279068](https://doi.org/10.1201/9781003279068)
-
-    Returns
-    -------
-    pint.Quantity
-        Aircraft velocity in kilometers per hour.
 
     Example
     -------
@@ -401,14 +397,6 @@ def _calculate_speed_of_sound(
     | $\gamma$ | [dimensionless]          | ratio of specific heats         | 1.40              |
     | $R$      | [energy/(mass*temp)]     | gas constant                    | 287.05 m²/(s²K)   |
 
-    See Also
-    --------
-    [`jetfuelburn.utility.physics._calculate_atmospheric_temperature`][]
-
-    References
-    ----------
-    Eqn. (2.77) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
-
     Parameters
     ----------
     temperature : pint.Quantity
@@ -423,6 +411,14 @@ def _calculate_speed_of_sound(
     ------
     ValueError
         If temperature is below absolute zero.
+
+    See Also
+    --------
+    [`jetfuelburn.utility.physics._calculate_atmospheric_temperature`][]
+
+    References
+    ----------
+    Eqn. (2.77) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
     """
     T_val = temperature.to(ureg.kelvin)
     if T_val.magnitude < 0:
@@ -459,10 +455,6 @@ def _calculate_dynamic_viscosity(
     | $\beta$ | [pressure·time/temperature$^{1/2}$] | Sutherland constant   | 1.458e-6 kg/(m·s·K$^{1/2}$)             |
     | $S$     | [temperature]         | Sutherland temperature              | 110.4 K                                 |
 
-    References
-    ----------
-    Eqn. (22) in ICAO (1993). Manual of the ICAO Standard Atmosphere (extended to 80 kilometres). Doc 7488/3.
-
     Parameters
     ----------
     altitude : pint.Quantity
@@ -472,6 +464,10 @@ def _calculate_dynamic_viscosity(
     -------
     pint.Quantity
         Dynamic viscosity of air [Pa·s].
+
+    References
+    ----------
+    Eqn. (22) in ICAO (1993). Manual of the ICAO Standard Atmosphere (extended to 80 kilometres). Doc 7488/3.
 
     Example
     -------

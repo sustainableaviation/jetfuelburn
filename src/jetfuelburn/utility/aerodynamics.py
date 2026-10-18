@@ -1,4 +1,5 @@
-# %%
+"""Drag polars and lift-to-drag ratios of civil transport aircraft."""
+
 import csv
 import math
 from importlib import resources
@@ -335,11 +336,6 @@ class poll_schumann_drag_polars:
         Given lift, Mach number, and altitude,
         calculates the lift-to-drag ratio for a specified aircraft.
 
-        See Also
-        --------
-        - [`jetfuelburn.utility.aerodynamics.poll_schumann_drag_polars.calculate_drag`][]
-        - [`jetfuelburn.utility.aerodynamics.poll_schumann_drag_polars.calculate_lift_to_drag_binder_function`][]
-
         Parameters
         ----------
         acft : str
@@ -357,6 +353,11 @@ class poll_schumann_drag_polars:
         -------
         pint.Quantity
             Lift-to-drag ratio [dimensionless]
+
+        See Also
+        --------
+        - [`jetfuelburn.utility.aerodynamics.poll_schumann_drag_polars.calculate_drag`][]
+        - [`jetfuelburn.utility.aerodynamics.poll_schumann_drag_polars.calculate_lift_to_drag_binder_function`][]
         """
         drag = poll_schumann_drag_polars.calculate_drag(acft, L, M, h, compressibility)
         return (L / drag).to("dimensionless")  # Eq. (45)
@@ -376,6 +377,10 @@ class poll_schumann_drag_polars:
         with `acft` (and `compressibility`) pre-bound.
         If all arguments are provided, performs the calculation immediately.
 
+        See Also
+        --------
+        [`jetfuelburn.utility.aerodynamics.poll_schumann_drag_polars.calculate_lift_to_drag`][]
+
         Notes
         -----
         This is useful for scenarios where you want to create a reusable function for a specific aircraft,
@@ -388,10 +393,6 @@ class poll_schumann_drag_polars:
         a320_lift_to_drag = poll_schumann_drag_polars.calculate_lift_to_drag_binder_function(acft='A320')
         a320_lift_to_drag(L=60*ureg.metric_ton*ureg.gravity, M=0.78, h=35000*ureg.feet)
         ```
-
-        See Also
-        --------
-        [`jetfuelburn.utility.aerodynamics.poll_schumann_drag_polars.calculate_lift_to_drag`][]
         """
         if L is None or M is None or h is None:
             return functools.partial(

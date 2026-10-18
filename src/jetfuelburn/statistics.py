@@ -1,4 +1,5 @@
-# %%
+"""Fuel burn from the traffic and fuel statistics that U.S. air carriers report to the U.S. Department of Transportation."""
+
 from importlib import resources
 import json
 import pint
@@ -13,8 +14,42 @@ class usdot:
     Data is based on averages of fuel consumption per passenger mile and per ton mile,
     reported by the US DOT in table T2, summarizing Form 41 Schedule T-100.
 
-    Terminology
+    Warnings
+    --------
+    Form 41 Schedule T-100 data can be downloaded from the US Department of Transportation website.
+    Unfortunately, there are no permalinks to the data files, and even regular URLs are
+    generated dynamically based on some JavaScript magic.
+
+    The best way to obtain the correct files is to search by name, according to the following hierarchy:
+
+    ```
+    Database Name: Air Carrier Summary Data (Form 41 and 298C Summary Data)
+    T2: U.S. Air Carrier TRAFFIC And Capacity Statistics by Aircraft Type
+    ```
+
+    On the `T2: (...)` page, click on the "Download" button in the "Data Tools" sidebar (left).
+    The download should be an archive, containing the following file:
+
+    ```
+    T_SCHEDULE_T2.csv
+    ```
+
+    Aircraft types in this file are labeled using integer codes. These codes are
+    defined in a separate file, which must also be downloaded.
+    On the `T2: (...)` page, click on the `AircraftType` Field Name entry
+    and on the following page, click on the "Download Lookup Table" button.
+
+    See Also
+    --------
+    Working links to the relevant files (05-2025):
+
+    - [US DOT: BTS: Air Carrier Summary Data (Form 41 and 298C Summary Data)](https://www.transtats.bts.gov/Tables.asp?QO_VQ=EGD&QO)
+    - [US DOT: BTS: Air Carrier Summary Data: T2 (U.S. Air Carrier Traffic And Capacity Statistics by Aircraft Type)](https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FIH)
+
+    Notes
     -----
+    **Terminology**
+
     - **Form 41**
 
         Form 41 is a report that the U.S. Department of Transportation (DOT) generates
@@ -28,7 +63,7 @@ class usdot:
 
         The reporting requirements of Schedule T-100 of Form 41 are defined in federal law:
 
-        | Reglation | Scope |
+        | Regulation | Scope |
         | --------- | ----- |
         | [14 CFR 291.45](https://www.ecfr.gov/current/title-14/section-291.45) | General |
         | [Appendix A to Subpart E of Part 291, Title 14](https://www.ecfr.gov/current/title-14/part-291/appendix-Appendix%20A%20to%20Subpart%20E%20of%20Part%20291) | US Air Carriers |
@@ -61,38 +96,6 @@ class usdot:
 
         > This table summarizes the T-100 traffic data reported by U.S. air carriers. The monthly summary (...)
 
-    Warning
-    -------
-    Form 41 Schedule T-100 data can be downloaded from the US Department of Transportation website.
-    Unfortunately, there are no permalinks to the data files, and even regular URLs are
-    generated dynamically based on some JavaScript magic.
-
-    The best way to obtain the correct files is to search by name, according to the following hierarchy:
-
-    ```
-    Database Name: Air Carrier Summary Data (Form 41 and 298C Summary Data)
-    T2: U.S. Air Carrier TRAFFIC And Capacity Statistics by Aircraft Type
-    ```
-
-    On the `T2: (...)` page, click on the "Download" button in the "Data Tools" sidebar (left).
-    The download should be an archive, containing the following file:
-
-    ```
-    T_SCHEDULE_T2.csv
-    ```
-
-    Aircraft types in this file are labeled using integer codes. These codes are
-    defined in a separate file, which must also be downloaded.
-    On the `T2: (...)` page, click on the `AircraftType` Field Name entry
-    and on the following page, click on the "Download Lookup Table" button.
-
-    See Also
-    --------
-    Working links to the relevant files (05-2025):
-
-    - [US DOT: BTS: Air Carrier Summary Data (Form 41 and 298C Summary Data)](https://www.transtats.bts.gov/Tables.asp?QO_VQ=EGD&QO)
-    - [US DOT: BTS: Air Carrier Summary Data: T2 (U.S. Air Carrier Traffic And Capacity Statistics by Aircraft Type)](https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FIH)
-
     Licensing Note
     --------------
     Data from the U.S. Department of Transportation, Bureau of Transportation Statistics
@@ -100,7 +103,7 @@ class usdot:
     Full notice in [`NOTICE.md`](https://github.com/sustainableaviation/jetfuelburn/blob/main/NOTICE.md).
 
     Example
-    --------
+    -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
@@ -173,11 +176,6 @@ class usdot:
         | $R$    | [km]    | Range of the flight                                                         |
         | $W$    | [kg]    | Payload weight of the flight                                                |
 
-        Warnings
-        --------
-        Aircraft types here are given as full-length strings, e.g. "Boeing 737-800", instead of the ususal ICAO designator "B738".
-        These are taken directly from the `L_AIRCRAFT_TYPE.csv` US DOT lookup table file.
-
         Parameters
         ----------
         year : int
@@ -200,6 +198,11 @@ class usdot:
             If the range or weight is negative.
             If the year is not available in the model.
             If the aircraft type is not available in the model for the given year.
+
+        Warnings
+        --------
+        Aircraft types here are given as full-length strings, e.g. "Boeing 737-800", instead of the usual ICAO designator "B738".
+        These are taken directly from the `L_AIRCRAFT_TYPE.csv` US DOT lookup table file.
         """
         if R.magnitude < 0 or W.magnitude < 0:
             raise ValueError(f"Range and/or weight must not be negative.")
@@ -253,11 +256,6 @@ class usdot:
         | $paxD$ | [kg*km] | Total passenger-distance flown on a specific aircraft type in a specific year |
         | $R$    | [km]    | Range of the flight                                                           |
 
-        Warnings
-        --------
-        Aircraft types here are given as full-length strings, e.g. "Boeing 737-800", instead of the ususal ICAO designator "B738".
-        These are taken directly from the `L_AIRCRAFT_TYPE.csv` US DOT lookup table file.
-
         Parameters
         ----------
         year : int
@@ -278,6 +276,11 @@ class usdot:
             If the range is negative.
             If the year is not available in the model.
             If the aircraft type is not available in the model for the given year.
+
+        Warnings
+        --------
+        Aircraft types here are given as full-length strings, e.g. "Boeing 737-800", instead of the usual ICAO designator "B738".
+        These are taken directly from the `L_AIRCRAFT_TYPE.csv` US DOT lookup table file.
         """
         if R.magnitude < 0:
             raise ValueError(f"Range must not be negative.")
@@ -309,7 +312,7 @@ class usdot:
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            US DOT aircraft designator string (e.g. ``'B739'``).
+            US DOT aircraft designator string (e.g. `'B739'`).
 
         Returns
         -------
@@ -347,7 +350,7 @@ class usdot:
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            US DOT aircraft designator string (e.g. ``'B739'``).
+            US DOT aircraft designator string (e.g. `'B739'`).
 
         Returns
         -------
@@ -386,7 +389,7 @@ class usdot:
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            US DOT aircraft designator string (e.g. ``'B739'``).
+            US DOT aircraft designator string (e.g. `'B739'`).
 
         Returns
         -------
@@ -426,7 +429,7 @@ class usdot:
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            US DOT aircraft designator string (e.g. ``'B739'``).
+            US DOT aircraft designator string (e.g. `'B739'`).
 
         Returns
         -------
@@ -466,7 +469,7 @@ class usdot:
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            US DOT aircraft designator string (e.g. ``'B739'``).
+            US DOT aircraft designator string (e.g. `'B739'`).
 
         Returns
         -------
@@ -503,8 +506,8 @@ class usdot:
         F_{\text{total}} = \sum_{\text{acft}} \frac{F}{\text{paxD}} \cdot \text{paxD}
         $$
 
-        where $F/\text{paxD}$ is the ``Fuel/Revenue Seat Distance`` field (kg per pax-km)
-        and $\text{paxD}$ is the ``Revenue PAX km`` field (pax-km) for each aircraft type.
+        where $F/\text{paxD}$ is the `Fuel/Revenue Seat Distance` field (kg per pax-km)
+        and $\text{paxD}$ is the `Revenue PAX km` field (pax-km) for each aircraft type.
 
         Parameters
         ----------

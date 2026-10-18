@@ -1,7 +1,7 @@
 import pytest
 from jetfuelburn.utility.geography import _atlas, _calculate_haversine_distance
 from jetfuelburn import ureg
-from jetfuelburn.utility.tests import approx_with_units
+from .helpers import approx_with_units
 import math
 
 

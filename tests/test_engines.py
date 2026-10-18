@@ -1,7 +1,7 @@
 import pytest
 from jetfuelburn import ureg
 from jetfuelburn.utility.engines import calculate_corrected_tsfc
-from jetfuelburn.utility.tests import approx_with_units
+from .helpers import approx_with_units
 
 
 class TestCalculateCorrectedTSFC:

@@ -1,0 +1,13 @@
+{% include "partials/actions.html" %}
+{# Pages may set hide_title so the theme does not add a fallback h1.
+   The homepage uses this so the badges sit at the top of the page. #}
+{% if "\u003ch1" not in page.content %}
+  {% if not page.meta or not page.meta.hide_title %}
+    <h1 id="__skip">{{ page.title | d(config.site_name, true)}}</h1>
+  {% endif %}
+{% endif %}
+{{ page.content }}
+{% include "partials/tags.html" %}
+{% include "partials/source-file.html" %}
+{% include "partials/feedback.html" %}
+{% include "partials/comments.html" %}

@@ -1,4 +1,5 @@
-# %%
+"""Reduced-order fuel burn models, fitted by their authors to simulated or reported flights and keyed by aircraft type."""
+
 import csv
 import json
 import math
@@ -34,18 +35,6 @@ class montlaur_etal:
     | $S$            | [dimensionless]                     | Number of available seats                                      |
     | $\beta_{0-4}$  | varies                              | Regression coefficients                                        |
 
-    References
-    ----------
-    Montlaur, A., Trapote-Barreira, C., & Delgado, L. (2025).
-    Analytical models of flight fuel consumption and Non-CO2 emissions as a function of aircraft capacity.
-    _Applied Sciences_, 15(17), 9688.
-    doi:[10.3390/app15179688](https://doi.org/10.3390/app15179688)
-
-    Montlaur, A., Delgado, L., & Trapote-Barreira, C. (2021).
-    Analytical models for CO2 emissions and travel time for short-to-medium-haul flights considering available seats.
-    _Sustainability_, 13(18), 10401.
-    doi:[10.3390/su131810401](https://doi.org/10.3390/su131810401)
-
     See Also
     --------
     [`emissions_fuel_estimation.emissions_fuel_model.compute_fuel_ask()`](https://github.com/luis-uow/emissions_fuel_estimation/blob/6d415b38e6089f29ff46a86646db0d5cc04744ba/emissions_fuel_model.py#L9)
@@ -59,6 +48,18 @@ class montlaur_etal:
     |-------------------|-----------------------------|-------------------------------|------------------------------------------------------------------------|
     | "Model D, E"      | $50 \le S \le 172$          | $100 \le D \le 5000$ km       | **CAT D:** B38M, A319<br>**CAT E:** CRJ2, CRJ9, E190                  |
     | "Model B, D"      | $172 \le S \le 365$         | $200 \le D \le 12000$ km      | **CAT B:** A359, A339, B77W, B788, B789<br>**CAT D:** A21N, A20N, B38M |
+
+    References
+    ----------
+    Montlaur, A., Trapote-Barreira, C., & Delgado, L. (2025).
+    Analytical models of flight fuel consumption and Non-CO2 emissions as a function of aircraft capacity.
+    _Applied Sciences_, 15(17), 9688.
+    doi:[10.3390/app15179688](https://doi.org/10.3390/app15179688)
+
+    Montlaur, A., Delgado, L., & Trapote-Barreira, C. (2021).
+    Analytical models for CO2 emissions and travel time for short-to-medium-haul flights considering available seats.
+    _Sustainability_, 13(18), 10401.
+    doi:[10.3390/su131810401](https://doi.org/10.3390/su131810401)
 
     Licensing Note
     --------------
@@ -237,6 +238,13 @@ class sacchi_etal:
 
     ![Weight Approximation](../_static/reduced_order_sacchi_weight.svg)
 
+    See Also
+    --------
+    Cell `DM8` in [Supplement 1 of Sacchi et al. (2020)](https://doi.org/10.5281/zenodo.8059750) for fuel burn in cruise.
+    Cell `CQ8` in [Supplement 1 of Sacchi et al. (2020)](https://doi.org/10.5281/zenodo.8059750) for fuel burn in climb/descent.
+    Cell `BU8` in [Supplement 1 of Sacchi et al. (2020)](https://doi.org/10.5281/zenodo.8059750) for fuel burn in takeoff/landing.
+    Cell `BP8` in [Supplement 1 of Sacchi et al. (2020)](https://doi.org/10.5281/zenodo.8059750) for OEW as a function of max passengers.
+
     Notes
     -----
     Key assumptions of this fuel calculation function:
@@ -249,17 +257,10 @@ class sacchi_etal:
     | reserve fuel uplift   | 45 min for long-haul flights assumed                                             |
     | diversion fuel uplift | not considered                                                                   |
 
-    Refences
-    --------
+    References
+    ----------
     Sacchi, R., Becattini, V., Gabrielli, P., Cox, B., Dirnaichner, A., Bauer, C., & Mazzotti, M. (2023).
     How to make climate-neutral aviation fly. _Nature Communications_. doi:[10.1038/s41467-023-39749-y](https://doi.org/10.1038/s41467-023-39749-y)
-
-    See Also
-    --------
-    Cell `DM8` in [Supplement 1 of Sacchi et al. (2020)](https://doi.org/10.5281/zenodo.8059750) for fuel burn in cruise.
-    Cell `CQ8` in [Supplement 1 of Sacchi et al. (2020)](https://doi.org/10.5281/zenodo.8059750) for fuel burn in climb/descent.
-    Cell `BU8` in [Supplement 1 of Sacchi et al. (2020)](https://doi.org/10.5281/zenodo.8059750) for fuel burn in takeoff/landing.
-    Cell `BP8` in [Supplement 1 of Sacchi et al. (2020)](https://doi.org/10.5281/zenodo.8059750) for OEW as a function of max passengers.
 
     Licensing Note
     --------------
@@ -420,9 +421,9 @@ class sacchi_etal:
 
 class yanto_etal:
     r"""
-    This class implements the the reduced-order fuel burn model of Yanto and Liem (2017):
+    This class implements the reduced-order fuel burn model of Yanto and Liem (2017):
 
-    ![Payload/Range Diagram](../_static/reduced_order_yanto_etal.svg)
+    ![Yanto and Liem Visual Abstract](../_static/reduced_order_yanto_etal.svg)
 
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
@@ -447,6 +448,13 @@ class yanto_etal:
     | $c_P$      | [mass/mass]       | Regression coefficient for payload                                     |
     | $c_C$      | [mass]            | Constant term                                                          |
 
+    Warnings
+    --------
+    The x-axes of all three panels in Figure 14 of Yanto and Liem (2017) are incorrectly rendered.
+    According to panel (a), the maximum achievable range of a Boeing 777 would be ~30'000NM. This is ~1.6x the circumference of the Earth.
+    Neither assuming that the axis multiplier `1e4` nor the unit `nm` (sic!) are incorrect explains this issue.
+    Figure 5 was instead used to test the implementation of the method.
+
     Notes
     -----
     Key assumptions of this fuel calculation function:
@@ -465,13 +473,6 @@ class yanto_etal:
     Efficient fast approximation for aircraft fuel consumption for decision-making and policy analysis.
     In _AIAA Modeling and Simulation Technologies Conference_ (p. 3338).
     doi:[10.2514/6.2017-3338](https://doi.org/10.2514/6.2017-3338)
-
-    Warnings
-    --------
-    The x-axes of all three panels in Figure 14 of Yanto and Liem (2017) are incorrectly rendered.
-    According to panel (a), the maximum achievable range of a Boeing 777 would be ~30'000NM. This is ~1.6x the circumference of the Earth.
-    Neither assuming that the axis multiplier `1e4` nor the unit `nm` (sic!) are incorrect explains this issue.
-    Figure 5 was instead used to test the implementation of the method.
 
     Example
     -------
@@ -558,17 +559,17 @@ class yanto_etal:
         PL : pint.Quantity
             Payload mass [mass]
 
+        Returns
+        -------
+        pint.Quantity
+            Fuel mass [kg]
+
         Raises
         ------
         ValueError
             If the ICAO aircraft designator is not found in the model data.
         ValueError
             If range or payload are less than zero.
-
-        Returns
-        -------
-        pint.Quantity
-            Fuel mass [kg]
         """
         if R < 0:
             raise ValueError("Range must be greater than zero.")
@@ -593,9 +594,9 @@ class yanto_etal:
 
 class lee_etal:
     """
-    This class implements the the reduced-order fuel burn model of Lee et al. (2010).
+    This class implements the reduced-order fuel burn model of Lee et al. (2010).
 
-    ![Payload/Range Diagram](../_static/reduced_order_lee_etal.svg)
+    ![Lee et al. Visual Abstract](../_static/reduced_order_lee_etal.svg)
 
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
@@ -605,6 +606,20 @@ class lee_etal:
     Cruise segment fuel burn is calculated using the Breguet range equation.
 
     For the equations implemented in this class, see Lee et al. (2010), Eqns.(13)ff. and Figure 5.
+
+    Warnings
+    --------
+
+    Note that the present implementation of the Lee et al. (2010)
+    cannot completely replicate aircraft payload in a small segment of Figure 6 in referenced paper.
+    The calculated aircraft payload for extreme aircraft ranges differs from the one shown in the paper:
+
+    ```python exec="true" html="true"
+    from jetfuelburn.figures.reducedorder import figure_lee2010
+    fig = figure_lee2010()
+    print(fig.to_html(full_html=False, include_plotlyjs="cdn"))
+    # https://pawamoy.github.io/markdown-exec/gallery/#with-plotly
+    ```
 
     Notes
     -----
@@ -624,20 +639,6 @@ class lee_etal:
     Closed-form takeoff weight estimation model for air transportation simulation.
     In _10th AIAA Aviation Technology, Integration, and Operations (ATIO) Conference_ (p. 9156).
     doi:[10.2514/6.2010-9156](https://doi.org/10.2514/6.2010-9156)
-
-    Warnings
-    --------
-
-    Note that the present implementation of the Lee et al. (2010)
-    cannot completely replicate aircraft payload in a small segment of Figure 6 in referenced paper.
-    The calculated aircraft payload for extreme aircraft ranges differs from the one shown in the paper:
-
-    ```python exec="true" html="true"
-    from jetfuelburn.figures.reducedorder import figure_lee2010
-    fig = figure_lee2010()
-    print(fig.to_html(full_html=False, include_plotlyjs="cdn"))
-    # https://pawamoy.github.io/markdown-exec/gallery/#with-plotly
-    ```
 
     Example
     -------
@@ -1004,7 +1005,7 @@ class seymour_etal:
     r"""
     Reduced-order fuel burn model based on Seymour et al. (2020).
 
-    ![Payload/Range Diagram](../_static/reduced_order_seymour_etal.svg)
+    ![Seymour et al. Visual Abstract](../_static/reduced_order_seymour_etal.svg)
 
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were fitted to simulated flight missions: climb, cruise, descent, approach and landing
@@ -1041,8 +1042,6 @@ class seymour_etal:
     Results beyond that range are extrapolations. For the 26 types with a negative $a_1$, the fit bends downward
     beyond that range. Where the fit no longer returns a positive fuel burn, `calculate()` raises a `ValueError`.
 
-    Warnings
-    --------
     Note that Seymour et al. in the Disclaimers section of their publication mention, that:
     > This document has been created with elements of Base of Aircraft Data (BADA) Family 3 Release 3.15
     > which has been made available by EUROCONTROL to ETH Zurich (...). EUROCONTROL has all relevant rights to BADA.
@@ -1054,6 +1053,11 @@ class seymour_etal:
     > (...) computing global CO2 emissions using the reduced order models (...) [and]
     > (...) fleet turnover and flight route projections can be combined to create any
     > number of future flight movement scenarios which together with the reduced order models can be leveraged to generate valuable insights.
+
+    See Also
+    --------
+    [FEAT repository on GitHub](https://github.com/kwdseymour/FEAT/tree/master):
+    Jupyter notebooks and `.csv` files that accompany the paper.
 
     Notes
     -----
@@ -1074,11 +1078,6 @@ class seymour_etal:
     Fuel Estimation in Air Transportation: Modeling global fuel consumption for commercial aviation.
     _Transportation Research Part D: Transport and Environment_, 88, 102528.
     doi:[10.1016/j.trd.2020.102528](https://doi.org/10.1016/j.trd.2020.102528)
-
-    See Also
-    --------
-    [FEAT repository on GitHub](https://github.com/kwdseymour/FEAT/tree/master):
-    Jupyter notebooks and `.csv` files that accompany the paper.
 
     Licensing Note
     --------------
@@ -1786,16 +1785,17 @@ class seymour_etal:
         """
         Given an ICAO aircraft designator and the great-circle distance, calculates the fuel burned.
 
-        Warnings
-        --------
-        An "average" payload is assumed for every aircraft. Distance is the only variable.
-
         Parameters
         ----------
         acft : str
             ICAO Aircraft Designator
         R : pint.Quantity
             Great-circle distance between origin and destination [length]
+
+        Returns
+        -------
+        pint.Quantity
+            Fuel mass [kg]
 
         Raises
         ------
@@ -1807,10 +1807,9 @@ class seymour_etal:
             If the fit returns no positive fuel burn at this distance
             (types with a negative $a_1$, far beyond their maximum range).
 
-        Returns
-        -------
-        pint.Quantity
-            Fuel mass [kg]
+        Warnings
+        --------
+        An "average" payload is assumed for every aircraft. Distance is the only variable.
         """
         if acft not in seymour_etal._regression_coefficients.keys():
             raise ValueError(
@@ -1841,7 +1840,7 @@ class aim2015:
 
     The class implements the reduced-order fuel burn model of the [AIM2015 air transport model](https://www.atslab.org/data-tools/) (part "Aircraft Performance Model"):
 
-    ![Payload/Range Diagram](../_static/reduced_order_aim2015.svg)
+    ![AIM2015 Visual Abstract](../_static/reduced_order_aim2015.svg)
 
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
@@ -1863,6 +1862,15 @@ class aim2015:
     | $\eta$     | varies            | regression coefficients                                                |
 
     For information on the inefficiency parameter $I$, see the conference publication of Reynolds (2009).
+
+    Warnings
+    --------
+    While the AIM2015 documentation lists the Boeing 777-300ER using the PW4090 engine,
+    this aircraft variant [was exclusively powered by GE90 engines](https://en.wikipedia.org/wiki/Boeing_777#Engines).
+
+    See Also
+    --------
+    Class `AircraftPerformanceParams` in `aim/v11/datastructures/AircraftPerformanceParams`
 
     Notes
     -----
@@ -1888,15 +1896,6 @@ class aim2015:
     | climb/descent         | considered separately                                                       |
     | reserve fuel uplift   | considered implicitly (?)                                                   |
     | diversion fuel uplift | considered implicitly (?)                                                   |
-
-    Warnings
-    --------
-    While the AIM2015 documentation lists the Boeing 777-300ER using the PW4090 engine,
-    this aircraft variant [was exclusively powered by GE90 engines](https://en.wikipedia.org/wiki/Boeing_777#Engines).
-
-    See Also
-    --------
-    Class `AircraftPerformanceParams` in `aim/v11/datastructures/AircraftPerformanceParams`
 
     References
     ----------
@@ -1983,11 +1982,6 @@ class aim2015:
         PL : pint.Quantity
             Payload [mass]
 
-        Raises
-        ------
-        ValueError
-            If range or payload is negative, or if the aircraft size class is not between 1 and 8.
-
         Returns
         -------
         dict[str, pint.Quantity]
@@ -1997,6 +1991,11 @@ class aim2015:
                 Fuel mass (cruise segment) [kg]
             'mass_fuel_descent' : pint.Quantity
                 Fuel mass (descent segment) [kg]
+
+        Raises
+        ------
+        ValueError
+            If range or payload is negative, or if the aircraft size class is not between 1 and 8.
         """
         if D_climb.magnitude < 0:
             raise ValueError("Climb distance must be non-negative.")
@@ -2109,7 +2108,7 @@ class eea_emission_inventory_2009:
     r"""
     The class implements the reduced-order fuel burn model of the [EMEP/EEA air pollutant emission inventory guidebook](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023) (2009).
 
-    ![Payload/Range Diagram](../_static/reduced_order_eea2009.svg)
+    ![EEA 2009 Visual Abstract](../_static/reduced_order_eea2009.svg)
 
     In this model, fuel burn calculations are based on a regression model.
     The regression coefficients were obtained by fitting mission parameters to fuel burn data obtained
@@ -2125,9 +2124,11 @@ class eea_emission_inventory_2009:
     | reserve fuel uplift   | considered implicitly (?)                                                   |
     | diversion fuel uplift | considered implicitly (?)                                                   |
 
-    References
-    ----------
-    - [EMEP/EEA air pollutant emission inventory guidebook - 2009, Part B, Section 1 (Energy), Subsection 1.A.3.a (`Aviation_annex.zip`)](https://www.eea.europa.eu/en/analysis/publications/emep-eea-emission-inventory-guidebook-2009)
+    Warnings
+    --------
+    Note that only EEA data between 1999-2009 was based on Piano simulations, as documented in the `Aviation_annex.zip` file.
+    Later versions of the EEA guidebook (2013, 2016, 2019, 2023) instead use the Eurocontrol Advanced Emission Model (AEM), as documented in the respective guidebook files.
+    These later models could not be incorporated into `jetfuelburn` for licensing reasons.
 
     Notes
     -----
@@ -2136,11 +2137,9 @@ class eea_emission_inventory_2009:
     by the Swedish Defence Research Agency (foi.se). Note that this data may be a poor representation of
     newer variants of the same aircraft types.
 
-    Warnings
-    --------
-    Note that only EEA data between 1999-2009 was based on Piano simulations, as documented in the `Aviation_annex.zip` file.
-    Later versions of the EEA guidebook (2013, 2016, 2019, 2023) instead use the Eurocontrol Advanced Emission Model (AEM), as documented in the respective guidebook files.
-    These later models could not be incorporated into `jetfuelburn` for licensing reasons.
+    References
+    ----------
+    - [EMEP/EEA air pollutant emission inventory guidebook - 2009, Part B, Section 1 (Energy), Subsection 1.A.3.a (`Aviation_annex.zip`)](https://www.eea.europa.eu/en/analysis/publications/emep-eea-emission-inventory-guidebook-2009)
 
     Licensing Note
     --------------
@@ -2196,7 +2195,6 @@ class eea_emission_inventory_2009:
         |------------|-------------------|------------------------------------------------------------------------|
         | $m_F$      | [mass]            | fuel mass burned during flight                                         |
         | $R$        | [length]          | mission range                                                          |
-
 
         Parameters
         ----------
@@ -2393,6 +2391,19 @@ class myclimate:
         Given a flight distance, calculate the fleet-average fuel consumption of a flight using the
         [myClimate Flight Emissions Calculator](https://co2.myclimate.org/en/flight_calculators/new).
 
+        Parameters
+        ----------
+        acft : str
+            Aircraft type: `A320`, `B737`, `A330`, `B777` or `standard aircraft` (see `list_aircraft()`)
+        x : pint.Quantity
+            Flight distance [length]. myclimate defines it as the great-circle distance
+            plus a detour correction of 95 km.
+
+        Returns
+        -------
+        pint.Quantity
+            Fuel mass [kg]
+
         Warnings
         --------
         It is not entirely clear from the description of the myClimate Flight Emissions Calculator
@@ -2406,19 +2417,6 @@ class myclimate:
         In this function, the short-haul aircraft (A320, B737) therefore accept distances up to 2500 km
         and the long-haul aircraft (A330, B777) distances from 1500 km. The `standard aircraft` option
         can be used for all distances.
-
-        Parameters
-        ----------
-        acft : str
-            Aircraft type: `A320`, `B737`, `A330`, `B777` or `standard aircraft` (see `list_aircraft()`)
-        x : pint.Quantity
-            Flight distance [length]. myclimate defines it as the great-circle distance
-            plus a detour correction of 95 km.
-
-        Returns
-        -------
-        pint.Quantity
-            Fuel mass [kg]
         """
         if x < (0 * ureg.km):
             raise ValueError("Distance must not be negative.")
@@ -2489,6 +2487,19 @@ class gossling_etal:
     computed with integer (truncating) division as in the reference implementation
     (cf. `load_private_jet_models()` in [`src/model.rs`](https://github.com/jorgecardleitao/private-jets/blob/main/src/model.rs)).
 
+    Warnings
+    --------
+    The hourly fuel consumption values are figures from manufacturer/broker brochures ("marketing material"),
+    not operational data. The authors estimate the associated uncertainty at a standard deviation of at most 10%,
+    and note that, because a single constant fuel flow is applied irrespective of flight phase, distance, altitude,
+    payload or load factor, the resulting emission estimates "likely represent a lower boundary estimate".
+
+    See Also
+    --------
+    - Methodology `M-models-for-private-use` in the [Private Jets methodology](https://github.com/jorgecardleitao/private-jets/blob/main/methodology.md)
+    - Fuel/CO2 conversion `leg_co2_kg()` in [`src/emissions.rs`](https://github.com/jorgecardleitao/private-jets/blob/main/src/emissions.rs)
+    - Per-model averaging `load_private_jet_models()` in [`src/model.rs`](https://github.com/jorgecardleitao/private-jets/blob/main/src/model.rs)
+
     Notes
     -----
     Key assumptions of this fuel calculation function:
@@ -2501,25 +2512,12 @@ class gossling_etal:
     | reserve fuel uplift   | not considered                                                                   |
     | diversion fuel uplift | not considered                                                                   |
 
-    Warnings
-    --------
-    The hourly fuel consumption values are figures from manufacturer/broker brochures ("marketing material"),
-    not operational data. The authors estimate the associated uncertainty at a standard deviation of at most 10%,
-    and note that, because a single constant fuel flow is applied irrespective of flight phase, distance, altitude,
-    payload or load factor, the resulting emission estimates "likely represent a lower boundary estimate".
-
     References
     ----------
     Gössling, S., Humpe, A., & Leitão, J. (2024).
     Private aviation is making a growing contribution to climate change.
     _Communications Earth & Environment_, 5, 666.
     doi:[10.1038/s43247-024-01775-z](https://doi.org/10.1038/s43247-024-01775-z)
-
-    See Also
-    --------
-    - Methodology `M-models-for-private-use` in the [Private Jets methodology](https://github.com/jorgecardleitao/private-jets/blob/main/methodology.md)
-    - Fuel/CO2 conversion `leg_co2_kg()` in [`src/emissions.rs`](https://github.com/jorgecardleitao/private-jets/blob/main/src/emissions.rs)
-    - Per-model averaging `load_private_jet_models()` in [`src/model.rs`](https://github.com/jorgecardleitao/private-jets/blob/main/src/model.rs)
 
     Licensing Note
     --------------
@@ -2594,18 +2592,17 @@ class gossling_etal:
         """
         Given an ICAO aircraft designator and a flight time, calculates the fuel burned.
 
-        Warnings
-        --------
-        A single, constant model-average hourly fuel consumption is assumed. Flight time is the only variable.
-        The associated CO2 emissions can be obtained by multiplying the returned fuel mass by 3.16
-        (kg CO2 per kg of Jet-A burned).
-
         Parameters
         ----------
         acft : str
             ICAO Aircraft Designator (see `list_aircraft()`)
         flight_time : pint.Quantity
             Flight time [time]
+
+        Returns
+        -------
+        pint.Quantity
+            Fuel mass [kg]
 
         Raises
         ------
@@ -2614,10 +2611,11 @@ class gossling_etal:
         ValueError
             If the flight time is negative.
 
-        Returns
-        -------
-        pint.Quantity
-            Fuel mass [kg]
+        Warnings
+        --------
+        A single, constant model-average hourly fuel consumption is assumed. Flight time is the only variable.
+        The associated CO2 emissions can be obtained by multiplying the returned fuel mass by 3.16
+        (kg CO2 per kg of Jet-A burned).
         """
         if acft not in gossling_etal._fuel_flow_gph:
             raise ValueError(
@@ -2674,6 +2672,20 @@ class turgut_etal:
     (altitude in ft, mass in tonne, TAS in knot, fuel flow in kg/h). Inputs in any other
     units are converted internally.
 
+    Warnings
+    --------
+    This model returns a cruise fuel-flow **rate** (kg/h), not a total mission fuel mass.
+    To obtain the fuel burned in cruise, multiply the returned rate by the cruise time.
+
+    The regression is valid only within the domain of the data it was fitted to:
+    cruise altitude of approximately 22,000–40,000 ft, aircraft mass of approximately 45–79 tonne,
+    and TAS of approximately 300–440 knot. Extrapolating the linear model far outside these ranges is unreliable.
+
+    See Also
+    --------
+    Table 2 ("The results of the regression analyses, where the FF parameter is dependent variable")
+    in Turgut et al. (2014).
+
     Notes
     -----
     Regression models available (cf. Table 2 in Turgut et al. (2014)):
@@ -2700,28 +2712,12 @@ class turgut_etal:
     | reserve fuel uplift   | not applicable                                                              |
     | diversion fuel uplift | not applicable                                                              |
 
-    Warnings
-    --------
-    This model returns a cruise fuel-flow **rate** (kg/h), not a total mission fuel mass.
-    To obtain the fuel burned in cruise, multiply the returned rate by the cruise time.
-
-    Warnings
-    --------
-    The regression is valid only within the domain of the data it was fitted to:
-    cruise altitude of approximately 22,000–40,000 ft, aircraft mass of approximately 45–79 tonne,
-    and TAS of approximately 300–440 knot. Extrapolating the linear model far outside these ranges is unreliable.
-
     References
     ----------
     Turgut, E. T., Cavcar, M., Usanmaz, O., Canarslanlar, A. O., Dogeroglu, T., Armutlu, K., & Yay, O. D. (2014).
     Fuel flow analysis for the cruise phase of commercial aircraft on domestic routes.
     _Aerospace Science and Technology_, 37, 1–9.
     doi:[10.1016/j.ast.2014.04.012](https://doi.org/10.1016/j.ast.2014.04.012)
-
-    See Also
-    --------
-    Table 2 ("The results of the regression analyses, where the FF parameter is dependent variable")
-    in Turgut et al. (2014).
 
     Example
     -------
@@ -2817,10 +2813,6 @@ class turgut_etal:
         """
         Given a regression model, cruise altitude, aircraft mass and true airspeed, calculates the cruise fuel-flow rate.
 
-        Warnings
-        --------
-        This function returns a cruise fuel-flow **rate** (kg/h), not a total mission fuel mass.
-
         Parameters
         ----------
         acft : str
@@ -2832,6 +2824,11 @@ class turgut_etal:
         TAS : pint.Quantity
             True airspeed [speed]
 
+        Returns
+        -------
+        pint.Quantity
+            Cruise fuel-flow rate [kg/h]
+
         Raises
         ------
         ValueError
@@ -2839,10 +2836,9 @@ class turgut_etal:
         ValueError
             If altitude, mass or true airspeed are not greater than zero.
 
-        Returns
-        -------
-        pint.Quantity
-            Cruise fuel-flow rate [kg/h]
+        Warnings
+        --------
+        This function returns a cruise fuel-flow **rate** (kg/h), not a total mission fuel mass.
         """
         if acft not in turgut_etal._regression_coefficients:
             raise ValueError(

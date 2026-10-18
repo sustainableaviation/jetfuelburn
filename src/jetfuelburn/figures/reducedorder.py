@@ -1,3 +1,5 @@
+"""Figures for the documentation of the reduced-order models."""
+
 from jetfuelburn import ureg
 from jetfuelburn.reducedorder import lee_etal
 from importlib import resources
