@@ -2,7 +2,7 @@
 
 !!! tip
     This page lists a selection of the fuel burn calculations available in the `jetfuelburn` package.  
-    For a full list, see the **API Reference (Public)**.
+    For a full list, see the **API Reference**.
 
 ## Range Equation
 

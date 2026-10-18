@@ -86,6 +86,8 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.highlight
   - attr_list
+  # Pin Pyodide's jetfuelburn install to this build's __version__.
+  - jetfuelburn._pyodide
 
 extra_javascript:
   - _javascripts/katex.js

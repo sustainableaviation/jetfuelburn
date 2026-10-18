@@ -45,6 +45,7 @@ tracker = "https://github.com/sustainableaviation/jetfuelburn/issues"
 testing = [
     "pytest",
     "pytest-cov",
+    "markdown",  # for the tests of the documentation extension jetfuelburn._pyodide
 ]
 optionaldependencies = [
     "pandas",

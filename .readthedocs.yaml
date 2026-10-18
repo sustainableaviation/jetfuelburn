@@ -9,6 +9,10 @@ build:
     install:
       - pip install -r docs/_requirements.txt
       - pip install .
+    pre_build:
+      # The interactive code blocks install this wheel, so every version of the
+      # documentation runs the code it documents. See src/jetfuelburn/_pyodide.py.
+      - python -m pip wheel . --no-deps --wheel-dir docs/_static/wheel
     build:
       html:
         - zensical build

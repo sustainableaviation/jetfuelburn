@@ -41,6 +41,7 @@ Old names remain available as deprecated aliases: they point to the new class an
 - The airport list used by `utility.geography` now uses [OurAirports](https://ourairports.com/data/) (public domain). The list now contains 11,763 airports (9,051 IATA and 10,530 ICAO codes) and corrects coordinates that the old list had wrong by up to 14,450 km (e.g. `GBI`, `SHO`, `KUR`).
 - `reducedorder.seymour_etal` now uses the coefficients published in Table M.7 of the Supplementary Information of Seymour et al. (2020). They replace the values of the FEAT GitHub `.csv` file, an earlier fit committed in June 2020. The 133 aircraft types stay the same.
 - `utility.aerodynamics.poll_schumann_drag_polars` implements the clean-configuration drag polar of Poll & Schumann (2025) for the 67 aircraft types of their Table 2, with a Reynolds-number-dependent zero-lift drag and wave drag. It replaces the OpenAP drag polars and the JSBSim/FlightGear drag tables, which are no longer bundled.
+- The interactive code blocks of the documentation install the wheel of the build they belong to, so every version of the documentation runs the code it documents.
 - The package now ships `NOTICE.md`, which lists the source, copyright holder and licence of all bundled third-party data. Each class that uses such data has a short Licensing Note that points to it.
 
 ### Fixes
