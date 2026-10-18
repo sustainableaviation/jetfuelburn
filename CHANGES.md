@@ -3,7 +3,7 @@
 The format of this log is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## `4.0.0` (16. October 2026)
+## `4.0.0` (18. October 2026)
 
 ### Breaking Changes
 
