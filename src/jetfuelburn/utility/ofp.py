@@ -1,4 +1,5 @@
-# %%
+"""Four-dimensional trajectories generated from operational flight plans."""
+
 try:
     import pandas as pd
 except ImportError as e:
@@ -10,6 +11,7 @@ except ImportError as e:
 import math
 import json
 from pathlib import Path
+import pint
 from jetfuelburn import ureg
 
 
@@ -23,8 +25,8 @@ def _get_aircraft_performance(
     perf_data_path: Path,
     aircraft_type: str,
     phase: str,
-    alt: float | ureg.Quantity,
-):
+    alt: pint.Quantity,
+) -> pint.Quantity:
     """
     Look up the climb or descent rate for a given aircraft type and altitude.
 
@@ -66,49 +68,49 @@ def _get_aircraft_performance(
         The file must follow the schema used by the EUROCONTROL APD dataset
         (see `src/jetfuelburn/data/EurocontrolAPD/data.json`).
     aircraft_type : str
-        ICAO aircraft type designator (e.g. ``'B123'``), matching a top-level
+        ICAO aircraft type designator (e.g. `'B123'`), matching a top-level
         key in the JSON file.
     phase : str
-        Flight phase; must be either ``'climb'`` or ``'descent'``.
+        Flight phase, either `'climb'` or `'descent'`.
     alt : pint.Quantity
-        Current altitude with a length dimension (e.g. ``30000 * ureg.ft``).
-        The ``@ureg.check`` decorator enforces dimensional correctness.
+        Current altitude with a length dimension (e.g. `30000 * ureg.ft`).
+        The `@ureg.check` decorator enforces dimensional correctness.
 
     Returns
     -------
     pint.Quantity
-        Rate of climb or descent in ``ft/min``.  Climb rates are positive;
-        descent rates are negative.
+        Rate of climb or descent in `ft/min`.  Climb rates are positive.
+        Descent rates are negative.
 
     Raises
     ------
     ValueError
-        If *phase* is not ``'climb'`` or ``'descent'``.
+        If `phase` is not `'climb'` or `'descent'`.
     ValueError
-        If *aircraft_type* is not present in the JSON file.
+        If `aircraft_type` is not present in the JSON file.
     ValueError
-        If the flight phase is missing for the given *aircraft_type*.
+        If the flight phase is missing for the given `aircraft_type`.
     ValueError
-        If a regime in the JSON file has ``min_alt == max_alt`` (degenerate band).
+        If a regime in the JSON file has `min_alt == max_alt` (degenerate band).
     ValueError
-        If *alt* does not fall within any altitude band defined for the aircraft
+        If `alt` does not fall within any altitude band defined for the aircraft
         and flight phase.
 
-    Warning
-    -------
+    Warnings
+    --------
     Climb rates are positive and descent rates are negative numbers!
 
     Example
     -------
     ```pyodide install='jetfuelburn'
-    import jetfuelburn
+    from importlib.resources import files
     from jetfuelburn import ureg
-
-    jetfuelburn._get_aircraft_performance(
-        jetfuelburn.data.EurocontrolAPD.data.json,
-        "B123",
-        "climb",
-        30000 * ureg.ft,
+    from jetfuelburn.utility.ofp import _get_aircraft_performance
+    _get_aircraft_performance(
+        perf_data_path=files("jetfuelburn.data.EurocontrolAPD").joinpath("data.json"),
+        aircraft_type="B123",
+        phase="climb",
+        alt=30000 * ureg.ft,
     )
     ```
     """
@@ -168,7 +170,7 @@ def generate_4d_trajectory(
     df_ofp: pd.DataFrame | str | Path,
     aircraft_type: str,
     perf_data_path: Path | str,
-    time_resolution: ureg.Quantity = 1.0 * ureg.minute,
+    time_resolution: pint.Quantity = 1.0 * ureg.minute,
     strategy: str = "leveloff",
     colname_wp: str = "waypoint",
     colname_timecum: str = "timecum",
@@ -187,63 +189,63 @@ def generate_4d_trajectory(
     Parameters
     ----------
     df_ofp : pd.DataFrame
-        Operational flight plan (OFP) as a :class:`pandas.DataFrame`.
-        Must contain at minimum the columns named by *colname_wp*,
-        *colname_timecum*, *colname_alt*, *colname_lat*, and *colname_lon*.
+        Operational flight plan (OFP) as a `pandas.DataFrame`.
+        Must contain at minimum the columns named by `colname_wp`,
+        `colname_timecum`, `colname_alt`, `colname_lat`, and `colname_lon`.
         The altitude column may contain numeric values (in feet) **or** the
-        string tokens ``'CLB'`` / ``'DSC'`` for climb/descent waypoints whose
+        string tokens `'CLB'` / `'DSC'` for climb/descent waypoints whose
         exact altitude is not yet known.
     aircraft_type : str
-        ICAO aircraft type designator (e.g. ``'B123'``), passed directly to
-        :func:`_get_aircraft_performance`.
+        ICAO aircraft type designator (e.g. `'B123'`), passed directly to
+        `_get_aircraft_performance()`.
     perf_data_path : Path
-        Path to the JSON performance data file; forwarded to
-        :func:`_get_aircraft_performance`.
+        Path to the JSON performance data file, forwarded to
+        `_get_aircraft_performance()`.
     time_resolution : pint.Quantity, optional
-        Resampling resolution as a Pint time quantity (e.g. ``1 * ureg.minute``).
+        Resampling resolution as a Pint time quantity (e.g. `1 * ureg.minute`).
         The output trajectory is resampled to this resolution using linear
-        interpolation. Default is ``1 * ureg.minute``.
+        interpolation. Default is `1 * ureg.minute`.
     strategy : str, optional
-        Altitude interpolation strategy. Currently only ``'leveloff'`` is
+        Altitude interpolation strategy. Currently only `'leveloff'` is
         implemented (default). With this strategy the aircraft levels off at
         the target altitude of the next waypoint if it would otherwise
         overshoot.
     colname_wp : str, optional
-        Name of the waypoint-identifier column in *df_ofp*. Default ``'waypoint'``.
+        Name of the waypoint-identifier column in `df_ofp`. Default `'waypoint'`.
     colname_timecum : str, optional
-        Name of the cumulative flight time column (in minutes) in *df_ofp*.
-        Default ``'timecum'``.
+        Name of the cumulative flight time column (in minutes) in `df_ofp`.
+        Default `'timecum'`.
     colname_alt : str, optional
-        Name of the altitude column (in feet, or ``'CLB'``/``'DSC'`` tokens)
-        in *df_ofp*. Default ``'alt'``.
+        Name of the altitude column (in feet, or `'CLB'`/`'DSC'` tokens)
+        in `df_ofp`. Default `'alt'`.
     colname_lat : str, optional
-        Name of the latitude column in *df_ofp*. Default ``'lat'``.
+        Name of the latitude column in `df_ofp`. Default `'lat'`.
     colname_lon : str, optional
-        Name of the longitude column in *df_ofp*. Default ``'lon'``.
+        Name of the longitude column in `df_ofp`. Default `'lon'`.
     unit_alt : str, optional
-        Pint-compatible unit string for altitude values in *df_ofp* and in the
-        output (e.g. ``'ft'``, ``'m'``). Altitude columns are read and written
-        as plain :class:`float` in this unit. Default is ``'ft'``.
+        Pint-compatible unit string for altitude values in `df_ofp` and in the
+        output (e.g. `'ft'`, `'m'`). Altitude columns are read and written
+        as plain `float` in this unit. Default is `'ft'`.
     timestamp_start : pd.Timestamp, optional
-        UTC departure timestamp. Cumulative flight times from *colname_timecum*
-        are added as :class:`pandas.Timedelta` offsets to this value to produce
-        absolute timestamps. Default is ``pd.Timestamp('2025-01-01 00:00:00')``.
+        UTC departure timestamp. Cumulative flight times from `colname_timecum`
+        are added as `pandas.Timedelta` offsets to this value to produce
+        absolute timestamps. Default is `pd.Timestamp('2025-01-01 00:00:00')`.
 
     Returns
     -------
     pd.DataFrame
         Resampled 4-D trajectory merged with the original OFP data.
         The DataFrame is indexed by the resampling timestamps and contains
-        (at minimum) the interpolated columns ``alt_filled``, *colname_lat*,
-        and *colname_lon*.
+        (at minimum) the interpolated columns `alt_filled`, `colname_lat`,
+        and `colname_lon`.
 
     Raises
     ------
     ValueError
-        If *df_ofp* is empty.
+        If `df_ofp` is empty.
     ValueError
-        If any of the required columns (*colname_wp*, *colname_timecum*,
-        *colname_alt*, *colname_lat*, *colname_lon*) is missing from *df_ofp*.
+        If any of the required columns (`colname_wp`, `colname_timecum`,
+        `colname_alt`, `colname_lat`, `colname_lon`) is missing from `df_ofp`.
 
     Warnings
     --------
@@ -259,7 +261,7 @@ def generate_4d_trajectory(
     - **Descent**: the aircraft holds its current altitude for as long as possible, then begins
       descending at the applicable rate so as to arrive at the target altitude exactly at the
       next waypoint (Top of Descent / TOD back-calculation). The TOD is estimated using the
-      descent rate at the current altitude; as the aircraft descends through multiple regimes
+      descent rate at the current altitude. As the aircraft descends through multiple regimes,
       the rate is re-evaluated at each time step.
 
     ![Flight Plan Diagram](../_static/ofp_1.svg)
@@ -267,7 +269,7 @@ def generate_4d_trajectory(
     **Figure 1:** Diagrammatic representation of the `leveloff` strategy.
     Shown are two different _climb regimes_, which describe the altitude-dependent
     rate of climb (ROC) and rate of descent (ROD) of an aircraft. This could, for instance,
-    be infered from the [EUROCONTROL Aircraft Performance Database](https://learningzone.eurocontrol.int/ilp/customs/ATCPFDB/details.aspx?ICAO=A359).
+    be inferred from the [EUROCONTROL Aircraft Performance Database](https://learningzone.eurocontrol.int/ilp/customs/ATCPFDB/details.aspx?ICAO=A359).
     In this representation, the angle of the trajectory corresponds to the rate of climb (ROC).
     If the rate of climb is such that the aircraft would reach the altitude defined at the next waypoint
     before reaching the actual waypoint, the aircraft will level off at that altitude until the waypoint is reached.
@@ -275,8 +277,10 @@ def generate_4d_trajectory(
     Example
     -------
     ```pyodide install='jetfuelburn'
-    import jetfuelburn
+    from importlib.resources import files
+    import pandas as pd
     from jetfuelburn import ureg
+    from jetfuelburn.utility.ofp import generate_4d_trajectory
     df_ofp = pd.DataFrame({
         "waypoint": ["DEP", "MID", "ARR"],
         "alt": [0, "CLB", 5000],
@@ -284,10 +288,10 @@ def generate_4d_trajectory(
         "lat": [47.0, 47.5, 48.0],
         "lon": [8.0, 8.5, 9.0],
     })
-    result = jetfuelburn.generate_4d_trajectory(
-        df_ofp,
-        "B123",
-        jetfuelburn.DATA_JSON,
+    generate_4d_trajectory(
+        df_ofp=df_ofp,
+        aircraft_type="B123",
+        perf_data_path=files("jetfuelburn.data.EurocontrolAPD").joinpath("data.json"),
         time_resolution=1 * ureg.minute,
         timestamp_start=pd.Timestamp("2025-01-01 00:00:00"),
     )

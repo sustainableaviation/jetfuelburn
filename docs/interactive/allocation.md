@@ -1,4 +1,4 @@
-# Cabin Class Fuel Burn Allocation
+# Cabin Class Allocation
 
 Passengers in first class are allocated more fuel than passengers in economy class. This is because first class seats are larger and heavier than economy class seats. The fuel burn allocation implemented in JetFuelBurn is calculated based on the area of the cabin class seats. This follows current recommendations of both ICAO and IATA.
 

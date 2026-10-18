@@ -2,7 +2,7 @@
 
 !!! tip
     This page lists a selection of the fuel burn calculations available in the `jetfuelburn` package.  
-    For a full list, see the **API Reference (Public)**.
+    For a full list, see the **API Reference**.
 
 ## Range Equation
 
@@ -19,20 +19,20 @@ the lift-to-drag ratio (L/D) and specific fuel consumption (TSFC) are often more
 ```pyodide session='fuel' install='jetfuelburn'
 import jetfuelburn
 from jetfuelburn import ureg
-from jetfuelburn.rangeequation import calculate_fuel_consumption_breguet
+from jetfuelburn.rangeequation import range_equation
 
-calculate_fuel_consumption_breguet(
+range_equation.calculate(
     R=2000*ureg.nmi,
     LD=18,
     m_after_cruise=100*ureg.metric_ton,
-    v_cruise=800*ureg.kph,
-    TSFC_cruise=17*(ureg.mg/ureg.N/ureg.s),
+    V=800*ureg.kph,
+    TSFC=17*(ureg.mg/ureg.N/ureg.s),
 )
 ```
 
 !!! note
     For additional information, compare the function documentation:
-    [`jetfuelburn.rangeequation.calculate_fuel_consumption_breguet`][]
+    [`jetfuelburn.rangeequation.range_equation.calculate`][]
 
 
 ## Payload/Range Diagrams
@@ -41,9 +41,9 @@ Using payload/range diagrams is another common method for calculating fuel burn 
 This method is particularly popular due to the excellent data availability. After all, the payload/range diagram is a standard feature of aircraft performance manuals.
 
 ```pyodide session='fuel'
-from jetfuelburn.diagrams import calculate_fuel_consumption_payload_range
+from jetfuelburn.diagrams import payload_range
 
-calculate_fuel_consumption_payload_range(
+payload_range.calculate(
     d=2000*ureg.nmi,
     oew=142.4*ureg.metric_ton,
     mtow=280*ureg.metric_ton,
@@ -58,7 +58,7 @@ calculate_fuel_consumption_payload_range(
 
 !!! note
     For additional information, compare the function documentation:
-    [`jetfuelburn.diagrams.calculate_fuel_consumption_payload_range`][]
+    [`jetfuelburn.diagrams.payload_range.calculate`][]
 
 ## Reduced-Order Models
 
@@ -70,17 +70,17 @@ Both are physics-based models that simulate the fuel-burn of aircraft depending 
 
 #### Yanto et al. (2017-2019)
 
-Reduced-order models always offer multiple aircraft, for which simulations were run. The `available_aircraft` function always returns a list of these aircraft.
+Reduced-order models always offer multiple aircraft, for which simulations were run. The `list_aircraft` function always returns a list of these aircraft.
 
 ```pyodide session='fuel'
 from jetfuelburn.reducedorder import yanto_etal
-yanto_etal.available_aircraft()[0:10]
+yanto_etal.list_aircraft()[0:10]
 ```
 
-Fuel consumption calculations are then performed using the `calculate_fuel_consumption` function.
+Fuel consumption calculations are then performed using the `calculate` function.
 
 ```pyodide session='fuel'
-yanto_etal.calculate_fuel_consumption(
+yanto_etal.calculate(
     acft='A321',
     R=2200*ureg.km,
     PL=18*ureg.metric_ton
@@ -91,15 +91,15 @@ yanto_etal.calculate_fuel_consumption(
     For additional information, compare the function documentation:
     [`jetfuelburn.reducedorder.yanto_etal`][]
 
-#### Seymour et al. (2019)
+#### Seymour et al. (2020)
 
 !!! warning
     Note that Seymour et al. use "average weights" for every aircraft.
-    The only variable input is therefore the aircraft range.
+    The only variable input is therefore the great-circle distance between origin and destination.
 
 ```pyodide session='fuel'
 from jetfuelburn.reducedorder import seymour_etal
-seymour_etal.calculate_fuel_consumption(
+seymour_etal.calculate(
     acft='A321',
     R=2200*ureg.km,
 )
@@ -116,7 +116,7 @@ seymour_etal.calculate_fuel_consumption(
 
 ```pyodide session='fuel'
 from jetfuelburn.reducedorder import lee_etal
-lee_etal.calculate_fuel_consumption(
+lee_etal.calculate(
     acft='B732',
     W_E=265825*ureg.N,
     W_MPLD=156476*ureg.N,
@@ -136,7 +136,7 @@ lee_etal.calculate_fuel_consumption(
     For additional information, compare the function documentation:
     [`jetfuelburn.reducedorder.lee_etal`][]
 
-#### AIM2025 (from 2015)
+#### AIM2015 (Dray et al. 2019)
 
 !!! warning
     Note that the AIM2015 model uses 'representative' aircraft (in different size classes) instead of specific aircraft types.
@@ -144,7 +144,7 @@ lee_etal.calculate_fuel_consumption(
 
 ```pyodide session='fuel'
 from jetfuelburn.reducedorder import aim2015
-aim2015.calculate_fuel_consumption(
+aim2015.calculate(
     acft_size_class=8,
     D_climb=300*ureg.km,
     D_cruise=(15000-300-200)*ureg.km,

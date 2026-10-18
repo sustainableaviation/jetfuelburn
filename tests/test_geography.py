@@ -1,7 +1,7 @@
 import pytest
 from jetfuelburn.utility.geography import _atlas, _calculate_haversine_distance
 from jetfuelburn import ureg
-from jetfuelburn.utility.tests import approx_with_units
+from .helpers import approx_with_units
 import math
 
 
@@ -19,7 +19,7 @@ class TestGeography:
         # Verify coordinates are floats
         assert isinstance(airport["latitude"], float)
         assert isinstance(airport["longitude"], float)
-        assert airport["latitude"] == 25.2528
+        assert airport["latitude"] == 25.24979
 
     def test_get_airport_by_iata_valid(self):
         """Test that a specific airport is retrievable by IATA code."""
@@ -59,6 +59,19 @@ class TestGeography:
         # The public function raises ValueError, but the internal _get_airport returns None
         assert _atlas._get_airport("ZZZZ", by="iata") is None
         assert _atlas._get_airport("NonExistentName", by="name") is None
+
+    def test_data_rules(self):
+        """Test the rules of processing/ourairports/ourairports.py on a few known airports."""
+        # closed airports carry no codes (Berlin Tegel closed in 2020)
+        assert _atlas._get_airport("TXL", by="iata") is None
+        # codes follow their current assignment (Palm Beach is DJT/KDJT)
+        assert _atlas._get_airport("DJT", by="iata")["icao"] == "KDJT"
+        # one row per ICAO code (the EuroAirport is BSL/LFSB)
+        assert _atlas._get_airport("LFSB", by="icao")["iata"] == "BSL"
+        # for a shared name, the airport with scheduled service wins (New Zealand)
+        assert _atlas._get_airport("Queenstown Airport", by="name")["iata"] == "ZQN"
+        # names are written with single spaces
+        assert _atlas._get_airport("Zermatt Heliport", by="name")["icao"] == "LSEZ"
 
     def test_error_handling_invalid_key(self):
         """Test that invalid 'by' parameters raise ValueError."""

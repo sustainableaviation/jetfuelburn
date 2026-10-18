@@ -1,171 +1,9 @@
-# %%
-from jetfuelburn import ureg
+"""Fuel burn from the traffic and fuel statistics that U.S. air carriers report to the U.S. Department of Transportation."""
+
 from importlib import resources
 import json
-import csv
+import pint
 from jetfuelburn import ureg
-
-
-class aeromaps:
-    r"""
-    This class implements the the reduced-order fuel burn model of the AeroMaps software tool by Planès et al. (2023).
-
-    In this model, fuel burn calculations are based on statistical average values in MJ/ASK (megajoule per available seat-kilometer) for three representative aircraft types,
-    with future efficiency improvements modelled over time:
-
-    > The corresponding historical fleet was calibrated using mean fuel consumption per market and representative aircraft.
-    > - [Planès et al. (2023), P.5](https://doi.org/10.59490/joas.2023.7147)
-
-    > The future aircraft fleet can be modelled using two solutions: a top-down approach  based on annual efficiency gains, and a bottom-up approach in which aircraft data (performance,  entry-into-service...) are coupled with fleet renewal models.
-    > - [Planès et al. (2023), P.5](https://doi.org/10.59490/joas.2023.7147)
-
-    Here, the `drop_in` (fuel) data is used, although the model also data on future `hydrogen` aircraft.
-
-    Warnings
-    --------
-    It is unclear from the model documentation whether the fuel consumption values given in MJ/ASK for future years are based on the top-down or bottom-up approach.
-
-    References
-    ----------
-    Planès, T., Delbecq, S., & Salgas, A. (2023).
-    AeroMAPS: a framework for performing multidisciplinary assessment of prospective scenarios for air transport.
-    In _Journal of Open Aviation Science_.
-    doi:[10.59490/joas.2023.7147](https://doi.org/10.59490/joas.2023.7147)
-
-    Planès, T., Salgas, A., Pollet, F., & Delbecq, S. (2025).
-    Simulation and analyses of ICAO transition scenarios using the AeroMAPS open-source framework.
-    In _Towards Sustainable Aviation Summit (TSAS 2025)_.
-    doi:[10.60711/TSAS25.20250216.7026241092200926](https://doi.org/10.60711/TSAS25.20250216.7026241092200926)
-
-    Pollet, F., Planès, T., & Delbecq, S. (2024).
-    A Comprehensive Methodology for Performing Prospective Life Cycle Assessments of Future Air Transport Scenarios.
-    In _34th Congress of the International Council of the Aeronautical Sciences_.
-    hal:[hal-04703961](https://hal.science/hal-04703961v1)
-
-    See Also
-    --------
-    Excel in the AeroMAPS repository containing the statistical average energy use of aircraft types (short/medium/long-haul): [`aeromaps/resources/data/data.xlsx`](https://github.com/AeroMAPS/AeroMAPS/blob/5febefe03cd69815a6949b67c43906c209ac14b1/aeromaps/resources/data/data.xlsx)
-
-    Example
-    -------
-    ```pyodide install='jetfuelburn'
-    import jetfuelburn
-    from jetfuelburn import ureg
-    from jetfuelburn.statistics import aeromaps
-    aeromaps.calculate_fuel_consumption(
-        acft_type='long_range',
-        year=2020,
-        R=4000*ureg('km')
-    )
-    ```
-    """
-
-    _statistical_data = {}
-    with resources.open_text(
-        "jetfuelburn.data.AeroMaps", "aeromaps_data.csv", encoding="utf-8-sig"
-    ) as file:
-        csv_reader = csv.DictReader(file)
-        for row in csv_reader:
-            year = int(row.pop("year"))
-            _statistical_data[year] = {k: float(v) for k, v in row.items()}
-
-    @staticmethod
-    def available_years() -> list[int]:
-        """
-        Returns a sorted list of available years included in the model.
-        """
-        return sorted(aeromaps._statistical_data.keys())
-
-    @staticmethod
-    def available_aircraft(
-        year: int,
-    ) -> list[str]:
-        """
-        Given a year, returns a sorted list of available aircraft types
-        (e.g., ['long_range', 'medium_range', 'short_range']).
-        """
-        if year not in aeromaps._statistical_data:
-            return []
-        return sorted(aeromaps._statistical_data[year].keys())
-
-    @staticmethod
-    @ureg.check(
-        None,  # acft_type
-        None,  # year
-        "[length]",
-    )
-    def calculate_fuel_consumption(
-        acft_type: str,
-        year: int,
-        R: float,
-    ) -> float:
-        r"""
-        Given an aircraft type and range, calculates the fuel burned during flight **per passenger**.
-
-        Data is based on averages of fuel consumption per weight-distance flown by specific aircraft types,
-        in specific years, based on the assumptions of the AeroMaps software framework by Planès et al. (2023):
-
-        $$
-        F/pax = MJ/ASK * R / e
-        $$
-
-        where:
-
-        | Symbol     | Dimension     | Description                              |
-        | ---------- | ------------- | ---------------------------------------- |
-        | $F$        | [weight]      | Fuel burned during flight                |
-        | $pax$      | [1]           | Number of passengers                     |
-        | $R$        | length        | Range of the flight                      |
-        | $MJ/ASK$   | energy/length | Average energy use per available seat-km |
-        | $e$        | energy/weight | Specific energy content of jet fuel      |
-
-        Warnings
-        --------
-        This model does not
-
-        Parameters
-        ----------
-        year : int
-            Year of the data to be used for the calculation.
-        acft_type : str
-            Aircraft type (short/medium/long-haul) to be used for the calculation.
-        R : pint.Quantity
-            Range of the flight.
-
-        Returns
-        -------
-        pint.Quantity
-            Fuel burned during flight per passenger.
-
-        Raises
-        ------
-        ValueError
-            If the range is negative.
-            If the year is not available in the model.
-            If the aircraft type (short/medium/long-haul) is not available in the model for the given year.
-
-        """
-        if R.magnitude < 0:
-            raise ValueError(f"Range must not be negative.")
-        else:
-            R = R.to("km")
-        if year not in aeromaps._statistical_data:
-            raise ValueError(
-                f"Year '{year}' not found in model data. Please select one of the following: {aeromaps.available_years()}"
-            )
-        if acft_type not in aeromaps._statistical_data[year]:
-            raise ValueError(
-                f"Aircraft type '{acft_type}' not found in model data for year '{year}'. Please select one of the following: {aeromaps.available_aircraft(year)}"
-            )
-
-        specific_energy = 43.15 * ureg(
-            "MJ/kg"
-        )  # https://en.wikipedia.org/wiki/Jet_fuel#Types
-        fuel_burn_MJ = (
-            aeromaps._statistical_data[year][acft_type] * R.magnitude
-        )  # in MJ
-        fuel_burn_kg = fuel_burn_MJ * ureg("MJ") / specific_energy  # in kg
-        return fuel_burn_kg.to("kg")
 
 
 class usdot:
@@ -176,8 +14,42 @@ class usdot:
     Data is based on averages of fuel consumption per passenger mile and per ton mile,
     reported by the US DOT in table T2, summarizing Form 41 Schedule T-100.
 
-    Terminology
+    Warnings
+    --------
+    Form 41 Schedule T-100 data can be downloaded from the US Department of Transportation website.
+    Unfortunately, there are no permalinks to the data files, and even regular URLs are
+    generated dynamically based on some JavaScript magic.
+
+    The best way to obtain the correct files is to search by name, according to the following hierarchy:
+
+    ```
+    Database Name: Air Carrier Summary Data (Form 41 and 298C Summary Data)
+    T2: U.S. Air Carrier TRAFFIC And Capacity Statistics by Aircraft Type
+    ```
+
+    On the `T2: (...)` page, click on the "Download" button in the "Data Tools" sidebar (left).
+    The download should be an archive, containing the following file:
+
+    ```
+    T_SCHEDULE_T2.csv
+    ```
+
+    Aircraft types in this file are labeled using integer codes. These codes are
+    defined in a separate file, which must also be downloaded.
+    On the `T2: (...)` page, click on the `AircraftType` Field Name entry
+    and on the following page, click on the "Download Lookup Table" button.
+
+    See Also
+    --------
+    Working links to the relevant files (05-2025):
+
+    - [US DOT: BTS: Air Carrier Summary Data (Form 41 and 298C Summary Data)](https://www.transtats.bts.gov/Tables.asp?QO_VQ=EGD&QO)
+    - [US DOT: BTS: Air Carrier Summary Data: T2 (U.S. Air Carrier Traffic And Capacity Statistics by Aircraft Type)](https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FIH)
+
+    Notes
     -----
+    **Terminology**
+
     - **Form 41**
 
         Form 41 is a report that the U.S. Department of Transportation (DOT) generates
@@ -191,7 +63,7 @@ class usdot:
 
         The reporting requirements of Schedule T-100 of Form 41 are defined in federal law:
 
-        | Reglation | Scope |
+        | Regulation | Scope |
         | --------- | ----- |
         | [14 CFR 291.45](https://www.ecfr.gov/current/title-14/section-291.45) | General |
         | [Appendix A to Subpart E of Part 291, Title 14](https://www.ecfr.gov/current/title-14/part-291/appendix-Appendix%20A%20to%20Subpart%20E%20of%20Part%20291) | US Air Carriers |
@@ -224,47 +96,21 @@ class usdot:
 
         > This table summarizes the T-100 traffic data reported by U.S. air carriers. The monthly summary (...)
 
-    Warning
-    -------
-    Form 41 Schedule T-100 data can be downloaded from the US Department of Transportation website.
-    Unfortunately, there are no permalinks to the data files, and even regular URLs are
-    generated dynamically based on some JavaScript magic.
-
-    The best way to obtain the correct files is to search by name, according to the following hierarchy:
-
-    ```
-    Database Name: Air Carrier Summary Data (Form 41 and 298C Summary Data)
-    T2: U.S. Air Carrier TRAFFIC And Capacity Statistics by Aircraft Type
-    ```
-
-    On the `T2: (...)` page, click on the "Download" button in the "Data Tools" sidebar (left).
-    The download should be an archive, containing the following file:
-
-    ```
-    T_SCHEDULE_T2.csv
-    ```
-
-    Aircraft types in this file are labeled using integer codes. These codes are
-    defined in a separate file, which must also be downloaded.
-    On the `T2: (...)` page, click on the `AircraftType` Field Name entry
-    and on the following page, click on the "Download Lookup Table" button.
-
-    See Also
-    --------
-    Working links to the relevant files (05-2025):
-
-    - [US DOT: BTS: Air Carrier Summary Data (Form 41 and 298C Summary Data)](https://www.transtats.bts.gov/Tables.asp?QO_VQ=EGD&QO)
-    - [US DOT: BTS: Air Carrier Summary Data: T2 (U.S. Air Carrier Traffic And Capacity Statistics by Aircraft Type)](https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FIH)
+    Licensing Note
+    --------------
+    Data from the U.S. Department of Transportation, Bureau of Transportation Statistics
+    (Form 41 Schedule T-100), public domain.
+    Full notice in [`NOTICE.md`](https://github.com/sustainableaviation/jetfuelburn/blob/main/NOTICE.md).
 
     Example
-    --------
+    -------
     ```pyodide install='jetfuelburn'
     import jetfuelburn
     from jetfuelburn import ureg
     from jetfuelburn.statistics import usdot
-    usdot.available_years()
-    usdot.available_aircraft(usdot.available_years()[0])
-    usdot.calculate_fuel_consumption_per_weight(
+    usdot.list_years()
+    usdot.list_aircraft(usdot.list_years()[0])
+    usdot.calculate_per_weight(
         year=2024,
         acft='B787-800 Dreamliner',
         R=1000 * ureg.nmi,
@@ -282,18 +128,18 @@ class usdot:
             _aircraft_data[year] = json.load(file)
 
     @staticmethod
-    def available_years() -> list[int]:
+    def list_years() -> list[int]:
         """
         Returns a sorted list of available years included in the model.
         """
         return sorted(usdot._years)
 
     @staticmethod
-    def available_aircraft(
+    def list_aircraft(
         year: int,
     ) -> list[str]:
         """
-        Given a year, returns a sorted list of available ICAO aircraft designators included in the model.
+        Given a year, returns a sorted list of the aircraft type names of the US DOT lookup table included in the model.
         """
         return sorted(usdot._aircraft_data[year].keys())
 
@@ -304,12 +150,12 @@ class usdot:
         "[length]",
         "[mass]",
     )
-    def calculate_fuel_consumption_per_weight(
+    def calculate_per_weight(
         year: int,
         acft: str,
-        R: float,
-        W: float,
-    ) -> dict:
+        R: pint.Quantity,
+        W: pint.Quantity,
+    ) -> pint.Quantity:
         r"""
         Given an aircraft name, range and payload weight, calculates the fuel burned during flight.
 
@@ -330,17 +176,12 @@ class usdot:
         | $R$    | [km]    | Range of the flight                                                         |
         | $W$    | [kg]    | Payload weight of the flight                                                |
 
-        Warnings
-        --------
-        Aircraft types here are given as full-length strings, e.g. "Boeing 737-800", instead of the ususal ICAO designator "B738".
-        These are taken directly from the `L_AIRCRAFT_TYPE.csv` US DOT lookup table file.
-
         Parameters
         ----------
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            Aircraft type to be used for the calculation.
+            Aircraft type as named in the US DOT lookup table (e.g. `'Boeing 737-800'`), see `list_aircraft(year)`.
         R : pint.Quantity
             Range of the flight.
         W : pint.Quantity
@@ -357,6 +198,11 @@ class usdot:
             If the range or weight is negative.
             If the year is not available in the model.
             If the aircraft type is not available in the model for the given year.
+
+        Warnings
+        --------
+        Aircraft types here are given as full-length strings, e.g. "Boeing 737-800", instead of the usual ICAO designator "B738".
+        These are taken directly from the `L_AIRCRAFT_TYPE.csv` US DOT lookup table file.
         """
         if R.magnitude < 0 or W.magnitude < 0:
             raise ValueError(f"Range and/or weight must not be negative.")
@@ -386,11 +232,11 @@ class usdot:
         None,
         "[length]",
     )
-    def calculate_fuel_consumption_per_seat(
+    def calculate_per_seat(
         year: int,
         acft: str,
-        R: float,
-    ) -> dict:
+        R: pint.Quantity,
+    ) -> pint.Quantity:
         r"""
         Given an aircraft name and range, calculates the fuel burned during flight per passenger.
 
@@ -410,17 +256,12 @@ class usdot:
         | $paxD$ | [kg*km] | Total passenger-distance flown on a specific aircraft type in a specific year |
         | $R$    | [km]    | Range of the flight                                                           |
 
-        Warnings
-        --------
-        Aircraft types here are given as full-length strings, e.g. "Boeing 737-800", instead of the ususal ICAO designator "B738".
-        These are taken directly from the `L_AIRCRAFT_TYPE.csv` US DOT lookup table file.
-
         Parameters
         ----------
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            Aircraft type to be used for the calculation.
+            Aircraft type as named in the US DOT lookup table (e.g. `'Boeing 737-800'`), see `list_aircraft(year)`.
         R : pint.Quantity
             Range of the flight.
 
@@ -435,6 +276,11 @@ class usdot:
             If the range is negative.
             If the year is not available in the model.
             If the aircraft type is not available in the model for the given year.
+
+        Warnings
+        --------
+        Aircraft types here are given as full-length strings, e.g. "Boeing 737-800", instead of the usual ICAO designator "B738".
+        These are taken directly from the `L_AIRCRAFT_TYPE.csv` US DOT lookup table file.
         """
         if R.magnitude < 0:
             raise ValueError(f"Range must not be negative.")
@@ -454,10 +300,11 @@ class usdot:
         fuelburn = fuelburn.to("kg")
         return fuelburn
 
+    @staticmethod
     def calculate_movements(
         year: int,
         acft: str,
-    ) -> dict:
+    ) -> float:
         """
         Given a year and aircraft designator, returns the number of flights captured.
 
@@ -466,11 +313,11 @@ class usdot:
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            US DOT aircraft designator string (e.g. ``'B739'``).
+            Aircraft type as named in the US DOT lookup table (e.g. `'Boeing 737-900'`), see `list_aircraft(year)`.
 
         Returns
         -------
-        int or float
+        float
             Number of flights captured for the given aircraft type and year.
 
         Raises
@@ -492,10 +339,11 @@ class usdot:
         movements = aircraft_data["Number of flights captured"]
         return movements
 
+    @staticmethod
     def calculate_average_time(
         year: int,
         acft: str,
-    ) -> dict:
+    ) -> pint.Quantity:
         """
         Given a year and aircraft designator, returns the average trip flight time.
 
@@ -504,7 +352,7 @@ class usdot:
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            US DOT aircraft designator string (e.g. ``'B739'``).
+            Aircraft type as named in the US DOT lookup table (e.g. `'Boeing 737-900'`), see `list_aircraft(year)`.
 
         Returns
         -------
@@ -531,10 +379,11 @@ class usdot:
         time = time.to("h")
         return time
 
+    @staticmethod
     def calculate_average_distance(
         year: int,
         acft: str,
-    ) -> dict:
+    ) -> pint.Quantity:
         """
         Given a year and aircraft designator, returns the average trip distance.
 
@@ -543,7 +392,7 @@ class usdot:
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            US DOT aircraft designator string (e.g. ``'B739'``).
+            Aircraft type as named in the US DOT lookup table (e.g. `'Boeing 737-900'`), see `list_aircraft(year)`.
 
         Returns
         -------
@@ -571,10 +420,11 @@ class usdot:
         distance = distance.to("km")
         return distance
 
+    @staticmethod
     def calculate_average_cargo(
         year: int,
         acft: str,
-    ) -> dict:
+    ) -> pint.Quantity:
         """
         Given a year and aircraft designator, returns the average freight and mail transported.
 
@@ -583,7 +433,7 @@ class usdot:
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            US DOT aircraft designator string (e.g. ``'B739'``).
+            Aircraft type as named in the US DOT lookup table (e.g. `'Boeing 737-900'`), see `list_aircraft(year)`.
 
         Returns
         -------
@@ -611,10 +461,11 @@ class usdot:
         cargo = cargo.to("kg")
         return cargo
 
+    @staticmethod
     def calculate_average_pax(
         year: int,
         acft: str,
-    ) -> dict:
+    ) -> float:
         """
         Given a year and aircraft designator, returns the average number of passengers per flight.
 
@@ -623,11 +474,11 @@ class usdot:
         year : int
             Year of the data to be used for the calculation.
         acft : str
-            US DOT aircraft designator string (e.g. ``'B739'``).
+            Aircraft type as named in the US DOT lookup table (e.g. `'Boeing 737-900'`), see `list_aircraft(year)`.
 
         Returns
         -------
-        int or float
+        float
             Average number of passengers per flight for the given aircraft type and year.
 
         Raises
@@ -650,7 +501,7 @@ class usdot:
         return pax
 
     @staticmethod
-    def calculate_total_fuel_consumption(year: int) -> float:
+    def calculate_total_fuel_consumption(year: int) -> pint.Quantity:
         r"""
         Given a year, returns the total fuel burned by all aircraft types combined.
 
@@ -660,8 +511,8 @@ class usdot:
         F_{\text{total}} = \sum_{\text{acft}} \frac{F}{\text{paxD}} \cdot \text{paxD}
         $$
 
-        where $F/\text{paxD}$ is the ``Fuel/Revenue Seat Distance`` field (kg per pax-km)
-        and $\text{paxD}$ is the ``Revenue PAX km`` field (pax-km) for each aircraft type.
+        where $F/\text{paxD}$ is the `Fuel/Revenue Seat Distance` field (kg per pax-km)
+        and $\text{paxD}$ is the `Revenue PAX km` field (pax-km) for each aircraft type.
 
         Parameters
         ----------
@@ -680,7 +531,7 @@ class usdot:
         """
         if year not in usdot._years:
             raise ValueError(
-                f"No data available for year '{year}'. Please select one of the following: {usdot.available_years()}"
+                f"No data available for year '{year}'. Please select one of the following: {usdot.list_years()}"
             )
 
         total_kg = sum(
@@ -690,3 +541,17 @@ class usdot:
             and data["Revenue PAX km"] is not None
         )
         return (total_kg * ureg("kg")).to("kg")
+
+
+# Deprecated aliases of methods renamed in jetfuelburn 4.0.0 (to be removed in 5.0.0).
+from jetfuelburn.utility.code import _add_deprecated_method_aliases
+
+_add_deprecated_method_aliases(
+    usdot,
+    {
+        "calculate_fuel_consumption_per_weight": "calculate_per_weight",
+        "calculate_fuel_consumption_per_seat": "calculate_per_seat",
+        "available_aircraft": "list_aircraft",
+        "available_years": "list_years",
+    },
+)

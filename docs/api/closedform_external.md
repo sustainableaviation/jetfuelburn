@@ -16,16 +16,16 @@ The implementation in `pycontrails` computes instantaneous fuel flow and total b
     The Poll-Schumann Model requires a full flight trajectory as input for fuel calculations.
 
 !!! reference "References"
-    - Poll, D. I. A., & Schumann, U. (2025). An estimation method for the fuel burn and other performance characteristics of civil transport aircraft; part 3 full flight profile when the trajectory is specified. *The Aeronautical Journal*, 1-37. doi:[10.1017/aer.2024.141](https://doi.org/10.1017/aer.2024.141)
-    - Poll, D. I. A., & Schumann, U. (2021). An estimation method for the fuel burn and other performance characteristics of civil transport aircraft during cruise. part 2, determining the aircraft's characteristic parameters. *The Aeronautical Journal*, 125(1284), 296-340. doi:[10.1017/aer.2020.124](https://doi.org/10.1017/aer.2020.124)
-    - Poll, D. I. A., & Schumann, U. (2021). An estimation method for the fuel burn and other performance characteristics of civil transport aircraft in the cruise. Part 1 fundamental quantities and governing relations for a general atmosphere. *The Aeronautical Journal*, 125(1284), 257-295. doi:[10.1017/aer.2020.62](https://doi.org/10.1017/aer.2020.62)
+    - Poll, D. I. A., & Schumann, U. (2025). An estimation method for the fuel burn and other performance characteristics of civil transport aircraft; part 3 full flight profile when the trajectory is specified. *The Aeronautical Journal*, 1-37. <https://doi.org/10.1017/aer.2024.141>
+    - Poll, D. I. A., & Schumann, U. (2021). An estimation method for the fuel burn and other performance characteristics of civil transport aircraft during cruise. part 2, determining the aircraft's characteristic parameters. *The Aeronautical Journal*, 125(1284), 296-340. <https://doi.org/10.1017/aer.2020.124>
+    - Poll, D. I. A., & Schumann, U. (2021). An estimation method for the fuel burn and other performance characteristics of civil transport aircraft in the cruise. Part 1 fundamental quantities and governing relations for a general atmosphere. *The Aeronautical Journal*, 125(1284), 257-295. <https://doi.org/10.1017/aer.2020.62>
 
 !!! reference "See Also"
     - [`pycontrails.models.ps_model.PSFlight`](https://py.contrails.org/api/pycontrails.models.ps_model.PSFlight.html)  
     - [contrails.org](https://contrails.org)
 
 !!! warning
-    `pycontrails`, which implements the Poll-Schumann model, is not a pure Python package and therefore not compatible with [Pyodide](https://pyodide.org/en/stable/). The below example is therefore not interactice.
+    `pycontrails`, which implements the Poll-Schumann model, is not a pure Python package and therefore not compatible with [Pyodide](https://pyodide.org/en/stable/). The below example is therefore not interactive.
 
 !!! example "Usage Example"
     ```python

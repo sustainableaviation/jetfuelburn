@@ -1,5 +1,10 @@
+"""Allocation of the fuel burn of a flight to its cabin classes."""
+
+import pint
+
+
 def footprint_allocation_by_area(
-    fuel_per_flight: float,
+    fuel_per_flight: float | pint.Quantity,
     size_factor_eco: float,
     size_factor_premiumeco: float,
     size_factor_business: float,
@@ -12,7 +17,7 @@ def footprint_allocation_by_area(
     load_factor_premiumeco: float,
     load_factor_business: float,
     load_factor_first: float,
-) -> dict[float, float, float, float]:
+) -> dict[str, float | pint.Quantity]:
     r"""
     Given the fuel burn per flight $F$, the number of seats in each cabin class $S_i$,
     the load factor in each cabin class $L_i$ and the size factor of each cabin class $s_i$,
@@ -49,35 +54,9 @@ def footprint_allocation_by_area(
 
     This approach is suggested by both ICAO and IATA as the "allocation by area" method.
 
-    Notes
-    -----
-    IATA RP 1726 (Section 2.4.2) recommends the following size factors:
-
-    |             | Economy | Premium Economy | Business | First |
-    | ----------- | ------- | --------------- | -------- | ----- |
-    | __Narrow-Body__ | 1.0     | 1.00            | 1.5      | 1.5   |
-    | __Wide-Body__   | 1.0     | 1.5             | 4.0      | 5.0   |
-
-    Warnings
-    --------
-    If a certain seating class is not present, all related parameters
-    (`seats`, `size_factor`, `load_factor`) should be set to 0.
-
-    References
-    --------
-    - [IATA Recommended Practice RP 1726: Passenger CO2 Calculation Methodology](https://web.archive.org/web/20230526103741/https://www.iata.org/contentassets/139d686fa8f34c4ba7a41f7ba3e026e7/iata-rp-1726_passenger-co2.pdf)
-    - [ICAO Carbon Emissions Calculator Methodology (Version 13.1)](https://web.archive.org/web/20240826103513/https://applications.icao.int/icec/Methodology%20ICAO%20Carbon%20Emissions%20Calculator_v13_Final.pdf)
-    - [World Bank Policy Research Working Paper 6471 _"Calculating the Carbon Footprint from Different Classes of Air Travel"_](https://documents1.worldbank.org/curated/en/141851468168853188/pdf/WPS6471.pdf)
-
-    Raises
-    ------
-    ValueError
-        If `fuel_per_flight` < 0 or
-        (`load_factor_eco`, `load_factor_premiumeco`, `load_factor_business`, `load_factor_first`) not between 0 and 1.
-
     Parameters
     ----------
-    fuel_per_flight : float
+    fuel_per_flight : float | pint.Quantity
         Fuel burn per flight.
     size_factor_eco : float
         Size factor for economy class (1 by definition).
@@ -106,8 +85,35 @@ def footprint_allocation_by_area(
 
     Returns
     -------
-    dict[float, float, float, float]
-        Fuel burn per passenger per flight in economy, premium economy, business and first class.
+    dict[str, float | pint.Quantity]
+        Fuel burn per passenger per flight in economy, premium economy, business and first class
+        (keys `fuel_eco`, `fuel_premiumeco`, `fuel_business`, `fuel_first`), in the units of `fuel_per_flight`.
+
+    Raises
+    ------
+    ValueError
+        If `fuel_per_flight` < 0 or
+        (`load_factor_eco`, `load_factor_premiumeco`, `load_factor_business`, `load_factor_first`) not between 0 and 1.
+
+    Warnings
+    --------
+    If a certain seating class is not present, all related parameters
+    (`seats`, `size_factor`, `load_factor`) should be set to 0.
+
+    Notes
+    -----
+    IATA RP 1726 (Section 2.4.2) recommends the following size factors:
+
+    |             | Economy | Premium Economy | Business | First |
+    | ----------- | ------- | --------------- | -------- | ----- |
+    | __Narrow-Body__ | 1.0     | 1.00            | 1.5      | 1.5   |
+    | __Wide-Body__   | 1.0     | 1.5             | 4.0      | 5.0   |
+
+    References
+    ----------
+    - [IATA Recommended Practice RP 1726: Passenger CO2 Calculation Methodology](https://web.archive.org/web/20230526103741/https://www.iata.org/contentassets/139d686fa8f34c4ba7a41f7ba3e026e7/iata-rp-1726_passenger-co2.pdf)
+    - [ICAO Carbon Emissions Calculator Methodology (Version 13.1)](https://web.archive.org/web/20240826103513/https://applications.icao.int/icec/Methodology%20ICAO%20Carbon%20Emissions%20Calculator_v13_Final.pdf)
+    - [World Bank Policy Research Working Paper 6471 _"Calculating the Carbon Footprint from Different Classes of Air Travel"_](https://documents1.worldbank.org/curated/en/141851468168853188/pdf/WPS6471.pdf)
 
     Example
     -------
@@ -156,7 +162,7 @@ def footprint_allocation_by_area(
         )
     )
     if load_factor_premiumeco == 0 or seats_premiumeco == 0:
-        fuel_premiumeco = 0
+        fuel_premiumeco = 0.0 * fuel_per_flight
     else:
         fuel_premiumeco = (
             (1 / load_factor_premiumeco)
@@ -169,7 +175,7 @@ def footprint_allocation_by_area(
             )
         )
     if load_factor_business == 0 or seats_business == 0:
-        fuel_business = 0
+        fuel_business = 0.0 * fuel_per_flight
     else:
         fuel_business = (
             (1 / load_factor_business)
@@ -182,7 +188,7 @@ def footprint_allocation_by_area(
             )
         )
     if load_factor_first == 0 or seats_first == 0:
-        fuel_first = 0
+        fuel_first = 0.0 * fuel_per_flight
     else:
         fuel_first = (
             (1 / load_factor_first)

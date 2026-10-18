@@ -2,12 +2,12 @@ import jetfuelburn
 from jetfuelburn import ureg
 from jetfuelburn.statistics import usdot
 
-aircraft = usdot.available_aircraft(2024)
+aircraft = usdot.list_aircraft(2024)
 
 
-usdot.available_years()
-usdot.available_aircraft(usdot.available_years()[0])
-result1 = usdot.calculate_fuel_consumption_per_seat(
+usdot.list_years()
+usdot.list_aircraft(usdot.list_years()[0])
+result1 = usdot.calculate_per_seat(
     year=2024,
     acft="Boeing 777-200ER/200LR/233LR",
     R=6187 * ureg.km,

@@ -3,24 +3,22 @@
 site_name: JetFuelBurn Documentation
 site_url: https://jetfuelburn.readthedocs.io/
 repo_url: https://github.com/sustainableaviation/jetfuelburn
-copyright: © Paul Scherrer Institute (PSI) and Contributors | Code under MIT License
+copyright: © JetFuelBurn Contributors | Code under MIT License
 nav:
   - Home: 'index.md'
   - About: 'about.md'
   - Getting Started:
     - Installation: 'installation.md'
-    - Working with Physical Units: 'interactive/units.md'
+    - Physical Units: 'interactive/units.md'
     - Fuel Burn Calculations: 'interactive/fuel.md'
-    - Cabin Class Fuel Allocation: 'interactive/allocation.md'
+    - Cabin Class Allocation: 'interactive/allocation.md'
     - Aircraft Type Matrix: 'comparison/comparison.md'
   - API Reference:
     - PL/R-Diagrams: 'api/diagrams.md'
     - Range Equation: 'api/rangeequation.md'
     - Statistics Models: 'api/statistics.md'
     - Reduced Order Models: 'api/reducedorder.md'
-    #- Combined Models: 'api/combined.md'
-    #- Closed Form Models: 'api/closedform.md' 
-    - Cabin Class Fuel Allocation: 'api/allocation.md'
+    - Cabin Class Allocation: 'api/allocation.md'
   - API Reference (Utility):
     - Aerodynamics: 'api/aerodynamics.md'
     - Engines: 'api/engines.md'
@@ -41,15 +39,14 @@ theme: # https://www.mkdocs.org/user-guide/choosing-your-theme/#readthedocs
   logo: _static/logos/jetfuelburn_logo.svg
   favicon: _static/logos/jetfuelburn_logo.svg
   features:
-    # instant navigation is intentionally disabled: it re-executes page
-    # content scripts out of order (breaks the interactive Plotly figure)
-    # — see https://github.com/zensical/ui/issues/190
+    - navigation.instant
     - navigation.expand
     - navigation.path
     - navigation.indexes
     - navigation.top
     - content.footnote.tooltips
     - content.code.copy
+    - content.tabs.link
   palette:
     - scheme: default
       toggle:
@@ -70,7 +67,7 @@ plugins:
             show_root_heading: true
             heading_level: 2
             show_source: true
-            filters: []
+            filters: ["!^__getattr__$"]
             separate_signature: true
   - markdown-exec
   - autorefs
@@ -78,6 +75,9 @@ plugins:
 markdown_extensions:
   - admonition
   - pymdownx.superfences
+  # https://zensical.org/docs/authoring/content-tabs/
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.details
   - toc:
       permalink: true
@@ -86,19 +86,21 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.highlight
   - attr_list
+  # Pin Pyodide's jetfuelburn install to this build's __version__.
+  - jetfuelburn._pyodide
 
 extra_javascript:
   - _javascripts/katex.js
   # https://cdnjs.com/libraries/KaTeX
   # unpkg is incredibly slow (17s to load the css file)
-  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js
-  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js
-  - https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.19.0/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.19.0/contrib/auto-render.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.7.1/tablesort.min.js
   - _javascripts/tablesort.js
 extra_css:
   # https://cdnjs.com/libraries/KaTeX
   # unpkg is incredibly slow (17s to load the css file)
-  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.19.0/katex.min.css
   - _css/extra.css
 
 watch:
@@ -107,3 +109,7 @@ watch:
 
 extra:
   generator: false
+  version:
+    provider: mike
+    default: latest
+    alias: true

@@ -1,3 +1,5 @@
+"""Properties of the International Standard Atmosphere and conversions between airspeed and Mach number."""
+
 import math
 import pint
 from jetfuelburn import ureg
@@ -5,7 +7,7 @@ from jetfuelburn import ureg
 
 @ureg.check("[length]")
 def _calculate_atmospheric_temperature(
-    altitude,
+    altitude: pint.Quantity,
 ) -> pint.Quantity:
     r"""
     Computes the air temperature as a function of altitude up to 20,000 meters
@@ -29,24 +31,24 @@ def _calculate_atmospheric_temperature(
 
     Temperature in the lower Stratosphere (> 11,000 m) is assumed constant at -56.5°C (216.65 K).
 
-    References
-    ----------
-    Eqn.(1.6) in Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. doi:[10.1201/9781003279068](https://doi.org/10.1201/9781003279068)
-
     Parameters
     ----------
-    altitude : Quantity [length]
-        Altitude above sea level (0 to 20,000 meters).
+    altitude : pint.Quantity
+        Altitude above sea level (0 to 20,000 meters) [length].
 
     Returns
     -------
-    ureg.Quantity (float) [temperature]
+    pint.Quantity
         Air temperature (°C).
 
     Raises
     ------
     ValueError
         If altitude is less than 0 m or greater than 20,000 m.
+
+    References
+    ----------
+    Eqn.(1.6) in Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. <https://doi.org/10.1201/9781003279068>
 
     Example
     -------
@@ -76,7 +78,7 @@ def _calculate_atmospheric_temperature(
 
 @ureg.check("[length]")
 def _calculate_atmospheric_density(
-    altitude,
+    altitude: pint.Quantity,
 ) -> pint.Quantity:
     r"""
     Computes the air density as a function of altitude up to 20,000 meters
@@ -113,25 +115,25 @@ def _calculate_atmospheric_density(
     | $R$     | [energy/(mass*temperature)] | specific gas constant for air              | 287.052874 J/(kg·K)  |
     | $M$     | [mass/mole]                 | molar mass of dry air                      | 0.0289644 kg/mol     |
 
-    References
-    ----------
-    - Troposphere: Eqn. (4.14) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
-    - Stratosphere: Eqn. (4.16) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
-
     Parameters
     ----------
-    altitude : Quantity [length]
-        Altitude above sea level (0 to 20,000 meters).
+    altitude : pint.Quantity
+        Altitude above sea level (0 to 20,000 meters) [length].
 
     Returns
     -------
-    ureg.Quantity (float) [mass/volume]
+    pint.Quantity
         Air density (kg/m³).
 
     Raises
     ------
     ValueError
         If altitude is less than 0 m or greater than 20,000 m.
+
+    References
+    ----------
+    - Troposphere: Eqn. (4.14) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. <https://doi.org/10.1002/9781118534786>
+    - Stratosphere: Eqn. (4.16) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. <https://doi.org/10.1002/9781118534786>
 
     Example
     -------
@@ -176,8 +178,8 @@ def _calculate_atmospheric_density(
     "[length]",
 )
 def _calculate_dynamic_pressure(
-    speed: float,
-    altitude: float,
+    speed: pint.Quantity,
+    altitude: pint.Quantity,
 ) -> pint.Quantity:
     r"""
     Computes the dynamic pressure $q$ at a given speed and altitude.
@@ -194,26 +196,25 @@ def _calculate_dynamic_pressure(
     | $\rho$ | [mass/volume]   | air density         |
     | $V$    | [speed]         | aircraft speed      |
 
+    Parameters
+    ----------
+    speed : pint.Quantity
+        Aircraft speed [speed]
+    altitude : pint.Quantity
+        Aircraft altitude above sea level [length]
+
+    Returns
+    -------
+    pint.Quantity
+        Dynamic pressure (Pascals).
 
     See Also
     --------
     [Dynamic Pressure entry on Wikipedia](https://en.wikipedia.org/wiki/Dynamic_pressure)
 
     References
-    --------
-    Eqn. (2.63) in in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
-
-    Parameters
     ----------
-    speed : float
-        Aircraft speed [speed]
-    altitude : float
-        Aircraft altitude above sea level [distance]
-
-    Returns
-    -------
-    ureg.Quantity (float) [pressure]
-        Dynamic pressure (Pascals).
+    Eqn. (2.63) in in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. <https://doi.org/10.1002/9781118534786>
 
     Example
     -------
@@ -237,8 +238,8 @@ def _calculate_dynamic_pressure(
     "[length]",
 )
 def _calculate_airspeed_from_mach(
-    mach_number: float,
-    altitude: float,
+    mach_number: float | pint.Quantity,
+    altitude: pint.Quantity,
 ) -> pint.Quantity:
     r"""
     Converts aircraft speed from mach number $M$ to airspeed $V$,
@@ -259,14 +260,14 @@ def _calculate_airspeed_from_mach(
 
     Parameters
     ----------
-    mach_number : float [dimensionless]
-        Mach number
-    altitude : float [length]
-        Flight altitude above sea level
+    mach_number : float | pint.Quantity
+        Mach number [dimensionless]
+    altitude : pint.Quantity
+        Flight altitude above sea level [length]
 
     Returns
     -------
-    ureg.Quantity (float) [speed]
+    pint.Quantity
         Aircraft velocity (km/h).
 
     See Also
@@ -275,12 +276,7 @@ def _calculate_airspeed_from_mach(
 
     References
     ----------
-    Eqn.(1.33)-(1.34) Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. doi:[10.1201/9781003279068](https://doi.org/10.1201/9781003279068)
-
-    Returns
-    -------
-    ureg.Quantity (float) [speed]
-        Aircraft velocity in kilometers per hour.
+    Eqn.(1.33)-(1.34) Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. <https://doi.org/10.1201/9781003279068>
 
     Example
     -------
@@ -308,9 +304,9 @@ def _calculate_airspeed_from_mach(
     "[length]",
 )
 def _calculate_mach_from_airspeed(
-    airspeed: float,
-    altitude: float,
-) -> float:
+    airspeed: pint.Quantity,
+    altitude: pint.Quantity,
+) -> pint.Quantity:
     r"""
     Converts aircraft airspeed $V$ to Mach number $M$,
     depending on the flight altitude $h$.
@@ -330,15 +326,15 @@ def _calculate_mach_from_airspeed(
 
     Parameters
     ----------
-    airspeed : float [speed]
-        Aircraft true airspeed (TAS).
-    altitude : float [length]
-        Flight altitude above sea level.
+    airspeed : pint.Quantity
+        Aircraft true airspeed (TAS) [speed].
+    altitude : pint.Quantity
+        Flight altitude above sea level [length].
 
     Returns
     -------
-    ureg.Quantity (float) [dimensionless]
-        Mach number.
+    pint.Quantity
+        Mach number [dimensionless].
 
     See Also
     --------
@@ -346,7 +342,7 @@ def _calculate_mach_from_airspeed(
 
     References
     ----------
-    Eqn.(1.33)-(1.34) Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. doi:[10.1201/9781003279068](https://doi.org/10.1201/9781003279068)
+    Eqn.(1.33)-(1.34) Sadraey, M. H. (2017). Aircraft Performance: An Engineering Approach . _CRC Press_. <https://doi.org/10.1201/9781003279068>
 
     Example
     -------
@@ -375,8 +371,8 @@ def _calculate_mach_from_airspeed(
 
 @ureg.check("[temperature]")
 def _calculate_speed_of_sound(
-    temperature,
-):
+    temperature: pint.Quantity,
+) -> pint.Quantity:
     r"""
     Computes the speed of sound in air as a function of temperature uses the relationship for an ideal gas:
 
@@ -401,28 +397,28 @@ def _calculate_speed_of_sound(
     | $\gamma$ | [dimensionless]          | ratio of specific heats         | 1.40              |
     | $R$      | [energy/(mass*temp)]     | gas constant                    | 287.05 m²/(s²K)   |
 
-    See Also
-    --------
-    [`jetfuelburn.utility.physics._calculate_atmospheric_temperature`][]
-
-    References
-    ----------
-    Eqn. (2.77) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. doi:[10.1002/9781118534786](https://doi.org/10.1002/9781118534786)
-
     Parameters
     ----------
-    temperature : Quantity [temperature]
-        The local air temperature.
+    temperature : pint.Quantity
+        The local air temperature [temperature].
 
     Returns
     -------
-    ureg.Quantity (float) [velocity]
+    pint.Quantity
         Speed of sound (km/h).
 
     Raises
     ------
     ValueError
         If temperature is below absolute zero.
+
+    See Also
+    --------
+    [`jetfuelburn.utility.physics._calculate_atmospheric_temperature`][]
+
+    References
+    ----------
+    Eqn. (2.77) in Young, T. M. (2018). Performance of the Jet Transport Airplane. _John Wiley & Sons_. <https://doi.org/10.1002/9781118534786>
     """
     T_val = temperature.to(ureg.kelvin)
     if T_val.magnitude < 0:
@@ -436,3 +432,52 @@ def _calculate_speed_of_sound(
     speed_of_sound = a0 * math.sqrt((T_val / T0).magnitude)
 
     return speed_of_sound.to(ureg.kph)
+
+
+@ureg.check("[length]")
+def _calculate_dynamic_viscosity(
+    altitude: pint.Quantity,
+) -> pint.Quantity:
+    r"""
+    Computes the dynamic viscosity of air as a function of altitude,
+    using Sutherland's law with the ISA temperature:
+
+    $$
+    \mu = \frac{\beta \cdot T^{3/2}}{T + S}
+    $$
+
+    where:
+
+    | Symbol  | Dimension             | Description                         | Value                                   |
+    |---------|-----------------------|-------------------------------------|-----------------------------------------|
+    | $\mu$   | [pressure·time]       | dynamic viscosity                   | N/A                                     |
+    | $T$     | [temperature]         | ISA temperature at altitude $h$     | N/A                                     |
+    | $\beta$ | [pressure·time/temperature$^{1/2}$] | Sutherland constant   | 1.458e-6 kg/(m·s·K$^{1/2}$)             |
+    | $S$     | [temperature]         | Sutherland temperature              | 110.4 K                                 |
+
+    Parameters
+    ----------
+    altitude : pint.Quantity
+        Altitude above sea level (0 to 20,000 meters) [length].
+
+    Returns
+    -------
+    pint.Quantity
+        Dynamic viscosity of air [Pa·s].
+
+    References
+    ----------
+    Eqn. (22) in ICAO (1993). Manual of the ICAO Standard Atmosphere (extended to 80 kilometres). Doc 7488/3.
+
+    Example
+    -------
+    ```pyodide install='jetfuelburn'
+    import jetfuelburn
+    from jetfuelburn import ureg
+    from jetfuelburn.utility.physics import _calculate_dynamic_viscosity
+    _calculate_dynamic_viscosity(altitude=10000*ureg.m)
+    ```
+    """
+    T = _calculate_atmospheric_temperature(altitude).to(ureg.kelvin).magnitude
+    mu = 1.458e-6 * T**1.5 / (T + 110.4)
+    return mu * ureg("Pa*s")

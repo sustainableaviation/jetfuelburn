@@ -3,6 +3,7 @@ mkdocstrings-python
 # mkdocstrings >=1.0.6 fixes the docstring relative-link double-rewrite under
 # Zensical (https://github.com/zensical/zensical/issues/818)
 mkdocstrings>=1.0.6
+# mkdocstrings formats long signatures with ruff when it is installed
 ruff
 pymdown-extensions
 markdown-exec[ansi]>=1.12.3

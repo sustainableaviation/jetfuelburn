@@ -1,15 +1,10 @@
 import pytest
 from jetfuelburn import ureg
 import pint
-from jetfuelburn.rangeequation import (
-    calculate_fuel_consumption_breguet,
-    calculate_fuel_consumption_breguet_improved,
-    calculate_fuel_consumption_stepclimb_arctan,
-    calculate_fuel_consumption_stepclimb_integration,
-)
-from jetfuelburn.utility.tests import approx_with_units
+from jetfuelburn.rangeequation import range_equation
+from .helpers import approx_with_units
 from jetfuelburn.utility.physics import _calculate_mach_from_airspeed
-from jetfuelburn.utility.aerodynamics import openap_drag_polars
+from jetfuelburn.utility.aerodynamics import poll_schumann_drag_polars
 
 from .fixtures.rangeequation import breguet_range_fuel_calculation_data_1
 
@@ -26,7 +21,7 @@ class TestCalculateFuelConsumptionBreguet:
         V = 850 * ureg.kph
         TSFC = 0.6 * (ureg.lb / ureg.lbf / ureg.hour)
 
-        result = calculate_fuel_consumption_breguet(R, LD, m_after, V, TSFC)
+        result = range_equation.calculate(R, LD, m_after, V, TSFC)
 
         assert result.check("[mass]")
         assert result.units == ureg.kg
@@ -42,7 +37,7 @@ class TestCalculateFuelConsumptionBreguet:
         V = 200 * ureg.meter / ureg.second
         TSFC = 15 * (ureg.mg / ureg.N / ureg.second)
 
-        result = calculate_fuel_consumption_breguet(R, LD, m_after, V, TSFC)
+        result = range_equation.calculate(R, LD, m_after, V, TSFC)
 
         assert result.magnitude == 0
         assert result.units == ureg.kg
@@ -80,7 +75,7 @@ class TestCalculateFuelConsumptionBreguet:
         params.update(invalid_input)
 
         with pytest.raises(ValueError, match=expected_msg):
-            calculate_fuel_consumption_breguet(**params)
+            range_equation.calculate(**params)
 
     def test_raises_dimensionality_error(self):
         """
@@ -88,7 +83,7 @@ class TestCalculateFuelConsumptionBreguet:
         via the @ureg.check decorator.
         """
         with pytest.raises((ValueError, pint.errors.DimensionalityError)):
-            calculate_fuel_consumption_breguet(
+            range_equation.calculate(
                 R=500 * ureg.second,  # Invalid: Time instead of Length
                 LD=18,
                 m_after_cruise=50000 * ureg.kg,
@@ -96,16 +91,14 @@ class TestCalculateFuelConsumptionBreguet:
                 TSFC=0.0001 * (ureg.sec / ureg.meter),
             )
 
-    def test_calculate_fuel_consumption_breguet_from_fixture(
-        self, breguet_range_fuel_calculation_data_1
-    ):
+    def test_calculate_from_fixture(self, breguet_range_fuel_calculation_data_1):
         """
         Test using a data fixture.
         """
         input_data, expected_data = breguet_range_fuel_calculation_data_1
 
         # Call the function using the keys from your fixture input_data
-        calculated_data = calculate_fuel_consumption_breguet(
+        calculated_data = range_equation.calculate(
             R=input_data["R"],
             LD=input_data["LD"],
             m_after_cruise=input_data["m_after_cruise"],
@@ -131,9 +124,7 @@ class TestCalculateFuelConsumptionBreguetImproved:
         V_hw = 20 * ureg.knot
         TSFC = 0.55 * (ureg.lb / ureg.lbf / ureg.hour)
 
-        result = calculate_fuel_consumption_breguet_improved(
-            R, LD, m_after, V, V_hw, TSFC
-        )
+        result = range_equation.calculate_improved(R, LD, m_after, V, V_hw, TSFC)
 
         assert result.check("[mass]")
         assert result.units == ureg.kg
@@ -141,7 +132,7 @@ class TestCalculateFuelConsumptionBreguetImproved:
 
     def test_zero_range(self):
         """Test zero range returns zero mass."""
-        result = calculate_fuel_consumption_breguet_improved(
+        result = range_equation.calculate_improved(
             R=0 * ureg.km,
             LD=18,
             m_after_cruise=50000 * ureg.kg,
@@ -150,6 +141,48 @@ class TestCalculateFuelConsumptionBreguetImproved:
             TSFC=17 * (ureg.mg / ureg.N / ureg.s),
         )
         assert result.magnitude == 0
+
+    @pytest.mark.parametrize(
+        "invalid_input",
+        [
+            {"R": -100 * ureg.km, "msg": "Range must be greater than zero"},
+            {"LD": 1, "msg": "Lift-to-Drag ratio must be greater than 1"},
+            {
+                "m_after_cruise": -50 * ureg.kg,
+                "msg": "Mass after cruise must be greater than zero",
+            },
+            {"V": 0 * ureg.kph, "msg": "Cruise speed must be greater than zero"},
+            {
+                "V_headwind": 800 * ureg.kph,
+                "msg": "Headwind must be less than the cruise speed",
+            },
+            {
+                "TSFC": -5 * (ureg.mg / ureg.N / ureg.s),
+                "msg": "Thrust Specific Fuel Consumption must be greater than zero",
+            },
+            {
+                "lost_fuel_fraction": 1.5,
+                "msg": "Lost fuel fraction must be between 0 and 1",
+            },
+            {
+                "recovered_fuel_fraction": -0.1,
+                "msg": "Recovered fuel fraction must be between 0 and 1",
+            },
+        ],
+    )
+    def test_raises_value_error_on_invalid_magnitudes(self, invalid_input):
+        params = {
+            "R": 2000 * ureg.nmi,
+            "LD": 18,
+            "m_after_cruise": 100 * ureg.metric_ton,
+            "V": 800 * ureg.kph,
+            "V_headwind": 50 * ureg.kph,
+            "TSFC": 17 * (ureg.mg / ureg.N / ureg.s),
+        }
+        expected_msg = invalid_input.pop("msg")
+        params.update(invalid_input)
+        with pytest.raises(ValueError, match=expected_msg):
+            range_equation.calculate_improved(**params)
 
     def test_equivalence_to_standard_breguet(self):
         """
@@ -164,12 +197,12 @@ class TestCalculateFuelConsumptionBreguetImproved:
         TSFC = 16 * (ureg.mg / ureg.N / ureg.second)
 
         # 1. Standard Calculation
-        val_standard = calculate_fuel_consumption_breguet(
+        val_standard = range_equation.calculate(
             R=R, LD=LD, m_after_cruise=m_after, V=V, TSFC=TSFC
         )
 
         # 2. Improved Calculation (with effects nullified)
-        val_improved = calculate_fuel_consumption_breguet_improved(
+        val_improved = range_equation.calculate_improved(
             R=R,
             LD=LD,
             m_after_cruise=m_after,
@@ -188,7 +221,7 @@ class TestCalculateFuelConsumptionBreguetImproved:
         Test that the improved function also checks dimensions via @ureg.check.
         """
         with pytest.raises((ValueError, pint.errors.DimensionalityError)):
-            calculate_fuel_consumption_breguet_improved(
+            range_equation.calculate_improved(
                 R=2000 * ureg.nmi,
                 LD=18,
                 m_after_cruise=100 * ureg.kg,
@@ -202,7 +235,7 @@ class TestCalculateFuelConsumptionStepclimbArctan:
 
     def test_valid_input_units(self):
         """Test valid calculation for the arctan method."""
-        result = calculate_fuel_consumption_stepclimb_arctan(
+        result = range_equation.calculate_stepclimb_arctan(
             R=2000 * ureg.nmi,
             h=35000 * ureg.feet,
             K=0.045,
@@ -218,7 +251,7 @@ class TestCalculateFuelConsumptionStepclimbArctan:
 
     def test_zero_range(self):
         """Test zero range returns zero mass."""
-        result = calculate_fuel_consumption_stepclimb_arctan(
+        result = range_equation.calculate_stepclimb_arctan(
             R=0 * ureg.nmi,
             h=35000 * ureg.feet,
             K=0.045,
@@ -240,9 +273,16 @@ class TestCalculateFuelConsumptionStepclimbArctan:
                 "msg": "Mass after cruise must be greater than zero",
             },
             {
-                "S": 1.0 * ureg.m**2,
-                "msg": "Lift-to-Drag ratio must be greater than 1",
-            },  # Error msg corresponds to check S<=1 in source
+                "S": 0 * ureg.m**2,
+                "msg": "Wing reference area must be greater than zero",
+            },
+            {"S": 1.0 * ureg.m**2, "msg": "no positive fuel mass exists"},
+            {"R": 20000 * ureg.nmi, "msg": "no positive fuel mass exists"},
+            {"K": 0, "msg": "Lift-dependent drag factor must be greater than zero"},
+            {
+                "C_D0": -0.01,
+                "msg": "Zero-lift drag coefficient must be greater than zero",
+            },
             {"V": 0 * ureg.kph, "msg": "Cruise speed must be greater than zero"},
             {
                 "TSFC": -5 * (ureg.mg / ureg.N / ureg.s),
@@ -266,14 +306,14 @@ class TestCalculateFuelConsumptionStepclimbArctan:
         params.update(invalid_input)
 
         with pytest.raises(ValueError, match=expected_msg):
-            calculate_fuel_consumption_stepclimb_arctan(**params)
+            range_equation.calculate_stepclimb_arctan(**params)
 
 
 class TestCalculateFuelConsumptionStepclimbIntegration:
 
     def test_valid_input_scalar(self):
         """Test integration method with scalar TSFC and LD inputs."""
-        result = calculate_fuel_consumption_stepclimb_integration(
+        result = range_equation.calculate_stepclimb_integration(
             m_after_cruise=100 * ureg.metric_ton,
             R=2000 * ureg.nmi,
             h=35000 * ureg.feet,
@@ -295,7 +335,7 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
         def mock_ld(L, M, h):
             return 18
 
-        result = calculate_fuel_consumption_stepclimb_integration(
+        result = range_equation.calculate_stepclimb_integration(
             m_after_cruise=100 * ureg.metric_ton,
             R=2000 * ureg.nmi,
             h=35000 * ureg.feet,
@@ -305,6 +345,35 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
         )
         assert result.check("[mass]")
         assert result.units == ureg.kg
+        assert result.magnitude > 0
+
+    def test_callable_without_the_named_parameters_is_rejected(self):
+        """A TSFC or LD function must accept the names it is called with."""
+        params = dict(
+            m_after_cruise=100 * ureg.metric_ton,
+            R=2000 * ureg.nmi,
+            h=35000 * ureg.feet,
+            M=0.78,
+        )
+        with pytest.raises(ValueError, match="missing parameters"):
+            range_equation.calculate_stepclimb_integration(
+                TSFC=lambda x, y: 17 * (ureg.mg / ureg.N / ureg.s), LD=18, **params
+            )
+        with pytest.raises(ValueError, match="missing parameters"):
+            range_equation.calculate_stepclimb_integration(
+                TSFC=17 * (ureg.mg / ureg.N / ureg.s), LD=lambda L: 18, **params
+            )
+
+    def test_callable_with_kwargs_is_accepted(self):
+        """A function taking **kwargs accepts any parameter name."""
+        result = range_equation.calculate_stepclimb_integration(
+            m_after_cruise=100 * ureg.metric_ton,
+            R=2000 * ureg.nmi,
+            h=35000 * ureg.feet,
+            M=0.78,
+            TSFC=lambda **kwargs: 17 * (ureg.mg / ureg.N / ureg.s),
+            LD=lambda **kwargs: 18,
+        )
         assert result.magnitude > 0
 
     @pytest.mark.parametrize(
@@ -337,11 +406,11 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
         params.update(invalid_input)
 
         with pytest.raises(ValueError, match=expected_msg):
-            calculate_fuel_consumption_stepclimb_integration(**params)
+            range_equation.calculate_stepclimb_integration(**params)
 
     def test_zero_range(self):
         """Test zero range integration returns zero fuel mass."""
-        result = calculate_fuel_consumption_stepclimb_integration(
+        result = range_equation.calculate_stepclimb_integration(
             m_after_cruise=100 * ureg.metric_ton,
             R=0 * ureg.nmi,
             h=35000 * ureg.feet,
@@ -354,7 +423,7 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
     def test_raises_dimensionality_error(self):
         """Test dimensionality checks on arguments."""
         with pytest.raises((ValueError, pint.errors.DimensionalityError)):
-            calculate_fuel_consumption_stepclimb_integration(
+            range_equation.calculate_stepclimb_integration(
                 m_after_cruise=100 * ureg.meter,  # Invalid: Length instead of Mass
                 R=2000 * ureg.nmi,
                 h=35000 * ureg.feet,
@@ -365,7 +434,7 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
 
     def test_integration_convergence(self):
         """Test that the integration method converges to a reasonable value as integration_mass_step decreases."""
-        base_result = calculate_fuel_consumption_stepclimb_integration(
+        base_result = range_equation.calculate_stepclimb_integration(
             m_after_cruise=100 * ureg.metric_ton,
             R=2000 * ureg.nmi,
             h=35000 * ureg.feet,
@@ -375,7 +444,7 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
             integration_mass_step=100 * ureg.kg,
         )
 
-        finer_result = calculate_fuel_consumption_stepclimb_integration(
+        finer_result = range_equation.calculate_stepclimb_integration(
             m_after_cruise=100 * ureg.metric_ton,
             R=2000 * ureg.nmi,
             h=35000 * ureg.feet,
@@ -396,24 +465,26 @@ class TestCalculateFuelConsumptionStepclimbIntegration:
         m_after_cruise = 100 * ureg.metric_ton
         TSFC = 17 * (ureg.mg / ureg.N / ureg.s)
 
-        arctan_result = calculate_fuel_consumption_stepclimb_arctan(
+        arctan_result = range_equation.calculate_stepclimb_arctan(
             R=range,
             h=altitude,
-            K=openap_drag_polars.get_basic_drag_parameters("A320").get("K"),
-            C_D0=openap_drag_polars.get_basic_drag_parameters("A320").get("CD0"),
+            K=poll_schumann_drag_polars.get_basic_drag_parameters("A320").get("K"),
+            C_D0=poll_schumann_drag_polars.get_basic_drag_parameters("A320").get("CD0"),
             m_after_cruise=m_after_cruise,
-            S=openap_drag_polars.get_basic_drag_parameters("A320").get("S"),
+            S=poll_schumann_drag_polars.get_basic_drag_parameters("A320").get("S"),
             V=airspeed,
             TSFC=TSFC,
         )
 
-        integration_result = calculate_fuel_consumption_stepclimb_integration(
+        integration_result = range_equation.calculate_stepclimb_integration(
             m_after_cruise=m_after_cruise,
             R=range,
             h=altitude,
             M=mach,
             TSFC=TSFC,
-            LD=openap_drag_polars.calculate_lift_to_drag_binder_function(acft="A320"),
+            LD=poll_schumann_drag_polars.calculate_lift_to_drag_binder_function(
+                acft="A320"
+            ),
             integration_mass_step=100 * ureg.kg,
         )
 

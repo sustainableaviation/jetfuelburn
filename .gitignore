@@ -177,3 +177,6 @@ cython_debug/
 
 # Linting
 .ruff*
+
+# wheel of the checkout, built by .readthedocs.yaml for the interactive code blocks
+docs/_static/wheel/

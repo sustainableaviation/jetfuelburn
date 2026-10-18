@@ -23,16 +23,18 @@ The [reduced order](api/reducedorder.md) module of the JetFuelBurn package imple
 
 The [`jetfuelburn.reducedorder.seymour_etal`][] model for fuel burn estimation of commercial aircraft is a reduced order model. This means that the model is based on statistical analysis (regression) of a more complex model. In this specific case, Seymour et al. used a combination of BADA and ICAO Engine Emissions Databank data to compute high-resolution fuel burn estimates.
 
-Having computed many such high-resolution estimates for different routes, they then performed a regression analysis to derive a reduced order model that can be used to compute fuel burn estimates with much lower computational effort. Their regression is in the variable of range $R$ only, since they assume an average payload per aircraft:
+Having computed many such high-resolution estimates for different routes, they then performed a regression analysis to derive a reduced order model that can be used to compute fuel burn estimates with much lower computational effort. Their regression has the great-circle distance $R$ between origin and destination as its only variable, since they assume an average payload per aircraft:
 $$
 F=a_1 \cdot R^2 + a_2 \cdot R + c
 $$
-While Seymour et al. in developing their reduced-order model therefore used proprietary BADA data under license, the resulting regression coefficients \(a_1\), \(a_2\), and \(c\) have been published in the appendix to their open-access peer-reviewed article.
+While Seymour et al. in developing their reduced-order model therefore used proprietary BADA data under license, the resulting regression coefficients \(a_1\), \(a_2\), and \(c\) have been published in Table M.7 of the Supplementary Information to their open-access peer-reviewed article (CC BY 4.0). JetFuelBurn uses the coefficients as printed in Table M.7.
 
-Note, however that in the disclaimer section of their article, they mention that:
+Note, however, that in the disclaimer section of their article, they mention that:
 
-> The fuel burn models provided in (...) [the supplementary information] shall not be used for 
-> comparing fuel efficiency and emission data between aircraft models and manufacturers. 
+> This document has been created with elements of Base of Aircraft Data (BADA) Family 3 Release 3.15
+> which has been made available by EUROCONTROL to ETH Zurich (...). EUROCONTROL has all relevant rights to BADA.
+> (...) The fuel burn models provided in SI M [Section M of the Supplementary Information, which holds Table M.7]
+> shall not be used for comparing fuel efficiency and emission data between aircraft models and manufacturers.
 > Recommended model applications are reported in Section 3.5.
 
-This notice is included with the implementation of the Seymour et al. model in the JetFuelBurn package.
+This disclaimer covers Table M.7 and therefore the coefficients used by JetFuelBurn. This notice is included with the implementation of the Seymour et al. model in the JetFuelBurn package.

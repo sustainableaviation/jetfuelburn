@@ -2,7 +2,7 @@
 
 ## Authors
 
-The `jetfuelburn` package was developed by [Michael Weinold](https://www.linkedin.com/in/michaelweinold/) under the supervision of [Prof. Russell McKenna](https://esc.ethz.ch/people/person-detail.mckenna.html) as part of his doctoral research at ETH Zurich and Paul Scherrer Institute (PSI).
+The `jetfuelburn` package was developed by [Dr. Michael Weinold](https://www.linkedin.com/in/michaelweinold/) under the supervision of [Prof. Russell McKenna](https://esc.ethz.ch/people/person-detail.mckenna.html) as part of his doctoral research at ETH Zurich and Paul Scherrer Institute (PSI).
 
 ## Contributors
 
@@ -15,7 +15,7 @@ The `jetfuelburn` package was developed by [Michael Weinold](https://www.linkedi
 
 To cite the use of `jetfuelburn` in academic work, please use the main publication:
 
-> Weinold and McKenna, (2026). JetFuelBurn: A Python package for calculating fuel burn of commercial aircraft. _Journal of Open Source Software_, 11(117), 9280, [doi:10.21105/joss.09280](https://doi.org/10.21105/joss.09280).
+> Weinold and McKenna, (2026). JetFuelBurn: A Python package for calculating fuel burn of commercial aircraft. _Journal of Open Source Software_, 11(117), 9280, <https://doi.org/10.21105/joss.09280>.
 
 ??? quote "BibTeX Entry"
     ```bibtex
@@ -50,3 +50,10 @@ Funding was provided by the [Swiss Innovation Agency Innosuisse](https://innosui
 ```plaintext
 --8<-- "LICENSE.txt"
 ```
+
+!!! note "Third-party data"
+    JetFuelBurn also contains data and model coefficients from third parties, under their own licenses
+    (public domain, MIT, CC BY 4.0) or with permission of the rights holder.
+    Their sources, copyright holders and licenses are listed in the
+    [`NOTICE.md`](https://github.com/sustainableaviation/jetfuelburn/blob/main/NOTICE.md) file,
+    which ships with every release of the package.

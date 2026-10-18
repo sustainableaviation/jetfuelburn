@@ -7,7 +7,7 @@
 [![Code style: black](https://img.shields.io/badge/Code%20Style-Black-000000.svg)](https://github.com/psf/black)
 
 A Python package for calculating fuel burn of commercial aircraft.  
-Maintainance Team: [@michaelweinold](https://github.com/michaelweinold)
+Maintenance Team: [@michaelweinold](https://github.com/michaelweinold)
 
 ## Installation
 
@@ -17,10 +17,10 @@ See [the package documentation](https://jetfuelburn.readthedocs.io/) for install
 
 ### Documentation
 
-The package documentation is based on [`mkdocs`](https://www.mkdocs.org). To build the documentation locally, install required packages from the `docs/_requirements.txt` file and navigate to the package root directory to execute:
+The package documentation is built with [Zensical](https://zensical.org), which reads the `mkdocs.yaml` configuration. To build the documentation locally, install the required packages from the `docs/_requirements.txt` file and navigate to the package root directory to execute:
 
 ```bash
-mkdocs serve
+zensical serve
 ```
 
 ### Testing

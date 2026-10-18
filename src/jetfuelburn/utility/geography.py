@@ -1,8 +1,10 @@
-# %%
+"""Great-circle distances between airports."""
+
 import csv
 import gzip
 from importlib.resources import files
 import math
+import pint
 from jetfuelburn import ureg
 
 
@@ -19,13 +21,13 @@ class _AirportAtlas:
         self._icao_index: dict[str, dict] = {}
         self._name_index: dict[str, dict] = {}
 
-    def _load_data(self):
+    def _load_data(self) -> None:
         r"""
         Loads the GZIP containing airport data into memory and builds indices.
 
         See Also
         --------
-        [`ip2location-iata-icao`](https://github.com/ip2location/ip2location-iata-icao) list of airport codes, names and coordinates on GitHub.
+        [OurAirports](https://ourairports.com/data/) list of airport codes, names and coordinates (public domain).
         """
         if self._loaded:
             return
@@ -57,7 +59,7 @@ class _AirportAtlas:
 
         self._loaded = True
 
-    def _get_airport(self, identifier: str, by: str = "iata") -> dict:
+    def _get_airport(self, identifier: str, by: str = "iata") -> dict | None:
         r"""
         Retrieves an airport data dictionary by the specified identifier.
 
@@ -91,8 +93,8 @@ class _AirportAtlas:
             {
                 'iata': 'INN',
                 'icao': 'LOWI',
-                'airport': 'Innsbruck Airport (Kranebitten Airport)',
-                'latitude': 47.2602,
+                'name': 'Innsbruck Airport',
+                'latitude': 47.260201,
                 'longitude': 11.344
             }
             ```
@@ -120,7 +122,9 @@ class _AirportAtlas:
 _atlas = _AirportAtlas()
 
 
-def _calculate_haversine_distance(lat1, lon1, lat2, lon2):
+def _calculate_haversine_distance(
+    lat1: float, lon1: float, lat2: float, lon2: float
+) -> pint.Quantity:
     r"""
     Calculates the Great Circle distance between two points 
     on the earth (specified in decimal degrees).
@@ -139,12 +143,6 @@ def _calculate_haversine_distance(lat1, lon1, lat2, lon2):
     | $\Delta\phi$, $\Delta\lambda$ | Difference in latitude and longitude (in radians)|
     | $R$                           | Mean earth radius (approx. 6,371 km)             |
 
-    See Also
-    --------
-    [Haversine formula entry on Wikipedia](https://en.wikipedia.org/wiki/Haversine_formula)  
-    [Great-circle distance entry on Wikipedia](https://en.wikipedia.org/wiki/Great-circle_distance)  
-    [Earth radius entry on Wikipedia](https://en.wikipedia.org/wiki/Earth_radius)
-
     Parameters
     ----------
     lat1 : float
@@ -155,11 +153,17 @@ def _calculate_haversine_distance(lat1, lon1, lat2, lon2):
         Latitude of point 2 in decimal degrees.
     lon2 : float
         Longitude of point 2 in decimal degrees.
-    
+
     Returns
     -------
-    Quantity
+    pint.Quantity
         The distance between the two points [length].
+
+    See Also
+    --------
+    [Haversine formula entry on Wikipedia](https://en.wikipedia.org/wiki/Haversine_formula)  
+    [Great-circle distance entry on Wikipedia](https://en.wikipedia.org/wiki/Great-circle_distance)  
+    [Earth radius entry on Wikipedia](https://en.wikipedia.org/wiki/Earth_radius)
 
     Example
     -------
@@ -191,10 +195,10 @@ def _calculate_haversine_distance(lat1, lon1, lat2, lon2):
 
 def calculate_distance_between_airports(
     origin: str, destination: str, identifier: str = "iata"
-):
+) -> pint.Quantity:
     r"""
     Calculates the Great Circle distance between two airports.
-    The list of airports is sourced from the `ip2location-iata-icao` dataset.
+    The list of airports is sourced from [OurAirports](https://ourairports.com/data/).
 
     ```python exec="true" html="true"
     import plotly.graph_objects as go
@@ -229,10 +233,6 @@ def calculate_distance_between_airports(
     _Great Circle route between Sydney (SYD) and London Heathrow (LHR).
     On a mercator projection, the shortest path appears curved._
 
-    See Also
-    --------
-    [`ip2location-iata-icao`](https://github.com/ip2location/ip2location-iata-icao) list of airport codes, names and coordinates on GitHub.
-
     Parameters
     ----------
     origin : str
@@ -247,15 +247,25 @@ def calculate_distance_between_airports(
         `name`: Full airport name
 
         Default is `iata`.
+
     Returns
     -------
-    Quantity
-        The distance between the two airports as a `pint.Quantity` in kilometers.
+    pint.Quantity
+        The distance between the two airports in kilometers [length].
 
     Raises
     ------
     ValueError
         If either airport code/name is not found.
+
+    See Also
+    --------
+    [OurAirports](https://ourairports.com/data/) list of airport codes, names and coordinates (public domain).
+
+    Licensing Note
+    --------------
+    Airport codes and coordinates from [OurAirports](https://ourairports.com/data/), public domain.
+    Full notice in [`NOTICE.md`](https://github.com/sustainableaviation/jetfuelburn/blob/main/NOTICE.md).
 
     Example
     -------

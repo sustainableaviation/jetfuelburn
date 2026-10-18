@@ -1,4 +1,4 @@
-# Working with Physical Units
+# Physical Units
 
 The `jetfuelburn` package utilises the [`pint` package](https://pint.readthedocs.io/en/stable/) to support physical units in calculations. The `pint` package allows for the definition of physical units and the conversion between them.
 
@@ -47,4 +47,4 @@ You can search this list for specific units using list comprehensions:
 
 !!! note
 
-    Note that because of American hegemony in the world of science, `'ton'` refers to a short ton (2000 lbs). If you would instead like to use civilized tons (1000 kg), you can use `'metric_ton'` instead.
+    Note that in recognition of American exceptionalism, `'ton'` refers to a [short ton](https://en.wikipedia.org/wiki/Short_ton) (2000 lbs). If you would instead like to use civilized tons (1000 kg), you must use `'metric_ton'` instead.

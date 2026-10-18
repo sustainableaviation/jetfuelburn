@@ -1,4 +1,5 @@
-# %%
+"""Plots of operational flight plans: altitude profiles and maps."""
+
 try:
     import pandas as pd
     import plotly.graph_objects as go
@@ -146,7 +147,7 @@ def plot_ofp_2d(
         The generated Plotly Figure object.
 
     Warnings
-    -----
+    --------
     Rows with missing or invalid lat/lon values are automatically skipped.
 
     Notes

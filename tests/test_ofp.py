@@ -1,7 +1,4 @@
-# %%
 import math
-import textwrap
-import tempfile
 from pathlib import Path
 
 import pandas as pd
@@ -103,8 +100,8 @@ class TestGetAircraftPerformance:
     ):
         """Altitude exactly at the band boundary (5 000 ft) is accepted."""
         rate = _get_aircraft_performance(tmp_json, "TEST", "climb", 5000 * ureg.ft)
-        # 5 000 ft satisfies BOTH bands (min_alt <= alt <= max_alt for both);
-        # the first matching band is returned.
+        # 5 000 ft satisfies BOTH bands (min_alt <= alt <= max_alt for both).
+        # The first matching band is returned.
         assert rate.check("[length]/[time]")
 
     def test_uses_real_json_file(self):
@@ -244,7 +241,7 @@ class TestGenerate4DTrajectory:
         Notes
         -----
         The merge in ``generate_4d_trajectory`` produces an integer-indexed
-        DataFrame; the resampled timestamps are available in the ``'timestamp'``
+        DataFrame. The resampled timestamps are available in the ``'timestamp'``
         column (carried through the merge from ``df_resampled``).
         """
         df = pd.DataFrame(
@@ -314,7 +311,7 @@ class TestGenerate4DTrajectory:
     ):
         """
         Waypoints tagged with the ``'CLB'`` string token get their altitude
-        filled in by the function; the output column ``alt_filled`` must be
+        filled in by the function. The output column ``alt_filled`` must be
         fully numeric (no NaN) for a well-defined flight plan.
         """
         df = pd.DataFrame(
