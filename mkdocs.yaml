@@ -105,3 +105,7 @@ watch:
 
 extra:
   generator: false
+  version:
+    provider: mike
+    default: latest
+    alias: true

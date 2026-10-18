@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block outdated %}
+  You're not viewing the latest version.
+  <a href="{{ base_url }}/../{{ config.extra.version.default }}/">
+    <strong>Click here to go to the latest version.</strong>
+  </a>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    // The theme requests ../versions.json with XMLHttpRequest. mike publishes
+    // that file beside the version directories. Read the Docs only stores
+    // files inside the version, so use the copy shipped with this build.
+    (function () {
+      var open = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function () {
+        var args = Array.prototype.slice.call(arguments);
+        try {
+          var resolved = new URL(args[1], window.location.href);
+          if (resolved.pathname.endsWith("/versions.json")) {
+            var config = JSON.parse(document.getElementById("__config").textContent);
+            var base = new URL(config.base, window.location.href);
+            if (!base.pathname.endsWith("/")) base.pathname += "/";
+            var local = new URL("versions.json", base);
+            if (resolved.href !== local.href) args[1] = local.href;
+          }
+        } catch (error) {}
+        return open.apply(this, args);
+      };
+    })();
+  </script>
+  {{ super() }}
+{% endblock %}
