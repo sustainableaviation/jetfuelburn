@@ -142,6 +142,48 @@ class TestCalculateFuelConsumptionBreguetImproved:
         )
         assert result.magnitude == 0
 
+    @pytest.mark.parametrize(
+        "invalid_input",
+        [
+            {"R": -100 * ureg.km, "msg": "Range must be greater than zero"},
+            {"LD": 1, "msg": "Lift-to-Drag ratio must be greater than 1"},
+            {
+                "m_after_cruise": -50 * ureg.kg,
+                "msg": "Mass after cruise must be greater than zero",
+            },
+            {"V": 0 * ureg.kph, "msg": "Cruise speed must be greater than zero"},
+            {
+                "V_headwind": 800 * ureg.kph,
+                "msg": "Headwind must be less than the cruise speed",
+            },
+            {
+                "TSFC": -5 * (ureg.mg / ureg.N / ureg.s),
+                "msg": "Thrust Specific Fuel Consumption must be greater than zero",
+            },
+            {
+                "lost_fuel_fraction": 1.5,
+                "msg": "Lost fuel fraction must be between 0 and 1",
+            },
+            {
+                "recovered_fuel_fraction": -0.1,
+                "msg": "Recovered fuel fraction must be between 0 and 1",
+            },
+        ],
+    )
+    def test_raises_value_error_on_invalid_magnitudes(self, invalid_input):
+        params = {
+            "R": 2000 * ureg.nmi,
+            "LD": 18,
+            "m_after_cruise": 100 * ureg.metric_ton,
+            "V": 800 * ureg.kph,
+            "V_headwind": 50 * ureg.kph,
+            "TSFC": 17 * (ureg.mg / ureg.N / ureg.s),
+        }
+        expected_msg = invalid_input.pop("msg")
+        params.update(invalid_input)
+        with pytest.raises(ValueError, match=expected_msg):
+            range_equation.calculate_improved(**params)
+
     def test_equivalence_to_standard_breguet(self):
         """
         Verify that the improved function returns the same result as the standard function
@@ -231,9 +273,16 @@ class TestCalculateFuelConsumptionStepclimbArctan:
                 "msg": "Mass after cruise must be greater than zero",
             },
             {
-                "S": 1.0 * ureg.m**2,
-                "msg": "Lift-to-Drag ratio must be greater than 1",
-            },  # Error msg corresponds to check S<=1 in source
+                "S": 0 * ureg.m**2,
+                "msg": "Wing reference area must be greater than zero",
+            },
+            {"S": 1.0 * ureg.m**2, "msg": "no positive fuel mass exists"},
+            {"R": 20000 * ureg.nmi, "msg": "no positive fuel mass exists"},
+            {"K": 0, "msg": "Lift-dependent drag factor must be greater than zero"},
+            {
+                "C_D0": -0.01,
+                "msg": "Zero-lift drag coefficient must be greater than zero",
+            },
             {"V": 0 * ureg.kph, "msg": "Cruise speed must be greater than zero"},
             {
                 "TSFC": -5 * (ureg.mg / ureg.N / ureg.s),

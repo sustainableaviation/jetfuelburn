@@ -331,6 +331,8 @@ class range_equation:
             If the dimensions of the inputs are invalid.
         ValueError
             If the magnitude of the inputs are invalid (eg. negative).
+        ValueError
+            If the range exceeds the maximum range of the arctan solution for the given parameters.
 
         References
         ----------
@@ -358,30 +360,39 @@ class range_equation:
         )
         ```
         """
-        if R == 0 * ureg.meter:
-            return 0 * ureg.kg
         if R < 0 * ureg.meter:
             raise ValueError("Range must be greater than zero.")
         if h < 0 * ureg.meter:
             raise ValueError("Altitude must be greater than zero.")
+        if K <= 0:
+            raise ValueError("Lift-dependent drag factor must be greater than zero.")
+        if C_D0 <= 0:
+            raise ValueError("Zero-lift drag coefficient must be greater than zero.")
         if m_after_cruise < 0 * ureg.kg:
             raise ValueError("Mass after cruise must be greater than zero.")
-        if S <= 1 * ureg.meter**2:
-            raise ValueError("Lift-to-Drag ratio must be greater than 1.")
+        if S <= 0 * ureg.meter**2:
+            raise ValueError("Wing reference area must be greater than zero.")
         if V <= 0 * ureg.kph:
             raise ValueError("Cruise speed must be greater than zero.")
         if TSFC.magnitude <= 0:
             raise ValueError(
                 "Thrust Specific Fuel Consumption must be greater than zero."
             )
+        if R == 0 * ureg.meter:
+            return 0 * ureg.kg
 
         E_max = 0.5 * (1 / math.sqrt(C_D0 * K))
         rho = _calculate_atmospheric_density(altitude=h)
         theta = (R * ureg.gravity * TSFC) / (2 * E_max * V)
         B = (C_D0 / K) * ((rho * V**2 * S) / (2 * ureg.gravity)) ** 2
-        m_fuel = ((B + m_after_cruise**2) * math.tan(theta)) / (
-            B**0.5 - m_after_cruise * math.tan(theta)
-        )  # math.sqrt(pint.Quantity) is not supported
+        # math.sqrt(pint.Quantity) is not supported, hence B**0.5
+        denominator = B**0.5 - m_after_cruise * math.tan(theta)
+        if theta >= math.pi / 2 or denominator <= 0 * ureg.kg:
+            raise ValueError(
+                "The range exceeds the maximum range of the arctan solution for these parameters, "
+                "so no positive fuel mass exists."
+            )
+        m_fuel = ((B + m_after_cruise**2) * math.tan(theta)) / denominator
         return m_fuel.to("kg")
 
     @staticmethod
@@ -531,17 +542,35 @@ class range_equation:
         )
         ```
         """
+        if R < 0 * ureg.meter:
+            raise ValueError("Range must be greater than zero.")
+        if LD <= 1:
+            raise ValueError("Lift-to-Drag ratio must be greater than 1.")
+        if m_after_cruise < 0 * ureg.kg:
+            raise ValueError("Mass after cruise must be greater than zero.")
+        if V <= 0 * ureg.kph:
+            raise ValueError("Cruise speed must be greater than zero.")
+        if V_headwind >= V:
+            raise ValueError("Headwind must be less than the cruise speed.")
+        if TSFC.magnitude <= 0:
+            raise ValueError(
+                "Thrust Specific Fuel Consumption must be greater than zero."
+            )
+        if not 0 <= lost_fuel_fraction <= 1:
+            raise ValueError("Lost fuel fraction must be between 0 and 1.")
+        if not 0 <= recovered_fuel_fraction <= 1:
+            raise ValueError("Recovered fuel fraction must be between 0 and 1.")
         if R == 0 * ureg.meter:
             return 0 * ureg.kg
-        else:
-            H = (LD * V) / (TSFC * ureg.gravity)
-            m_fuel = m_after_cruise * (
-                (1 / math.exp((-R / H) * (1 - (V_headwind / V))))
-                - lost_fuel_fraction
-                + recovered_fuel_fraction
-                - 1
-            )
-            return m_fuel.to("kg")
+
+        H = (LD * V) / (TSFC * ureg.gravity)
+        m_fuel = m_after_cruise * (
+            (1 / math.exp((-R / H) * (1 - (V_headwind / V))))
+            - lost_fuel_fraction
+            + recovered_fuel_fraction
+            - 1
+        )
+        return m_fuel.to("kg")
 
     @staticmethod
     @ureg.check(

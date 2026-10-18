@@ -49,6 +49,7 @@ Old names remain available as deprecated aliases: they point to the new class an
 - `reducedorder.myclimate` had the coefficients of the A320 and the B737 swapped. They now match the parameter tables of the myclimate Calculation Principles page.
 - `utility.allocation.footprint_allocation_by_area()` returns zero in the units of `fuel_per_flight` for cabin classes without seats. Earlier releases returned a bare `0` next to pint quantities.
 - `rangeequation.range_equation.calculate_stepclimb_integration()` now checks that a `TSFC` or `LD` function accepts the parameters it is called with (`M` and `h`, or `L`, `M` and `h`). The check never ran in earlier releases.
+- `rangeequation.range_equation.calculate_stepclimb_arctan()` rejected wing areas up to 1 m² with a message about the lift-to-drag ratio. It now checks the wing area, `K` and `C_D0` for positive values, and raises a `ValueError` where the range exceeds the maximum range of the solution. `calculate_improved()` validates its inputs like `calculate()` does.
 
 ## `3.4.0` (14. July 2026)
 
