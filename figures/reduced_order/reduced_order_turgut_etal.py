@@ -18,12 +18,14 @@ from pathlib import Path
 
 # SETUP #########################################
 
-plt.rcParams.update({
-    "text.usetex": False,
-    "font.family": "sans-serif",
-    "font.sans-serif": "Arial",
-    "font.size": 12,
-})
+plt.rcParams.update(
+    {
+        "text.usetex": False,
+        "font.family": "sans-serif",
+        "font.sans-serif": "Arial",
+        "font.size": 12,
+    }
+)
 
 # DATA ##########################################
 
@@ -156,7 +158,9 @@ ax2.set_title("Flight Profile", fontsize=12, fontweight="bold")
 
 legend2 = ax2.legend(
     handles=[
-        Patch(facecolor="#009E73", edgecolor="#009E73", alpha=0.22, label="Cruise (FDR)"),
+        Patch(
+            facecolor="#009E73", edgecolor="#009E73", alpha=0.22, label="Cruise (FDR)"
+        ),
     ],
     loc="lower left",
     framealpha=0.95,
