@@ -1,5 +1,6 @@
 import pytest
 
+from jetfuelburn import ureg
 from .fixtures.allocation import (
     allocation_one_class,
     allocation_two_classes,
@@ -137,3 +138,25 @@ class TestFootprintAllocationByArea:
             * input_data["seats_first"]
             * input_data["load_factor_first"]
         ) == pytest.approx(expected=input_data["fuel_per_flight"], rel=0.01)
+
+    def test_absent_classes_keep_the_units(self):
+        """Classes without seats return zero in the units of fuel_per_flight."""
+        result = footprint_allocation_by_area(
+            fuel_per_flight=14000 * ureg.kg,
+            size_factor_eco=1,
+            size_factor_premiumeco=0,
+            size_factor_business=1.5,
+            size_factor_first=0,
+            seats_eco=154,
+            seats_premiumeco=0,
+            seats_business=24,
+            seats_first=0,
+            load_factor_eco=0.9,
+            load_factor_premiumeco=0,
+            load_factor_business=0.5,
+            load_factor_first=0,
+        )
+        assert result["fuel_premiumeco"] == 0 * ureg.kg
+        assert result["fuel_first"] == 0 * ureg.kg
+        assert result["fuel_premiumeco"].units == result["fuel_eco"].units
+        assert result["fuel_first"].units == result["fuel_eco"].units
