@@ -1,4 +1,4 @@
-# Working with Physical Units
+# Physical Units
 
 The `jetfuelburn` package utilises the [`pint` package](https://pint.readthedocs.io/en/stable/) to support physical units in calculations. The `pint` package allows for the definition of physical units and the conversion between them.
 

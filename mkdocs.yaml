@@ -9,16 +9,16 @@ nav:
   - About: 'about.md'
   - Getting Started:
     - Installation: 'installation.md'
-    - Working with Physical Units: 'interactive/units.md'
+    - Physical Units: 'interactive/units.md'
     - Fuel Burn Calculations: 'interactive/fuel.md'
-    - Cabin Class Fuel Allocation: 'interactive/allocation.md'
+    - Cabin Class Allocation: 'interactive/allocation.md'
     - Aircraft Type Matrix: 'comparison/comparison.md'
   - API Reference:
     - PL/R-Diagrams: 'api/diagrams.md'
     - Range Equation: 'api/rangeequation.md'
     - Statistics Models: 'api/statistics.md'
     - Reduced Order Models: 'api/reducedorder.md'
-    - Cabin Class Fuel Allocation: 'api/allocation.md'
+    - Cabin Class Allocation: 'api/allocation.md'
   - API Reference (Utility):
     - Aerodynamics: 'api/aerodynamics.md'
     - Engines: 'api/engines.md'
