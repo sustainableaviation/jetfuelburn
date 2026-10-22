@@ -1,0 +1,4 @@
+/en/latest/ / 301
+/en/stable/ / 301
+/en/latest/* /:splat 301
+/en/stable/* /:splat 301

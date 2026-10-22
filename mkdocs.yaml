@@ -1,7 +1,7 @@
 # https://www.mkdocs.org/user-guide/configuration/
 # Built with Zensical (https://zensical.org), which reads this mkdocs.yaml natively.
 site_name: JetFuelBurn Documentation
-site_url: https://jetfuelburn.readthedocs.io/
+site_url: https://jetfuelburn.org/
 repo_url: https://github.com/sustainableaviation/jetfuelburn
 copyright: © JetFuelBurn Contributors | Code under MIT License
 nav:
@@ -109,7 +109,3 @@ watch:
 
 extra:
   generator: false
-  version:
-    provider: mike
-    default: latest
-    alias: true

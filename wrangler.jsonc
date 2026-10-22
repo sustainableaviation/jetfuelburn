@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "jetfuelburn-org",
+  "compatibility_date": "2026-10-22",
+  "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "jetfuelburn.org/*",
+      "zone_id": "d3f13329ddcf8c8b4d323a41564b22f3"
+    }
+  ],
+  "assets": {
+    "directory": "./site",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}
