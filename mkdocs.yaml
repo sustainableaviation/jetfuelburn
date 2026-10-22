@@ -91,7 +91,6 @@ markdown_extensions:
 
 extra_javascript:
   - _javascripts/katex.js
-  - _javascripts/family.js
   # https://cdnjs.com/libraries/KaTeX
   # unpkg is incredibly slow (17s to load the css file)
   - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.19.0/katex.min.js
